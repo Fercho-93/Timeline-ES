@@ -3582,6 +3582,71 @@
       }
     },
     {
+      "path": "assets/cofre-reference-v3-clean.webp",
+      "sha256": "cd7f5015ac4863941e3c880ba0b8a10c7bf7b71d6e4ad12b97a68b34f0785d72",
+      "rightsEvidence": {
+        "status": "project-generated-ai",
+        "generator": "OpenAI image generation",
+        "evidenceRef": "tools/cofre-v3/README.md",
+        "generatedAt": "2026-10-15",
+        "referenceImage": "assets/cofre-reference-v3-closed.webp",
+        "exactPrompt": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/cofre-reference-v3-closed.webp",
+      "sha256": "0e17a7342ac63e2b545ef5f0f20db7f81ee1d1711a34cd530d867bcfae14d94f",
+      "rightsEvidence": {
+        "status": "user-provided-reference",
+        "generator": "Ilustración aportada por el titular",
+        "evidenceRef": "tools/cofre-v3/README.md",
+        "generatedAt": null,
+        "referenceImage": null,
+        "exactPrompt": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/cofre-reference-v3-fan.webp",
+      "sha256": "9dad2bfe669f326c5ca0487a606a0b62e40565bb7c682b8efb3a72fff8900d13",
+      "rightsEvidence": {
+        "status": "user-provided-reference",
+        "generator": "Ilustración aportada por el titular",
+        "evidenceRef": "tools/cofre-v3/README.md",
+        "generatedAt": null,
+        "referenceImage": null,
+        "exactPrompt": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/cofre-reference-v3-open.webp",
+      "sha256": "83b05ee1cea5438a4516202dcb33c5323226daba815109b3a8c10c9646bc9e4f",
+      "rightsEvidence": {
+        "status": "user-provided-reference",
+        "generator": "Ilustración aportada por el titular",
+        "evidenceRef": "tools/cofre-v3/README.md",
+        "generatedAt": null,
+        "referenceImage": null,
+        "exactPrompt": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/cofre-reference-v3-rise.webp",
+      "sha256": "8ef48ab790f7d0bb43ccb336d9c285c2b6dff9d74b0ddac5d482a4646ae29137",
+      "rightsEvidence": {
+        "status": "user-provided-reference",
+        "generator": "Ilustración aportada por el titular",
+        "evidenceRef": "tools/cofre-v3/README.md",
+        "generatedAt": null,
+        "referenceImage": null,
+        "exactPrompt": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
       "path": "assets/cofre-voyage-v1.webp",
       "sha256": "ba4147305bf840e5d44b024e073ae4d3ba12eec3f6abf474dab2c475683aeed2",
       "rightsEvidence": {

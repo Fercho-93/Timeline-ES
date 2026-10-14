@@ -1,0 +1,5 @@
+<!doctype html><meta charset="utf-8"><style>html,body{margin:0;background:#1a1511}canvas{display:block}</style><canvas id="scene" width="706" height="1536"></canvas><script type="module">
+import {createAnimation} from './animation.mjs';
+const animation=await createAnimation(document.getElementById('scene'));
+window.drawChest=t=>animation.draw(t);window.drawChest(0);window.chestReady=true;
+</script>

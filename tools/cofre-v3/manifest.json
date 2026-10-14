@@ -1,0 +1,29 @@
+{
+  "width": 706,
+  "height": 1536,
+  "fps": 30,
+  "frames": 180,
+  "durationSeconds": 6,
+  "video": {
+    "path": "assets/cofre-opening-v3.mp4",
+    "sha256": "2e2e9edbb763d8b2b95c6f62532c59290777a8c1834ce796bec0296ac6e59e32"
+  },
+  "sourceFiles": [
+    {
+      "filename": "2DDAA7B0-5DAE-42A1-ADB5-374BEA871E6A.jpeg",
+      "sha256": "a3076c9caa2f47c9942ab4992d433fe9a9c5dec365114977baef63f4fd6a0971"
+    },
+    {
+      "filename": "BED95C47-0BFB-464C-B1D1-5FC7F994E9A1.jpeg",
+      "sha256": "21dc09eeec13ff0286cb257a0c0465bb9075710af2ba1bab79b7d6c2aed2eb5a"
+    },
+    {
+      "filename": "D2B1453F-DCDD-4211-A31D-BE851268222F.jpeg",
+      "sha256": "c602b632435a07d2a63fb1401582d737cc8aab8a2ab26d5e9228e2ce178babc2"
+    },
+    {
+      "filename": "F32ABFF0-46A6-401C-A2AB-BDD5CEAE5125.jpeg",
+      "sha256": "dd6153efe8e7e64dfd4b9a1d3dbb0335bf9f848d8a3ffd5a975390a8652ab02d"
+    }
+  ]
+}
