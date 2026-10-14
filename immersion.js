@@ -18,6 +18,13 @@
     more: '<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>'
   };
   const icon = name => `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]}</svg>`;
+  const menuIcons = {
+    home: '<path d="m3 11 9-8 9 8M5 10v11h5v-7h4v7h5V10"/><path d="M7 11v8m10-8v8M10 7l2-2 2 2" stroke-width=".6"/>',
+    atlas: '<path d="m12 1 2.4 7.6L20 4l-4.6 5.6L23 12l-7.6 2.4L20 20l-5.6-4.6L12 23l-2.4-7.6L4 20l4.6-5.6L1 12l7.6-2.4L4 4l5.6 4.6Z"/><path d="m12 1 0 11L23 12M12 23V12H1m3-8 8 8 8 8M20 4l-8 8-8 8" stroke-width=".65"/><path d="m12 4 1.4 6.6L20 12l-6.6 1.4L12 20l-1.4-6.6L4 12l6.6-1.4Z" stroke-width=".65"/>',
+    book: '<path d="M12 5v16M3 4c4-1 6 0 9 2 3-2 5-3 9-2v15c-4-1-6 0-9 2-3-2-5-3-9-2ZM3 6H1v15c4-1 7-1 11 2 4-3 7-3 11-2V6h-2"/><path d="m5 7 5 1m-5 2 5 1m-5 2 5 1m-5 2 5 1m4-8 5-1m-5 4 5-1m-5 4 5-1m-5 4 5-1" stroke-width=".7"/>',
+    settings: '<path d="m9 2-.5 3-2 1-2.6-1.2-2 3.4L4 10v3l-2.1 1.8 2 3.4L6.5 17l2 1L9 22h6l.5-4 2-1 2.6 1.2 2-3.4L20 13v-3l2.1-1.8-2-3.4L17.5 6l-2-1L15 2Z"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="3.5"/><path d="M10 10h4v4h-4Z" stroke-width=".7"/>'
+  };
+  const menuIcon = name => `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${menuIcons[name]}</svg>`;
   // `help`, si lo hay, son los atributos de un botón de guía propio de la pantalla.
   function header(back = '', menu = '', inGame = false, title = '', help = '') {
     // La tercera columna es una fila propia, no una sola celda: así aloja el interruptor
@@ -32,7 +39,7 @@
   function nav(screen) {
     return `<nav class="home-nav atlas-nav" aria-label="Menú principal">${[
       ['home-top', 'home', 'Inicio', ['home']], ['perfil', 'atlas', 'Atlas', ['perfil']], ['rules', 'book', 'Guía', ['guide']], ['settings', 'settings', 'Ajustes', ['settings']]
-    ].map(([action, symbol, label, current]) => `<button type="button" aria-label="${label}" ${action === 'settings' ? 'data-settings-action="open"' : `data-action="${action}"`}${current.includes(screen) ? ' aria-current="page"' : ''}><span>${icon(symbol)}</span><small>${label}</small></button>`).join('')}</nav>`;
+    ].map(([action, symbol, label, current]) => `<button type="button" aria-label="${label}" ${action === 'settings' ? 'data-settings-action="open"' : `data-action="${action}"`}${current.includes(screen) ? ' aria-current="page"' : ''}><span>${menuIcon(symbol)}</span><small>${label}</small></button>`).join('')}</nav>`;
   }
   // `discard` es opcional: cuando lo hay, añade un tercer botón para salir sin guardar
   // nada, sin pasar por el guardado que hace `proceed`. Vive en el mismo diálogo que

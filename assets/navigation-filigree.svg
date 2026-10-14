@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 72" preserveAspectRatio="none" fill="none" stroke="#a17a3c" stroke-width=".55" opacity=".36">
+  <defs>
+    <g id="sprig">
+      <path d="M29 4C9 9 6 23 10 36S9 61 29 68M16 12C22 13 24 9 25 7M12 19C17 20 21 17 21 14M10 27C16 28 18 24 18 22M11 37C16 38 18 34 18 31M11 45C17 47 18 42 18 40M13 54C19 55 23 52 22 49M18 62C23 63 26 61 26 58"/>
+      <path d="M16 12C12 8 12 6 14 5C18 7 18 10 16 12ZM12 19C7 16 7 12 9 11C13 13 14 16 12 19ZM10 27C6 25 4 21 6 19C10 20 12 23 10 27ZM11 37C5 36 4 33 6 30C10 31 12 34 11 37ZM11 45C5 44 4 41 6 39C10 40 12 42 11 45ZM13 54C7 54 6 50 8 48C12 49 15 51 13 54ZM18 62C12 63 10 60 11 57C15 57 18 59 18 62Z"/>
+      <path d="M26 13l2 3-2 3-2-3ZM22 29l2 3-2 3-2-3ZM25 50l2 3-2 3-2-3ZM30 5l1-3 1 3 3 1-3 1-1 3-1-3-3-1ZM30 65l1-3 1 3 3 1-3 1-1 3-1-3-3-1Z"/>
+      <path d="M8 9C3 17 2 27 5 36S3 55 8 63" stroke-dasharray="1 2"/>
+    </g>
+  </defs>
+  <use href="#sprig"/>
+  <use href="#sprig" transform="translate(500 0) scale(-1 1)"/>
+</svg>
