@@ -5639,17 +5639,17 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
   padding: 16px 18px; text-align: left;
 }
 #app .solo-shortcut-resume .solo-shortcut-copy {
-  position: relative; z-index: 1; display: block; width: 74%; min-width: 0;
+  position: relative; z-index: 1; display: block; width: 65%; min-width: 0;
 }
 #app .solo-shortcut-resume .solo-resume-art {
-  position: absolute; z-index: 0; inset: 0 0 0 auto; width: 48%;
+  position: absolute; z-index: 0; inset: 0 0 0 auto; width: 52%;
   display: block; pointer-events: none; opacity: .92;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 48%);
-  mask-image: linear-gradient(90deg, transparent, #000 48%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #0003 28%, #000 68%);
+  mask-image: linear-gradient(90deg, transparent 0%, #0003 28%, #000 68%);
 }
 #app .solo-shortcut-resume .solo-resume-illustration {
   display: block; width: 100%; height: 100%; object-fit: cover; object-position: 60% center;
-  filter: drop-shadow(0 4px 3px #63432318);
+  mix-blend-mode: multiply;
 }
 #app .solo-shortcut-resume .solo-shortcut-arrow {
   position: absolute; z-index: 2; right: 12px; bottom: 10px;
@@ -5660,6 +5660,60 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
 }
 @media (max-width: 360px) {
   #app .solo-shortcut-resume { padding: 15px 16px; }
-  #app .solo-shortcut-resume .solo-shortcut-copy { width: 76%; }
+  #app .solo-shortcut-resume .solo-shortcut-copy { width: 68%; }
   #app .solo-shortcut-resume .solo-shortcut-copy b { font-size: 1.05rem; }
+}
+
+/* Mazos del desplegable: pequeñas láminas subordinadas a su colección. */
+#app .mode-inline-drawer .collection-decks {
+  margin: 10px 0 8px 16px; padding: 8px 0 6px 12px;
+  border: 0; border-left: 1px solid var(--edition-line); border-radius: 0;
+  background: transparent; box-shadow: none;
+}
+#app .mode-inline-drawer .collection-decks > h2 { display: none; }
+#app .mode-inline-drawer .collection-decks > .lead {
+  margin: 0 0 10px; text-align: left; color: var(--edition-muted);
+  font: 600 .65rem/1.4 var(--ui-font); letter-spacing: .08em; text-transform: uppercase;
+}
+#app .mode-inline-drawer .collection-decks .games { gap: 10px; }
+#app .mode-inline-drawer .collection-decks .games .game-row {
+  isolation: isolate; display: block; min-height: 106px; margin: 0;
+  padding: 14px 32% 16px 16px; overflow: hidden;
+  border: 1px solid var(--edition-line); border-left: 3px solid var(--edition-brass);
+  border-radius: 6px 16px 16px 6px;
+  background: linear-gradient(110deg, var(--edition-surface), var(--edition-paper));
+  box-shadow: inset 0 0 0 4px #fff7e71a, 0 3px 9px #63432318;
+}
+#app .mode-inline-drawer .collection-decks .game-row::before { content: none; }
+#app .mode-inline-drawer .collection-decks .game-row::after {
+  inset: auto 10px 5px 10px; height: 1px; opacity: .5;
+  background: linear-gradient(90deg, var(--edition-brass), transparent);
+}
+#app .mode-inline-drawer .collection-decks .game-row .deck-preview {
+  position: absolute; z-index: -1; inset: 0 0 0 auto; width: 36%; height: 100%;
+  max-height: none; margin: 0; border: 0; border-radius: 0; float: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 55%);
+  mask-image: linear-gradient(90deg, transparent, #000 55%);
+}
+#app .mode-inline-drawer .collection-decks .deck-preview > :is(img, svg) {
+  width: 100%; height: 100%; object-fit: cover; object-position: center;
+}
+#app .mode-inline-drawer .collection-decks .game-row .deck-chapter {
+  margin-bottom: 7px; color: var(--edition-brass); font-size: .55rem;
+}
+#app .mode-inline-drawer .collection-decks .game-row .deck-chapter i { display: none; }
+#app .mode-inline-drawer .collection-decks .game-row .game-name {
+  padding: 0; border: 0; font-size: 1.13rem; line-height: 1.2; overflow-wrap: break-word;
+}
+#app .mode-inline-drawer .collection-decks .game-row .game-meta { font: .74rem/1.45 var(--ui-font); }
+#app .mode-inline-drawer .collection-decks .game-row.active { border-color: var(--edition-brass); }
+#app .solo-shortcut-resume .solo-shortcut-copy { overflow-wrap: break-word; }
+#app .solo-shortcut-resume .solo-resume-art::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, var(--edition-paper), transparent 70%);
+}
+:root[data-theme="dark"] #app .solo-resume-illustration { mix-blend-mode: normal; opacity: .75; }
+@media (max-width: 360px) {
+  #app .mode-inline-drawer .collection-decks { margin-left: 10px; padding-left: 10px; }
+  #app .mode-inline-drawer .collection-decks .games .game-row { padding-left: 12px; }
 }
