@@ -209,3 +209,29 @@ html #app button.mode-play-card:hover, html #app button.mode-play-card:active { 
 :root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-door-art img { filter: sepia(.04) saturate(.82) brightness(.92); }
 #app .home-shell .gallery-panel:not(.active) .panel-art { filter: sepia(.05) saturate(.85) brightness(.96); }
 #app .enc-deck-cover img { filter: sepia(.05) saturate(.85); }
+
+/* Colecciones en el hub: sangría y marco de lámina, visibles aun cerradas. */
+#app .mode-inline-drawer .gallery {
+  margin-inline-start: 14px; padding-inline-start: 10px;
+  border-inline-start: 1px solid var(--edition-line); gap: 14px;
+}
+#app .mode-inline-drawer .gallery-panel,
+#app .mode-inline-drawer .gallery-panel.active {
+  border: 1px solid var(--edition-brass); border-radius: 12px 20px 20px 12px;
+  box-shadow: 0 5px 12px #39261228, inset 0 0 0 3px #f3dcac30;
+}
+#app .mode-inline-drawer .gallery-panel::before {
+  inset: 7px; border: 1px solid #f3dcac80; border-radius: 7px 14px 14px 7px;
+}
+#app .mode-inline-drawer .gallery-panel .collection-foil {
+  inset: 10px; border: 1px solid #f3dcac25; border-radius: 5px 11px 11px 5px;
+}
+#app .mode-inline-drawer .gallery-panel .collection-open {
+  border-radius: 50%; transform: translateY(-50%);
+  background: #241b1545; border: 1px solid #f3dcac99;
+  box-shadow: inset 0 0 0 3px #f3dcac15;
+}
+@media (max-width: 360px) {
+  #app .mode-inline-drawer .gallery { margin-inline-start: 8px; padding-inline-start: 8px; }
+}
+#app .mode-inline-drawer .gallery-panel .collection-open::after { transform: none; }
