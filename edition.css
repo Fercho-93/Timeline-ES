@@ -3661,6 +3661,10 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app[data-screen="perfil"] .atlas-chart-heading small { font-size: .84rem; }
 }
 
+/* Mientras immersion.js mide la mesa (en el mismo fotograma, sin pintarse), las cartas que
+   entran volando en la mano cuentan en su sitio: una regla !important manda sobre la animación. */
+#app.mesa-midiendo .hand .hand-card { translate: none !important; rotate: none !important; }
+
 /* La mesa se adapta al alto útil al 100 %, sin ocultar cartas ni recortar sus datos. */
 @media (max-width: 699px) {
   #app.atlas-board > .shell > .board-timeline-section .timeline-wrap {

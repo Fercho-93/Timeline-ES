@@ -29,8 +29,10 @@ try {
     if(process.env.BROWSER_ENGINE && process.env.BROWSER_ENGINE!==engine)continue;
     browser=await type.launch(engine === 'chromium' && process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {});
     for(const {width,height} of [{width:320,height:568},{width:375,height:667},{width:390,height:640},{width:390,height:844},{width:430,height:932},{width:600,height:800}]) {
-      for(const format of ['solo','local','competition','quick']) {
-        const page=await browser.newPage({viewport:{width,height},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
+      // local-anim: la partida local con movimiento. Al pasar el móvil, las cartas de la mano entran
+      // volando desde abajo y la mesa no puede medirse con ellas a medio camino.
+      for(const format of ['solo','local','local-anim','competition','quick']) {
+        const page=await browser.newPage({viewport:{width,height},isMobile:true,deviceScaleFactor:2,reducedMotion:format==='local-anim'?'no-preference':'reduce'});
         page.setDefaultTimeout(12000);
         const errors=[];
         page.on('pageerror',e=>errors.push(e.message));
@@ -71,6 +73,7 @@ try {
               }
               await page.locator('[data-action="starter-start"]').click();
               await page.locator('[data-action="ready"]').click();
+              if(format==='local-anim')await page.waitForTimeout(1600);
             }
           }
           // Medir cuando la mesa ya está quieta: imágenes cargadas y dos fotogramas seguidos iguales.
@@ -108,7 +111,7 @@ try {
           records.push({engine,width,height,format,...data,errors});
           // Cada condición con su nombre: si falla, el registro dice cuál.
           const checks=[
-            ['pantalla',data.screen!==(format==='quick'?'quick-game':format==='local'?'game':'solo')],
+            ['pantalla',data.screen!==(format==='quick'?'quick-game':format.startsWith('local')?'game':'solo')],
             [`alto ${data.documentHeight}/${data.viewport}`,data.documentHeight>data.viewport+2],
             ['desborda en horizontal',data.horizontalOverflow],
             [`zoom ${data.zoom}`,data.zoom!=='100%'],
@@ -120,8 +123,9 @@ try {
             ['carta colocada achatada',data.placed&&data.placed.height<data.placed.width*1.2],
             [`hueco bajo la barra ${data.headingGap}`,data.headingGap>45],
             ['carta colocada estrecha',width===390&&format==='solo'&&data.placed?.width<120],
+            ['mesa encogida tras pasar el móvil',format==='local-anim'&&data.fit!=='normal'],
             ['el título pisa la carta',width===390&&format==='solo'&&data.focusTitle?.right>data.handCard?.left+2],
-            ['marcador de jugadores',format==='local'&&(data.players.length!==2||data.rosterOverflowsY||data.players.some(p=>p.left<data.roster.left-2||p.right>data.roster.right+2||p.top<data.roster.top-2||p.bottom>data.roster.bottom+2))],
+            ['marcador de jugadores',format.startsWith('local')&&(data.players.length!==2||data.rosterOverflowsY||data.players.some(p=>p.left<data.roster.left-2||p.right>data.roster.right+2||p.top<data.roster.top-2||p.bottom>data.roster.bottom+2))],
             ['carta colocada fuera de pantalla',data.placed&&data.placed.bottom>data.viewport+2]
           ].filter(([,bad])=>bad).map(([name])=>name);
           if(checks.length) errors.push('La mesa no cumple las medidas o el orden de juego: '+checks.join(', '));

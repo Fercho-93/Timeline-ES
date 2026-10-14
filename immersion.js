@@ -461,6 +461,10 @@
       if (!container.classList.contains('atlas-board')) return;
       const shell = container.querySelector(':scope > .shell');
       if (!shell) return;
+      // Las cartas que entran en la mano al pasar el móvil vuelan desde abajo de la pantalla:
+      // mientras vuelan agrandan el alto de la mesa, y medirla así la daba por llena y
+      // encogía la carta de la línea toda la jugada. Se mide con cada carta en su sitio.
+      container.classList.add('mesa-midiendo');
       // En puntos de la mesa: dentro de la partida, los del iPhone de referencia (mesa-escala.js).
       const available = CT.Mesa.alto();
       const top = mesaCaja(shell).top + CT.Mesa.desplazado();
@@ -587,6 +591,7 @@
         }
       }
       if (handSection && !previewing && handSection.querySelector('.hand-card')) heldHand = { screen: container.dataset.screen, height: Math.round(mesaCaja(handSection).height) };
+      container.classList.remove('mesa-midiendo');
     });
   }
   // Papel libre bajo la carta de la línea, dentro de su recuadro y de la pantalla.
