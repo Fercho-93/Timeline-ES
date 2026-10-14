@@ -3,7 +3,7 @@
 (function () {
   "use strict";
   const CT = window.CONTINUUM;
-  CT.APP_VERSION = "continuum-v729";
+  CT.APP_VERSION = "continuum-v730";
   CT.Updates = { start };
   function start() {
     if (!("serviceWorker" in navigator) || window.Capacitor?.isNativePlatform?.()) return;
