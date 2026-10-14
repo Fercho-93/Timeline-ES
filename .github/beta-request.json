@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 696,
+  "cache": 727,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Barra inferior estable al desplazar (sin rebote elástico y centrada sin medio píxel), volver suena siempre igual, la escala del menú sube de grave a agudo y acceso al último mazo con carátula"
+  "reason": "Guía en vídeo interactiva (de qué va, cómo colocar cartas y modalidades), «Ver el manual» en la portada que reproduce el vídeo y vuelve, y portada encajada sobre el globo sin solapes"
 }
