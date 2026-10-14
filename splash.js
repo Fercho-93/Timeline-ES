@@ -59,6 +59,59 @@
     el?.querySelector('.splash-coin')?.addEventListener('animationend', settle, { once: true });
     setTimeout(settle, 3600);
   };
+  // Encaje de la portada. El globo es parte de la imagen de fondo (escalada con `cover`), así
+  // que su altura en pantalla cambia con cada móvil y con las barras del navegador. Se calcula
+  // dónde cae su borde y el bloque «Jugar» + «Ver el manual» se apoya justo encima; si así
+  // tocaría el lema, la marca sube (sin pasar bajo el botón de sonido) y, si aun así no cabe,
+  // se encoge lo justo. Sin esto, en pantallas bajas el botón tapaba el lema o el enlace
+  // quedaba sobre el globo, donde no se lee.
+  const FONDO = { ancho: 941, alto: 1672, globo: 0.785 };
+  const encaja = () => {
+    const el = splash(), actions = document.getElementById('splash-actions');
+    const masthead = el?.querySelector('.splash-masthead');
+    if (!el || !actions || !masthead) return;
+    masthead.style.marginTop = ''; masthead.style.scale = ''; masthead.style.transformOrigin = ''; actions.style.bottom = '';
+    const vw = el.clientWidth, vh = el.clientHeight;
+    if (!vw || !vh) return;
+    const escala = Math.max(vw / FONDO.ancho, vh / FONDO.alto), altoImagen = FONDO.alto * escala;
+    const posY = parseFloat(getComputedStyle(el).backgroundPositionY) / 100;
+    const globo = (vh - altoImagen) * (Number.isFinite(posY) ? posY : .5) + FONDO.globo * altoImagen;
+    const abajo = parseFloat(getComputedStyle(actions).bottom) || 0;
+    // Encima del globo con un respiro, pero nunca pegado al borde inferior.
+    const nuevoAbajo = Math.max(Math.min(vh - globo + 10, vh * .45), 18);
+    if (globo < vh) actions.style.bottom = `${Math.round(nuevoAbajo)}px`;
+    else if (abajo > vh * .3) actions.style.bottom = `${Math.round(vh * .22)}px`;
+    const techo = (document.getElementById('splash-ambience')?.getBoundingClientRect().bottom || 0) + 8;
+    // Dónde queda el bloque al terminar su entrada (mientras entra va 12 px más abajo): se
+    // calcula con su `bottom` y su alto, no con lo que mide en este instante.
+    const tope = () => vh - (parseFloat(getComputedStyle(actions).bottom) || 0) - actions.offsetHeight - 22;
+    // Lo que se ve de la marca: emblema, nombre, lema y adorno. Los puntos de carga de debajo
+    // no se ven mientras espera «Jugar», así que pueden quedar tras el botón.
+    const visible = () => {
+      const cajas = [...masthead.querySelectorAll('.splash-crest, .home-wordmark, .home-tagline, .home-ornament')]
+        .map(nodo => nodo.getBoundingClientRect()).filter(caja => caja.height);
+      return { top: Math.min(...cajas.map(caja => caja.top)), bottom: Math.max(...cajas.map(caja => caja.bottom)) };
+    };
+    let marca = visible();
+    const sobra = marca.bottom - tope();
+    if (sobra > 0) {
+      const sube = Math.min(sobra, Math.max(0, marca.top - techo));
+      masthead.style.marginTop = `${-Math.round(sube)}px`;
+      marca = visible();
+      if (marca.bottom > tope()) {
+        // Se encoge desde el borde superior de la caja tal como se ve (la marca va subida
+        // medio alto con `translateY(-50%)`, de ahí el origen en -50 %): solo sube lo de abajo.
+        const caja = masthead.getBoundingClientRect();
+        const factor = Math.max(.6, Math.min(1, (tope() - caja.top) / (marca.bottom - caja.top)));
+        masthead.style.transformOrigin = '50% -50%';
+        masthead.style.scale = factor.toFixed(3);
+      }
+    }
+  };
+  if (typeof window !== 'undefined') window.addEventListener('resize', () => { if (startedAt !== null) encaja(); });
+  // Con la tipografía definitiva el nombre y el lema cambian de tamaño: se vuelve a encajar.
+  document.fonts?.ready?.then(() => { if (startedAt !== null) encaja(); });
+
   // El juego no entra solo: entra cuando alguien pulsa «Jugar». Ese toque es además lo
   // único que permite encender el audio —ningún navegador deja sonar nada antes—, así
   // que es lo que hace que la música ya esté puesta cuando aparece el menú.
@@ -115,6 +168,7 @@
       sound.style.animationDelay = `${Math.max(0, 5200 - elapsed)}ms`;
       el.append(sound, actions);
     }
+    encaja();
     let entered = false;
     const enter = () => {
       if (entered) return;

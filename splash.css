@@ -347,7 +347,7 @@ html.splash-active #app-splash .splash-masthead {
   width: min(78vw, 440px);
   display: grid;
   z-index: 2;
-  gap: 12px;
+  gap: 4px;
   transform: translateX(-50%);
   /* Llega cuando la intro ya ha dibujado la marca; tocar antes también entra. */
   animation: splash-play-in 700ms 5s cubic-bezier(.2,.7,.2,1) both;
@@ -390,14 +390,10 @@ html.splash-active #app-splash .splash-masthead {
   box-shadow: inset 0 0 0 3px #c69458, inset 0 0 0 5px #5f2418, 0 7px 16px #4426174f;
 }
 #app-splash .splash-play:focus-visible { outline: 3px solid #f8e2af; outline-offset: 4px; }
-/* «Ver el manual»: apenas una línea de tinta bajo el botón, sin caja ni color propio. Cuelga
-   por debajo de «Jugar» sin ocupar sitio en el bloque: si ocupara, el bloque (anclado por
-   abajo) crecería hacia arriba y el botón taparía el lema en pantallas bajas. */
+/* «Ver el manual»: apenas una línea de tinta bajo el botón, sin caja ni color propio. Dónde
+   cae el bloque (y si la marca tiene que subir o encogerse) lo decide `encaja` en splash.js. */
 #app-splash .splash-guide {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
+  justify-self: center;
   white-space: nowrap;
   min-height: 44px;
   padding: 6px 14px;
@@ -469,7 +465,9 @@ html.splash-active #app-splash .splash-masthead {
   animation: splash-play-in 400ms ease-out both;
 }
 /* Los hitos solo aparecen al montar la aplicación, como indicador discreto. */
-#app-splash .splash-hitos { height: 7px; margin-top: 16px; opacity: 0; transition: opacity 180ms ease; }
+/* `grid-column: 1`: en escritorio una regla general de edition.css la manda a una segunda
+   columna, que partía la marca en dos y dejaba el lema apretado a la izquierda. */
+#app-splash .splash-hitos { grid-column: 1; height: 7px; margin: 16px auto 0; opacity: 0; transition: opacity 180ms ease; }
 #app-splash.splash-entering .splash-hitos { opacity: .8; }
 @media (prefers-reduced-motion: no-preference) {
   #app-splash.splash-entering .splash-hitos i { animation: splash-hito-latido 1.4s ease-in-out infinite; }
@@ -498,9 +496,8 @@ html.splash-active #app-splash .splash-masthead {
   #app-splash .splash-actions { bottom: max(22svh, calc(28px + env(safe-area-inset-bottom))); }
   #app-splash .splash-play { min-height: 60px; }
 }
-/* Muy bajos (iPhone SE con las barras de Safari): el botón baja para no tocar el lema. */
+/* Muy bajos (iPhone SE con las barras de Safari): el botón se compacta. */
 @media (max-height: 600px) {
-  #app-splash .splash-actions { bottom: max(13svh, calc(62px + env(safe-area-inset-bottom))); }
   #app-splash .splash-play { min-height: 54px; padding-block: 14px; }
 }
 @media (min-aspect-ratio: 4/3) and (max-height: 760px) {
@@ -508,8 +505,7 @@ html.splash-active #app-splash .splash-masthead {
   html.splash-active #app-splash .splash-masthead { top: 45%; width: min(50vw, 480px); }
   #app-splash .splash-crest { width: min(36vw, 320px); }
   #app-splash .home-wordmark { font-size: clamp(2.2rem, 5vw, 3.5rem); }
-  /* Deja sitio debajo para «Ver el manual», que cuelga del botón. */
-  #app-splash .splash-actions { width: min(36vw, 390px); bottom: max(9svh, 64px); }
+  #app-splash .splash-actions { width: min(36vw, 390px); bottom: max(4svh, 22px); }
 }
 @media (prefers-reduced-motion: reduce) {
   html.splash-active #app-splash,
