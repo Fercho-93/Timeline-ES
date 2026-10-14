@@ -6,7 +6,7 @@
 #app .mode-entry-grid::before { content: "ELIGE TU CAMINO"; grid-column: 1 / -1; }
 #app .mode-daily-family { margin: -2px 4px 2px; color: #665442; font: .8rem/1.4 var(--ui-font); }
 #app .mode-play-zone { min-width: 0; }
-#app .mode-play-card { width: 100%; transform: translateZ(0); backface-visibility: hidden; }
+#app .mode-play-card { width: 100%; backface-visibility: visible; }
 #app .mode-choices-reveal { contain: layout paint; }
 #app .mode-play-card .mode-play-chevron { display: inline-block; margin-left: 8px; font: 700 1.35rem/0.7 var(--font-display); vertical-align: middle; transition: transform .32s ease; }
 #app .mode-play-card[aria-expanded="true"] .mode-play-chevron { transform: rotate(180deg); }
@@ -180,7 +180,7 @@ html #app .public-create-segmented .segmented-option::after { content: none !imp
 #app .mode-inline-drawer .gallery-panel .collection-open { width: 28px; height: 28px; right: 12px; }
 
 /* La tarjeta «Jugar» no se mueve al tocarla (el :hover pegado del móvil y el giro de :active la hacían bailar mientras se despliega). */
-html #app button.mode-play-card:hover, html #app button.mode-play-card:active { transform: translateZ(0); box-shadow: inherit; }
+html #app button.mode-play-card:hover, html #app button.mode-play-card:active { transform: none; box-shadow: inherit; }
 
 #app .mode-ranking-summary .mode-ranking-link { margin-top: 10px; width: 100%; }
 #app .mode-ranking-summary .mode-ranking-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }

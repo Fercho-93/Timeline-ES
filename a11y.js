@@ -172,12 +172,16 @@
     const cleanup = () => {
       if (done) return;
       done = true;
+      // Safari puede conservar la capa de opacidad de una entrada ya terminada y
+      // vaciarla al sacarla del viewport. El estado final lo pinta CSS; liberar los
+      // efectos devuelve las láminas al flujo de pintura normal de todas las pantallas.
+      animations.forEach(animation => animation.cancel());
       if (surfaceMotions.get(sheet) === cancel) {
         surfaceMotions.delete(sheet);
         sheet.classList.remove('motion-entering');
       }
     };
-    const cancel = () => { animations.forEach(animation => animation.cancel()); cleanup(); };
+    const cancel = cleanup;
     surfaceMotions.set(sheet, cancel);
     Promise.all(animations.map(animation => animation.finished)).then(cleanup, cleanup);
     return cancel;

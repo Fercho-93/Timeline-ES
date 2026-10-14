@@ -2064,7 +2064,8 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   text-align: left;
   background: var(--edition-surface);
   box-shadow: 0 5px 16px #352a1718;
-  transform-style: preserve-3d;
+  /* Son láminas planas: no conservar un contexto 3D durante el scroll de Safari. */
+  transform-style: flat;
   transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
 }
 #app .home-door-art,
