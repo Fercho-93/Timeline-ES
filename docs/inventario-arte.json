@@ -3464,6 +3464,110 @@
       }
     },
     {
+      "path": "assets/cofre-frames-v2-0.webp",
+      "sha256": "0ea3d6058ae88dedfd66bd7c28becc1f7a3e1cbcbc4a3ac696d7e0df30db23db",
+      "rightsEvidence": {
+        "status": "project-rendered-from-ai-materials",
+        "generator": "Three.js 0.186.1; materiales originales ChatGPT / OpenAI",
+        "evidenceRef": "tools/cofre/README.md",
+        "generatedAt": "2026-10-15",
+        "referenceImage": "assets/cofre-oak-v1.webp",
+        "exactPrompt": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/cofre-frames-v2-1.webp",
+      "sha256": "455874d47301cfa493d260b6beb3d2b86d3b768cbf6f774d2832e54dd2514e25",
+      "rightsEvidence": {
+        "status": "project-rendered-from-ai-materials",
+        "generator": "Three.js 0.186.1; materiales originales ChatGPT / OpenAI",
+        "evidenceRef": "tools/cofre/README.md",
+        "generatedAt": "2026-10-15",
+        "referenceImage": "assets/cofre-oak-v1.webp",
+        "exactPrompt": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/cofre-frames-v2-2.webp",
+      "sha256": "c1d60c0f4b2f4786033fd73da8d33a7414456f1dbe92c0f1bbf2eff8602f539c",
+      "rightsEvidence": {
+        "status": "project-rendered-from-ai-materials",
+        "generator": "Three.js 0.186.1; materiales originales ChatGPT / OpenAI",
+        "evidenceRef": "tools/cofre/README.md",
+        "generatedAt": "2026-10-15",
+        "referenceImage": "assets/cofre-oak-v1.webp",
+        "exactPrompt": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/cofre-frames-v2-3.webp",
+      "sha256": "a97743ce23e031de69feeb103e298f1345d01fcea8bea30d54819406afc359de",
+      "rightsEvidence": {
+        "status": "project-rendered-from-ai-materials",
+        "generator": "Three.js 0.186.1; materiales originales ChatGPT / OpenAI",
+        "evidenceRef": "tools/cofre/README.md",
+        "generatedAt": "2026-10-15",
+        "referenceImage": "assets/cofre-oak-v1.webp",
+        "exactPrompt": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/cofre-frames-v2-4.webp",
+      "sha256": "5a49839d2c5225c5f63a77a2a0b11b7ed7372140365caf2b31e43b8b65a24323",
+      "rightsEvidence": {
+        "status": "project-rendered-from-ai-materials",
+        "generator": "Three.js 0.186.1; materiales originales ChatGPT / OpenAI",
+        "evidenceRef": "tools/cofre/README.md",
+        "generatedAt": "2026-10-15",
+        "referenceImage": "assets/cofre-oak-v1.webp",
+        "exactPrompt": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/cofre-frames-v2-5.webp",
+      "sha256": "8a338c03eb68022047bc2abd23782fe25ade3af3d68932d19e5f65943fea9a72",
+      "rightsEvidence": {
+        "status": "project-rendered-from-ai-materials",
+        "generator": "Three.js 0.186.1; materiales originales ChatGPT / OpenAI",
+        "evidenceRef": "tools/cofre/README.md",
+        "generatedAt": "2026-10-15",
+        "referenceImage": "assets/cofre-oak-v1.webp",
+        "exactPrompt": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/cofre-frames-v2-6.webp",
+      "sha256": "84777a652f8e15c09e379b77696664277d1eb15d3cecb8755311ae01e43759bd",
+      "rightsEvidence": {
+        "status": "project-rendered-from-ai-materials",
+        "generator": "Three.js 0.186.1; materiales originales ChatGPT / OpenAI",
+        "evidenceRef": "tools/cofre/README.md",
+        "generatedAt": "2026-10-15",
+        "referenceImage": "assets/cofre-oak-v1.webp",
+        "exactPrompt": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/cofre-frames-v2-7.webp",
+      "sha256": "4d6c74642f3611b5562786bb7219d846c72a5cc20f00427040363a6ab13c04ab",
+      "rightsEvidence": {
+        "status": "project-rendered-from-ai-materials",
+        "generator": "Three.js 0.186.1; materiales originales ChatGPT / OpenAI",
+        "evidenceRef": "tools/cofre/README.md",
+        "generatedAt": "2026-10-15",
+        "referenceImage": "assets/cofre-oak-v1.webp",
+        "exactPrompt": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
       "path": "assets/cofre-oak-v1.webp",
       "sha256": "505b158769b7c20c3f124cf51e985a7adb1f21f82a9e8c20dada9cd70d5d41a6",
       "rightsEvidence": {

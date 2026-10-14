@@ -57,7 +57,7 @@
   // un toque. Al abrirlo sale la luz, salen las cartas y la cámara entra en el cofre: ahí empieza
   // la intro de siempre. Solo esa primera vez; después se recuerda y la portada abre directa.
   const CAJA = 'continuum-caja-abierta-v1';
-  const CAJA_ABRE = 2750, CAJA_SE_VA = 500;
+  const CAJA_ABRE = 4200, CAJA_SE_VA = 500;
   let quitaCaja = null, esperandoJugar = false;
   // Lo que espera `gate`: resuelto de salida (sin caja) y, si hay caja, cuando se termina de abrir.
   let cajaAbierta = Promise.resolve();
@@ -89,6 +89,56 @@
     const angle = Math.atan2(z2 - z1, y2 - y1) * 180 / Math.PI + 180;
     return `<i class="caja-duela" style="--ly:${-.18 + (y1 + y2) / 2};--lz:${(z1 + z2) / 2};--lh:${h};--la:${angle}deg;--shade:${.82 + Math.sin((a+b)/2) * .18}"></i>`;
   }).join('');
+  // 64 fotogramas renderizados con la misma cámara, materiales y luz. Las ocho
+  // hojas se piden solo si hay cofre; el resto de visitas no paga esta descarga.
+  // Si una hoja falla o se toca antes de cargar, la geometría CSS sigue abriendo.
+  const preparaCofre = escena => {
+    const lienzo = document.createElement('canvas');
+    lienzo.className = 'caja-cine'; lienzo.width = 640; lienzo.height = 560;
+    lienzo.setAttribute('aria-hidden', 'true');
+    const ctx = lienzo.getContext('2d');
+    let hojas = [], lista = false, tocada = false, retirada = false, raf = 0;
+    const dibuja = frame => {
+      const celda = frame % 8;
+      ctx.clearRect(0, 0, 640, 560);
+      ctx.drawImage(hojas[Math.floor(frame / 8)], (celda % 4) * 640, Math.floor(celda / 4) * 560, 640, 560, 0, 0, 640, 560);
+    };
+    if (ctx) {
+      escena.classList.add('cofre-cine-pendiente');
+      const carga = n => new Promise((resolve, reject) => {
+        const img = new Image();
+        const timer = setTimeout(() => reject(new Error('cofre-timeout')), 5000);
+        img.onload = () => { clearTimeout(timer); resolve(img); };
+        img.onerror = () => { clearTimeout(timer); reject(new Error('cofre-imagen')); };
+        img.src = `assets/cofre-frames-v2-${n}.webp`;
+      });
+      Promise.all(Array.from({ length: 8 }, (_, n) => carga(n))).then(images => {
+        if (retirada || tocada) return;
+        hojas = images; lista = true; dibuja(0);
+        escena.querySelector('.caja-mesa').prepend(lienzo);
+        escena.classList.remove('cofre-cine-pendiente');
+        escena.classList.add('cofre-cine-listo');
+      }).catch(() => escena.classList.remove('cofre-cine-pendiente'));
+    }
+    return {
+      play() {
+        tocada = true; escena.classList.remove('cofre-cine-pendiente');
+        if (!lista || retirada) return;
+        const start = performance.now(); let anterior = -1;
+        const tick = now => {
+          if (retirada) return;
+          // Tiempo absoluto: un móvil lento salta al fotograma correcto, nunca
+          // alarga la apertura ni se desincroniza con luz, cartas y transición.
+          const t = (now - start) / 1000, frame = Math.min(63, Math.floor(t * 25));
+          if (frame !== anterior) { dibuja(frame); anterior = frame; }
+          escena.dataset.cofreFase = t < .54 ? 'cierre' : t < 1.82 ? 'tapa' : 'abierto';
+          if (frame < 63) raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+      },
+      dispose() { retirada = true; cancelAnimationFrame(raf); hojas = []; lienzo.remove(); }
+    };
+  };
   const montaCaja = el => {
     // Mientras el cofre espera un toque no corre el aviso de carga lenta: se espera a una persona.
     clearTimeout(timeout);
@@ -114,17 +164,19 @@
       </div></div>
       <p class="caja-pista">Toca el cofre para abrirlo</p>`;
     el.append(escena);
-    let abierta = false;
+    const cine = preparaCofre(escena);
+    let abierta = false, aperturaTimer, salidaTimer;
     const abre = () => {
       if (abierta) return;
       abierta = true;
       try { localStorage.setItem(CAJA, '1'); } catch { /* Se verá otra vez: mejor eso que no entrar. */ }
       el.classList.add('splash-caja-abriendo');
+      cine.play();
       // Un botón de verdad aplanaría la caja (los navegadores no respetan `preserve-3d` en
       // <button>): es un div con rol de botón, así que al abrirse deja de ser pulsable a mano.
       const caja = escena.querySelector('.caja');
       caja.setAttribute('aria-disabled', 'true'); caja.tabIndex = -1;
-      setTimeout(() => {
+      aperturaTimer = setTimeout(() => {
         // La cámara ya está dentro, a oscuras: arranca la intro de siempre bajo la escena,
         // que se disuelve sobre su telón. El reloj de «Jugar» empieza a contar ahora.
         root.classList.remove('splash-caja');
@@ -132,7 +184,7 @@
         introStart = performance.now();
         asienta(el);
         if (!esperandoJugar) guard();
-        setTimeout(() => escena.remove(), CAJA_SE_VA);
+        salidaTimer = setTimeout(() => { cine.dispose(); escena.remove(); }, CAJA_SE_VA);
         quitaCaja = null;
         resuelve();
       }, CAJA_ABRE);
@@ -140,7 +192,7 @@
     let resuelve;
     cajaAbierta = new Promise(resolve => { resuelve = resolve; });
     // Si el telón se cierra con la caja aún en la mesa (arranque fallido), no se deja a nadie esperando.
-    quitaCaja = () => { escena.remove(); root.classList.remove('splash-caja'); el.classList.remove('splash-caja-abriendo'); quitaCaja = null; resuelve(); };
+    quitaCaja = () => { clearTimeout(aperturaTimer); clearTimeout(salidaTimer); cine.dispose(); escena.remove(); root.classList.remove('splash-caja'); el.classList.remove('splash-caja-abriendo'); quitaCaja = null; resuelve(); };
     // Un toque en cualquier parte de la escena vale; la caja, además, responde al teclado.
     escena.addEventListener('click', abre);
     escena.querySelector('.caja').addEventListener('keydown', event => {
