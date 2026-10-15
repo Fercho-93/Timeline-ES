@@ -85,6 +85,26 @@ workflow). El contenido del archivo es un registro de la petición; lo que dispa
 compilación es el cambio. Detalles de firma y secretos en
 [DISTRIBUCION_MOVIL.md](DISTRIBUCION_MOVIL.md).
 
+## Cartel remoto: pedir actualizar o pausar el online
+
+El juego lee al abrirse (y cada cinco minutos con la app a la vista) el documento `appConfig/current` de
+Firestore. Solo se edita a mano en la consola de Firebase (Firestore Database → Datos → colección
+`appConfig` → documento `current`); ningún cliente puede escribirlo. Si no existe, o no se puede leer,
+no pasa nada. Campos, todos opcionales:
+
+| Campo | Tipo | Efecto |
+| --- | --- | --- |
+| `minBuild` | número entero | Las versiones con un número menor ven «Hay una versión nueva de Continuum» y su conexión con el servidor se desactiva. Pueden pulsar «Seguir sin conexión» para jugar sin internet. El número es el de `CT.APP_VERSION` (`continuum-v749` → `749`); una app de tienda lleva el de la web con la que se compiló. |
+| `onlineEnabled` | `false` | Pausa las partidas por internet para todos: aviso arriba, y solitario y un solo móvil siguen. Al quitarlo o ponerlo a `true`, el juego se reconecta en el siguiente chequeo (hasta cinco minutos). |
+| `message` | texto, hasta 200 | Sustituye al texto por defecto del aviso. |
+| `updateUrl` | enlace `https://` | Destino del botón «Actualizar» (la ficha de la tienda). Sin él: en la web lleva a `actualizar.html`; en la app, no hay botón. |
+
+Antes de subir `minBuild`, comprueba que el número que pones no deja fuera a la versión que ya está en
+las tiendas. Para volver a la normalidad, borra el documento o quita los campos. Esto no sustituye a la
+compatibilidad de las reglas con clientes anteriores (`tests/compatibilidad-version-anterior.mjs`): es la
+salida de emergencia para cuando algo se rompe de todos modos. Lo prueban `tests/config-remota.mjs` y
+`tests/config-remota-reglas.mjs`.
+
 ## Qué validan las reglas
 
 Cada escritura en una sala entra por una sola rama de las reglas, según lo que intente cambiar:

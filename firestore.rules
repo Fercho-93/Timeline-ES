@@ -548,6 +548,12 @@ service cloud.firestore {
       allow get: if registered();
       allow write, list: if false;
     }
+    // Cartel remoto (versión mínima de la app y pausa del online): lo escribe solo quien administra el
+    // proyecto desde la consola; los clientes únicamente lo leen (ver app-config.js).
+    match /appConfig/current {
+      allow get: if registered();
+      allow write, list: if false;
+    }
     // Tablón de mesas públicas (como el vestíbulo de Risk): una ficha por mesa que espera
     // jugadores, con su configuración. Solo la escribe quien lleva la mesa, y cualquiera
     // con perfil la puede listar para elegir dónde entrar. La sala sigue mandando.

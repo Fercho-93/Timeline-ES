@@ -62,6 +62,7 @@ externa o una decisión del titular. Las listas de comprobación de la beta est�
 - [x] El build móvil genera `dist/` correctamente.
 - [x] Reglas publicadas automáticamente en Firebase desde `main`.
 - [x] Correo de comentarios real.
+- [x] Cartel remoto (`appConfig/current`) para pedir actualizar o pausar el online (ver [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#cartel-remoto-pedir-actualizar-o-pausar-el-online)).
 - [ ] Comprobar en los registros de Cloud Functions que `purgeExpiredData` se ejecuta cada día.
 - [ ] Activar el *enforcement* de App Check cuando las métricas muestren tráfico verificado
       (ver [SEGURIDAD_Y_OPERACION.md](SEGURIDAD_Y_OPERACION.md#app-check)).

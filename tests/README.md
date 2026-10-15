@@ -58,6 +58,8 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `card-text.mjs` | test | El texto de las cartas se ajusta sin partir palabras y recupera su tamaño. |
 | `cartera.mjs` | test | La cartera: un mazo cerrado a mano se respeta en todos los rincones del juego. |
 | `cifras.mjs` | test | Duelo de cifras: puntos por cercanía y rapidez, carga útil recalculada y reloj que no se para. |
+| `config-remota.mjs` | test | El cartel remoto: pide actualizar, pausa el online, levanta la pausa y no hace nada si no puede leerse. |
+| `config-remota-reglas.mjs` | reglas | `appConfig/current`: lectura con sesión, ninguna escritura ni listado desde clientes. |
 | `compartir-local.mjs` | test | La señal de la sala Wi-Fi viaja por «compartir» del sistema o por el portapapeles. |
 | `compatibilidad-version-anterior.mjs` | reglas | Las reglas nuevas aceptan las salas y escrituras de la versión anterior de la app. |
 | `competicion-turnos.mjs` | test | Competición de varios temas dentro de un duelo por turnos. |
