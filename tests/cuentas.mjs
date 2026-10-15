@@ -24,7 +24,7 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
 {
  const {w,dom,auth,data}=setup();let started=0;await w.testAccounts.startAccounts(()=>started++);
  assert.equal(started,1);assert.equal(auth.currentUser.uid,'guest');assert.equal(w.CONTINUUM.Accounts.ready,true);
- assert.match(data.get('playerProfiles/guest').alias,/^Player \d{4}$/);
+ assert.match(data.get('playerProfiles/guest').alias,/^Jugador \d{4}$/);
  assert.equal(w.document.querySelector('#account-email'),null);
  const alias=data.get('playerProfiles/guest').alias;
  await w.testAccounts.enter();assert.equal(started,1);assert.equal(data.get('playerProfiles/guest').alias,alias);

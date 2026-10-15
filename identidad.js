@@ -7,7 +7,7 @@
   const CLAVE = "continuum-identidad-v1";
   const NOMBRE_ANTIGUO = "hilo-nombre-v1";
   // Los nombres que pone el juego por su cuenta no cuentan como elegidos: el invitado
-  // nace como «Player 1234» y el duelo usaba «Explorador» mientras no hubiera otro.
+  // nace como «Jugador 1234» y el duelo usaba «Explorador» mientras no hubiera otro.
   const PUESTO_POR_EL_JUEGO = /^(Player \d{4}|Explorador|Jugador \d+)$/i;
   // 18 caracteres: lo que admiten los nombres de las salas y de la partida en un móvil.
   const MAX = 18;

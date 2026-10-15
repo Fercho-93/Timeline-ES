@@ -1,6 +1,6 @@
 # Privacidad de Continuum
 
-Información de la beta · actualizada el 13 de octubre de 2026.
+Actualizada el 15 de octubre de 2026.
 
 Esta página explica qué datos trata Continuum, para qué, con quién se comparten, cuánto tiempo se guardan y cómo puedes decidir sobre ellos. Continuum no tiene publicidad, no usa analítica de terceros y no vende ni cede datos a nadie con fines comerciales.
 
@@ -10,7 +10,7 @@ Continuum es un proyecto personal. El responsable del tratamiento es **Fernando 
 
 ## Tu invitado y tu progreso
 
-Al abrir el juego se crea automáticamente un invitado mediante Firebase Authentication (de Google), sin pedir correo, contraseña ni nombre real. Tiene un identificador aleatorio y un alias como «Player 4821», que puedes cambiar en la bienvenida o en el Atlas: usa un apodo, no tu nombre real. El identificador va unido a esta instalación o navegador; no es un identificador del aparato.
+Al abrir el juego se crea automáticamente un invitado mediante Firebase Authentication (de Google), sin pedir correo, contraseña ni nombre real. Tiene un identificador aleatorio y un alias como «Jugador 4821», que puedes cambiar en la bienvenida o en el Atlas: usa un apodo, no tu nombre real. El identificador va unido a esta instalación o navegador; no es un identificador del aparato.
 
 Se guardan en Firestore (de Google) y en el propio dispositivo: el alias y el avatar elegidos, las estadísticas (incluido cada acierto y fallo por carta al terminar o guardar una partida), logros, cartas descubiertas, récords, rachas y los retos diarios de los últimos 60 días, con los aciertos, el tiempo empleado y la fecha y hora en que se terminaron. Sirven para que no pierdas tu progreso y puedas seguir en otra sesión.
 
@@ -106,13 +106,13 @@ Si tienes menos de 14 años, necesitas el permiso de tu madre, padre o tutor par
 ## Lo que no hacemos
 
 - No mostramos publicidad ni usamos analítica de terceros.
-- No pedimos datos de pago: los precios que puedan verse en la beta son una simulación sin cobro.
+- No pedimos datos de pago: el juego no tiene compras.
 - No tomamos decisiones automatizadas que te afecten de forma significativa.
 - No vendemos ni cedemos tus datos.
 
 ## Cambios en esta política
 
-Si cambia algo importante, se actualizará esta página y su fecha. Mientras dure la beta, la política puede ajustarse a medida que cambie el juego.
+Si cambia algo importante, se actualizará esta página y su fecha.
 
 ## Procedencia del arte
 

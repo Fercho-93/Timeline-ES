@@ -97,7 +97,7 @@ const button = (id, fn) => document.getElementById(id)?.addEventListener('click'
 function randomAlias() {
   const number = new Uint32Array(1);
   crypto.getRandomValues(number);
-  return `Player ${1000 + number[0] % 9000}`;
+  return `Jugador ${1000 + number[0] % 9000}`;
 }
 const nameRef = key => doc(db,'playerNames',key);
 const nameKey = alias => alias.toLowerCase();

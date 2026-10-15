@@ -8,7 +8,7 @@ local de cada cuenta), `avatares.js` e `identidad.js` (alias y avatar) y, en iPh
 ## Invitado
 
 - La primera apertura con conexión crea un invitado anónimo de Firebase y un alias aleatorio
-  `Player 4821`. No hay formulario ni registro previo: la bienvenida solo propone cambiar el alias
+  `Jugador 4821`. No hay formulario ni registro previo: la bienvenida solo propone cambiar el alias
   y avisa de que el progreso se guarda en un servidor, sin correo, y de que el ranking es opcional,
   con enlace a la política de privacidad.
 - Firebase conserva la sesión en el dispositivo. Volver a abrir usa el mismo UID.

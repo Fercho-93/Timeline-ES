@@ -578,14 +578,14 @@
         <button class="btn btn-primary btn-block" type="submit">Empezar a jugar <span aria-hidden="true">→</span></button>
       </form>
       <p class="hint" id="bienvenida-pista">Toca el avatar para elegirlo. Podrás cambiarlo después.</p>
-      <p class="hint bienvenida-datos" id="bienvenida-datos">Mejor un apodo que tu nombre real. Tu progreso se guarda en un servidor, sin correo ni datos personales. El ranking es opcional: te preguntaremos al terminar tu primer reto diario. <a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a></p>
+      <p class="hint bienvenida-datos" id="bienvenida-datos">Mejor un apodo que tu nombre real. Tu progreso se guarda en un servidor junto a tu apodo, sin pedirte correo ni nombre real. El ranking es opcional: te preguntaremos al terminar tu primer reto diario. <a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a></p>
     </section></div>`);
   }
 
   // El nombre se guarda también en la cuenta, si la hay: es el del ranking y los duelos.
   // El nombre es público en el ranking y no puede repetirse: si otra cuenta ya lo usa, se vuelve
   // a pedir otro. Con `NOMBRES_UNICOS` a `false` (solo para pruebas) el nombre se guardaría en
-  // este móvil y la cuenta conservaría el suyo, con lo que el ranking mostraría «Player ####».
+  // este móvil y la cuenta conservaría el suyo, con lo que el ranking mostraría «Jugador ####».
   const NOMBRES_UNICOS = true;
   async function guardaNombre(nombre) {
     const problema = CT.Identidad.problema(nombre);
@@ -599,7 +599,7 @@
   }
 
   // Quien puso su nombre sin conexión (o antes de que hubiera cuenta) lo tiene en el móvil pero no en el
-  // ranking, donde seguiría apareciendo como «Player ####». Al abrir con cuenta se publica; si el nombre
+  // ranking, donde seguiría apareciendo como «Jugador ####». Al abrir con cuenta se publica; si el nombre
   // lo tiene ya otra persona, se avisa en vez de dejarlo así sin decir nada.
   async function sincronizaNombrePendiente() {
     const nombre = CT.Identidad.nombre();

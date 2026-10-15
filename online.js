@@ -1155,7 +1155,7 @@ async function startRoom(withGhost = true, keepOrder = false) {
       return await startRoom(withGhost, true);
     }
     console.error(error);
-    if (error.message === 'FINAL_RULES_REQUIRED') { showToast('El servicio de salas necesita actualizarse para la final secreta. Contacta con el organizador de la beta.'); return; }
+    if (error.message === 'FINAL_RULES_REQUIRED') { showToast('El servicio de salas necesita actualizarse para la final secreta. Inténtalo de nuevo más tarde.'); return; }
     showToast(error.message === "DECK_MISMATCH" ? "Alguien de la sala lleva una versión distinta del juego. Actualizad todos los móviles y cread una sala nueva." : error.message === "UPDATE_CLIENTS" ? `Para usar esta sala, actualizad todos los móviles a v${CLIENT_VERSION} y cread una sala nueva.` : (enableGhost || pulse) && error.code === "permission-denied" ? "Actualiza firestore.rules a v39 para usar Fantasma o Pulso." : "No se pudo iniciar la partida");
   } finally { busy = false; }
 }

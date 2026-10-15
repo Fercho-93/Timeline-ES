@@ -143,7 +143,7 @@
       <details class="settings-section settings-support"><summary><span><b>Ayuda y comentarios</b><small>Cuéntanos cómo mejorar tu experiencia</small></span><i aria-hidden="true">+</i></summary><div class="settings-support-body">
         <p class="hint" style="text-align:left;margin-top:0"><a href="privacidad.html#arte" target="_blank" rel="noopener noreferrer">Privacidad, datos y procedencia del arte</a> · <a href="licencias.html" target="_blank" rel="noopener noreferrer">Licencias de terceros</a></p>
         <div class="field">
-          <label for="feedback-note">Comentario para la beta</label>
+          <label for="feedback-note">Tu comentario</label>
           <textarea id="feedback-note" rows="3" maxlength="4000" placeholder="Qué ocurrió y qué esperabas"></textarea>
         </div>
         <button class="btn btn-secondary btn-block" data-settings-action="download-feedback">Guardar comentario con diagnóstico</button>

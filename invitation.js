@@ -14,6 +14,6 @@
   button.href = links.nativeUrl(target);
   button.hidden = false;
   button.addEventListener('click', () => {
-    status.textContent = 'Si no se abre Continuum, comprueba que tienes instalada la última beta. Puedes copiar el enlace y abrirlo en Safari o Chrome si WhatsApp no permite abrir la app.';
+    status.textContent = 'Si no se abre Continuum, comprueba que tienes Continuum instalado y actualizado. Puedes copiar el enlace y abrirlo en Safari o Chrome si WhatsApp no permite abrir la app.';
   });
 })();
