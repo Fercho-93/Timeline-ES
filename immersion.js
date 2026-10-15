@@ -653,7 +653,10 @@
       const competition = screen.startsWith('competition');
       const alone = screen === 'solo-home';
       const joining = screen === 'friends-join' || screen === 'local-unirse' || panel.matches('[data-online-form="join"], [data-local-form="join-offer"]');
-      const art = quick ? 'menu-quick.webp' : competition ? 'competition-engraving.webp' : alone ? 'menu-collections.webp' : screen.startsWith('local-') ? 'menu-wifi.webp' : 'menu-private.webp';
+      const scene = document.documentElement.dataset.scene;
+      const collectionArt = ['history', 'entertainment', 'science', 'nature', 'geography', 'mixed'].includes(scene)
+        ? `hero-${scene}-400.webp` : 'menu-collections.webp';
+      const art = quick ? 'menu-quick.webp' : competition ? 'competition-engraving.webp' : alone ? collectionArt : screen.startsWith('local-') ? 'menu-wifi.webp' : screen === 'hub-online-create' ? 'menu-online.webp' : 'menu-private.webp';
       const kicker = competition ? 'Cada ronda cuenta' : alone ? 'A tu ritmo' : joining ? 'Tu sitio en la mesa' : 'La mesa os espera';
       panel.style.setProperty('--setup-illustration', `url("assets/${art}")`);
       panel.querySelectorAll('.tiempo-field > .field-label').forEach(label => {

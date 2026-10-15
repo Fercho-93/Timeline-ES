@@ -220,3 +220,52 @@ html[data-theme="dark"] #app[data-screen] .quick-free-setup .quick-mode-head::af
 html[data-theme="dark"] #app[data-screen] .quick-free-setup .tiempo-field .segmented-option.is-on {
   color: #fff3d9; border-color: #d8b37e; background: linear-gradient(145deg, #765236, #493020);
 }
+
+/* La lámina pertenece al estuche: llega al borde y se pierde hacia la lectura. */
+html #app[data-screen] .quick-free-setup .quick-day-panel { --quick-frame-inset: clamp(18px, 4vw, 28px); }
+html #app[data-screen] .quick-free-setup .quick-mode-head {
+  isolation: isolate; overflow: hidden; min-height: 136px;
+  margin: calc(-1 * var(--quick-frame-inset)) calc(-1 * var(--quick-frame-inset)) 22px;
+  padding: 26px var(--quick-frame-inset) 24px; border-radius: 22px 22px 0 0;
+  background: var(--edition-paper);
+}
+html #app[data-screen] .quick-free-setup .quick-mode-head::after {
+  z-index: -1; inset: 0 0 0 auto; width: 59%; height: 100%; border-radius: 0; opacity: .9;
+  background-position: 58% 48%;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 75%);
+  mask-image: linear-gradient(90deg, transparent, #000 75%);
+}
+html #app[data-screen] .quick-free-setup .quick-mode-head > :is(h3, .quick-setup-kicker) { max-width: 65%; }
+html #app[data-screen] .quick-free-setup .quick-mode-visual { border-bottom: 0; background: transparent; }
+html #app[data-screen] .quick-free-setup .quick-mode-visual > img {
+  -webkit-mask-image: linear-gradient(#000 55%, transparent);
+  mask-image: linear-gradient(#000 55%, transparent);
+}
+html #app[data-screen] .quick-free-setup .quick-day-head {
+  position: relative; isolation: isolate; overflow: hidden; padding-right: 32%;
+  background: var(--edition-paper);
+}
+html #app[data-screen] .quick-free-setup .quick-day-head::before {
+  content: ""; position: absolute; z-index: -1; inset: 0 0 0 auto; width: 51%;
+  background: url("assets/menu-daily.webp") 75% center / cover;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 85%);
+  mask-image: linear-gradient(90deg, transparent, #000 85%);
+}
+html #app[data-screen] .quick-free-setup .quick-day-deck {
+  position: relative; isolation: isolate; overflow: hidden; min-height: 112px;
+  grid-template-columns: minmax(0, 1fr) auto; padding: 16px; gap: 8px;
+}
+html #app[data-screen] .quick-free-setup .quick-day-deck > img {
+  position: absolute; z-index: -1; inset: 0 0 0 auto; width: 47%; height: 100%;
+  border: 0; border-radius: 0; object-position: center;
+  -webkit-mask-image: linear-gradient(90deg, transparent 5%, #000 85%);
+  mask-image: linear-gradient(90deg, transparent 5%, #000 85%);
+}
+html #app[data-screen] .quick-free-setup .quick-day-deck-copy { width: 74%; }
+html #app[data-screen] .quick-free-setup .quick-day-deck-go {
+  display: grid; place-items: center; width: 26px; height: 26px;
+  border: 1px solid var(--edition-line); border-radius: 50%; background: var(--edition-paper);
+}
+html[data-theme="dark"] #app[data-screen] .quick-free-setup .quick-mode-head::after,
+html[data-theme="dark"] #app[data-screen] .quick-free-setup .quick-day-head::before,
+html[data-theme="dark"] #app[data-screen] .quick-free-setup .quick-day-deck > img { opacity: .65; }

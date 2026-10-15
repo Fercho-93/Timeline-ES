@@ -84,7 +84,7 @@
       <div class="settings-head">
         <button class="settings-close" data-settings-action="close" aria-label="Cerrar ajustes">×</button>
       </div>
-      <header class="atlas-page-heading"><div class="eyebrow">A tu manera</div><h1 tabindex="-1" data-dialog-focus>Ajustes</h1><p>Encuentra tu forma de leer, escuchar y jugar.</p></header><div class="settings-layout">
+      <header class="atlas-page-heading settings-illustrated-heading"><img class="settings-heading-art" src="assets/menu-collections.webp" alt="" aria-hidden="true" decoding="async"><div class="eyebrow">A tu manera</div><h1 tabindex="-1" data-dialog-focus>Ajustes</h1><p>Encuentra tu forma de leer, escuchar y jugar.</p></header><div class="settings-layout">
 
       <section class="settings-section settings-appearance">
         <div class="settings-section-heading"><span aria-hidden="true">01</span><div><h2>Apariencia y lectura</h2><p>Prueba los cambios antes de aplicarlos.</p></div></div>

@@ -5727,3 +5727,42 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
   #app .mode-inline-drawer .collection-decks { margin-left: 10px; padding-left: 10px; }
   #app .mode-inline-drawer .collection-decks .games .game-row { padding-left: 12px; }
 }
+
+/* Cabeceras incrustadas: el papel del formulario continúa bajo la lámina lateral. */
+html #app[data-screen] .setup-art-panel:not(.solo-fold) {
+  --setup-inset: 20px; padding: var(--setup-inset); overflow: hidden;
+}
+html #app[data-screen] .setup-art-panel .setup-art-head {
+  margin: calc(-1 * var(--setup-inset)) calc(-1 * var(--setup-inset)) 20px;
+  padding: 24px var(--setup-inset); min-height: 140px;
+  border: 0; border-bottom: 1px solid var(--edition-line); border-radius: 19px 19px 0 0;
+  background: var(--edition-paper);
+}
+html #app[data-screen] .setup-art-panel .setup-art-image {
+  width: 58%; object-position: 70% center; opacity: .85;
+  -webkit-mask-image: linear-gradient(90deg, transparent 3%, #000 82%);
+  mask-image: linear-gradient(90deg, transparent 3%, #000 82%);
+}
+html #app[data-screen] .setup-art-panel .setup-art-copy { width: 66%; position: relative; }
+html #app[data-screen] .setup-art-panel.solo-fold > summary::before {
+  width: 55%; -webkit-mask-image: linear-gradient(90deg, transparent, #000 85%);
+  mask-image: linear-gradient(90deg, transparent, #000 85%);
+}
+html #app[data-screen] .settings-modal .settings-illustrated-heading {
+  position: relative; isolation: isolate; overflow: hidden;
+  min-height: 175px; padding: 24px 20px; margin-top: 12px;
+  border: 1px solid var(--edition-line); border-radius: 18px; background: var(--edition-paper);
+}
+html #app[data-screen] .settings-heading-art {
+  position: absolute; z-index: -1; inset: 0 0 0 auto; width: 55%; height: 100%;
+  object-fit: cover; object-position: 70% center; opacity: .85;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 85%);
+  mask-image: linear-gradient(90deg, transparent, #000 85%);
+}
+html #app[data-screen] .settings-illustrated-heading > :not(img) { max-width: 66%; }
+html[data-theme="dark"] #app[data-screen] :is(.setup-art-image, .settings-heading-art) { opacity: .55; }
+@media (max-width: 370px) {
+  html #app[data-screen] .setup-art-panel:not(.solo-fold) { --setup-inset: 16px; }
+  html #app[data-screen] .setup-art-panel .setup-art-head { min-height: 132px; }
+  html #app[data-screen] .setup-art-panel .setup-art-copy { width: 70%; }
+}
