@@ -242,9 +242,7 @@ try {
       await page.screenshot({path:`test-results/zoom/${engine}-menu-color.png`,fullPage:true});
       await page.locator('[data-action="rules"]').click();
       const guideBack=page.locator('.rules .guide-tools > .atlas-dialog-back');
-      const guideVeil=page.locator('.rules > .atlas-scroll-veil');
-      assert.equal(await guideVeil.evaluate(veil=>getComputedStyle(veil).opacity),'0','la guía empieza sin veladura');
-      assert.ok(await guideVeil.evaluate(veil=>Math.abs(veil.getBoundingClientRect().width-veil.parentElement.clientWidth)<=2),'la veladura de la guía llega a los bordes sin dibujar un rectángulo interior');
+      assert.equal(await page.locator('.atlas-scroll-veil').count(),0,'la guía no lleva niebla al abrirse');
       const guideBackAtTop=await guideBack.boundingBox();
       await page.locator('.rules').evaluate(modal=>{modal.scrollTop=Math.max(20,modal.scrollHeight*.45);});
       await page.waitForTimeout(50);
@@ -255,8 +253,7 @@ try {
       assert.ok(Math.abs(guideBackHalfway.y-guideBackAtTop.y)<=1,'la flecha circular de la guía permanece flotante');
       assert.equal(guideBackStyle.radius,'50%','la guía comparte el botón circular de la enciclopedia');
       assert.notEqual(guideBackStyle.background,'rgba(0, 0, 0, 0)','la flecha de la guía conserva su fondo de papel');
-      assert.equal(await guideVeil.evaluate(veil=>getComputedStyle(veil).opacity),'1','la guía difumina el contenido que sale por arriba');
-      assert.ok(await guideVeil.evaluate(veil=>veil.getBoundingClientRect().top<=veil.parentElement.getBoundingClientRect().top+2),'la veladura de la guía cubre también el relleno superior');
+      assert.equal(await page.locator('.atlas-scroll-veil').count(),0,'hacer scroll en la guía no añade niebla');
       await page.locator('[data-tv-chapter="0"]').click();
       await page.locator('[data-tv="next"]').click();
       await page.locator('[data-tv="next"]').click();
@@ -275,9 +272,7 @@ try {
       await guideBack.click();
       await page.locator('[data-settings-action="open"]').click();
       const settingsBack=page.locator('.settings-modal .settings-head > .atlas-dialog-back');
-      const settingsVeil=page.locator('.settings-modal > .atlas-scroll-veil');
-      assert.equal(await settingsVeil.evaluate(veil=>getComputedStyle(veil).opacity),'0','ajustes empieza sin veladura');
-      assert.ok(await settingsVeil.evaluate(veil=>Math.abs(veil.getBoundingClientRect().width-veil.parentElement.clientWidth)<=2),'la veladura de ajustes llega a los bordes sin dibujar un rectángulo interior');
+      assert.equal(await page.locator('.atlas-scroll-veil').count(),0,'ajustes no lleva niebla al abrirse');
       const settingsBackAtTop=await settingsBack.boundingBox();
       await page.locator('.settings-modal').evaluate(modal=>{modal.scrollTop=Math.max(20,modal.scrollHeight*.45);});
       await page.waitForTimeout(50);
@@ -289,8 +284,7 @@ try {
       assert.ok(settingsBackAtTop.x < width/2,'la salida de ajustes queda a la izquierda');
       assert.equal(settingsBackStyle.radius,'50%','ajustes comparte el botón circular');
       assert.notEqual(settingsBackStyle.background,'rgba(0, 0, 0, 0)','la flecha de ajustes conserva su fondo de papel');
-      assert.equal(await settingsVeil.evaluate(veil=>getComputedStyle(veil).opacity),'1','ajustes difumina el contenido que sale por arriba');
-      assert.ok(await settingsVeil.evaluate(veil=>veil.getBoundingClientRect().top<=veil.parentElement.getBoundingClientRect().top+2),'la veladura de ajustes cubre también el relleno superior');
+      assert.equal(await page.locator('.atlas-scroll-veil').count(),0,'hacer scroll en ajustes no añade niebla');
       await page.locator('.settings-modal').evaluate(modal=>{modal.scrollTop=0;});
       await page.locator('#ajuste-tema').selectOption('dark');
       await page.locator('#ajuste-texto').selectOption('150');
@@ -300,8 +294,7 @@ try {
       await page.locator('.settings-close').click();
       await page.locator('[data-action="perfil"]').click();
       const profileBack=page.locator('#app[data-screen="perfil"] .atlas-topbar > .atlas-back');
-      const profileVeil=page.locator('#app[data-screen="perfil"] .atlas-profile-veil');
-      assert.equal(await profileVeil.evaluate(veil=>getComputedStyle(veil).opacity),'0','el perfil empieza sin veladura');
+      assert.equal(await page.locator('.atlas-profile-veil').count(),0,'el perfil no lleva niebla al abrirse');
       const profileBackAtTop=await profileBack.boundingBox();
       await page.evaluate(()=>scrollTo(0,Math.max(20,document.documentElement.scrollHeight*.45)));
       await page.waitForTimeout(50);
@@ -312,7 +305,7 @@ try {
       assert.ok(profileBackHalfway.y<=profileBackAtTop.y+1 && profileBackHalfway.y<=12,'la flecha circular del perfil permanece flotante');
       assert.equal(profileBackStyle.radius,'50%','perfil comparte el botón circular');
       assert.notEqual(profileBackStyle.background,'rgba(0, 0, 0, 0)','la flecha del perfil conserva su fondo de papel');
-      assert.equal(await profileVeil.evaluate(veil=>getComputedStyle(veil).opacity),'1','el perfil difumina el contenido que sale por arriba');
+      assert.equal(await page.locator('.atlas-profile-veil').count(),0,'hacer scroll en el perfil no añade niebla');
       await profileBack.click();
       await page.evaluate(()=>{
         for (const key of ['history','movies','animals','countries','languages']) {

@@ -273,11 +273,18 @@
     if(p&&p.v===2)throw Error('Este duelo se creó con una versión anterior de Continuum (en la que un fallo te dejaba fuera). Pide a tu amigo que cree uno nuevo.');
     if(!p||p.v!==DUEL_VERSION||typeof p.s!=='string'||!Number.isInteger(p.n)||p.n<1||p.n>CT.QuickCatalog.challenges.length||(p.t!==undefined&&![15,20,30].includes(p.t)))throw Error('Este enlace no es un duelo de Retos rápidos.');
     if(!(CT.QuickNetwork?.compatible?.(p.f) ?? p.f===duelFingerprint()))throw Error('Este duelo se creó con otra versión de Continuum. Actualizad la aplicación en los dos móviles.');
-    const rs=rounds(p.n,null,p.s);
-    let s;
-    try{s=E.restore({version:CT.QuickCatalog.version,config:{names:['Tú'],rounds:rs,kind:'duel',keep:true},commands:unpackCommands(p.c,rs)});}
-    catch{throw Error('El enlace del duelo está dañado o incompleto.');}
-    if(s.players.length!==1 || s.phase!=='round-end' || s.index!==rs.length-1)throw Error('Tu rival no ha terminado su duelo: pídele que lo termine antes de mandártelo.');
+    // Quien crea el duelo reparte 10 cartas al azar (E.MULTI_CARDS); los enlaces anteriores a ese cambio
+    // llevan el mazo entero. Se prueba primero el reparto actual y, si no encaja, el antiguo.
+    let rs,s,failure='El enlace del duelo está dañado o incompleto.';
+    for(const limit of [E.MULTI_CARDS,0]){
+      const candidate=rounds(p.n,null,p.s,limit);
+      try{
+        const restored=E.restore({version:CT.QuickCatalog.version,config:{names:['Tú'],rounds:candidate,kind:'duel',keep:true},commands:unpackCommands(p.c,candidate)});
+        if(restored.players.length===1 && restored.phase==='round-end' && restored.index===candidate.length-1){rs=candidate;s=restored;break;}
+        failure='Tu rival no ha terminado su duelo: pídele que lo termine antes de mandártelo.';
+      }catch{ /* este reparto no corresponde a la invitación */ }
+    }
+    if(!s)throw Error(failure);
     return {rounds:rs,seed:p.s,seconds:p.t||0,score:s.players[0].score,name:String(p.p||'').replace(/[<>\x00-\x1f]/g,'').slice(0,24)};
   }
   function acceptDuel(value=location.href) {
