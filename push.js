@@ -17,7 +17,7 @@ async function saveToken(token) {
 }
 
 export async function start() {
-  if (started || !native()) return false;
+  if (started || !native() || CT.Deployment?.nativePush !== true) return false;
   const push = plugin();
   if (!push) return false;
   started = true;

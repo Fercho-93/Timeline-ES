@@ -112,7 +112,9 @@ externa o una decisión del titular. Las listas de comprobación de la beta est�
 - [ ] AAB Android firmado y probado; Google Play Closed Testing.
 - [ ] TestFlight con testers externos.
 - [ ] Avisos del móvil: las Cloud Functions envían avisos, pero el registro del dispositivo
-      (`push.js`) no se activa todavía y falta la integración de APNs con FCM.
+      (`push.js`) está apagado con `nativePush: false` en `deployment.js` (`tests/push-apagado.mjs`): falta
+      `google-services.json` en Android, `aps-environment` en iPhone y la integración de APNs con FCM.
+      Al activarlo, declarar el token del dispositivo en las tiendas y en la política.
 - [ ] Prueba de actualización conservando una partida y una sala pendiente.
 
 ## 7. Servidor de competición pública

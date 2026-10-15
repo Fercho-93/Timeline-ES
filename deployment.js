@@ -5,6 +5,9 @@
   window.CONTINUUM.Deployment = Object.freeze({
     audience: 'private-beta',
     feedbackEmail: 'feedbackcontinuum@gmail.com',
+    // Avisos push del móvil. Apagados hasta integrar FCM y APNs: sin google-services.json (Android) ni
+    // aps-environment (iPhone), pedir permiso y registrar el dispositivo falla o cierra la app.
+    nativePush: false,
     appCheckSiteKey: '6Lcp5eYtAAAAAFymbjtUg5q2ys6tJyhrBsBOe5Gm',
     // App Check en la app de iPhone (App Attest): datos públicos de la app iOS registrada en
     // Firebase («Continuum iPhone»), los mismos que lleva su GoogleService-Info.plist.

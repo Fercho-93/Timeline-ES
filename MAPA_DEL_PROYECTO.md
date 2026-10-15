@@ -95,7 +95,7 @@ Cada archivo es una lista de cartas con su título, su explicación, el valor qu
 | `firebase-client.js` | Conecta con Firebase y con App Check (la comprobación de que quien llama es el juego de verdad). |
 | `deployment.js` | Configuración pública: correo de contacto, claves públicas de App Check. Nunca contraseñas. |
 | `accounts.js` | Cuentas: invitado automático, entrar con Apple, ranking, borrado de cuenta. |
-| `push.js` | Avisos al móvil (preparado, aún no activo en iPhone). |
+| `push.js` | Avisos al móvil (preparado y apagado: `nativePush` en `deployment.js`). |
 | `firestore.rules` | Las reglas de seguridad de la base de datos. **Subirlas a `main` las publica en producción.** |
 | `firebase.json`, `firebase-e2e.json` | Configuración de las herramientas de Firebase para publicar y para probar en local. |
 
