@@ -55,10 +55,9 @@
     return (overflow === "auto" || overflow === "scroll") && node.scrollWidth - node.clientWidth > 2;
   }
 
-  // En la pantalla de la guía en vídeo el dedo arrastra la carta del ensayo, no navega.
   function blocked(target) {
     if (!(target instanceof Element)) return false;
-    if (target.closest(CONTROLS) || target.closest('.hand-fan, .hand-fan-controls, .tv-screen')) return true;
+    if (target.closest(CONTROLS) || target.closest('.hand-fan, .hand-fan-controls')) return true;
     for (let node = target; node; node = node.parentElement) {
       if (scroller(node)) return true;
     }

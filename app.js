@@ -622,9 +622,9 @@
       return;
     }
     bienvenidaNombre = "";
+    // Con el nombre puesto se entra en Inicio. La guía no se abre sola: está en la barra de
+    // abajo (y en «Ver el manual», bajo «Jugar» en la portada) para quien quiera verla.
     home();
-    // Quien empieza de cero ve primero la guía en vídeo; una sola vez, aunque la cierre antes de acabar.
-    if (CT.Tutorial && !CT.Tutorial.seen()) { CT.Tutorial.markSeen(); rules(); }
   }
 
   // La portada tiene dos puertas y nada más: jugar y el reto del día (el atlas vive en la barra). Encima,

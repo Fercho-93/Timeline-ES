@@ -48,7 +48,7 @@ Casi todo el juego vive suelto en la carpeta principal. Se agrupa aquí por func
 | `accounts.css` | Estilo de las pantallas de cuenta y bienvenida. |
 | `quick-challenges.css` | Estilo de Retos rápidos. |
 | `mesa-escala.js`, `mesa-escala.css` | La mesa de juego siempre igual: se dibuja como en la pantalla de un iPhone Pro (402 × 874) y se escala entera a cualquier móvil u ordenador, con las mismas posiciones y proporciones. |
-| `tutorial.js`, `tutorial.css` | La guía en vídeo con la que se abre la Guía (y que ve una vez quien acaba de llegar): escenas que se reproducen solas con subtítulos, un dedo que hace las jugadas y una colocación que hace quien mira. Explica de qué va el juego, cómo se colocan las cartas y las modalidades. |
+| `tutorial.js`, `tutorial.css` | La guía en vídeo con la que se abre la Guía (y «Ver el manual», bajo «Jugar» en la portada). No se abre sola: solo desde esos dos botones. Escenas que se reproducen solas con un subtítulo corto y un dedo que hace las jugadas; quien mira no tiene que jugar nada. Tres capítulos: lo básico (cartas, línea, turno, fallo y dónde está cada cosa en Inicio), jugar solo (rondas, dificultad, Retos rápidos y reto del día) y en grupo (mano, quién empieza y desempate, con amigos, poderes y online). |
 | `effects.js`, `immersion.js`, `mapa.js` | Animaciones, ambiente de la mesa y zoom de la línea de cartas. Solo decoran: no deciden jugadas. |
 | `drag.js`, `swipe.js` | Arrastrar cartas con el dedo y deslizar para volver atrás. |
 | `a11y.js` | Accesibilidad: poder jugar con teclado o con lector de pantalla. |

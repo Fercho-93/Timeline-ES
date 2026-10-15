@@ -1,11 +1,10 @@
-// La guía en vídeo: el juego se explica mostrándolo. Cada escena se reproduce sola, con
-// subtítulos y un dedo que hace las jugadas, y en algunos momentos se detiene para que la
-// jugada la haga quien mira. Se pausa, se avanza y se rebobina como un vídeo; no es un
-// vídeo de verdad, sino la misma mesa dibujada con cartas reales del mazo, así que nunca
-// enseña algo que luego el tablero contradiga. No gasta vidas ni cambia el progreso.
+// La guía en vídeo: el juego se explica mostrándolo. Cada escena se reproduce sola, con un
+// subtítulo corto y un dedo que hace las jugadas. Se pausa, se avanza y se rebobina como un
+// vídeo; no es un vídeo de verdad, sino la misma mesa dibujada con cartas reales del mazo, así
+// que nunca enseña algo que luego el tablero contradiga. Solo se mira: no pide ninguna jugada,
+// no gasta vidas ni cambia el progreso.
 (() => {
   const CT = window.CONTINUUM;
-  const SEEN_KEY = "continuum-tutorial-visto-v1";
   const esc = value => CT.escapeHtml(value);
 
   // Las cartas de los ejemplos se toman de puntos separados del mazo, ordenadas y con valores
@@ -28,163 +27,228 @@
   }
 
   // Un hueco de la línea. Como en la mesa de verdad, el primero (antes de todo) es «−» y los
-  // demás «+».
-  const gapHtml = (index, interactive) => `<button type="button" class="tv-gap" data-gap="${index}"${interactive ? "" : ' tabindex="-1" aria-hidden="true"'} aria-label="Colocar en el hueco ${index + 1}">${index === 0 ? "−" : "+"}</button>`;
+  // demás «+». Es un dibujo, no un botón: el vídeo solo se mira.
+  const gapHtml = index => `<span class="tv-gap" data-gap="${index}" aria-hidden="true">${index === 0 ? "−" : "+"}</span>`;
   // Una línea con sus huecos entre carta y carta (y en los extremos).
-  function lineMarkup(modeKey, list, { gaps = true, interactive = false } = {}) {
-    const gap = index => gaps ? gapHtml(index, interactive) : "";
+  function lineMarkup(modeKey, list, { gaps = true } = {}) {
+    const gap = index => gaps ? gapHtml(index) : "";
     return `<div class="tv-line">${list.map((card, index) => gap(index) + cardMarkup(modeKey, card.card || card, card.opts || {})).join("")}${gap(list.length)}</div>`;
   }
 
+  // Dónde está en la aplicación lo que cuenta la escena: los botones que hay que pulsar.
+  const path = steps => `<div class="tv-path">${steps.map(step => `<span>${esc(step)}</span>`).join('<i aria-hidden="true">›</i>')}</div>`;
   function tile(icon, name, facts, extra = "") {
-    return `<div class="tv-tile${extra ? " " + extra : ""}"><i aria-hidden="true">${icon}</i><b>${name}</b><small>${facts}</small></div>`;
+    return `<div class="tv-tile${extra ? " " + extra : ""}"><i aria-hidden="true">${icon}</i><b>${name}</b>${facts ? `<small>${facts}</small>` : ""}</div>`;
+  }
+  const hearts = () => `<div class="tv-lives" aria-hidden="true"><i>♥</i><i>♥</i><i>♥</i></div>`;
+  const dots = marks => `<div class="tv-dots">${marks.split("").map(m => `<span data-mark="${m === "✓" ? "ok" : "bad"}">${m}</span>`).join("")}</div>`;
+
+  // Los niveles salen de las mismas reglas que usa la partida (ghost.js): si cambian, el vídeo
+  // cambia con ellas.
+  const FALLBACK_LEVELS = {
+    easy: { name: "Fácil", extra: 0, seconds: 0, hidden: "never" }, normal: { name: "Normal", extra: 1, seconds: 30, hidden: "never" },
+    hard: { name: "Difícil", extra: 2, seconds: 20, hidden: "sometimes" }, expert: { name: "Experto", extra: 2, seconds: 15, hidden: "always" }
+  };
+  function levelsTable(time) {
+    const levels = Object.values(CT.Ghost?.LEVELS || FALLBACK_LEVELS);
+    const row = (label, value) => `<div class="tv-level-row"><span>${label}</span>${levels.map((level, i) => `<b data-level="${i}">${value(level)}</b>`).join("")}</div>`;
+    return `<div class="tv-levels" style="--tv-levels:${levels.length}">${row("", level => esc(level.name)).replace("tv-level-row", "tv-level-row tv-level-head")}
+      ${row("Reloj", level => level.seconds ? `${level.seconds} s` : "No")}
+      ${row("Por acierto", level => level.extra ? `+${level.extra} carta${level.extra > 1 ? "s" : ""}` : "—")}
+      ${row(time ? "Fechas ocultas" : "Cifras ocultas", level => ({ never: "No", sometimes: "A veces", always: "Siempre" })[level.hidden] || "No")}</div>`;
+  }
+
+  // Un reto rápido de verdad, para enseñar que cada mazo trae su propia regla.
+  function quickExample() {
+    const list = CT.QuickCatalog?.challenges || [];
+    const deck = list.find(item => item.id === "sports-players") || list[0];
+    return deck ? `<div class="tv-deck"><b>${esc(deck.title)}</b><small>${esc(deck.rule)}</small></div>` : "";
   }
 
   // ── Las escenas ────────────────────────────────────────────────────────────────────────
-  // Cada escena dibuja su mesa (`html`) y una lista de pasos [milisegundo, acción]. Una
-  // acción con `wait` detiene el reloj hasta que quien mira hace la jugada.
+  // Cada escena dibuja su mesa (`html`) y una lista de pasos [milisegundo, acción].
   // `portada`: el vídeo se ve suelto desde la portada, sin manual debajo; al acabar se vuelve a ella.
   function scenes(modeKey, portada = false) {
     const s = sample(modeKey);
     const time = CT.mode(modeKey).axis === "time";
     const order = time ? "de antes a después" : "de menor a mayor";
+    const [less, more] = CT.axis?.(modeKey)?.ends || (time ? ["Antes", "Después"] : ["Menos", "Más"]);
     const [A, B, C, D, E, F, G] = s;
-    const hidden = card => ({ card, opts: { hidden: true } });
-    const examples = [["history", "Fechas", "de antes a después"], ["animals", "Cifras", "de menor a mayor"]]
-      .filter(([key]) => CT.has(key) && CT.cards(key).length)
-      .map(([key, kind, how]) => { const card = CT.cards(key)[Math.floor(CT.cards(key).length / 3)]; return `<div class="tv-example">${cardMarkup(key, card)}<span><b>${kind}</b><small>${esc(CT.mode(key).name)} · ${how}</small></span></div>`; }).join("");
+
+    // Una carta de fechas y otra de cifras, si el juego tiene los dos mazos; si no, la del mazo abierto.
+    const kinds = ["history", "animals"].filter(key => CT.has(key) && CT.cards(key).length)
+      .map(key => [key, CT.cards(key)[Math.floor(CT.cards(key).length / 3)]]);
+    const pair = (kinds.length === 2 ? kinds : [[modeKey, D]])
+      .map(([key, card]) => `<figure class="tv-kind">${cardMarkup(key, card, { hidden: true, extra: "tv-big" })}<figcaption>${esc(CT.mode(key).name)}</figcaption></figure>`).join("");
+
+    // Quién empieza: cada uno dice el dato de la carta D. Las respuestas son valores reales del
+    // mazo, así que se escriben en su unidad; empieza quien más se acerca.
+    const guesses = [["Ana", B], ["Luis", E], ["Sara", G]];
+    const target = CT.sortValue(modeKey, D);
+    const closest = guesses.reduce((best, [, card], i) => Math.abs(CT.sortValue(modeKey, card) - target) < Math.abs(CT.sortValue(modeKey, guesses[best][1]) - target) ? i : best, 0);
+
+    const seat = (name, cards) => `<div class="tv-seat"><b>${name}</b><span class="tv-minihand">${"<i></i>".repeat(cards)}</span><em></em></div>`;
 
     return [
-      // 1 · De qué va
-      { chapter: 0, title: "Cada carta esconde un dato", duration: 6200,
-        html: `<div class="tv-center"><div class="tv-logo">Continuum</div>${cardMarkup(modeKey, D, { hidden: true, extra: "tv-big" })}</div>`,
+      // 1 · Lo básico
+      { chapter: 0, title: "Cada carta, un dato", duration: 6800,
+        html: `<div class="tv-center"><div class="tv-pair">${pair}</div></div>`,
         steps: [
-          [0, c => c.say("Cada carta esconde un dato: una fecha, un peso, una población…")],
-          [900, c => c.add(".tv-big", "is-in")],
-          [2700, c => { c.fingerTo(".tv-big"); }],
-          [3300, c => { c.tap(); c.reveal(".tv-big"); }]
+          [0, c => c.say("Cada carta esconde un dato.")],
+          [300, c => c.stagger(".tv-kind", 350)],
+          [2400, c => c.fingerTo(".tv-big")],
+          [2900, c => { c.tap(); c.reveal(".tv-big"); c.fingerHide(); }],
+          [3300, c => c.say("Según el mazo, una fecha o una cifra.")]
         ] },
-      { chapter: 0, title: "El objetivo", duration: 7600,
-        html: `<div class="tv-center">${lineMarkup(modeKey, [A, C, E, G], { gaps: false })}<div class="tv-axis"><span>${time ? "Antes" : "Menos"}</span><i></i><span>${time ? "Después" : "Más"}</span></div></div>`,
+      { chapter: 0, title: "La línea", duration: 7000,
+        html: `<div class="tv-center">${lineMarkup(modeKey, [A, C, E, G], { gaps: false })}<div class="tv-axis"><span>${esc(less)}</span><i></i><span>${esc(more)}</span></div></div>`,
         steps: [
-          [0, c => c.say(`Colócalas en su sitio de la línea, ${order}, sin ver su dato hasta hacerlo.`)],
+          [0, c => c.say("Tu objetivo: poner cada carta en su sitio de la línea.")],
           [300, c => c.stagger(".tv-line .tv-card", 380)],
-          [2400, c => c.add(".tv-axis", "is-in")]
+          [2600, c => c.add(".tv-axis", "is-in")],
+          [3400, c => c.say(`La línea va ${order}.`)]
         ] },
-      { chapter: 0, title: "Fechas y cifras", duration: 7400,
-        html: `<div class="tv-center"><div class="tv-examples">${examples}</div></div>`,
+      { chapter: 0, title: "Tu turno", duration: 10000,
+        html: `<div class="tv-table">${lineMarkup(modeKey, [B, E])}<div class="tv-hand">${cardMarkup(modeKey, C, { hidden: true })}</div><span class="tv-confirm" aria-hidden="true">Sí, aquí</span></div>`,
         steps: [
-          [0, c => c.say("Unos mazos se ordenan por fechas y otros por cifras: peso, población, superficie…")],
-          [300, c => c.stagger(".tv-example", 1700)]
-        ] },
-
-      // 2 · Colocar cartas
-      { chapter: 1, title: "Arrastra o toca el hueco", duration: 10400,
-        html: `<div class="tv-table">${lineMarkup(modeKey, [B, E])}<div class="tv-hand">${cardMarkup(modeKey, C, { hidden: true })}</div><button type="button" class="tv-confirm" tabindex="-1" aria-hidden="true">Sí, aquí</button></div>`,
-        steps: [
-          [0, c => c.say("Arrastra la carta a un hueco, o toca el hueco, y confirma con «Sí, aquí».")],
+          [0, c => c.say("Arrastra la carta al hueco donde crees que va, o tócalo.")],
           [400, c => c.add(".tv-hand .tv-card", "is-in")],
-          [2000, c => c.fingerTo(".tv-hand .tv-card")],
-          [2600, c => c.press(true)],
-          [3100, c => c.dragTo(".tv-hand .tv-card", '.tv-gap[data-gap="1"]')],
-          [4300, c => { c.press(false); c.drop('.tv-gap[data-gap="1"]'); }],
-          [5200, c => c.add(".tv-confirm", "is-in")],
-          [6200, c => c.fingerTo(".tv-confirm")],
-          [6800, c => c.tap()],
-          [7400, c => { c.reveal(".tv-line .is-placed", true); c.remove(".tv-confirm", "is-in"); c.fingerHide(); }]
+          [1800, c => c.fingerTo(".tv-hand .tv-card")],
+          [2400, c => c.press(true)],
+          [2900, c => c.dragTo(".tv-hand .tv-card", '.tv-gap[data-gap="1"]')],
+          [4100, c => { c.press(false); c.drop('.tv-gap[data-gap="1"]'); }],
+          [4800, c => { c.add(".tv-confirm", "is-in"); c.say("Confirma con «Sí, aquí»."); }],
+          [5800, c => c.fingerTo(".tv-confirm")],
+          [6400, c => c.tap()],
+          [6900, c => { c.reveal(".tv-line .is-placed", true); c.remove(".tv-confirm", "is-in"); c.fingerHide(); c.say("Se descubre el dato. Si encaja, la carta se queda."); }]
         ] },
-      { chapter: 1, title: "Si fallas", duration: 8800,
-        html: `<div class="tv-table">${lineMarkup(modeKey, [B, C, E])}<div class="tv-hand">${cardMarkup(modeKey, F, { hidden: true })}</div></div>`,
+      { chapter: 0, title: "Si fallas", duration: 9200,
+        html: `<div class="tv-table">${hearts()}${lineMarkup(modeKey, [B, C, E])}<div class="tv-hand">${cardMarkup(modeKey, F, { hidden: true })}</div></div>`,
         steps: [
-          [0, c => c.say("Si fallas, la línea marca dónde iba la carta y esta pasa a su sitio.")],
-          [300, c => c.add(".tv-hand .tv-card", "is-in")],
-          [1500, c => c.fingerTo('.tv-gap[data-gap="1"]')],
-          [2100, c => { c.tap(); c.drop('.tv-gap[data-gap="1"]'); }],
-          [3000, c => { c.reveal(".tv-line .is-placed", false); c.fingerHide(); }],
-          [4300, c => c.mark(4)],
-          [6000, c => c.move(".tv-line .is-placed", 3)]
+          [0, c => { c.say("Si fallas…"); c.add(".tv-hand .tv-card", "is-in"); c.add(".tv-lives", "is-in"); }],
+          [1200, c => c.fingerTo('.tv-gap[data-gap="1"]')],
+          [1800, c => { c.tap(); c.drop('.tv-gap[data-gap="1"]'); }],
+          [2600, c => { c.reveal(".tv-line .is-placed", false); c.fingerHide(); c.say("…la línea marca dónde iba."); }],
+          [3400, c => c.mark(4)],
+          [5600, c => { c.move(".tv-line .is-placed", 3); c.lose(".tv-lives"); c.say("En una ronda, la carta pasa a su sitio y pierdes una vida."); }]
         ] },
-      { chapter: 1, title: "Ahora tú", duration: 6000, interactive: true,
-        html: `<div class="tv-table is-yours">${lineMarkup(modeKey, [B, C, F], { interactive: true })}<div class="tv-hand">${cardMarkup(modeKey, D, { hidden: true, extra: "is-draggable" })}</div><button type="button" class="tv-confirm" disabled>Sí, aquí</button></div>`,
-        correct: 2,
+      { chapter: 0, title: "Dónde se juega", duration: 8600,
+        html: `<div class="tv-home"><div class="tv-door tv-door-play"><b>Jugar</b><span aria-hidden="true">⌄</span></div>
+          <div class="tv-choices"><span>☺ Jugar solo</span><span>♟ Jugar con amigos</span><span>◎ Jugar online</span></div>
+          <div class="tv-door tv-door-join">Unirme a una partida</div><div class="tv-door tv-door-daily">☼ Reto del día</div></div>`,
         steps: [
-          [0, c => { c.say("Ahora tú. ¿Dónde va esta carta? Toca un hueco o arrástrala."); c.add(".tv-hand .tv-card", "is-in"); }],
-          [700, c => c.wait()],
-          [1000, c => c.say("¡Exacto! Así se juega. Aquí no gastas nada.")]
+          [0, c => { c.say("En Inicio, toca «Jugar» y elige: solo, con amigos u online."); c.add(".tv-home", "is-in"); }],
+          [1100, c => c.fingerTo(".tv-door-play")],
+          [1700, c => { c.tap(); c.add(".tv-door-play", "is-open"); c.add(".tv-choices", "is-open"); }],
+          [1900, c => c.stagger(".tv-choices span", 300)],
+          [3600, c => c.fingerHide()],
+          [4800, c => { c.say("Debajo, «Unirme a una partida» y el reto del día."); c.stagger(".tv-door-join, .tv-door-daily", 400); }]
         ] },
 
-      // 3 · Modalidades
-      { chapter: 2, title: "Elige cómo jugar", duration: 9400,
-        html: `<div class="tv-board"><div class="tv-kicker">En Inicio, «Jugar» abre tres caminos</div><div class="tv-tiles tv-three">
-          ${tile("☺", "Jugar solo", "Colecciones, Retos rápidos o competición")}${tile("♟", "Con amigos", "En el mismo móvil o cada uno en el suyo")}${tile("◎", "Online", "Mesas públicas")}</div>
-          <div class="tv-daily">${tile("☼", "Reto del día", "Uno al día, el mismo para todo el mundo", "tv-wide")}</div></div>`,
+      // 2 · Jugar solo
+      { chapter: 1, title: "Rondas", duration: 10400,
+        html: `<div class="tv-board">${path(["Jugar solo", "Grandes colecciones"])}<div class="tv-round"><div class="tv-round-head"><b>Ronda</b>${hearts()}</div>${dots("✓✓✓✗✓✓✓✓✓✓")}<div class="tv-stars">★★<i>★</i></div></div>
+          <div class="tv-tiles">${tile("∞", "Maratón", "Todo el mazo · 3 vidas")}${tile("◈", "Competición", "Varios temas · 3 vidas en cada uno")}</div></div>`,
         steps: [
-          [0, c => c.say("«Jugar» tiene tres caminos: solo, con amigos u online. Y cada día, un reto.")],
-          [400, c => c.stagger(".tv-three .tv-tile", 500)],
-          [3200, c => c.stagger(".tv-daily .tv-tile", 0)]
+          [0, c => { c.say("Elige un mazo y juega una ronda: 10 cartas, 3 vidas."); c.add(".tv-lives", "is-in"); }],
+          [500, c => c.stagger(".tv-dots span", 260)],
+          [1300, c => c.lose(".tv-lives")],
+          [3600, c => { c.add(".tv-stars", "is-in"); c.say("Si la acabas con vidas, cada una que te quede es una estrella."); }],
+          [6800, c => { c.say("También hay maratón, con el mazo entero, y competición."); c.stagger(".tv-tile", 500); }]
         ] },
-      { chapter: 2, title: "Reto del día", duration: 11000,
-        html: `<div class="tv-board"><div class="tv-kicker">☼ Reto del día</div><div class="tv-dots">${"✓✓✗✓✓✓✗✓✓✗".split("").map(m => `<span data-mark="${m === "✓" ? "ok" : "bad"}">${m}</span>`).join("")}</div><div class="tv-score">7 de 10</div>
-          <div class="tv-facts"><span>10 cartas</span><span>Sin vidas ni tiempo</span><span>Mismas cartas para todos</span><span>Puntúa en el ranking</span><span>Pares: Grandes colecciones</span><span>Impares: Retos rápidos</span></div></div>`,
+      { chapter: 1, title: "Dificultad", duration: 10200,
+        html: `<div class="tv-board">${path(["Jugar solo", "Grandes colecciones", "Dificultad"])}${levelsTable(time)}</div>`,
         steps: [
-          [0, c => c.say("10 cartas al día, las mismas para todos, sin vidas ni tiempo. Puntúa en el ranking.")],
-          [600, c => c.stagger(".tv-dots span", 280)],
-          [3600, c => c.add(".tv-score", "is-in")],
-          [5600, c => c.stagger(".tv-facts span", 220)]
+          [0, c => c.say("Hay cuatro niveles. En Fácil no hay reloj.")],
+          [300, c => c.stagger(".tv-level-row", 350)],
+          [1600, c => c.focus(".tv-levels", 0)],
+          [3600, c => { c.focus(".tv-levels", 1); c.say("Desde Normal hay reloj, y cada acierto añade cartas a la línea."); }],
+          [5400, c => c.focus(".tv-levels", 2)],
+          [7000, c => { c.focus(".tv-levels", 3); c.say(`En Experto, la línea oculta sus ${time ? "fechas" : "cifras"}: te guías por las ilustraciones.`); }]
         ] },
-      { chapter: 2, title: "Jugar solo", duration: 11400,
-        html: `<div class="tv-board"><div class="tv-kicker">☺ Jugar solo · Grandes colecciones</div><div class="tv-tiles">
-          ${tile("∞", "Rondas", "10 cartas · 3 vidas · una ★ por vida que te quede")}${tile("∞", "Maratón", "El mazo entero, hasta perder las 3 vidas")}${tile("◈", "Competición", "Varios temas seguidos")}</div>
-          <div class="tv-levels">${Object.values(CT.Ghost?.LEVELS || { a: { name: "Fácil" }, b: { name: "Normal" }, c: { name: "Difícil" }, d: { name: "Experto" } }).map(level => `<span>${esc(level.name)}</span>`).join("")}</div></div>`,
+      { chapter: 1, title: "Retos rápidos", duration: 9800,
+        html: `<div class="tv-board">${path(["Jugar solo", "Retos rápidos"])}${quickExample()}<div class="tv-tiles">
+          ${tile("☀", "Mazos del día", "4 mazos, nuevos cada día")}${tile("?", "Partida sorpresa", "1, 3, 5 o más, al azar")}</div></div>`,
         steps: [
-          [0, c => c.say("Jugando solo eliges mazo y dificultad; cada fallo cuesta una de tus 3 vidas.")],
-          [400, c => c.stagger(".tv-tiles .tv-tile", 700)],
-                    [5600, c => c.stagger(".tv-levels span", 300)],
-          [8000, c => c.sweep(".tv-levels span", 600)]
+          [0, c => { c.say("Mazos cortos, cada uno con su propia regla de orden."); c.add(".tv-deck", "is-in"); }],
+          [3400, c => { c.say("Juega uno de los mazos del día o una partida sorpresa."); c.stagger(".tv-tile", 500); }],
+          [6800, c => c.say("Un fallo no te saca del reto: cuentan los aciertos.")]
         ] },
-      { chapter: 2, title: "Retos rápidos", duration: 8800,
-        html: `<div class="tv-board"><div class="tv-kicker">⇅ Retos rápidos</div><p class="tv-note">Mazos cortos, cada uno con su propia regla de orden, que se lee antes de empezar.</p><div class="tv-tiles">
-          ${tile("☀", "Mazos del día", "Cuatro mazos que cambian cada día, los mismos para todo el mundo")}${tile("?", "Partida sorpresa", "Mazos al azar: de 1 a 20, o todo el catálogo")}</div></div>`,
+      { chapter: 1, title: "Reto del día", duration: 9600,
+        html: `<div class="tv-board">${path(["Inicio", "Reto del día"])}${dots("✓✓✗✓✓✓✗✓✓✗")}<div class="tv-score">7 de 10</div>
+          <div class="tv-facts"><span>Un intento al día</span><span>Días pares: Grandes colecciones</span><span>Impares: Retos rápidos</span></div></div>`,
         steps: [
-          [0, c => c.say("Mazos cortos con su propia regla. Juega los del día o una partida sorpresa.")],
-          [500, c => c.add(".tv-note", "is-in")],
-          [2600, c => c.stagger(".tv-tiles .tv-tile", 900)]
+          [0, c => c.say("Cada día, un reto de 10 cartas, las mismas para todos.")],
+          [500, c => c.stagger(".tv-dots span", 260)],
+          [3300, c => c.add(".tv-score", "is-in")],
+          [4400, c => c.say("Sin vidas ni reloj. Puntúa en el ranking diario y semanal.")],
+          [5600, c => c.stagger(".tv-facts span", 350)]
         ] },
-      { chapter: 2, title: "Con amigos", duration: 12600,
-        html: `<div class="tv-board"><div class="tv-kicker">♟ Con amigos</div><div class="tv-pass"><span class="tv-phone" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10.5 18.5h3"/></svg></span><span class="tv-people"><b>Ana</b><b>Luis</b><b>Sara</b></span></div><div class="tv-tiles">
-          ${tile("♟", "Un solo móvil", "2–9 personas · pasáis el teléfono")}${tile("⌁", "En directo", "Cada uno en su móvil, todos a la vez")}${tile("⇄", "Por turnos", "Un duelo entre dos, cuando cada uno pueda")}${tile("↗", "Mismas cartas", "Juega y reta con un enlace")}</div></div>`,
+
+      // 3 · En grupo
+      { chapter: 2, title: "Tu mano", duration: 11000,
+        html: `<div class="tv-board"><div class="tv-path"><span>Grandes colecciones · en grupo</span></div><div class="tv-seats">${seat("Ana", 3)}${seat("Luis", 3)}${seat("Sara", 3)}</div>
+          <div class="tv-piles"><span data-pile="deck">Mazo</span><span data-pile="discard">Descarte</span></div></div>`,
         steps: [
-          [0, c => c.say("Un solo móvil, o cada uno en el suyo: en directo, por turnos o con las mismas cartas.")],
-          [400, c => c.add(".tv-pass", "is-in")],
-          [900, c => c.cycle(".tv-people b", 900, 3)],
-          [6400, c => c.stagger(".tv-tiles .tv-tile", 500)]
+          [0, c => { c.say("En grupo, cada uno juega con su mano de cartas."); c.stagger(".tv-seat", 300); }],
+          [1200, c => c.add(".tv-piles", "is-in")],
+          [2600, c => { c.turn(0); c.say("Si aciertas, te queda una carta menos."); }],
+          [3300, c => c.play(0, true)],
+          [5000, c => { c.turn(1); c.say("Si fallas, va al descarte y robas otra."); }],
+          [5700, c => { c.play(1, false); c.pulse('[data-pile="discard"]'); }],
+          [6600, c => { c.draw(1); c.pulse('[data-pile="deck"]'); }],
+          [8000, c => { c.turn(0); c.say("Gana quien se quede sin cartas."); }],
+          [8400, c => c.play(0, true)],
+          [8900, c => c.play(0, true)],
+          [9400, c => c.win(0)]
         ] },
-      { chapter: 2, title: "Poderes", duration: 9400,
-        html: `<div class="tv-board"><div class="tv-kicker">Poderes · solo en partidas en grupo</div><div class="tv-tiles">
-          ${tile("◌", "Fantasma", "Una vuelta entera con los datos y las ilustraciones ocultos")}${tile("ϟ", "Pulso", "Retas a un rival: los dos colocáis la misma carta a ciegas")}</div><p class="tv-note">Opcionales: se activan al preparar la partida.</p></div>`,
+      { chapter: 2, title: "Quién empieza", duration: 10600,
+        html: `<div class="tv-center">${cardMarkup(modeKey, D, { hidden: true, extra: "tv-big tv-guess-card" })}<div class="tv-guesses">${guesses.map(([name, card], i) => `<span data-guess="${i}"><b>${name}</b>${esc(CT.shortValue(modeKey, card))}</span>`).join("")}</div></div>`,
         steps: [
-          [0, c => c.say("En grupo, puedes usar Fantasma (datos ocultos una vuelta) o retar con el Pulso.")],
-          [500, c => c.stagger(".tv-tiles .tv-tile", 1600)],
-          [5400, c => c.add(".tv-note", "is-in")]
+          [0, c => { c.say("Para ver quién empieza, todos escriben el dato de una carta."); c.add(".tv-big", "is-in"); }],
+          [1000, c => c.stagger(".tv-guesses span", 450)],
+          [3800, c => { c.reveal(".tv-big"); c.say("Empieza quien más se acerque."); }],
+          [4300, c => c.add(`[data-guess="${closest}"]`, "is-on")],
+          [7000, c => c.say("Si en la misma vuelta varios se quedan sin cartas, se desempata igual.")]
         ] },
-      { chapter: 2, title: "Online", duration: 8600,
-        html: `<div class="tv-board"><div class="tv-kicker">◎ Jugar online</div><div class="tv-table-seats"><span>●</span><span>●</span><span class="is-free">○</span><span class="is-free">○</span></div><div class="tv-tiles">
-          ${tile("◎", "Mesas públicas", "2–4 plazas · crea una o siéntate")}${tile("⚡", "Partida rápida", "Te buscamos mesa")}</div></div>`,
+      { chapter: 2, title: "Con amigos", duration: 11000,
+        html: `<div class="tv-board">${path(["Jugar", "Jugar con amigos"])}<div class="tv-ways">
+          <div class="tv-way tv-way-one"><b>Un solo móvil</b><span class="tv-pass"><span class="tv-phone" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10.5 18.5h3"/></svg></span><span class="tv-people"><b>Ana</b><b>Luis</b><b>Sara</b></span></span><small>De 2 a 9 personas</small></div>
+          <div class="tv-way tv-way-many"><b>Cada uno en su móvil</b><span class="tv-rhythms"><span><b>En directo</b>Todos a la vez</span><span><b>Por turnos</b>Un duelo a dos, sin prisa</span><span><b>Mismas cartas</b>Juegas y retas con un enlace</span></span></div></div></div>`,
         steps: [
-          [0, c => c.say("Mesas públicas de 2 a 4 jugadores: crea una, siéntate en otra o pide partida rápida.")],
-          [400, c => c.add(".tv-table-seats", "is-in")],
-          [1600, c => c.fill(".tv-table-seats .is-free", 900)],
-          [3600, c => c.stagger(".tv-tiles .tv-tile", 600)]
+          [0, c => { c.say("En un solo móvil, de 2 a 9: os pasáis el teléfono en cada turno."); c.add(".tv-way-one", "is-in"); }],
+          [500, c => c.cycle(".tv-people b", 800, 2)],
+          [4400, c => { c.add(".tv-way-many", "is-in"); c.stagger(".tv-rhythms > span", 450); c.say("O cada uno en el suyo: en directo, por turnos o con las mismas cartas."); }],
+          [8200, c => c.say("Te unes a la de otro en «Unirme a una partida».")]
         ] },
-      { chapter: 2, title: "¡A jugar!", duration: 4000, last: true,
-        html: `<div class="tv-center tv-end"><div class="tv-logo">¡Ya sabes jugar!</div><p>Para tu primera partida: «Jugar solo», un mazo de Grandes colecciones, en Fácil.</p><div class="tv-end-actions"><button type="button" class="btn btn-secondary" data-tv="replay">Ver otra vez</button>${portada ? "" : '<button type="button" class="btn btn-ghost" data-tv="manual">Ver el manual</button>'}</div></div>`,
+      { chapter: 2, title: "Poderes", duration: 11400,
+        html: `<div class="tv-board"><div class="tv-path"><span>Opcionales · se activan al preparar la partida</span></div><div class="tv-powers">
+          <div class="tv-power" data-power="ghost"><i aria-hidden="true">◌</i><b>Fantasma</b><span class="tv-mini" aria-hidden="true"><em>?</em><em>?</em><em>?</em></span></div>
+          <div class="tv-power" data-power="pulse"><i aria-hidden="true">ϟ</i><b>Pulso</b><span class="tv-duel" aria-hidden="true"><em>Tú</em><i>ϟ</i><em>Luis</em></span></div></div>
+          <p class="tv-note">No hay poderes en duelos, competición, mesas públicas ni Retos rápidos.</p></div>`,
         steps: [
-          [0, c => { c.say(portada ? "¡Listo! Ya sabes jugar. Pulsa «Jugar» para empezar." : "¡Listo! Ya sabes jugar. Los detalles están en el manual, debajo."); c.add(".tv-end", "is-in"); }]
+          [0, c => { c.say("Si se activan, algunas cartas traen un poder. Cada uno se usa una vez."); c.stagger(".tv-power", 400); }],
+          [3200, c => { c.add('[data-power="ghost"]', "is-on"); c.say("Fantasma: durante una vuelta, las cartas ocultan su dato y su ilustración."); }],
+          [7000, c => { c.remove('[data-power="ghost"]', "is-on"); c.add('[data-power="pulse"]', "is-on"); c.say("Pulso: retas a alguien con la misma carta. Si solo aciertas tú, le pasas una."); }],
+          [9200, c => c.add(".tv-note", "is-in")]
+        ] },
+      { chapter: 2, title: "Online", duration: 8800,
+        html: `<div class="tv-board">${path(["Jugar", "Jugar online"])}<div class="tv-table-seats"><span>●</span><span>●</span><span class="is-free">○</span><span class="is-free">○</span></div><div class="tv-tiles tv-three">
+          ${tile("◎", "Mesas abiertas", "Siéntate en una")}${tile("+", "Crear mesa", "Juego, plazas y tiempo")}${tile("⚡", "Partida rápida", "Te sentamos")}</div></div>`,
+        steps: [
+          [0, c => { c.say("Online juegas con otras personas, en mesas de 2 a 4."); c.add(".tv-table-seats", "is-in"); }],
+          [1400, c => c.fill(".tv-table-seats .is-free", 800)],
+          [3600, c => { c.say("Siéntate en una mesa, crea la tuya o pide partida rápida."); c.stagger(".tv-tile", 450); }]
+        ] },
+      { chapter: 2, title: "A jugar", duration: 4500, last: true,
+        html: `<div class="tv-center tv-end"><div class="tv-logo">A jugar</div><p>Para tu primera partida: «Jugar solo», un mazo de Grandes colecciones, en Fácil.</p><div class="tv-end-actions"><button type="button" class="btn btn-secondary" data-tv="replay">Ver otra vez</button>${portada ? "" : '<button type="button" class="btn btn-ghost" data-tv="manual">Ver el manual</button>'}</div></div>`,
+        steps: [
+          [0, c => { c.say(portada ? "Pulsa «Jugar» para empezar." : "Debajo tienes el manual, con todos los detalles."); c.add(".tv-end", "is-in"); }]
         ] }
     ];
   }
 
-  const CHAPTERS = ["De qué va", "Colocar cartas", "Modalidades"];
+  const CHAPTERS = ["Lo básico", "Jugar solo", "En grupo"];
 
   const ICON = {
     play: '<svg class="tv-ico-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.6v14.8c0 .9 1 1.4 1.7.9l11-7.4c.7-.4.7-1.4 0-1.8l-11-7.4C8 3.2 7 3.7 7 4.6Z"/></svg>',
@@ -229,7 +293,7 @@
     const list = scenes(modeKey, root.hasAttribute("data-portada"));
     const stage = root.querySelector(".tv-stage"), finger = root.querySelector(".tv-finger"), fade = root.querySelector(".tv-fade");
     const caption = root.querySelector(".tv-caption"), sceneTitle = root.querySelector(".tv-scene-title");
-    let index = 0, t = 0, applied = 0, playing = true, waiting = false, ended = false, last = 0, timer = 0;
+    let index = 0, t = 0, applied = 0, playing = true, ended = false, last = 0, timer = 0;
     const timeouts = new Set();
 
     const $ = sel => stage.querySelector(sel);
@@ -240,15 +304,29 @@
       const box = root.querySelector(".tv-screen").getBoundingClientRect(), r = el.getBoundingClientRect();
       return [r.left - box.left + r.width / 2, r.top - box.top + r.height / 2];
     };
+    const seat = i => $$(".tv-seat")[i];
     const ctx = {
       // Cada frase entra de nuevo (la clase se quita y se vuelve a poner para repetir la animación).
       say(text) { caption.textContent = text; caption.classList.remove("is-say"); void caption.offsetWidth; caption.classList.add("is-say"); },
       add(sel, cls) { $$(sel).forEach(el => el.classList.add(cls)); },
       remove(sel, cls) { $$(sel).forEach(el => el.classList.remove(cls)); },
       stagger(sel, gap) { $$(sel).forEach((el, i) => later(() => el.classList.add("is-in"), i * gap)); },
-      sweep(sel, gap) { $$(sel).forEach((el, i) => later(() => { $$(sel).forEach(o => o.classList.toggle("is-on", o === el)); }, i * gap)); },
       cycle(sel, gap, rounds) { const els = $$(sel); for (let i = 0; i < els.length * rounds; i++) later(() => els.forEach((el, k) => el.classList.toggle("is-on", k === i % els.length)), i * gap); },
       fill(sel, gap) { $$(sel).forEach((el, i) => later(() => { el.classList.remove("is-free"); el.textContent = "●"; }, i * gap)); },
+      pulse(sel) { $$(sel).forEach(el => { el.classList.remove("is-pulse"); void el.offsetWidth; el.classList.add("is-pulse"); }); },
+      // Resalta una columna de la tabla de niveles.
+      focus(sel, column) { $$(`${sel} [data-level]`).forEach(el => el.classList.toggle("is-on", el.dataset.level === String(column))); },
+      // Una vida menos: se apaga el último corazón que quede.
+      lose(sel) { $$(`${sel} i:not(.is-lost)`).pop()?.classList.add("is-lost"); },
+      // La mesa en grupo: de quién es el turno, una carta jugada (bien o mal), robar y ganar.
+      turn(i) { $$(".tv-seat").forEach((el, k) => { el.classList.toggle("is-turn", k === i); el.querySelector("em").textContent = ""; }); },
+      play(i, ok) {
+        const row = seat(i); if (!row) return;
+        row.querySelectorAll(".tv-minihand i:not(.is-out)")[0]?.classList.add("is-out", ok ? "is-ok" : "is-bad");
+        const mark = row.querySelector("em"); mark.textContent = ok ? "✓" : "✗"; mark.dataset.mark = ok ? "ok" : "bad";
+      },
+      draw(i) { seat(i)?.querySelector(".tv-minihand")?.insertAdjacentHTML("beforeend", '<i class="is-new"></i>'); },
+      win(i) { const row = seat(i); if (!row) return; row.classList.add("is-winner"); const mark = row.querySelector("em"); mark.textContent = "Gana"; mark.dataset.mark = "win"; },
       fingerTo(sel) { const el = typeof sel === "string" ? $(sel) : sel; if (!el) return; const [x, y] = centerOf(el); finger.style.transform = `translate(${x}px, ${y}px)`; finger.classList.add("is-in"); },
       fingerHide() { finger.classList.remove("is-in", "is-press"); },
       press(on) { finger.classList.toggle("is-press", on); },
@@ -261,17 +339,16 @@
         ctx.fingerTo(gap);
       },
       // La carta de la mano entra en la línea por el hueco indicado, todavía oculta.
-      // Se busca la carta que queda a la izquierda del hueco sin contar la propia, para que
-      // cambiar de idea con la carta ya en la línea la lleve al hueco que se ha tocado.
       drop(gapSel) {
-        const card = $(".tv-line .is-placed") || $(".tv-hand .tv-card"), gap = typeof gapSel === "string" ? $(gapSel) : gapSel;
+        const card = $(".tv-hand .tv-card"), gap = $(gapSel);
         const line = $(".tv-line"); if (!card || !gap || !line) return;
         let prev = gap.previousElementSibling;
-        while (prev && (prev === card || !prev.classList.contains("tv-card"))) prev = prev.previousElementSibling;
+        while (prev && !prev.classList.contains("tv-card")) prev = prev.previousElementSibling;
         card.remove();
         if (prev) prev.after(card); else line.prepend(card);
-        card.style.transform = ""; card.classList.remove("is-lifted", "is-in", "is-draggable", "is-bad");
+        card.style.transform = ""; card.classList.remove("is-lifted", "is-in");
         card.classList.add("is-placed");
+        $(".tv-hand")?.classList.add("is-empty");
         ctx.renumber();
       },
       renumber() {
@@ -279,15 +356,15 @@
         // Huecos entre cartas, sin dos seguidos ni carta sin hueco al lado.
         line.querySelectorAll(".tv-gap").forEach(gap => gap.remove());
         const cards = [...line.querySelectorAll(".tv-card")];
-        const interactive = stage.querySelector(".is-yours");
-        cards.forEach((card, i) => card.insertAdjacentHTML("beforebegin", gapHtml(i, interactive)));
-        line.insertAdjacentHTML("beforeend", gapHtml(cards.length, interactive));
+        cards.forEach((card, i) => card.insertAdjacentHTML("beforebegin", gapHtml(i)));
+        line.insertAdjacentHTML("beforeend", gapHtml(cards.length));
       },
       reveal(sel, ok) {
-        const el = $(sel); if (!el) return;
-        el.classList.remove("is-hidden");
-        if (ok === true) el.classList.add("is-ok");
-        if (ok === false) el.classList.add("is-bad");
+        $$(sel).forEach(el => {
+          el.classList.remove("is-hidden");
+          if (ok === true) el.classList.add("is-ok");
+          if (ok === false) el.classList.add("is-bad");
+        });
       },
       mark(gapIndex) { $(`.tv-gap[data-gap="${gapIndex}"]`)?.classList.add("is-here"); },
       move(sel, gapIndex) {
@@ -297,8 +374,7 @@
         if (others[gapIndex - 1]) others[gapIndex - 1].after(el); else line.prepend(el);
         el.classList.remove("is-bad"); el.classList.add("is-moved");
         ctx.renumber();
-      },
-      wait() { waiting = true; root.classList.add("is-waiting"); paint(); }
+      }
     };
 
     function build(target = 0) {
@@ -317,7 +393,6 @@
       sceneTitle.classList.remove("is-in"); void sceneTitle.offsetWidth; sceneTitle.classList.add("is-in");
       ctx.fingerHide(); finger.style.transform = "";
       caption.textContent = "";
-      waiting = false; root.classList.remove("is-waiting", "is-solved");
       t = 0; applied = 0;
       if (target > 0) {
         instant = true; root.classList.add("tv-instant");
@@ -330,11 +405,7 @@
 
     function advance(to) {
       const steps = list[index].steps;
-      while (applied < steps.length && steps[applied][0] <= to) {
-        steps[applied][1](ctx); applied++;
-        t = Math.max(t, steps[applied - 1][0]);
-        if (waiting) return;
-      }
+      while (applied < steps.length && steps[applied][0] <= to) { steps[applied][1](ctx); applied++; }
       t = to;
     }
 
@@ -358,18 +429,16 @@
       if (!root.isConnected) { stop(); return; }
       if (!playing) return;
       const moment = now(), dt = Math.min(200, moment - last); last = moment;
-      if (!waiting) {
-        advance(t + dt);
-        const scene = list[index];
-        if (!waiting && t >= scene.duration) {
-          if (scene.last || index >= list.length - 1) {
-            ended = true; playing = false; markSeen(); paint();
-            // Quien lo ha abierto (la portada) decide qué hacer al terminar.
-            root.dispatchEvent(new CustomEvent("tutorial-end", { bubbles: true }));
-            return;
-          }
-          index++; build();
+      advance(t + dt);
+      const scene = list[index];
+      if (t >= scene.duration) {
+        if (scene.last || index >= list.length - 1) {
+          ended = true; playing = false; paint();
+          // Quien lo ha abierto (la portada) decide qué hacer al terminar.
+          root.dispatchEvent(new CustomEvent("tutorial-end", { bubbles: true }));
+          return;
         }
+        index++; build();
       }
       paintProgress();
       timer = setTimeout(loop, 60);
@@ -393,50 +462,14 @@
       const play = root.querySelector(".tv-play"), big = root.querySelector(".tv-big-play");
       play.dataset.state = playing ? "playing" : ended ? "ended" : "paused";
       play.setAttribute("aria-label", playing ? "Pausar" : ended ? "Ver otra vez" : "Reproducir");
-      big.hidden = playing || ended || waiting;
+      big.hidden = playing || ended;
       root.classList.toggle("is-paused", !playing);
       root.classList.toggle("is-ended", ended);
       paintProgress();
     }
 
-    // La jugada de quien mira: tocar un hueco (o soltar la carta encima) y confirmar.
-    function choose(gap) {
-      if (!waiting || !gap) return;
-      $(".tv-line .is-placed, .tv-hand .tv-card")?.classList.remove("is-shake");
-      ctx.drop(gap);
-      const confirm = $(".tv-confirm"); confirm.disabled = false; confirm.classList.add("is-in");
-      ctx.say("Bien. Ahora confirma con «Sí, aquí», o toca otro hueco para cambiar de idea.");
-    }
-    function confirmPlacement() {
-      if (!waiting) return;
-      const card = $(".tv-line .is-placed"); if (!card) return;
-      const position = [...$(".tv-line").querySelectorAll(".tv-card")].indexOf(card);
-      CT.Sonidos?.confirm?.();
-      const confirm = $(".tv-confirm");
-      if (position === list[index].correct) {
-        confirm.disabled = true; confirm.classList.remove("is-in");
-        ctx.reveal(".tv-line .is-placed", true);
-        CT.Sonidos?.result?.(true);
-        root.classList.add("is-solved"); root.classList.remove("is-waiting");
-        $$(".tv-gap").forEach(gap => { gap.disabled = true; });
-        waiting = false; last = now(); paint();
-        if (!playing) setPlaying(true);
-      } else {
-        card.classList.add("is-bad", "is-shake");
-        CT.Sonidos?.result?.(false);
-        const cards = [...$(".tv-line").querySelectorAll(".tv-card")].filter(other => other !== card);
-        const before = cards[list[index].correct - 1], after = cards[list[index].correct];
-        ctx.say(`Casi: prueba otro hueco. Va entre «${before?.querySelector("small").textContent}» y «${after?.querySelector("small").textContent}».`);
-        confirm.disabled = true;
-        later(() => { card.classList.remove("is-shake"); }, 500);
-      }
-    }
-
     root.addEventListener("click", event => {
       const control = event.target.closest("[data-tv]"), chapter = event.target.closest("[data-tv-chapter]"), seg = event.target.closest("[data-tv-scene]");
-      const gap = event.target.closest(".tv-gap"), confirm = event.target.closest(".tv-confirm");
-      if (gap && stage.contains(gap) && stage.querySelector(".is-yours")) { choose(gap); return; }
-      if (confirm && stage.contains(confirm) && !confirm.disabled && stage.querySelector(".is-yours")) { confirmPlacement(); return; }
       if (seg) { go(Number(seg.dataset.tvScene)); return; }
       if (chapter) { go(list.findIndex(scene => scene.chapter === Number(chapter.dataset.tvChapter))); return; }
       if (!control) return;
@@ -447,50 +480,19 @@
       else if (action === "replay") go(0);
       else if (action === "manual") root.closest(".guide-handbook")?.querySelector(".guide-manual")?.scrollIntoView?.({ behavior: "smooth", block: "start" });
     });
-    // Tocar la pantalla pausa o reanuda, como en un vídeo (salvo en la jugada propia).
+    // Tocar la pantalla pausa o reanuda, como en un vídeo.
     root.querySelector(".tv-screen").addEventListener("click", event => {
-      if (event.target.closest("button, .tv-card")) return;
-      if (!waiting) setPlaying(!playing);
+      if (event.target.closest("button")) return;
+      setPlaying(!playing);
     });
-
-    // Arrastrar la carta con el dedo hasta un hueco.
-    let drag = null;
-    stage.addEventListener("pointerdown", event => {
-      const card = event.target.closest(".is-yours .tv-hand .tv-card, .is-yours .tv-line .is-placed");
-      if (!card || !waiting) return;
-      drag = { card, x: event.clientX, y: event.clientY, moved: false };
-      card.setPointerCapture?.(event.pointerId);
-    });
-    stage.addEventListener("pointermove", event => {
-      if (!drag) return;
-      const dx = event.clientX - drag.x, dy = event.clientY - drag.y;
-      if (Math.hypot(dx, dy) > 6) drag.moved = true;
-      drag.card.classList.add("is-lifted");
-      drag.card.style.transform = `translate(${dx}px, ${dy}px) scale(.92)`;
-      const over = document.elementsFromPoint?.(event.clientX, event.clientY)?.find(el => el.classList?.contains("tv-gap"));
-      $$(".tv-gap").forEach(gap => gap.classList.toggle("is-over", gap === over));
-    });
-    const endDrag = event => {
-      if (!drag) return;
-      const { card, moved } = drag; drag = null;
-      card.style.transform = ""; card.classList.remove("is-lifted");
-      const over = moved && document.elementsFromPoint?.(event.clientX, event.clientY)?.find(el => el.classList?.contains("tv-gap"));
-      $$(".tv-gap").forEach(gap => gap.classList.remove("is-over"));
-      if (over) choose(over);
-    };
-    stage.addEventListener("pointerup", endDrag);
-    stage.addEventListener("pointercancel", endDrag);
 
     // Al salir de la aplicación el vídeo se queda en pausa, como cualquier reproductor.
     const onHidden = () => { if (!root.isConnected) document.removeEventListener("visibilitychange", onHidden); else if (document.hidden && playing) setPlaying(false); };
     document.addEventListener("visibilitychange", onHidden);
     build();
     setPlaying(true);
-    root.tutorial = { go, setPlaying, state: () => ({ index, t, playing, waiting, ended, scenes: list.length }), stop };
+    root.tutorial = { go, setPlaying, state: () => ({ index, t, playing, ended, scenes: list.length, title: list[index].title, duration: list[index].duration }), stop };
   }
-
-  function markSeen() { try { CT.Storage?.setItem(SEEN_KEY, "1"); } catch { /* almacenamiento lleno */ } }
-  function seen() { try { return !!CT.Storage?.getItem(SEEN_KEY); } catch { return true; } }
 
   // La guía se inserta como texto desde varios sitios (la partida, las salas); el
   // reproductor arranca solo en cuanto aparece en la página.
@@ -500,5 +502,5 @@
     new MutationObserver(() => mountAll()).observe(page.documentElement, { childList: true, subtree: true });
   }
 
-  CT.Tutorial = { markup, mount, mountAll, seen, markSeen, SEEN_KEY };
+  CT.Tutorial = { markup, mount, mountAll };
 })();

@@ -257,15 +257,14 @@ try {
       assert.notEqual(guideBackStyle.background,'rgba(0, 0, 0, 0)','la flecha de la guía conserva su fondo de papel');
       assert.equal(await guideVeil.evaluate(veil=>getComputedStyle(veil).opacity),'1','la guía difumina el contenido que sale por arriba');
       assert.ok(await guideVeil.evaluate(veil=>veil.getBoundingClientRect().top<=veil.parentElement.getBoundingClientRect().top+2),'la veladura de la guía cubre también el relleno superior');
-      await page.locator('[data-tv-chapter="1"]').click();
+      await page.locator('[data-tv-chapter="0"]').click();
       await page.locator('[data-tv="next"]').click();
       await page.locator('[data-tv="next"]').click();
-      await page.waitForFunction(()=>document.querySelector('[data-tutorial]')?.classList.contains('is-waiting'));
-      await page.locator('.tv-gap[data-gap="2"]').click();
-      await page.locator('.tv-confirm').click();
-      assert.ok(await page.locator('[data-tutorial].is-solved').count(),'la guía en vídeo permite hacer la primera colocación');
+      // El vídeo solo se mira: la colocación de ejemplo la hace el dedo, sin esperar a nadie.
+      await page.waitForFunction(()=>document.querySelector('.tv-stage .tv-line .is-placed.is-ok'),null,{timeout:15000});
+      assert.equal(await page.locator('.tv-stage button.tv-gap, .tv-stage button.tv-confirm').count(),0,'la guía en vídeo no pide jugadas');
       assert.ok(await page.locator('.tv-player').evaluate(el=>el.scrollWidth<=el.clientWidth+1),'el vídeo cabe en el móvil');
-      await page.screenshot({path:`test-results/zoom/${engine}-guia-interactiva.png`,fullPage:true});
+      await page.screenshot({path:`test-results/zoom/${engine}-guia-video.png`,fullPage:true});
       await page.locator('[data-guide-chapter="02"] > summary').click();
       assert.equal(await page.locator('[data-guide-chapter][open]').count(),1);
       await page.locator('[data-guide-chapter="03"] > summary').click();

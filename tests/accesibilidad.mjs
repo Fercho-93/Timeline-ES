@@ -116,7 +116,7 @@ console.log("\nLas reglas se adaptan al mazo");
   const conPulso = w.CONTINUUM.guideMarkup("history", "local", { pulse: true });
   ok("el Pulso se explica fuera de solitario", /Pulso/.test(conPulso) && /Los dos colocáis/.test(conPulso));
   ok("y la guía dice si está en juego o no", /en juego/.test(conPulso) && /opcional/.test(w.CONTINUUM.guideMarkup("history", "local", { pulse: false })));
-  ok("la guía empieza por el vídeo, con sus tres capítulos", /data-tutorial=/.test(conPulso) && ["De qué va", "Colocar cartas", "Modalidades"].every(nombre => conPulso.includes(nombre)));
+  ok("la guía empieza por el vídeo, con sus tres capítulos", /data-tutorial=/.test(conPulso) && ["Lo básico", "Jugar solo", "En grupo"].every(nombre => conPulso.includes(nombre)));
   ok("el reto diario se explica en solitario", /reto diario/i.test(w.CONTINUUM.guideMarkup("history", "solo")));
   ok("la competición explica sus rondas", /cinco cartas/i.test(w.CONTINUUM.guideMarkup("history", "competition")));
   ok("la guía online explica quién prepara la sala", /quien crea la partida/i.test(w.CONTINUUM.guideMarkup("history", "online")));
@@ -124,30 +124,30 @@ console.log("\nLas reglas se adaptan al mazo");
   w.Capacitor = { isNativePlatform: () => true, getPlatform: () => "ios" };
   ok("en el iPhone sí lo explica", /inicia sesión con Apple/.test(w.CONTINUUM.guideMarkup("history", "solo")));
   delete w.Capacitor;
-  // El vídeo arranca solo, enseña cartas reales y se detiene para que la jugada la haga quien mira.
+  // El vídeo arranca solo, enseña cartas reales y nunca se detiene a pedir una jugada: solo se mira.
   await respira();
   const video = el(w, '[data-tutorial]');
+  const saved = JSON.stringify({...w.localStorage});
   ok("el vídeo arranca solo al abrir la guía", video?.dataset.tutorialReady === "1" && video.tutorial.state().playing && el(w, '.tv-caption').textContent.length > 0);
   ok("muestra cartas de verdad con su ilustración", w.document.querySelectorAll('.tv-stage .tv-card img').length >= 1);
   click(w, '.tv-play');
   ok("se puede pausar como un vídeo", !video.tutorial.state().playing && el(w, '.tv-play').getAttribute('aria-label') === 'Reproducir');
-  click(w, '[data-tv-chapter="2"]');
-  ok("cada capítulo se abre desde su barra", el(w, '.tv-scene-title').textContent === 'Elige cómo jugar' && el(w, '[data-tv-chapter="2"]').classList.contains('is-current'));
+  click(w, '[data-tv-chapter="1"]');
+  ok("cada capítulo se abre desde su barra", el(w, '.tv-scene-title').textContent === 'Rondas' && el(w, '[data-tv-chapter="1"]').classList.contains('is-current'));
   click(w, '[data-tv="prev"]');
-  ok("y se rebobina escena a escena", el(w, '.tv-scene-title').textContent === 'Ahora tú');
-  const saved = JSON.stringify({...w.localStorage});
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  ok("en «Ahora tú» el vídeo espera la jugada", video.tutorial.state().waiting && video.classList.contains('is-waiting'));
+  ok("y se rebobina escena a escena", el(w, '.tv-scene-title').textContent === 'Dónde se juega');
+  video.tutorial.go(2);
   ok("la carta por colocar dice qué dato esconde", /Peso oculto/i.test(el(w, '.tv-hand').textContent));
-  click(w, '.tv-gap[data-gap="0"]');
-  ok("tocar un hueco coloca la carta y pide confirmar", el(w, '.tv-line .is-placed') && !el(w, '.tv-confirm').disabled);
-  click(w, '.tv-confirm');
-  ok("un fallo no cuesta nada y da una pista", /prueba otro hueco/i.test(el(w, '.tv-caption').textContent) && video.tutorial.state().waiting);
-  click(w, '.tv-gap[data-gap="3"]');
-  ok("cambiar de idea lleva la carta al hueco tocado", [...el(w, '.tv-line').querySelectorAll('.tv-card')].indexOf(el(w, '.tv-line .is-placed')) === 2);
-  click(w, '.tv-confirm');
-  ok("acertar revela el dato y el vídeo sigue", !video.tutorial.state().waiting && video.classList.contains('is-solved') && !el(w, '.tv-line .is-placed').classList.contains('is-hidden'));
-  ok("el ensayo no modifica partidas ni progreso", JSON.stringify({...w.localStorage}) === saved);
+  // Ninguna escena espera a quien mira: en la mesa no hay huecos ni botones que pulsar.
+  const pideJugada = [];
+  for (let i = 0; i < video.tutorial.state().scenes; i++) {
+    video.tutorial.go(i);
+    const escena = video.tutorial.state();
+    if (w.document.querySelector('.tv-stage .tv-gap:not(span), .tv-stage .tv-confirm:not(span), .tv-stage [tabindex]:not([tabindex="-1"])')) pideJugada.push(escena.title);
+    if (escena.title !== 'A jugar' && w.document.querySelector('.tv-stage button')) pideJugada.push(escena.title);
+  }
+  ok("ninguna escena pide una jugada", pideJugada.length === 0);
+  ok("ver el vídeo no modifica partidas ni progreso", JSON.stringify({...w.localStorage}) === saved);
   video.tutorial.stop();
   const chapters = [...w.document.querySelectorAll('[data-guide-chapter]')];
   ok("siete capítulos cubren todas las reglas sin desplegarlas de golpe", chapters.length === 7 && chapters.every(chapter => !chapter.open));

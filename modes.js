@@ -1142,8 +1142,8 @@
       ['Descarte','Donde van las cartas falladas en una partida en grupo.'],
       ['Lámina','La ilustración de una carta, una vez desbloqueada en tu Atlas.']
     ].map(([term, text]) => '<dt>'+term+'</dt><dd>'+text+'</dd>').join('')+'</dl>';
-    // La guía empieza por el vídeo interactivo (tutorial.js); debajo queda el manual de consulta.
-    return '<div class="guide-handbook"><header class="guide-masthead"><div class="eyebrow">El manual del explorador</div><h1>Guía</h1><p>Mírala como un vídeo y haz tú la jugada cuando te toque. Debajo, cada detalle por capítulos.</p></header>'+
+    // La guía empieza por el vídeo (tutorial.js); debajo queda el manual de consulta.
+    return '<div class="guide-handbook"><header class="guide-masthead"><div class="eyebrow">El manual del explorador</div><h1>Guía</h1><p>Primero, el vídeo con lo esencial. Debajo, el manual completo por temas.</p></header>'+
       (window.CONTINUUM.Tutorial?.markup(modeKey) || '')+
       '<div class="atlas-section-heading guide-manual"><h2>Manual de consulta</h2><p class="guide-index-hint">'+here+' · Abre el tema que quieras consultar.</p></div>'+
       guideChapter('01','Aciertos, fallos y cómo se gana','Qué pasa al confirmar y quién gana','result',result)+
