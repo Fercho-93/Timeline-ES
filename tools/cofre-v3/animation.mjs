@@ -28,29 +28,41 @@ function quad(c,image,source,target,alpha=1,n=5){if(alpha<=0)return;c.save();c.g
  triangle(c,image,[s[0],s[1],s[2]],[d[0],d[1],d[2]]);triangle(c,image,[s[0],s[2],s[3]],[d[0],d[2],d[3]]);
  }c.restore();}
 const rect=(x,y,w,h,angle=0)=>{const a=angle*Math.PI/180;return[[-w/2,-h/2],[w/2,-h/2],[w/2,h/2],[-w/2,h/2]].map(p=>[x+p[0]*Math.cos(a)-p[1]*Math.sin(a),y+p[0]*Math.sin(a)+p[1]*Math.cos(a)]);};
-// Los cinco anversos se toman del abanico final; los dorsos de brújula, de la
-// fase de ascenso. Las coordenadas describen los bordes de cada carta.
-const faces=[[[23,634],[155,578],[249,780],[115,844]],[[137,541],[269,500],[346,714],[215,765]],[[270,482],[422,455],[446,681],[293,694]],[[428,498],[573,537],[512,761],[369,721]],[[548,586],[687,651],[593,850],[455,788]]];
-const backQuad=[[349,433],[424,385],[502,523],[424,568]];
+// Láminas originales distribuidas en los mazos del juego; no cartas inventadas.
+export const gameCards=[
+ ['world-cards/5009-battle-marathon.webp','Batalla de Maratón'],
+ ['medicine-cards/9001-hippocratic-corpus.webp','Corpus hipocrático'],
+ ['astronomy-cards/first-earth-photo.webp','Primera fotografía de la Tierra'],
+ ['world-cards/5002-great-pyramid-giza.webp','Gran Pirámide de Guiza'],
+ ['world-cards/5022-vesuvius-eruption.webp','Erupción del Vesubio']
+];
+const cardSource=[[0,0],[512,0],[512,768],[0,768]];
+const finalCards=[[132,700,-25],[244,625,-13],[355,590,0],[464,625,13],[575,700,25]];
+const bezier=(a,b,c,d,t)=>{const u=1-t;return u*u*u*a+3*u*u*t*b+3*u*t*t*c+t*t*t*d;};
 const innerQuad=[[273,729],[613,749],[619,952],[227,916]];
 const outerQuad=[[156,851],[608,851],[608,1011],[156,1011]];
 const outerPolygon=[[166,970],[165,930],[177,895],[199,872],[234,858],[273,861],[553,886],[579,897],[596,921],[606,957],[605,981],[585,1002],[514,1008],[164,982]];
 const bodyPolygon=[[144,976],[508,1019],[595,962],[599,1154],[588,1199],[507,1211],[143,1153]];
 const stackPolygon=[[238,945],[404,922],[503,951],[502,986],[475,1002],[267,980],[238,966]];
 const stackSource=[[238,922],[503,922],[503,1003],[238,1003]];
-const riseTargets=[rect(425,477,90,161,-31),rect(351,845,108,166,-25),rect(403,620,103,171,18),rect(361,734,105,164,-30),rect(378,966,113,166,24)];
-const emission=[0,3,1,2,4]; // orden de salida: barco, pájaro, cielo, mapa, mariposa
 export async function createAnimation(canvas){
  const c=canvas.getContext('2d');canvas.width=W;canvas.height=H;
  const images=await Promise.all(['closed','open','rise','fan','clean'].map(name=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=`/assets/cofre-reference-v3-${name}.webp`;})));
  const [closed,open,rise,fan,clean]=images;
  const body=cut(closed,bodyPolygon),outer=cut(closed,outerPolygon),inside=cut(open,[[273,729],[613,749],[636,815],[622,950],[227,922],[255,809]]),stack=cut(open,stackPolygon);
- const cardTextures=faces.map(q=>cut(fan,q)),back=cut(rise,backQuad);
- // La vue vide de la quatrième image est replacée dans la bouche du premier
- // cofre. Le raccord reste derrière la lèvre de bois et de métal du corps.
+ const load=src=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src='/assets/'+src;});
+ const cardTextures=await Promise.all(gameCards.map(([src])=>load(src)));
+ const emblem=await load('continuum-emblem-800.webp');
+ // Papel y emblema común del reverso real de la mano (edition.css).
+ const back=document.createElement('canvas');back.width=512;back.height=768;
+ const bc=back.getContext('2d'),paper=bc.createLinearGradient(0,0,512,768);paper.addColorStop(0,'#f9f2e2');paper.addColorStop(1,'#e6e6d5');bc.fillStyle=paper;bc.fillRect(0,0,512,768);
+ bc.strokeStyle='#486d6618';bc.lineWidth=1;for(let k=-768;k<1280;k+=24){bc.beginPath();bc.moveTo(k,0);bc.lineTo(k+768,768);bc.stroke();bc.beginPath();bc.moveTo(k,0);bc.lineTo(k-768,768);bc.stroke();}
+ bc.strokeStyle='#7b928180';bc.lineWidth=3;bc.strokeRect(15,15,482,738);bc.lineWidth=1;bc.strokeRect(23,23,466,722);bc.drawImage(emblem,60,235,392,261);
+
+ // La madera vacía de la cuarta referencia sustituye el mazo completo.
+ // El borde frontal se compone después para ocultar la salida de las cartas.
  const emptyMouth=[[152,1043],[284,977],[592,1009],[522,1084]];
  const mouth=[[145,978],[252,918],[596,958],[508,1021]];
- const mouthLayer=cut(open,[[146,975],[227,916],[620,951],[596,1020],[508,1021]]);
  const base=document.createElement('canvas');base.width=W;base.height=H;const b=base.getContext('2d');b.drawImage(closed,0,0);
  // Le fond nettoyé ne remplace que l'emprise du cofre et son ombre. Le ciel,
  // la côte et le bateau restent les pixels de la première image.
@@ -86,8 +98,7 @@ export async function createAnimation(canvas){
   c.drawImage(base,0,0);
   // Ombre de contact permanente, sans glissement de l'assise du coffre.
   c.save();const shadow=c.createRadialGradient(385,1188,30,385,1188,265);shadow.addColorStop(0,'#120a0560');shadow.addColorStop(1,'#120a0500');c.fillStyle=shadow;c.translate(0,795);c.scale(1,.34);c.fillRect(105,700,540,790);c.restore();
-  c.drawImage(mouthLayer,0,0);
-  c.save();path(c,stackPolygon);c.clip();quad(c,fan,emptyMouth,mouth,1,7);c.restore();
+  quad(c,fan,emptyMouth,mouth,1,7);
   const p=smooth((t-.22)/1.43),theta=p*1.68;
   lid(theta);
   const stackAlpha=1-smooth((t-2.02)/1.1);
@@ -97,20 +108,25 @@ export async function createAnimation(canvas){
   const light=smooth((t-.9)/1.0);
   c.save();c.globalCompositeOperation='screen';c.globalAlpha=.16*light;const glow=c.createRadialGradient(368,967,4,368,967,190);glow.addColorStop(0,'#ffc65f');glow.addColorStop(.5,'#ffbd4433');glow.addColorStop(1,'#ffbd4400');c.fillStyle=glow;c.fillRect(170,770,430,340);c.restore();
   for(let i=0;i<5;i++){
-   const order=emission[i],q=smooth((t-2.04-order*.17)/.82);
-   if(q<=0)continue;
-   const start=[[243,943],[415,926],[499,952],[325,974]];
-   const flight=start.map((pt,j)=>point(pt,riseTargets[i][j],q));
-   const f=smooth((t-3.54-order*.035)/1.0);
-   let pose=flight.map((pt,j)=>point(pt,faces[i][j],f));
-   if(f>0&&f<1)pose=pose.map(pt=>[pt[0],pt[1]-Math.sin(f*Math.PI)*(i%2?30:50)]);
-   // Les trois cartes vues de dos dans la troisième référence se retournent
-   // pendant leur déploiement. L'oiseau et le ciel montrent déjà leur face.
-   const reversed=[0,3,4].includes(i),flip=reversed?smooth((f-.12)/.68):1;
-   const squeeze=reversed?Math.max(.06,Math.abs(Math.cos(flip*Math.PI))):1;
-   if(reversed){const midL=point(pose[0],pose[1],.5),midB=point(pose[3],pose[2],.5);pose=[point(midL,pose[0],squeeze),point(midL,pose[1],squeeze),point(midB,pose[2],squeeze),point(midB,pose[3],squeeze)];}
-   const texture=reversed&&flip<.5?back:cardTextures[i],source=reversed&&flip<.5?backQuad:faces[i];
-   c.save();c.shadowColor='#28130460';c.shadowBlur=9;c.shadowOffsetY=4;c.fillStyle='#24100633';path(c,pose);c.fill();c.restore();quad(c,texture,source,pose,smooth(q*5),5);
+   const elapsed=t-(1.86+i*.13),progress=Math.max(0,Math.min(1,elapsed/2.8));
+   if(elapsed<=0)continue;
+   // Una sola curva continua desde el cofre hasta el abanico, sin escala intermedia.
+   const e=1-Math.pow(1-progress,3),[fx,fy,fa]=finalCards[i];
+   const x=bezier(368,368+(i-2)*26,fx+(i-2)*34,fx,e);
+   const y=bezier(982,745,fy-55,fy,e);
+   const drift=smooth((progress-.72)/.28);
+   const bob=Math.sin((t-4.1)*1.7+i*.48)*2.1*drift;
+   const w=mix(133,151,smooth(progress)),h=w*1.5;
+   const angle=mix((i-2)*-8,fa,smooth(progress))+Math.sin(t*1.3+i)*.65*drift;
+   let pose=rect(x,y+bob,w,h,angle);
+   const flip=smooth((progress-.09-i*.018)/.55);
+   const squeeze=Math.max(.025,Math.abs(Math.cos(flip*Math.PI)));
+   const midT=point(pose[0],pose[1],.5),midB=point(pose[3],pose[2],.5);
+   pose=[point(midT,pose[0],squeeze),point(midT,pose[1],squeeze),point(midB,pose[2],squeeze),point(midB,pose[3],squeeze)];
+   const texture=flip<.5?back:cardTextures[i];
+   c.save();c.shadowColor='#28130460';c.shadowBlur=9;c.shadowOffsetY=4;c.fillStyle='#24100633';path(c,pose);c.fill();c.restore();
+   quad(c,texture,cardSource,pose,smooth(progress*12),5);
+   c.save();path(c,pose);c.strokeStyle='#d8bf8b';c.lineWidth=1.7;c.stroke();c.restore();
   }
   c.drawImage(body,0,0);
   // Quelques poussières fixes, dont seule la lumière varie, dans le faisceau.

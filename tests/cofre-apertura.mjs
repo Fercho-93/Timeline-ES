@@ -24,7 +24,7 @@ function setup({failFetch=false,failPlay=false,delayed=false,reduced=false}={}) 
 {
  const h=setup();await h.flush();const v=h.w.document.querySelector('video');
  assert.equal(v.src,'blob:cofre-film');assert.equal(v.muted,true);assert.equal(v.playsInline,true);
- assert.equal(h.requests.length,1);assert.equal(h.requests[0].url,'assets/cofre-opening-v3.mp4');assert.equal(h.requests[0].options.headers,undefined,'descarga completa, sin Range');
+ assert.equal(h.requests.length,1);assert.equal(h.requests[0].url,'assets/cofre-opening-v4.mp4');assert.equal(h.requests[0].options.headers,undefined,'descarga completa, sin Range');
  const gate=h.w.CONTINUUM_SPLASH.gate();h.open();h.open();await h.flush();assert.equal(h.plays,1,'solo una reproducción');
  await h.advance(4000);assert.ok(h.w.document.querySelector('.splash-caja-escena'),'no corta la película a los 4,2 s del modelo antiguo');
  v.dispatchEvent(new h.w.Event('ended'));await h.advance(500);assert.equal(h.w.document.querySelector('.splash-caja-escena'),null);assert.deepEqual(h.revoked,['blob:cofre-film']);

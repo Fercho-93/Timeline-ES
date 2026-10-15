@@ -134,7 +134,7 @@
     // Descargar el archivo entero evita problemas de Range/206 en Safari y
     // permite al service worker cachearlo. El reproductor lee un blob local.
     cargaTimer = setTimeout(() => abort.abort(), 6500);
-    const carga = Promise.resolve().then(() => fetch('assets/cofre-opening-v3.mp4', { signal: abort.signal }))
+    const carga = Promise.resolve().then(() => fetch('assets/cofre-opening-v4.mp4', { signal: abort.signal }))
       .then(response => { if (!response.ok) throw new Error('cofre-video'); return response.blob(); })
       .then(blob => {
         if (retirada) return false;

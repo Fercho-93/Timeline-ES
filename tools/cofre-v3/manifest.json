@@ -1,12 +1,12 @@
 {
   "width": 706,
   "height": 1536,
-  "fps": 30,
-  "frames": 180,
+  "fps": 60,
+  "frames": 360,
   "durationSeconds": 6,
   "video": {
-    "path": "assets/cofre-opening-v3.mp4",
-    "sha256": "2e2e9edbb763d8b2b95c6f62532c59290777a8c1834ce796bec0296ac6e59e32"
+    "path": "assets/cofre-opening-v4.mp4",
+    "sha256": "cd4e1a0f04c6091dc0d44764e9359f0b48f33ff10703cb6d50bf693a5d033688"
   },
   "sourceFiles": [
     {
@@ -24,6 +24,32 @@
     {
       "filename": "F32ABFF0-46A6-401C-A2AB-BDD5CEAE5125.jpeg",
       "sha256": "dd6153efe8e7e64dfd4b9a1d3dbb0335bf9f848d8a3ffd5a975390a8652ab02d"
+    }
+  ],
+  "gameCardAssets": [
+    {
+      "path": "assets/world-cards/5009-battle-marathon.webp",
+      "sha256": "f7e9628bc004c54eb4d2a5b62626f233d5049471f5ba7c735c12c5bedb473065"
+    },
+    {
+      "path": "assets/medicine-cards/9001-hippocratic-corpus.webp",
+      "sha256": "f83dad5f3d02822bb68f74caab98e33ddbb8dc5f0a565d3d1926fa1bcc174c90"
+    },
+    {
+      "path": "assets/astronomy-cards/first-earth-photo.webp",
+      "sha256": "ccec354b38c7216e265df7adb9caf27a3e1feb39f342885a8ed5aef03c8a3cf5"
+    },
+    {
+      "path": "assets/world-cards/5002-great-pyramid-giza.webp",
+      "sha256": "971b561a63bc7139be0efc337cc399b32a9b481ddf1f9b28627ba20a0af45e0c"
+    },
+    {
+      "path": "assets/world-cards/5022-vesuvius-eruption.webp",
+      "sha256": "dff37640d5e3b4cffc9cd136970da9d08be61dc32022025f0a1322a895523ab3"
+    },
+    {
+      "path": "assets/continuum-emblem-800.webp",
+      "sha256": "38bbb95dd3231eec7e52f4a64f9f239868cda70c77d1d1b2753a033fa99039a3"
     }
   ]
 }
