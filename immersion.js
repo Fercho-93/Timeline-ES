@@ -645,6 +645,7 @@
       'local-entrada', 'local-unirse', 'quick-challenges']);
     if (!screens.has(screen)) return;
     const candidates = container.querySelectorAll('.setup-section .panel, .online-entry-grid > .online-form, .public-create');
+    const usedArt = new Set([...container.querySelectorAll('img[src]')].map(image => image.getAttribute('src').split('/').pop()));
     candidates.forEach(panel => {
       if (panel.closest('.quick-free-setup') || panel.classList.contains('setup-art-panel') || panel.matches('details:not(.solo-fold)')) return;
       if (!panel.matches('.online-form, .solo-panel-maraton, .solo-fold') && !panel.querySelector('input:not([type="hidden"]), select, textarea:not([hidden]), .segmented, .setup-block')) return;
@@ -656,17 +657,15 @@
       const scene = document.documentElement.dataset.scene;
       const collectionArt = ['history', 'entertainment', 'science', 'nature', 'geography', 'mixed'].includes(scene)
         ? `hero-${scene}-400.webp` : 'menu-collections.webp';
-      const art = quick ? 'menu-quick.webp' : competition ? 'competition-engraving.webp' : alone ? collectionArt : screen.startsWith('local-') ? 'menu-wifi.webp' : screen === 'hub-online-create' ? 'menu-online.webp' : 'menu-private.webp';
+      const choices = quick ? ['hero-quick-400.webp', 'hero-mixed-400.webp', 'voyage-duels-v1.webp']
+        : competition ? ['hero-mixed-400.webp', 'voyage-collection-v1.webp']
+        : alone ? [collectionArt, 'saved-journey-v1.webp', 'voyage-collection-v1.webp']
+        : screen.startsWith('local-') ? ['menu-wifi.webp', 'voyage-duels-v1.webp']
+        : ['menu-private.webp', 'voyage-duels-v1.webp', 'menu-collections.webp'];
+      const art = choices.find(file => !usedArt.has(file)) || 'hero-geography-400.webp';
+      usedArt.add(art);
       const kicker = competition ? 'Cada ronda cuenta' : alone ? 'A tu ritmo' : joining ? 'Tu sitio en la mesa' : 'La mesa os espera';
       panel.style.setProperty('--setup-illustration', `url("assets/${art}")`);
-      panel.querySelectorAll('.tiempo-field > .field-label').forEach(label => {
-        if (label.querySelector('.setup-time-icon')) return;
-        const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        icon.setAttribute('class', 'setup-time-icon'); icon.setAttribute('viewBox', '0 0 24 24');
-        icon.setAttribute('aria-hidden', 'true'); icon.setAttribute('focusable', 'false');
-        icon.innerHTML = '<circle cx="12" cy="13" r="8"/><path d="M12 8v5l4 2M9 2h6M12 2v3"/>';
-        label.prepend(icon);
-      });
       if (panel.matches('.solo-fold')) return; // el desplegable ya conserva su cabecera
       let head = panel.querySelector(':scope > .solo-panel-head');
       const heading = head?.querySelector('h3') || panel.querySelector(':scope > h3');

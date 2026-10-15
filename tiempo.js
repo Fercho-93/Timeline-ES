@@ -24,6 +24,7 @@
   function field(contexto, { porDefecto = 0, etiqueta = "Tiempo por carta", attrs = "", valor = null, nombre = `tiempo-${contexto}` } = {}) {
     const actual = valor !== null && valido(valor) ? Number(valor) : get(contexto, porDefecto), id = `${nombre}-label`;
     return `<div class="field duel-kind-field tiempo-field"${attrs}>
+      <div class="tiempo-caption" aria-hidden="true">${icono}<span>Marca tu ritmo</span></div>
       <span class="field-label" id="${id}">${etiqueta}</span>
       <div class="segmented tiempo-segmented" role="radiogroup" aria-labelledby="${id}">${OPCIONES.map(s => `<label class="segmented-option${s === actual ? " is-on" : ""}">
         <input type="radio" name="${nombre}" value="${s}" data-tiempo="${contexto}"${s === actual ? " checked" : ""}>

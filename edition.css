@@ -5406,9 +5406,6 @@ html #app.atlas-board[data-platform][data-device][data-screen] :is(.board-focus-
 #app .quick-free-setup .quick-length-more::before { content: "◇"; color: var(--edition-brass); font-size: 1.1rem; }
 #app .quick-free-setup .quick-length-more::after { content: "⌄"; color: var(--edition-brass); }
 #app .quick-free-setup .quick-length-more[aria-expanded="true"]::after { content: "⌃"; }
-#app .quick-pace-caption { display: flex; align-items: center; gap: 10px; margin: 22px 0 4px; padding-top: 17px; border-top: 1px solid var(--edition-line); color: var(--edition-brass); }
-#app .quick-pace-caption svg { width: 35px; height: 35px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.4; filter: drop-shadow(0 2px 1px #63432320); }
-#app .quick-pace-caption span { font: 600 1.15rem/1.2 var(--font-display); color: var(--edition-ink); }
 #app .quick-free-setup .solo-panel .tiempo-field { margin-top: 9px; }
 #app .quick-free-setup .tiempo-segmented .segmented-option { min-height: 55px; box-shadow: inset 0 0 0 3px #b8976012, 0 3px 7px #63432312; }
 #app .quick-free-setup .tiempo-segmented .segmented-option.is-on { border-color: #955338; color: #86442d; box-shadow: inset 0 0 0 1px #955338, 0 4px 8px #63432320; }
@@ -5478,7 +5475,6 @@ html #app[data-screen] .setup-art-panel .quick-length-more { min-height: 44px; b
 :root[data-theme="dark"] html #app[data-screen] .setup-art-panel .quick-length-chip.is-selected { --quick-card-paper: #725234; }
 :root[data-theme="dark"] html #app[data-screen] .setup-art-panel .quick-duration-art { color: #d0aa71; }
 @media (max-width: 370px) { #app .setup-art-head { min-height: 105px; padding-inline: 14px; } #app .setup-art-copy { width: 84%; } html #app[data-screen] .setup-art-panel .segmented { gap: 7px; } html #app[data-screen] .setup-art-panel .quick-length { gap: 7px; } html #app[data-screen] .setup-art-panel .quick-duration-art { height: 60px; } }
-html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 24px; flex: 0 0 24px; fill: none; stroke: currentColor; stroke-width: 1.4; }
 
 /* Retos rápidos en solitario: los mazos del día y la colección de cartas descubiertas. */
 #app .quick-free-setup .quick-collection-link { margin-top: 8px; min-height: 40px; padding: 6px 14px; border: 1px solid var(--edition-line); border-radius: 12px; font-size: .84rem; }
@@ -5765,4 +5761,64 @@ html[data-theme="dark"] #app[data-screen] :is(.setup-art-image, .settings-headin
   html #app[data-screen] .setup-art-panel:not(.solo-fold) { --setup-inset: 16px; }
   html #app[data-screen] .setup-art-panel .setup-art-head { min-height: 132px; }
   html #app[data-screen] .setup-art-panel .setup-art-copy { width: 70%; }
+}
+
+/* Un único selector de tiempo: el mismo estuche y fichas en cada modalidad. */
+html #app[data-screen][data-screen] .tiempo-field {
+  margin: 22px 0; padding: 16px 12px 14px;
+  border: 1px solid var(--edition-line); border-radius: 16px;
+  background: linear-gradient(110deg, #b897601c, transparent), var(--edition-paper);
+}
+html #app[data-screen][data-screen] .tiempo-caption {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+  color: var(--edition-brass);
+}
+html #app[data-screen][data-screen] .tiempo-caption svg { width: 30px; height: 30px; flex: none; }
+html #app[data-screen][data-screen] .tiempo-caption span { color: var(--edition-ink); font: 600 1.15rem/1.2 var(--font-display); }
+html #app[data-screen][data-screen] .tiempo-field .tiempo-segmented {
+  display: grid; grid-template-columns: minmax(0, 1.3fr) repeat(3, minmax(0, 1fr));
+  padding: 0; border: 0; background: none; box-shadow: none;
+}
+html #app[data-screen][data-screen] .tiempo-field .segmented-option {
+  display: grid; place-content: center; justify-items: center; margin: 0;
+  min-width: 0; transform: none;
+}
+html #app[data-screen][data-screen] .tiempo-field .segmented-option > span { min-width: 0; }
+html #app[data-screen][data-screen] .tiempo-field > .field-label { margin: 0 0 12px; font-size: .6rem; }
+html #app[data-screen][data-screen] .tiempo-segmented { gap: 7px; }
+html #app[data-screen][data-screen] .tiempo-field .segmented-option {
+  min-height: 82px; padding: 10px 3px 9px; gap: 8px; border-radius: 13px;
+  border-color: color-mix(in srgb, var(--edition-brass) 45%, var(--edition-line));
+  color: var(--edition-ink); cursor: pointer;
+  background: linear-gradient(150deg, #b8976010, transparent), var(--edition-surface);
+  box-shadow: inset 0 0 0 3px #b8976012, inset 0 1px 0 #fff7e766, 0 4px 8px #35200e12;
+}
+html #app[data-screen][data-screen] .tiempo-field .segmented-option::before {
+  content: ""; display: block; width: 23px; height: 23px;
+  border: 1px solid currentColor; border-radius: 50%;
+  background: linear-gradient(currentColor, currentColor) 50% 5px / 1px 7px no-repeat,
+    linear-gradient(35deg, transparent 43%, currentColor 46% 53%, transparent 56%) 12px 10px / 7px 7px no-repeat;
+  color: var(--edition-brass); box-shadow: 0 0 0 3px #b8976010;
+}
+html #app[data-screen][data-screen] .tiempo-field .segmented-option:has(input[value="0"])::before {
+  content: "∞"; border: 0; background: none; box-shadow: none; font: 500 30px/23px var(--font-display);
+}
+html #app[data-screen][data-screen] .tiempo-field .segmented-option b { font-size: .85rem; line-height: 1.2; }
+html #app[data-screen][data-screen] .tiempo-field .segmented-option.is-on {
+  color: #fff3d9; border-color: #795335;
+  background: linear-gradient(145deg, #976e46, #64432e);
+  box-shadow: inset 0 0 0 3px #f5dcad1a, inset 0 0 0 4px #edc68966, 0 5px 12px #35200e30;
+}
+html #app[data-screen][data-screen] .tiempo-field .segmented-option.is-on::before { color: #f6d6a1; }
+html #app[data-screen][data-screen] .tiempo-field .segmented-option:has(input:focus-visible) {
+  outline: 2px solid var(--edition-brass); outline-offset: 3px;
+}
+@media (hover: hover) and (pointer: fine) {
+  html #app[data-screen][data-screen] .tiempo-field .segmented-option:not(.is-on):hover {
+    color: var(--edition-ink); border-color: var(--edition-brass);
+    background: linear-gradient(145deg, #b8976033, #b8976015), var(--edition-surface);
+  }
+}
+html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-option.is-on {
+  color: #fff3d9; border-color: #d8b37e; background: linear-gradient(145deg, #765236, #493020);
 }

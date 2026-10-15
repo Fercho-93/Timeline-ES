@@ -185,13 +185,13 @@
             ${modeCard('day','Mazos del día',`Eliges entre ${QUICK_DAY_DECKS} mazos que cambian cada día.`,`Cambian en ${left} h`,sunArt)}
             ${modeCard('surprise','Partida sorpresa','Mazos al azar de todo el catálogo. No sabrás cuáles hasta jugarlos.',`${total} mazos posibles`,diceArt)}
           </div>
-          <div class="quick-pace-caption" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><circle cx="24" cy="25" r="17"/><circle cx="24" cy="25" r="13"/><path d="M24 16v10l7 4M19 4h10M24 4v4"/></svg><span>Marca tu ritmo</span></div>${CT.Tiempo.field('quick-solo')}
+          ${CT.Tiempo.field('quick-solo')}
           <div class="quick-mode-pane quick-day-pane" data-mode-pane="day"${mode==='day'?'':' hidden'}>
             <div class="quick-day-head"><span class="quick-setup-kicker">Mazos de hoy</span><h4>Toca un mazo para empezar</h4><small>Mañana salen otros ${QUICK_DAY_DECKS}. Cada carta que aciertes queda en tu colección.</small></div>
             <div class="quick-day-decks">${todayDecks().map(deckTile).join('')}</div>
           </div>
           <div class="quick-mode-pane quick-surprise" data-mode-pane="surprise"${mode==='surprise'?'':' hidden'}>
-            <div class="quick-preparation-head"><img class="quick-preparation-art" src="assets/menu-quick.webp" alt="" aria-hidden="true" decoding="async"><div class="quick-preparation-copy"><span class="quick-setup-kicker">Partida sorpresa</span><h4>¿Cuánto quieres jugar?</h4><span class="quick-preparation-motto">El azar reparte. Tú decides.</span></div></div>
+            <div class="quick-preparation-head"><img class="quick-preparation-art" src="assets/hero-mixed-400.webp" alt="" aria-hidden="true" decoding="async"><div class="quick-preparation-copy"><span class="quick-setup-kicker">Partida sorpresa</span><h4>¿Cuánto quieres jugar?</h4><span class="quick-preparation-motto">El azar reparte. Tú decides.</span></div></div>
             <p>Elige una duración. Los retos saldrán al azar, sin mostrarte cuáles son.</p>
             ${lengthChips('quick-free-length',[...options,[total,'Todo el catálogo']],'Duración de la partida','',true)}
             ${button('start-free',`${pendiente ? 'Empezar otra' : 'Empezar'} <span>→</span>`,`btn ${pendiente ? 'btn-secondary' : 'btn-primary'} btn-block`)}
