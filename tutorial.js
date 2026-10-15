@@ -21,6 +21,7 @@
 
   function cardMarkup(modeKey, card, { hidden = false, extra = "" } = {}) {
     return `<div class="tv-card${hidden ? " is-hidden" : ""}${extra ? " " + extra : ""}" data-card="${esc(card.id)}">
+      <span class="tv-back">${CT.cardBack(modeKey)}</span>
       <span class="tv-art">${CT.animalArt(modeKey, card) || `<i aria-hidden="true">◆</i>`}</span>
       <b class="tv-value">${esc(CT.shortValue(modeKey, card))}</b><b class="tv-secret">?<i>${esc(CT.hiddenLabel(modeKey))}</i></b>
       <small>${esc(card.title)}</small></div>`;
@@ -37,8 +38,19 @@
 
   // Dónde está en la aplicación lo que cuenta la escena: los botones que hay que pulsar.
   const path = steps => `<div class="tv-path">${steps.map(step => `<span>${esc(step)}</span>`).join('<i aria-hidden="true">›</i>')}</div>`;
+  // Las mismas láminas que las puertas y modalidades de Inicio, a escala de la guía.
+  const MENU_ART = {
+    "Jugar": "home-door-jugar.webp", "Jugar solo": "mode-walk-solo.webp",
+    "Jugar con amigos": "mode-walk-multi.webp", "Jugar online": "menu-online.webp",
+    "Unirme a una partida": "menu-private.webp", "Reto del día": "menu-daily.webp",
+    "Maratón": "mode-walk-solo.webp", "Competición": "competition-engraving.webp",
+    "Mazos del día": "menu-daily.webp", "Partida sorpresa": "menu-quick.webp",
+    "Mesas abiertas": "menu-online.webp", "Crear mesa": "menu-wifi.webp", "Partida rápida": "menu-quick.webp"
+  };
+  const menuArt = name => MENU_ART[name] ? `<img class="tv-menu-art" src="assets/${MENU_ART[name]}" alt="" decoding="async">` : "";
+  const door = (name, extra = "") => `<div class="tv-door ${extra}">${menuArt(name)}<b>${esc(name)}</b>${name === "Jugar" ? '<i class="tv-chevron" aria-hidden="true">⌄</i>' : ""}</div>`;
   function tile(icon, name, facts, extra = "") {
-    return `<div class="tv-tile${extra ? " " + extra : ""}"><i aria-hidden="true">${icon}</i><b>${name}</b>${facts ? `<small>${facts}</small>` : ""}</div>`;
+    return `<div class="tv-tile${extra ? " " + extra : ""}">${menuArt(name) || `<i aria-hidden="true">${icon}</i>`}<b>${name}</b>${facts ? `<small>${facts}</small>` : ""}</div>`;
   }
   const hearts = () => `<div class="tv-lives" aria-hidden="true"><i>♥</i><i>♥</i><i>♥</i></div>`;
   const dots = marks => `<div class="tv-dots">${marks.split("").map(m => `<span data-mark="${m === "✓" ? "ok" : "bad"}">${m}</span>`).join("")}</div>`;
@@ -62,7 +74,7 @@
   function quickExample() {
     const list = CT.QuickCatalog?.challenges || [];
     const deck = list.find(item => item.id === "sports-players") || list[0];
-    return deck ? `<div class="tv-deck"><b>${esc(deck.title)}</b><small>${esc(deck.rule)}</small></div>` : "";
+    return deck ? `<div class="tv-deck"><img class="tv-menu-art" src="${esc(deck.cards?.find(card => card.image)?.image || "assets/menu-quick.webp")}" alt="" decoding="async"><b>${esc(deck.title)}</b><small>${esc(deck.rule)}</small></div>` : "";
   }
 
   // ── Las escenas ────────────────────────────────────────────────────────────────────────
@@ -133,14 +145,14 @@
           [5600, c => { c.move(".tv-line .is-placed", 3); c.lose(".tv-lives"); c.say("En una ronda, la carta pasa a su sitio y pierdes una vida."); }]
         ] },
       { chapter: 0, title: "Dónde se juega", duration: 8600,
-        html: `<div class="tv-home"><div class="tv-door tv-door-play"><b>Jugar</b><span aria-hidden="true">⌄</span></div>
-          <div class="tv-choices"><span>☺ Jugar solo</span><span>♟ Jugar con amigos</span><span>◎ Jugar online</span></div>
-          <div class="tv-door tv-door-join">Unirme a una partida</div><div class="tv-door tv-door-daily">☼ Reto del día</div></div>`,
+        html: `<div class="tv-home">${door("Jugar", "tv-door-play")}
+          <div class="tv-choices">${["Jugar solo", "Jugar con amigos", "Jugar online"].map(name => `<span>${menuArt(name)}<b>${name}</b></span>`).join("")}</div>
+          ${door("Unirme a una partida", "tv-door-join")}${door("Reto del día", "tv-door-daily")}</div>`,
         steps: [
           [0, c => { c.say("En Inicio, toca «Jugar» y elige: solo, con amigos u online."); c.add(".tv-home", "is-in"); }],
           [1100, c => c.fingerTo(".tv-door-play")],
           [1700, c => { c.tap(); c.add(".tv-door-play", "is-open"); c.add(".tv-choices", "is-open"); }],
-          [1900, c => c.stagger(".tv-choices span", 300)],
+          [1900, c => c.stagger(".tv-choices > span", 300)],
           [3600, c => c.fingerHide()],
           [4800, c => { c.say("Debajo, «Unirme a una partida» y el reto del día."); c.stagger(".tv-door-join, .tv-door-daily", 400); }]
         ] },
@@ -213,8 +225,8 @@
         ] },
       { chapter: 2, title: "Con amigos", duration: 11000,
         html: `<div class="tv-board">${path(["Jugar", "Jugar con amigos"])}<div class="tv-ways">
-          <div class="tv-way tv-way-one"><b>Un solo móvil</b><span class="tv-pass"><span class="tv-phone" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10.5 18.5h3"/></svg></span><span class="tv-people"><b>Ana</b><b>Luis</b><b>Sara</b></span></span><small>De 2 a 9 personas</small></div>
-          <div class="tv-way tv-way-many"><b>Cada uno en su móvil</b><span class="tv-rhythms"><span><b>En directo</b>Todos a la vez</span><span><b>Por turnos</b>Un duelo a dos, sin prisa</span><span><b>Mismas cartas</b>Juegas y retas con un enlace</span></span></div></div></div>`,
+          <div class="tv-way tv-way-one"><img class="tv-menu-art" src="assets/menu-local.webp" alt=""><b>Un solo móvil</b><span class="tv-pass"><span class="tv-phone" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10.5 18.5h3"/></svg></span><span class="tv-people"><b>Ana</b><b>Luis</b><b>Sara</b></span></span><small>De 2 a 9 personas</small></div>
+          <div class="tv-way tv-way-many"><img class="tv-menu-art" src="assets/menu-private.webp" alt=""><b>Cada uno en su móvil</b><span class="tv-rhythms"><span><b>En directo</b>Todos a la vez</span><span><b>Por turnos</b>Un duelo a dos, sin prisa</span><span><b>Mismas cartas</b>Juegas y retas con un enlace</span></span></div></div></div>`,
         steps: [
           [0, c => { c.say("En un solo móvil, de 2 a 9: os pasáis el teléfono en cada turno."); c.add(".tv-way-one", "is-in"); }],
           [500, c => c.cycle(".tv-people b", 800, 2)],

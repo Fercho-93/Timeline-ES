@@ -364,3 +364,80 @@
   :is(#app, #app-splash) .tv-chapter small { display: none; }
   :is(#app, #app-splash) .tv-chapter { justify-items: center; grid-template-columns: auto; }
 }
+
+/* Las miniaturas del manual comparten papel, tinta, láminas y reverso con el juego.
+   Se limita al reproductor: no modifica los menús ni las cartas de una partida. */
+:is(#app, #app-splash) .tv-player {
+  --tv-cardback: radial-gradient(ellipse at 50% 43%, #fffaf0 0 18%, transparent 55%), repeating-conic-gradient(from 0deg at 50% 43%, #b897600b 0deg 1deg, transparent 1deg 15deg), repeating-linear-gradient(45deg, #a77b380b 0 1px, transparent 1px 10px), repeating-linear-gradient(-45deg, #a77b380b 0 1px, transparent 1px 10px), linear-gradient(145deg, #f9efdb, #e7d0a6);
+  --tv-paper: #f3eee4; --tv-paper-2: #e8ddc9; --tv-ink: #302d27; --tv-ink-soft: #70695d;
+}
+:is(#app, #app-splash) .tv-stage .tv-menu-art { display: block; object-fit: contain; pointer-events: none; }
+:is(#app, #app-splash) .tv-door,
+:is(#app, #app-splash) .tv-choices > span {
+  position: relative; isolation: isolate; overflow: hidden; min-height: 38px;
+  padding: 7px 86px 7px 14px; border: 1px solid #cbb896; border-radius: 12px;
+  background: linear-gradient(110deg, #f7f1e6, #e9dfcc); color: var(--tv-ink);
+  box-shadow: inset 0 1px #fff9, 0 5px 12px #0003;
+}
+:is(#app, #app-splash) .tv-door > .tv-menu-art,
+:is(#app, #app-splash) .tv-choices > span > .tv-menu-art {
+  position: absolute; z-index: -1; right: 0; top: 0; width: 88px; height: 100%; object-fit: cover;
+  mask-image: linear-gradient(90deg, transparent, #000 30%); -webkit-mask-image: linear-gradient(90deg, transparent, #000 30%);
+}
+:is(#app, #app-splash) .tv-door b { font: 500 .95rem/1.2 var(--font-display); }
+:is(#app, #app-splash) .tv-chevron { position: absolute; right: 9px; bottom: 7px; font-style: normal; transition: transform .3s; }
+:is(#app, #app-splash) .tv-door-play.is-open .tv-chevron { transform: rotate(180deg); }
+:is(#app, #app-splash) .tv-choices { padding-inline: 10px 0; gap: 4px; }
+:is(#app, #app-splash) .tv-choices.is-open { max-height: 155px; }
+:is(#app, #app-splash) .tv-choices > span { min-height: 32px; padding-block: 6px; font-size: .74rem; }
+:is(#app, #app-splash) .tv-choices > span b { font-weight: 600; }
+:is(#app, #app-splash) .tv-tile,
+:is(#app, #app-splash) .tv-way {
+  position: relative; isolation: isolate; overflow: hidden; border-color: #cbb896;
+  background: linear-gradient(155deg, #f7f1e6, #e9dfcc); color: var(--tv-ink);
+  box-shadow: inset 0 1px #fff9, 0 6px 14px #0003;
+}
+:is(#app, #app-splash) .tv-tile > .tv-menu-art { width: 100%; height: 48px; margin: -2px 0 2px; }
+:is(#app, #app-splash) .tv-tile b,
+:is(#app, #app-splash) .tv-way > b { color: var(--tv-ink); }
+:is(#app, #app-splash) .tv-tile small,
+:is(#app, #app-splash) .tv-way > small { color: var(--tv-ink-soft); }
+:is(#app, #app-splash) .tv-way { padding-right: 76px; }
+:is(#app, #app-splash) .tv-way > .tv-menu-art { position: absolute; right: 4px; top: 10%; width: 70px; height: 80%; }
+:is(#app, #app-splash) .tv-way .tv-phone { color: #866430; }
+:is(#app, #app-splash) .tv-way .tv-people b,
+:is(#app, #app-splash) .tv-way .tv-rhythms > span { background: #d7cbb666; color: var(--tv-ink-soft); }
+:is(#app, #app-splash) .tv-way .tv-rhythms b { color: #755528; }
+:is(#app, #app-splash) .tv-way .tv-people b.is-on { background: #866430; color: #fff7e8; }
+:is(#app, #app-splash) .tv-deck { position: relative; min-height: 82px; padding-right: 92px; overflow: hidden; background: linear-gradient(110deg, #f7f1e6, #e9dfcc); }
+:is(#app, #app-splash) .tv-deck > .tv-menu-art { position: absolute; right: 8px; top: 8px; width: 66px; height: calc(100% - 16px); border-radius: 5px; object-fit: cover; }
+:is(#app, #app-splash) .tv-card { background: linear-gradient(170deg, #fcfaf5, #f3eee4 50%, #e8ddc9); border-radius: 7px; }
+:is(#app, #app-splash) .tv-back { display: none; position: relative; width: 100%; aspect-ratio: 2 / 3; max-height: 74px; overflow: hidden; border-radius: 5px; background: var(--tv-cardback); box-shadow: inset 0 0 0 1px #ab804d, inset 0 0 0 3px #fff5e1, inset 0 0 0 4px #bc93575c; }
+:is(#app, #app-splash) .tv-back .carta-reverso { position: absolute; inset: 0; display: grid; place-items: center; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; background: none; box-shadow: none; transform: none; }
+:is(#app, #app-splash) .tv-back .carta-reverso::before,
+:is(#app, #app-splash) .tv-back .carta-reverso::after { content: none; }
+:is(#app, #app-splash) .tv-back .reverso-emblema { position: static; width: 88%; height: auto; max-height: 80%; object-fit: contain; transform: none; filter: drop-shadow(0 2px 2px #734f2938); }
+:is(#app, #app-splash) .tv-card.is-hidden .tv-back { display: block; }
+:is(#app, #app-splash) .tv-card.is-hidden .tv-art { display: none; }
+:is(#app, #app-splash) .tv-big .tv-back { max-height: 128px; }
+:is(#app, #app-splash) .tv-minihand i { background: url('assets/continuum-emblem-800.webp') center / 90% auto no-repeat, var(--tv-cardback); }
+@media (max-width: 360px) {
+  :is(#app, #app-splash) .tv-way { padding-right: 56px; }
+  :is(#app, #app-splash) .tv-way > .tv-menu-art { width: 50px; }
+  :is(#app, #app-splash) .tv-way .tv-rhythms { gap: 3px; }
+}
+
+:is(#app, #app-splash) .tv-home { gap: 5px; }
+:is(#app, #app-splash) .tv-tiles:not(.tv-three) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+:is(#app, #app-splash) .tv-tile { grid-template-columns: minmax(0, 1fr); gap: 3px; justify-items: center; text-align: center; }
+@media (max-width: 360px) {
+  :is(#app, #app-splash) .tv-board { gap: 8px; }
+  :is(#app, #app-splash) .tv-tile { padding: 8px 6px; }
+  :is(#app, #app-splash) .tv-tile > .tv-menu-art { height: 32px; }
+  :is(#app, #app-splash) .tv-tile b { font-size: .76rem; }
+  :is(#app, #app-splash) .tv-tile small { font-size: .62rem; }
+  :is(#app, #app-splash) .tv-deck { min-height: 70px; padding: 8px 76px 8px 10px; }
+  :is(#app, #app-splash) .tv-deck b { font-size: .9rem; }
+  :is(#app, #app-splash) .tv-deck small { font-size: .62rem; }
+  :is(#app, #app-splash) .tv-deck > .tv-menu-art { width: 54px; }
+}

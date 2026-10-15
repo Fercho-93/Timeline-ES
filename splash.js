@@ -24,12 +24,11 @@
     root.classList.remove('splash-active');
     const el = splash();
     el?.setAttribute('aria-hidden', 'true');
-    el?.classList.remove('splash-ready', 'splash-exit', 'splash-gate', 'splash-entering', 'splash-caja-abriendo', 'splash-caja-cargando');
+    el?.classList.remove('splash-ready', 'splash-exit', 'splash-gate', 'splash-entering');
     document.getElementById('splash-actions')?.remove();
     document.getElementById('splash-ambience')?.remove();
     document.getElementById('splash-status')?.remove();
-    quitaCaja?.();
-    startedAt = null; esperandoJugar = false;
+    startedAt = null;
     if (repinta) [0, 200, 600, 1500].forEach(ms => setTimeout(empuja, ms));
   };
   // Un arranque que se queda a medias no puede dejar la pantalla en blanco para siempre.
@@ -52,112 +51,6 @@
     setTimeout(settle, 3600);
   };
 
-  // El cofre del juego. La primera vez que alguien abre Continuum en un dispositivo no entra
-  // de golpe en la portada: está en cubierta, en alta mar, con un cofre cerrado que se abre con
-  // un toque. Al abrirlo sale la luz, salen las cartas y la cámara entra en el cofre: ahí empieza
-  // la intro de siempre. Solo esa primera vez; después se recuerda y la portada abre directa.
-  const CAJA = 'continuum-caja-abierta-v1';
-  const CAJA_SE_VA = 500;
-  let quitaCaja = null, esperandoJugar = false;
-  // Lo que espera `gate`: resuelto de salida (sin caja) y, si hay caja, cuando se termina de abrir.
-  let cajaAbierta = Promise.resolve();
-  const tocaCaja = () => {
-    try {
-      if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return false;
-      if (localStorage.getItem(CAJA)) return false;
-      // Quien ya guarda algo (una partida, un ajuste, una cuenta) conocía el juego antes de
-      // que existiera la caja: no se le entrega ahora, se le marca como ya abierta.
-      if (localStorage.length) { localStorage.setItem(CAJA, '1'); return false; }
-      return true;
-    } catch { return false; } // Sin almacenamiento no se podría recordar: se repetiría cada vez.
-  };
-  // Se decide ya, en <head>: la clase en <html> deja la intro parada antes del primer pintado,
-  // con lo que al abrir la caja empieza desde su principio y no desde donde se quedó.
-  const conCaja = tocaCaja();
-  if (conCaja) root.classList.add('splash-caja');
-  // La película se compone de las cuatro ilustraciones aportadas: cámara y
-  // cuerpo fijos, tapa con espesor y cartas separadas. Sin el modelo de prueba.
-  const montaCaja = el => {
-    clearTimeout(timeout);
-    const escena = document.createElement('div');
-    escena.className = 'splash-caja-escena';
-    escena.innerHTML = `<video class="cofre-pelicula" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true" poster="assets/cofre-reference-v3-closed.webp"></video>
-      <img class="cofre-fallback" src="assets/cofre-reference-v3-closed.webp" alt="" />
-      <p class="caja-etiqueta"><span>Un mundo por descubrir</span>Rumbo a <b>Continuum</b><i aria-hidden="true">✦</i></p>
-      <button type="button" class="caja-abrir" aria-label="Abrir el cofre de Continuum"></button>
-      <p class="caja-pista" aria-live="polite">Toca el cofre para abrirlo</p>`;
-    el.append(escena);
-    const video = escena.querySelector('video'), boton = escena.querySelector('button');
-    const pista = escena.querySelector('.caja-pista'), imagen = escena.querySelector('.cofre-fallback');
-    video.muted = true; video.playsInline = true;
-    let abierta = false, terminada = false, retirada = false, enFallback = false, falloVideo = false;
-    let objeto = null, cargaTimer, watchdog, salidaTimer, resuelve;
-    const pasos = [], abort = new AbortController();
-    cajaAbierta = new Promise(resolve => { resuelve = resolve; });
-    const limpiaTimers = () => { clearTimeout(cargaTimer); clearTimeout(watchdog); pasos.forEach(clearTimeout); };
-    const retira = () => {
-      if (retirada) return;
-      retirada = true; limpiaTimers(); clearTimeout(salidaTimer); abort.abort();
-      video.removeEventListener('ended', alTerminar); video.removeEventListener('error', alError);
-      video.pause(); video.removeAttribute('src'); video.load();
-      if (objeto) URL.revokeObjectURL(objeto);
-      escena.remove(); quitaCaja = null;
-    };
-    const termina = () => {
-      if (terminada || retirada) return;
-      terminada = true; limpiaTimers();
-      root.classList.remove('splash-caja');
-      escena.classList.add('caja-se-va');
-      introStart = performance.now(); asienta(el);
-      if (!esperandoJugar) guard();
-      salidaTimer = setTimeout(retira, CAJA_SE_VA);
-      resuelve();
-    };
-    const empieza = () => {
-      el.classList.remove('splash-caja-cargando');
-      el.classList.add('splash-caja-abriendo');
-    };
-    // Si el navegador bloquea el vídeo, se usan las cuatro láminas originales
-    // y siempre se llega a Jugar. No se vuelve a dibujar el cofre antiguo.
-    const fallback = () => {
-      if (terminada || retirada || enFallback) return;
-      enFallback = true; clearTimeout(watchdog); video.pause(); empieza();
-      escena.classList.add('cofre-sin-video');
-      ['closed', 'open', 'rise', 'fan'].forEach((frame, i) => {
-        pasos.push(setTimeout(() => { if (!retirada) imagen.src = `assets/cofre-reference-v3-${frame}.webp`; }, [0, 700, 1900, 3200][i]));
-      });
-      pasos.push(setTimeout(termina, 4700));
-    };
-    const alTerminar = () => { if (abierta && !enFallback) termina(); };
-    const alError = () => { falloVideo = true; if (abierta) fallback(); };
-    video.addEventListener('ended', alTerminar); video.addEventListener('error', alError);
-    // Descargar el archivo entero evita problemas de Range/206 en Safari y
-    // permite al service worker cachearlo. El reproductor lee un blob local.
-    cargaTimer = setTimeout(() => abort.abort(), 6500);
-    const carga = Promise.resolve().then(() => fetch('assets/cofre-opening-v4.mp4', { signal: abort.signal }))
-      .then(response => { if (!response.ok) throw new Error('cofre-video'); return response.blob(); })
-      .then(blob => {
-        if (retirada) return false;
-        objeto = URL.createObjectURL(blob); video.src = objeto; video.load(); return true;
-      }).catch(() => false).finally(() => clearTimeout(cargaTimer));
-    const abre = () => {
-      if (abierta || retirada) return;
-      abierta = true; boton.disabled = true;
-      try { localStorage.setItem(CAJA, '1'); } catch { /* La entrada sigue disponible. */ }
-      pista.textContent = 'Preparando la apertura…'; el.classList.add('splash-caja-cargando');
-      watchdog = setTimeout(fallback, 8000);
-      carga.then(ok => {
-        if (terminada || retirada || enFallback) return;
-        if (!ok || falloVideo) { fallback(); return; }
-        empieza(); clearTimeout(watchdog); watchdog = setTimeout(termina, 10000);
-        try { const play = video.play(); play?.catch?.(fallback); } catch { fallback(); }
-      });
-    };
-    // Botón nativo: toque, Enter y espacio comparten exactamente la misma ruta.
-    boton.addEventListener('click', abre);
-    quitaCaja = () => { retira(); root.classList.remove('splash-caja'); el.classList.remove('splash-caja-abriendo', 'splash-caja-cargando'); resuelve(); };
-  };
-
   const show = () => {
     // DOMContentLoaded y boot pueden pedir la misma apertura: no reiniciar su reloj.
     if (startedAt !== null) return;
@@ -168,8 +61,7 @@
     el?.classList.add('splash-ready');
     el?.setAttribute('aria-hidden', 'false');
     guard();
-    if (el && conCaja && !el.querySelector('.splash-caja-escena')) montaCaja(el);
-    else if (!conCaja) asienta(el);
+    asienta(el);
   };
   // Encaje de la portada. El globo es parte de la imagen de fondo (escalada con `cover`), así
   // que su altura en pantalla cambia con cada móvil y con las barras del navegador. Se calcula
@@ -227,13 +119,11 @@
   // El juego no entra solo: entra cuando alguien pulsa «Jugar». Ese toque es además lo
   // único que permite encender el audio —ningún navegador deja sonar nada antes—, así
   // que es lo que hace que la música ya esté puesta cuando aparece el menú.
-  // Si hay caja, «Jugar» no aparece hasta que se abre: la intro, y sus 5 s, empiezan entonces.
-  const gate = () => cajaAbierta.then(() => new Promise(resolve => {
+  const gate = () => new Promise(resolve => {
     const el = splash();
     if (!el) { resolve(); return; }
     // Aquí se espera a una persona, no a la red: el aviso de carga lenta sobra.
     clearTimeout(timeout);
-    esperandoJugar = true;
     el.classList.add('splash-gate');
     let actions = document.getElementById('splash-actions');
     let button = document.getElementById('splash-play');
@@ -295,7 +185,7 @@
     button.addEventListener('click', enter, { once: true });
     document.getElementById('splash-guide')?.addEventListener('click', () => verVideo(el));
     try { button.focus({ preventScroll: true }); } catch { /* Sin foco también se pulsa. */ }
-  }));
+  });
   // La guía en vídeo, a pantalla completa sobre la portada. No entra en el juego: al terminar
   // (o al cerrarla) se vuelve a la portada, con «Jugar» esperando.
   const verVideo = el => {
