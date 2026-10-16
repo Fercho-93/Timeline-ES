@@ -3054,6 +3054,20 @@
       }
     },
     {
+      "path": "assets/atlas-ocean-v1.webp",
+      "sha256": "de2b939f15fd14103a6f8c7b351f2981bec0fdc133185d23d61d01f496bdc1d1",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
       "path": "assets/avatars/alfonso-x.webp",
       "sha256": "28317f4099ad7be9e1414904f1baf22448a700b17afead6b00ac2337a7fbe3a6",
       "rightsEvidence": {
@@ -3464,205 +3478,8 @@
       }
     },
     {
-      "path": "assets/cofre-frames-v2-0.webp",
-      "sha256": "0ea3d6058ae88dedfd66bd7c28becc1f7a3e1cbcbc4a3ac696d7e0df30db23db",
-      "rightsEvidence": {
-        "status": "project-rendered-from-ai-materials",
-        "generator": "Three.js 0.186.1; materiales originales ChatGPT / OpenAI",
-        "evidenceRef": "tools/cofre/README.md",
-        "generatedAt": "2026-10-15",
-        "referenceImage": "assets/cofre-oak-v1.webp",
-        "exactPrompt": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/cofre-frames-v2-1.webp",
-      "sha256": "455874d47301cfa493d260b6beb3d2b86d3b768cbf6f774d2832e54dd2514e25",
-      "rightsEvidence": {
-        "status": "project-rendered-from-ai-materials",
-        "generator": "Three.js 0.186.1; materiales originales ChatGPT / OpenAI",
-        "evidenceRef": "tools/cofre/README.md",
-        "generatedAt": "2026-10-15",
-        "referenceImage": "assets/cofre-oak-v1.webp",
-        "exactPrompt": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/cofre-frames-v2-2.webp",
-      "sha256": "c1d60c0f4b2f4786033fd73da8d33a7414456f1dbe92c0f1bbf2eff8602f539c",
-      "rightsEvidence": {
-        "status": "project-rendered-from-ai-materials",
-        "generator": "Three.js 0.186.1; materiales originales ChatGPT / OpenAI",
-        "evidenceRef": "tools/cofre/README.md",
-        "generatedAt": "2026-10-15",
-        "referenceImage": "assets/cofre-oak-v1.webp",
-        "exactPrompt": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/cofre-frames-v2-3.webp",
-      "sha256": "a97743ce23e031de69feeb103e298f1345d01fcea8bea30d54819406afc359de",
-      "rightsEvidence": {
-        "status": "project-rendered-from-ai-materials",
-        "generator": "Three.js 0.186.1; materiales originales ChatGPT / OpenAI",
-        "evidenceRef": "tools/cofre/README.md",
-        "generatedAt": "2026-10-15",
-        "referenceImage": "assets/cofre-oak-v1.webp",
-        "exactPrompt": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/cofre-frames-v2-4.webp",
-      "sha256": "5a49839d2c5225c5f63a77a2a0b11b7ed7372140365caf2b31e43b8b65a24323",
-      "rightsEvidence": {
-        "status": "project-rendered-from-ai-materials",
-        "generator": "Three.js 0.186.1; materiales originales ChatGPT / OpenAI",
-        "evidenceRef": "tools/cofre/README.md",
-        "generatedAt": "2026-10-15",
-        "referenceImage": "assets/cofre-oak-v1.webp",
-        "exactPrompt": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/cofre-frames-v2-5.webp",
-      "sha256": "8a338c03eb68022047bc2abd23782fe25ade3af3d68932d19e5f65943fea9a72",
-      "rightsEvidence": {
-        "status": "project-rendered-from-ai-materials",
-        "generator": "Three.js 0.186.1; materiales originales ChatGPT / OpenAI",
-        "evidenceRef": "tools/cofre/README.md",
-        "generatedAt": "2026-10-15",
-        "referenceImage": "assets/cofre-oak-v1.webp",
-        "exactPrompt": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/cofre-frames-v2-6.webp",
-      "sha256": "84777a652f8e15c09e379b77696664277d1eb15d3cecb8755311ae01e43759bd",
-      "rightsEvidence": {
-        "status": "project-rendered-from-ai-materials",
-        "generator": "Three.js 0.186.1; materiales originales ChatGPT / OpenAI",
-        "evidenceRef": "tools/cofre/README.md",
-        "generatedAt": "2026-10-15",
-        "referenceImage": "assets/cofre-oak-v1.webp",
-        "exactPrompt": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/cofre-frames-v2-7.webp",
-      "sha256": "4d6c74642f3611b5562786bb7219d846c72a5cc20f00427040363a6ab13c04ab",
-      "rightsEvidence": {
-        "status": "project-rendered-from-ai-materials",
-        "generator": "Three.js 0.186.1; materiales originales ChatGPT / OpenAI",
-        "evidenceRef": "tools/cofre/README.md",
-        "generatedAt": "2026-10-15",
-        "referenceImage": "assets/cofre-oak-v1.webp",
-        "exactPrompt": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/cofre-oak-v1.webp",
-      "sha256": "505b158769b7c20c3f124cf51e985a7adb1f21f82a9e8c20dada9cd70d5d41a6",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "docs/cofre-intro.md",
-        "exactPrompt": null,
-        "generatedAt": "2026-10-15",
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/cofre-reference-v3-clean.webp",
-      "sha256": "cd7f5015ac4863941e3c880ba0b8a10c7bf7b71d6e4ad12b97a68b34f0785d72",
-      "rightsEvidence": {
-        "status": "project-generated-ai",
-        "generator": "OpenAI image generation",
-        "evidenceRef": "tools/cofre-v3/README.md",
-        "generatedAt": "2026-10-15",
-        "referenceImage": "assets/cofre-reference-v3-closed.webp",
-        "exactPrompt": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/cofre-reference-v3-closed.webp",
-      "sha256": "0e17a7342ac63e2b545ef5f0f20db7f81ee1d1711a34cd530d867bcfae14d94f",
-      "rightsEvidence": {
-        "status": "user-provided-reference",
-        "generator": "Ilustración aportada por el titular",
-        "evidenceRef": "tools/cofre-v3/README.md",
-        "generatedAt": null,
-        "referenceImage": null,
-        "exactPrompt": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/cofre-reference-v3-fan.webp",
-      "sha256": "9dad2bfe669f326c5ca0487a606a0b62e40565bb7c682b8efb3a72fff8900d13",
-      "rightsEvidence": {
-        "status": "user-provided-reference",
-        "generator": "Ilustración aportada por el titular",
-        "evidenceRef": "tools/cofre-v3/README.md",
-        "generatedAt": null,
-        "referenceImage": null,
-        "exactPrompt": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/cofre-reference-v3-open.webp",
-      "sha256": "83b05ee1cea5438a4516202dcb33c5323226daba815109b3a8c10c9646bc9e4f",
-      "rightsEvidence": {
-        "status": "user-provided-reference",
-        "generator": "Ilustración aportada por el titular",
-        "evidenceRef": "tools/cofre-v3/README.md",
-        "generatedAt": null,
-        "referenceImage": null,
-        "exactPrompt": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/cofre-reference-v3-rise.webp",
-      "sha256": "8ef48ab790f7d0bb43ccb336d9c285c2b6dff9d74b0ddac5d482a4646ae29137",
-      "rightsEvidence": {
-        "status": "user-provided-reference",
-        "generator": "Ilustración aportada por el titular",
-        "evidenceRef": "tools/cofre-v3/README.md",
-        "generatedAt": null,
-        "referenceImage": null,
-        "exactPrompt": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/cofre-voyage-v1.webp",
-      "sha256": "ba4147305bf840e5d44b024e073ae4d3ba12eec3f6abf474dab2c475683aeed2",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "docs/cofre-intro.md",
-        "exactPrompt": null,
-        "generatedAt": "2026-10-15",
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
       "path": "assets/competition-engraving.webp",
-      "sha256": "c9812eda2cd1ca2ef46c93136550dbeceffa40def8b513ffe4186fe160414d60",
+      "sha256": "17d770b82d9dba22bb200ec06e339378e93c708d31bcf591c05c2accbc718635",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -3677,6 +3494,20 @@
     {
       "path": "assets/continuum-emblem-800.webp",
       "sha256": "38bbb95dd3231eec7e52f4a64f9f239868cda70c77d1d1b2753a033fa99039a3",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/continuum-splash-blue-v5.webp",
+      "sha256": "5bbc9368d9f29206a26873b63ecd5b21ad1bf2aa9aa2deeea053f4b19a4b5872",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -4711,6 +4542,62 @@
       }
     },
     {
+      "path": "assets/difficulty-easy-v1.webp",
+      "sha256": "740f932abd8c2b6714293397a1905188c5e8ec8f546580021f6a7d5165aa9099",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/difficulty-expert-v1.webp",
+      "sha256": "e142f26ba314a7d4482eacfa380dc6beb8b3aa363895de990295dcf91e1281d7",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/difficulty-hard-v1.webp",
+      "sha256": "49f98696a5b2c3e577dce4873741baf5a0573560b4a96cd1a7bf55f53dd2bd65",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/difficulty-normal-v1.webp",
+      "sha256": "baa7bd2e55879cb8ceab8cda0a6bd7d1173cd81a0940a993cbbb41b9fcf14ffd",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
       "path": "assets/distance-cards/11001-paris-versailles.webp",
       "sha256": "a5f0f8f72eef888e037ef3dd67bc11386e6d7c03af4c60df5eb55f8b90774a7b",
       "rightsEvidence": {
@@ -5691,8 +5578,22 @@
       }
     },
     {
+      "path": "assets/guide-notebook-v1.webp",
+      "sha256": "8aa6d05e4a2855e0a89ee5d3d8d7a942400dc693dad38ac5c76b0535899e676b",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
       "path": "assets/hero-entertainment-400.webp",
-      "sha256": "a7a0d4020a79e758770fd6f69e3c825d7b4fa0374319867447632f76405fa43f",
+      "sha256": "f586f663ffb60ad22f779c7abc799592df52c76b7b16eda695b9e93c6af26a51",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -5706,7 +5607,7 @@
     },
     {
       "path": "assets/hero-entertainment-700.webp",
-      "sha256": "d29e5eef08423eaaf55c3c21b7e7718752ae1516f9a3011992a637c567320cc8",
+      "sha256": "3dd70c88462c0521093427ae890b7e38ab83f920654eaae825f906780e04b6c6",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -5720,7 +5621,7 @@
     },
     {
       "path": "assets/hero-geography-400.webp",
-      "sha256": "dca4f316a7ded87e2c822c8cea322238371f7a903d7233608577088142e6080a",
+      "sha256": "b960f9bac37d48257701bf2dc00ca990d73f1206312d7135582c76f95e3b1fd5",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -5734,7 +5635,7 @@
     },
     {
       "path": "assets/hero-geography-700.webp",
-      "sha256": "3d411f5b0fe39cd2a769b572134b02cd4f847e14e288d81e1d0cec59cf0696f9",
+      "sha256": "77e9aabad7545d2de053168c9c7d08c75a41f059012cdb7ed3e028c4952d518c",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -5776,7 +5677,7 @@
     },
     {
       "path": "assets/hero-mixed-400.webp",
-      "sha256": "50e59eee643cb117385577bd5177956107d58b0ede072e2291f4654b5a39b5a6",
+      "sha256": "81bf660104e754b64c482e07873f33905da58c4692d78db79e833536694c44b9",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -5790,7 +5691,7 @@
     },
     {
       "path": "assets/hero-mixed-700.webp",
-      "sha256": "ad875f64f04476fa66b4aa40697d48a44cd02465d23d48ca4cc90baf24ee96f3",
+      "sha256": "f42bd0d5d734d543946a461e323829cea748b9f92fb96e69cca203c0b0d3815c",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -5804,7 +5705,7 @@
     },
     {
       "path": "assets/hero-nature-400.webp",
-      "sha256": "8a35cd72332109d845678ac16a85113a4a7cb55d27d1b6ccd3b2eb663bb028a4",
+      "sha256": "ebdea3671e3f3069f28008b8ab899f65cb27b1d9eb89178f5c6358ab5712b836",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -5818,7 +5719,7 @@
     },
     {
       "path": "assets/hero-nature-700.webp",
-      "sha256": "5713c20190cc2bb4ce5b57b462b9aebde505c7ed0cc4b2cb30191b16fab1a64d",
+      "sha256": "342e6135136d9244da67a844371e80f87bc21e08a8c29889b004b11efc3362bf",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -5869,8 +5770,8 @@
       }
     },
     {
-      "path": "assets/history-cards/1.jpg",
-      "sha256": "0446c06b2291f6eca4ec7b0b3843b77755edab47e96e4ae3571831a932474341",
+      "path": "assets/history-cards/1.webp",
+      "sha256": "6e04bc41505abbc59f43ee36afc6c29b35a8d941a3fd85efaf5acf2aff04a68e",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -5883,8 +5784,8 @@
       }
     },
     {
-      "path": "assets/history-cards/10.jpg",
-      "sha256": "e263338adafb59f1f8c2beb5266c1f72ad010959c2ed88832ec3cd9045364f23",
+      "path": "assets/history-cards/10.webp",
+      "sha256": "970423b0215347f38f2afa4be7c67a6ea641d57b588f1fa33f5698a9aec3192e",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -5897,8 +5798,8 @@
       }
     },
     {
-      "path": "assets/history-cards/100.jpg",
-      "sha256": "975e18646b68a56d43ae98ca431bc99261f83e1e03570395bf89033b1054c7e3",
+      "path": "assets/history-cards/100.webp",
+      "sha256": "3e00e98294c30b2dae15c59873858a0d2cc6cefad6295d08e33a70ae2ef34966",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -5911,8 +5812,8 @@
       }
     },
     {
-      "path": "assets/history-cards/101.jpg",
-      "sha256": "4f78be53174f44b10710f1943811146be574e5d7589a605ff7285d80125eb257",
+      "path": "assets/history-cards/101.webp",
+      "sha256": "196ddf75a0e75fcc20cd35eb2dbb2112c4cca3add6e63b2dbb7472577d0f29af",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -5925,8 +5826,8 @@
       }
     },
     {
-      "path": "assets/history-cards/102.jpg",
-      "sha256": "55f08018ebbedc46c1a6e007f5fee78ab3ebacbafbbb488a460e87edb697eafe",
+      "path": "assets/history-cards/102.webp",
+      "sha256": "41af5076d1908221290aa6f2ef9d03b472cebce27f054c1f97ebd5f70a877ffc",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -5939,8 +5840,8 @@
       }
     },
     {
-      "path": "assets/history-cards/103.jpg",
-      "sha256": "6ae375f2f7739cdd219b100dd85fb1c1f85c57754ed595039b7a3e3c9247cf40",
+      "path": "assets/history-cards/103.webp",
+      "sha256": "afe9cfad3ffbbee746687cd1001c63179d359936c6fcea83dd7ef15f23509e48",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -5953,8 +5854,8 @@
       }
     },
     {
-      "path": "assets/history-cards/104.jpg",
-      "sha256": "5dd719b658a6457da708f5ba7c3278e02a523aef8022996dbd1bb32e8d2a3bf0",
+      "path": "assets/history-cards/104.webp",
+      "sha256": "8843d2b3fc1137ef8704aacb28f66ebd68170a3de101619b8d5d1b2bdcff8bb0",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -5967,8 +5868,8 @@
       }
     },
     {
-      "path": "assets/history-cards/105.jpg",
-      "sha256": "0bf2e642d3a72800fe8e987c5d3c75b3a713f51c2c8768607a26caa13749ebc7",
+      "path": "assets/history-cards/105.webp",
+      "sha256": "bc77e52b63d96d495baac2cf57aa6a765bdf331b625753526568b22a2e887194",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -5981,8 +5882,8 @@
       }
     },
     {
-      "path": "assets/history-cards/107.jpg",
-      "sha256": "44c505ea08ab2f3d714e7b5a87851bac0d3b7e1e4cdad8cd3c7be8a9bd645f87",
+      "path": "assets/history-cards/107.webp",
+      "sha256": "f5dd564f2515fa8008b62c806944c99334f152a801cf3fec69dfc64fe3302bb5",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -5995,8 +5896,8 @@
       }
     },
     {
-      "path": "assets/history-cards/108.jpg",
-      "sha256": "5aa779310cca27805d8b1bb0b0540429bc040b2b7494d80496cc488a60a91caa",
+      "path": "assets/history-cards/108.webp",
+      "sha256": "285f84110402fcc3da4c79ec2eca60543ffe23309cf18929ffbc5ddae46e85c0",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6009,8 +5910,8 @@
       }
     },
     {
-      "path": "assets/history-cards/109.jpg",
-      "sha256": "8e392046a3e8e51e1f1cf0c0d96c7f1f479d5b03ede4aa404dbbc6f1971db49a",
+      "path": "assets/history-cards/109.webp",
+      "sha256": "6330445838bc9630c9f9a59146bfd0c6a803a65920817b0143f504196e95f57d",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6023,8 +5924,8 @@
       }
     },
     {
-      "path": "assets/history-cards/11.jpg",
-      "sha256": "c4ca336e8137fc04b52bb05a5f126e96df1af086bd68f779febacb12ed8c4cce",
+      "path": "assets/history-cards/11.webp",
+      "sha256": "6a47e2f49ca8a63d7ca8e3cb38e7e2eedc07aa2ad7901d00e07ac85b7a4d5cfa",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6037,8 +5938,8 @@
       }
     },
     {
-      "path": "assets/history-cards/111.jpg",
-      "sha256": "c7b43c20714e6a9c69eb1e245547544a3b2eacdc8653a9fc666c2d3419e79c31",
+      "path": "assets/history-cards/111.webp",
+      "sha256": "4e2b1426a6a372a27feece223f38c27e42b3c06128ff3fe27abd193a19b58a3c",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6051,8 +5952,8 @@
       }
     },
     {
-      "path": "assets/history-cards/112.jpg",
-      "sha256": "58c26356c00bfea23b845cd801ab293743bd94eb18298691027e7436c1dd4e09",
+      "path": "assets/history-cards/112.webp",
+      "sha256": "4235150b018d8a7412d57ed79fe28aa35684743e95190a077be768be186e585a",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6065,8 +5966,8 @@
       }
     },
     {
-      "path": "assets/history-cards/113.jpg",
-      "sha256": "e20a02960dea6669f903eb0e5046f027f56117b97cfa3bab90dc2e08dc7a942d",
+      "path": "assets/history-cards/113.webp",
+      "sha256": "fb81d2cedb716ea7d321b2520a1e367005b7e5ffadd1b06139eb302a0ff1aa91",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6079,8 +5980,8 @@
       }
     },
     {
-      "path": "assets/history-cards/114.jpg",
-      "sha256": "805897913a59cbf83d4383d7d4d0eb05ff9bece45352330a39cab71bdfac8669",
+      "path": "assets/history-cards/114.webp",
+      "sha256": "3dd64bfee10b70a2221125ffbd479fd32a2498dd36f6f598ac21af77949b6c39",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6093,8 +5994,8 @@
       }
     },
     {
-      "path": "assets/history-cards/115.jpg",
-      "sha256": "01a6aefcba2991526c17060c606114d0477f7727092ed3d67d1fd39b8ff1cc22",
+      "path": "assets/history-cards/115.webp",
+      "sha256": "a4bb54d82553bc54c7cfd2d4eed2308cba100e2cf9eb1c83f5b0f62e938ce688",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6107,8 +6008,8 @@
       }
     },
     {
-      "path": "assets/history-cards/117.jpg",
-      "sha256": "7bdcd652921f3b9eb60eef2a8be0c423634e3ea066234bfdb787eb22b02061ac",
+      "path": "assets/history-cards/117.webp",
+      "sha256": "008570baf3ca1553c88b3d0a4de8edcc9155aa9fb0ff0d5221299e5762df0fd7",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6121,8 +6022,8 @@
       }
     },
     {
-      "path": "assets/history-cards/118.jpg",
-      "sha256": "6db36585c154fb4357648275cbd21417461884ff86736e47b1072bbcf189e897",
+      "path": "assets/history-cards/118.webp",
+      "sha256": "35033a5e36c9867bb1baab967f47ba84861130bab04db8dfe681918f255c51d9",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6135,8 +6036,8 @@
       }
     },
     {
-      "path": "assets/history-cards/12.jpg",
-      "sha256": "eabd60e1351230682852fc18a28d08ca36c0317875c639b429e2507da44b99f6",
+      "path": "assets/history-cards/12.webp",
+      "sha256": "70d5a1b7bfc3fb1ac81fe22c49ef5156a5d6fd070fa94707e64303e003fb2ea0",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6149,8 +6050,8 @@
       }
     },
     {
-      "path": "assets/history-cards/120.jpg",
-      "sha256": "d24803f7de32dd30d0b5c9779859b7d384bb49a58c8b8f2ac8925b4471684c86",
+      "path": "assets/history-cards/120.webp",
+      "sha256": "a5e808e77f14ebb594d715e1889a62b73141c52b34bc0b620bc5ba0f7a2acd4a",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6163,8 +6064,8 @@
       }
     },
     {
-      "path": "assets/history-cards/121.jpg",
-      "sha256": "0eaf4920b1cc184bd02bf4b13d9f17f8f415d16c60cf733acdca8388520c7f60",
+      "path": "assets/history-cards/121.webp",
+      "sha256": "a910636c4ee15ac05d3fc12051a4231e91c51fa10257a714350ed9b74bb6d638",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6177,8 +6078,8 @@
       }
     },
     {
-      "path": "assets/history-cards/122.jpg",
-      "sha256": "61181e0dfc43488e3c2f1db1b1435bdbcb3e208f44238d261e49248c7efc41f8",
+      "path": "assets/history-cards/122.webp",
+      "sha256": "de810a991b88b850188ccdc846dc138ccbcbc1900f31df0ce2f3237bba141689",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6191,8 +6092,8 @@
       }
     },
     {
-      "path": "assets/history-cards/123.jpg",
-      "sha256": "fcf1136302067f9704fc64b597a32e19d758196e2a9409f08bccc8ecc33f3597",
+      "path": "assets/history-cards/123.webp",
+      "sha256": "3f58717f7311e78d1deb1a7f7f4171ca0944b60f1f8c481348fcfd12249b92f0",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6205,8 +6106,8 @@
       }
     },
     {
-      "path": "assets/history-cards/124.jpg",
-      "sha256": "9c6b4d9a40964adb86fbee58b314d931cf748b72137a3fa1cd838619549f6a46",
+      "path": "assets/history-cards/124.webp",
+      "sha256": "56ccc17f0b4124275573188e37303b5970d9cda83cbe02b4616ecf7fb453bc64",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6219,8 +6120,8 @@
       }
     },
     {
-      "path": "assets/history-cards/125.jpg",
-      "sha256": "6d95c75487b15f9f38a51ea1ee01fe681c684b35b4019b44227b613f28fc1283",
+      "path": "assets/history-cards/125.webp",
+      "sha256": "4532a48caa7eac65a2c85bc9733540ea4e1396e5c9879d554ecfa7c5c9c0d4f8",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6233,8 +6134,8 @@
       }
     },
     {
-      "path": "assets/history-cards/126.jpg",
-      "sha256": "7bf407b5a0fd9852e9316f38e4b3c0e174b574d02e1c9c66028106e6ae22efb4",
+      "path": "assets/history-cards/126.webp",
+      "sha256": "f4846b75470d41c3586cfc338e73441a859aac08815d5bc64565c94860e08d59",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6247,8 +6148,8 @@
       }
     },
     {
-      "path": "assets/history-cards/127.jpg",
-      "sha256": "446d06dc2a5344df37ed19f83c55b8b1cd01df6ba0a0acf46a7e015fdf8c4ba0",
+      "path": "assets/history-cards/127.webp",
+      "sha256": "053c630e9d074723c80e225513ae08902dd1d3361f3b844590bcfe35982197e2",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6261,8 +6162,8 @@
       }
     },
     {
-      "path": "assets/history-cards/128.jpg",
-      "sha256": "73e2f1ea8c25a2e86a2ed12021944b1e535f5661d4c720c5c03744e3cb0e54bb",
+      "path": "assets/history-cards/128.webp",
+      "sha256": "a5ef1ba13780645fa04c989e6f532671cfe27c9c5e089d3dcfa13c58ebdb9fcc",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6275,8 +6176,8 @@
       }
     },
     {
-      "path": "assets/history-cards/129.jpg",
-      "sha256": "463a42859ad1ccdcc51397b60bf193424e7070307a98a1ec79113d45bff389c4",
+      "path": "assets/history-cards/129.webp",
+      "sha256": "92abcff705a4f1b5faeabe5e2d360aa7f0f03e4c39d25b65250cef197206ae64",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6289,8 +6190,8 @@
       }
     },
     {
-      "path": "assets/history-cards/13.jpg",
-      "sha256": "764636bf49f2b264cda91a7bb9bfce3e5c277a23ea3fa4723ab813f63a261418",
+      "path": "assets/history-cards/13.webp",
+      "sha256": "4fed5cc680e3bf9a81ea826e0a1575c23bf51a8453adfbb81c2bf67d5bc26a44",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6303,8 +6204,8 @@
       }
     },
     {
-      "path": "assets/history-cards/130.jpg",
-      "sha256": "3fe750346dd0ddda049def9d8abe521737380212bf6602cff0af6d578d00f5f9",
+      "path": "assets/history-cards/130.webp",
+      "sha256": "c0a99a446c938d9b95f105b558e0024f780e4e923d1e6f16db080cb750d1a766",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6317,8 +6218,8 @@
       }
     },
     {
-      "path": "assets/history-cards/131.jpg",
-      "sha256": "c6953ed1d9d97e70c087f4ebf13217517549acc3abe2430c0ea8360a5a21510d",
+      "path": "assets/history-cards/131.webp",
+      "sha256": "0746f5741fc76c2d58532faa9600f94c259cf2a0238b4ac28d404ee9bb97cf7c",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6331,8 +6232,8 @@
       }
     },
     {
-      "path": "assets/history-cards/132.jpg",
-      "sha256": "19212481ffee329dcc26e015effc062eb1749c0b14ad68348e3e2eb96ec8e403",
+      "path": "assets/history-cards/132.webp",
+      "sha256": "a194594d9e2000c49df20b2c6df663fc069d31e26124eee810a3ad839eebd0d1",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6345,8 +6246,8 @@
       }
     },
     {
-      "path": "assets/history-cards/134.jpg",
-      "sha256": "af4bab06de592913b1ce0bfdf2d1b5b4ef31a9ab0c3cb6a515adeea2b1ce12ab",
+      "path": "assets/history-cards/134.webp",
+      "sha256": "6491275ed74d245f4fc4ec000af7cc8eb83a66792e0b79dc8604ce55eeaec697",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6359,8 +6260,8 @@
       }
     },
     {
-      "path": "assets/history-cards/135.jpg",
-      "sha256": "fab1a7a24910a5784f0230dd5e333cf6daa6daa6ed2447bf6b2b3ad65575c097",
+      "path": "assets/history-cards/135.webp",
+      "sha256": "35948160ecef6336882c03b7064290b1cf6a53f9582ad7d9ae45c4c63d72e3d6",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6373,8 +6274,8 @@
       }
     },
     {
-      "path": "assets/history-cards/136.jpg",
-      "sha256": "c0aabe741344315067a6cab86900fd7d205a2e41c76ff24212353a7015cf582d",
+      "path": "assets/history-cards/136.webp",
+      "sha256": "11da2be0fa232f3b74e9f9b7a2560403ae5033bb503924af2a8e3c7c36cf7f4a",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6387,8 +6288,8 @@
       }
     },
     {
-      "path": "assets/history-cards/137.jpg",
-      "sha256": "8fa797631bf3c7773042980f8d91b79b8d9cdb4b0968758a7094969bc4ecfb19",
+      "path": "assets/history-cards/137.webp",
+      "sha256": "a4da70b4fc9fbbf776ec5c201fa8954e351f19b82487931038d7c69c83f4da38",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6401,8 +6302,8 @@
       }
     },
     {
-      "path": "assets/history-cards/138.jpg",
-      "sha256": "36fcdde2e400026252a2abed28b010cc34dd66f4062d792609bce71de431d0d8",
+      "path": "assets/history-cards/138.webp",
+      "sha256": "fc51ac760c13f4617f4192e27177ab3d8485295e20ec53348b16ad3af3a88199",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6415,8 +6316,8 @@
       }
     },
     {
-      "path": "assets/history-cards/14.jpg",
-      "sha256": "9c9da841ac41216202590cb2cd8be114f439ce43d1f7ae1551efe50f91652fb9",
+      "path": "assets/history-cards/14.webp",
+      "sha256": "0e8414d10787ec087bf3270bba36215872a937d1b2a5529f85f77e7fa53b90e8",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6429,8 +6330,8 @@
       }
     },
     {
-      "path": "assets/history-cards/140.jpg",
-      "sha256": "a5d5085b8f27e045454af430d4b51cfd6238304712d430fe7e0d13e74428b62a",
+      "path": "assets/history-cards/140.webp",
+      "sha256": "3b414d47755aea5d6e4c08188ee61f830d44e040f401853a64e53338d7f1351e",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6443,8 +6344,8 @@
       }
     },
     {
-      "path": "assets/history-cards/141.jpg",
-      "sha256": "364c2a92d7279112fcb3482dcc0555f566e1bb98b1e88be242055fb3db7bd96f",
+      "path": "assets/history-cards/141.webp",
+      "sha256": "7fd7aa73b8b1bbec0af9b9f84443b8c6972e05d8958ee6e5ad330a226b6b7a1b",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6457,8 +6358,8 @@
       }
     },
     {
-      "path": "assets/history-cards/144.jpg",
-      "sha256": "22881609b995709b547394bfbc3147d1c89f1730adcab027c6d9ddb96f382485",
+      "path": "assets/history-cards/144.webp",
+      "sha256": "b44e4b4bfb67c6dee92fb75d494597b88628bb17cc4a3a948c6291cf5c9c4bb1",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6471,8 +6372,8 @@
       }
     },
     {
-      "path": "assets/history-cards/147.jpg",
-      "sha256": "f58f075ff6af32cb346c0a8a1810a1169408dfdc7a471a4194f2c44dbd607f6b",
+      "path": "assets/history-cards/147.webp",
+      "sha256": "d0cfddd6c6beb4119b4f6bd20741fb43a72b90478106279543283bbcf70a8f8f",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6485,8 +6386,8 @@
       }
     },
     {
-      "path": "assets/history-cards/148.jpg",
-      "sha256": "0c12255d382bb8ec89113dc8f6dc564c33ed290d9de10ae6f585820efaf89dbe",
+      "path": "assets/history-cards/148.webp",
+      "sha256": "d314dc91469bdc07bc40e38f3286cbb71870135dfa546d319600edd2326dde7b",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6499,8 +6400,8 @@
       }
     },
     {
-      "path": "assets/history-cards/15.jpg",
-      "sha256": "476a45b1c841c953fd9369fe4607d96bc6bfd19be603a5fbaabfb32afe529084",
+      "path": "assets/history-cards/15.webp",
+      "sha256": "94c7f2b76a7996457ee82c0caa1937f75ad4cb464ca4f7f74031b8850b2c94fe",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6513,8 +6414,8 @@
       }
     },
     {
-      "path": "assets/history-cards/150.jpg",
-      "sha256": "77e5005a0aecef187bb7765488c1c04972878ba1159d5b4ec8cf53bc485675a1",
+      "path": "assets/history-cards/150.webp",
+      "sha256": "3053bd69d19027f7839ccdfb85939445a200038c6096cb3b4613b4640e138b91",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6527,8 +6428,8 @@
       }
     },
     {
-      "path": "assets/history-cards/152.jpg",
-      "sha256": "87dfde45e3ed52af0bf783da8ed1e50309e16775714279f3c7902cfcae6f17aa",
+      "path": "assets/history-cards/152.webp",
+      "sha256": "e1c93091ffd9f8cd5e3763186545c15d1e2e4336fcae0d474e7132ea2bea605a",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6541,8 +6442,8 @@
       }
     },
     {
-      "path": "assets/history-cards/154.jpg",
-      "sha256": "b6390a354666d4629d3f1c6ea20307fe76a8a2c8f9c5771fe3e259cfd8c389c1",
+      "path": "assets/history-cards/154.webp",
+      "sha256": "5eeed9994f444d9fdf69b5ce3edd804d854f138e25e0fce5cb3e55e3be7a9314",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6555,8 +6456,8 @@
       }
     },
     {
-      "path": "assets/history-cards/156.jpg",
-      "sha256": "0f146e06bdfc145eed81d59ca8a2819b21ac068731ebf0b1cb782257d634a8d1",
+      "path": "assets/history-cards/156.webp",
+      "sha256": "12cc2a14548274b3d7a5444b9f822bff5bb6be0d263a9f36c45d26f901725ca4",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6569,8 +6470,8 @@
       }
     },
     {
-      "path": "assets/history-cards/157.jpg",
-      "sha256": "94dba8467230e7855f4adb34205464f06edc4d0e0126333e89b87b1416cc3774",
+      "path": "assets/history-cards/157.webp",
+      "sha256": "346b7e854c03e07544a7ec4b4e14b9faf4ef864ac4e5500508dcbf616bad9def",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6583,8 +6484,8 @@
       }
     },
     {
-      "path": "assets/history-cards/158.jpg",
-      "sha256": "930ace8b8addf6fd8c4de462b67fefe794714a3fc237cd3cc2ea2c89417bdad2",
+      "path": "assets/history-cards/158.webp",
+      "sha256": "9daa6a7319042a10373915da26f3f36546e984f0f2dbd2116cb34bc4a274c220",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6597,8 +6498,8 @@
       }
     },
     {
-      "path": "assets/history-cards/159.jpg",
-      "sha256": "adb7928ab76aebc6742ba93bd25d91585a9fb7b8c6038edc485f82c1b639e8fb",
+      "path": "assets/history-cards/159.webp",
+      "sha256": "0939142a280c411b2074d1d43b9a3ddadb43f20ee898f3e9bc4d133ffa232702",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6611,8 +6512,8 @@
       }
     },
     {
-      "path": "assets/history-cards/16.jpg",
-      "sha256": "45795e5f4157b8737a9e0cacd24213918bf4bece1c9981be409dc86afce4406e",
+      "path": "assets/history-cards/16.webp",
+      "sha256": "0a2621c8f922b781b892d9f9eb109db8c48a5512ffc49f558ea04a198a0125f1",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6625,8 +6526,8 @@
       }
     },
     {
-      "path": "assets/history-cards/160.jpg",
-      "sha256": "96c99b329f89a70be95966e5ee69e099af8b937b2e72ed3d596b43ca7b250d70",
+      "path": "assets/history-cards/160.webp",
+      "sha256": "7ed4ee04d0ed2f51feb0ab1caaa4bc7836d5117f5ff89860c9a0d0e40c13f710",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6639,8 +6540,8 @@
       }
     },
     {
-      "path": "assets/history-cards/161.jpg",
-      "sha256": "ffdf820c1ca09b4da5b7aa4bfb10cd4f8efbbbb1c5ed1c1e6b6a587cbaf890c2",
+      "path": "assets/history-cards/161.webp",
+      "sha256": "8351a2164dab00520c859cc4b3bf4a0eaaec56495457dcc1480787697f8945b6",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6653,8 +6554,8 @@
       }
     },
     {
-      "path": "assets/history-cards/162.jpg",
-      "sha256": "9d86c1439d8cd13baa31f6e7978ff522693ae831ff6cf8a4f2b3171542cf64f3",
+      "path": "assets/history-cards/162.webp",
+      "sha256": "1e601d861d81a105e3841e56fc07824a5683d0bbd7606f58a7f6e5263b4ffc0e",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6667,8 +6568,8 @@
       }
     },
     {
-      "path": "assets/history-cards/163.jpg",
-      "sha256": "ef8cdb279319b040f6891f7f6186183fc7eb9f4b7b129d7bee1f44c98efb8ece",
+      "path": "assets/history-cards/163.webp",
+      "sha256": "bb965599b34b48023b7f05e0d9813580efe7f2d83d08b5d8d05a65e850875ec2",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6681,8 +6582,8 @@
       }
     },
     {
-      "path": "assets/history-cards/166.jpg",
-      "sha256": "8e75dc48564e4bc9eb813ea31e88019fc03d09aaa426007feaea8f032e15d707",
+      "path": "assets/history-cards/166.webp",
+      "sha256": "43ea887f90faf9bd614d8ad705896c334fbc967d4890953379a180a74c95c723",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6695,8 +6596,8 @@
       }
     },
     {
-      "path": "assets/history-cards/167.jpg",
-      "sha256": "ce1691a7c6c091dc2a16562bc17fc9caab000ced2a63eab37e3cd7163b9a1bb2",
+      "path": "assets/history-cards/167.webp",
+      "sha256": "e55754b3709a0f24b83dd7f961d5a65110fc796d379fa9e9c21109a51d21d21b",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6709,8 +6610,8 @@
       }
     },
     {
-      "path": "assets/history-cards/168.jpg",
-      "sha256": "725405d533ed57d42080241cacd1d434e9a79f7e5db6da310f0301debbbcfba7",
+      "path": "assets/history-cards/168.webp",
+      "sha256": "5d4dc475330525171a9977c0c441c38779bbf0b5435ca28b3820fd8d199f7c21",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6723,8 +6624,8 @@
       }
     },
     {
-      "path": "assets/history-cards/169.jpg",
-      "sha256": "381493d6abc420ca504010bbe9d0e1e595be7cf547f1418ad8c4c83bd2aa7e53",
+      "path": "assets/history-cards/169.webp",
+      "sha256": "ebd137cf74030aa0b7574fd179ffb1ae017b6d0873d22f1726343d108623f94a",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6737,8 +6638,8 @@
       }
     },
     {
-      "path": "assets/history-cards/17.jpg",
-      "sha256": "317e97aeeb35e2dd9dc71dd60bdd4b332ff0936966e5aebc57b6e99218041c61",
+      "path": "assets/history-cards/17.webp",
+      "sha256": "d1a9ec8074060033db19fec0ea4b11aa907454e040c512d2b7e92a01386b89a4",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6751,8 +6652,8 @@
       }
     },
     {
-      "path": "assets/history-cards/171.jpg",
-      "sha256": "63b4da014fe35f56ddb7ade9db1bbee22ea1ea3dafab74e19b0edf9acdbbcd8b",
+      "path": "assets/history-cards/171.webp",
+      "sha256": "d20b095035e5434091feeca001f44934e2d30e99b862c5f014313d85878c5bcd",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6765,8 +6666,8 @@
       }
     },
     {
-      "path": "assets/history-cards/172.jpg",
-      "sha256": "abf07e417cc9d001b10806bd1df097ee9ada191693710560b069dc2c3ed0a14b",
+      "path": "assets/history-cards/172.webp",
+      "sha256": "1ff31fb92b4cdd3c041c410a1997caef7988374659fb9260684124b72ed3da35",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6779,8 +6680,8 @@
       }
     },
     {
-      "path": "assets/history-cards/174.jpg",
-      "sha256": "7e4742bd849ffaa51e467c4515b4b3974653dd84e636ad50234e1a6ad3ad4bd6",
+      "path": "assets/history-cards/174.webp",
+      "sha256": "e764c49e214a5b0a92ed0137a45a4f2f00a0cf004432b6577981838ce5c0963a",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6793,8 +6694,8 @@
       }
     },
     {
-      "path": "assets/history-cards/175.jpg",
-      "sha256": "a02814a6e8b6a7e6efc4988cb85cc6b1b41ac3f607d728ea8f542141fdf535e8",
+      "path": "assets/history-cards/175.webp",
+      "sha256": "6e76c2406ccad4e18a7ec232cf53614677f6f0948aaa9ca07d9a805cf06f68ed",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6807,8 +6708,8 @@
       }
     },
     {
-      "path": "assets/history-cards/177.jpg",
-      "sha256": "5f95005ef9c977f2905c8e23a3b73282338f2dac2cfea972776982e2af503de8",
+      "path": "assets/history-cards/177.webp",
+      "sha256": "1d9b3bd145006b6e0a9d2a522f571596e1b11fcfe0721b1a121f076fabd1194f",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6821,8 +6722,8 @@
       }
     },
     {
-      "path": "assets/history-cards/178.jpg",
-      "sha256": "10819191a6cc4f172ae19a6c9b041bebd69c372a3ffc960da465d671ac2e86bf",
+      "path": "assets/history-cards/178.webp",
+      "sha256": "f202bf83585e50ef24506511a1829c771e3ff823a481f38eb77ca9ebf5688274",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6835,8 +6736,8 @@
       }
     },
     {
-      "path": "assets/history-cards/179.jpg",
-      "sha256": "29f8cff5f954d1429c76e38c5bf619a5eb4df1e1907aae2ff5d19892a54bf82e",
+      "path": "assets/history-cards/179.webp",
+      "sha256": "9ba89ceaaf37a93cfa4b86b6099f17d02fb96c84e3ed107947316fcfd25dd916",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6849,8 +6750,8 @@
       }
     },
     {
-      "path": "assets/history-cards/18.jpg",
-      "sha256": "3f2cc6eb0be4096b682f4b2c5a309f4230bfa3067b62f0bf5fa048e3473d18bd",
+      "path": "assets/history-cards/18.webp",
+      "sha256": "c35bdf5ffc5349a29914637d458b38b17865efa4b1d838ee62e32c806201411d",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6863,8 +6764,8 @@
       }
     },
     {
-      "path": "assets/history-cards/181.jpg",
-      "sha256": "53370be3ab2a4f7f40795bc0990f7092b72313086b4d7f61486f454e34bae081",
+      "path": "assets/history-cards/181.webp",
+      "sha256": "e400701790a32c8bdabd1a0555b32de87cde717512f60232f6b115cef670feb7",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6877,8 +6778,8 @@
       }
     },
     {
-      "path": "assets/history-cards/183.jpg",
-      "sha256": "a0c8649dce5a3da7463af925cea139930f3eedd5c1202280b251a406ee4b6af7",
+      "path": "assets/history-cards/183.webp",
+      "sha256": "b739ec4f79d048ea555e91a8f355ed1b6b83d096a3985e9435b1b18733cedab9",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6891,8 +6792,8 @@
       }
     },
     {
-      "path": "assets/history-cards/185.jpg",
-      "sha256": "e0a6278af0e667c469c52dc65a8d201bf7f4ba1bc78321c48b5b54311daba226",
+      "path": "assets/history-cards/185.webp",
+      "sha256": "374ef6d377d17cdabb6bbc3f61f6425d230bb53897d8b8fe38ec871ca40b08aa",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6905,8 +6806,8 @@
       }
     },
     {
-      "path": "assets/history-cards/186.jpg",
-      "sha256": "7db63f17efa76694e26e4a2d74ffb4f4858e24b9865bda927fb7ec94a0ad650c",
+      "path": "assets/history-cards/186.webp",
+      "sha256": "cfd9bcebd5fad02cfa30acaa0891fd48a753d73b05390b75b5c2fb1b9bc4b751",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6919,8 +6820,8 @@
       }
     },
     {
-      "path": "assets/history-cards/187.jpg",
-      "sha256": "e2efece7a6847f5c682e15b396076bb100425cb359e804dc572b85827e99006b",
+      "path": "assets/history-cards/187.webp",
+      "sha256": "4b26c3f4aa1a58ca78cbafd8970229d3292c6c260ec9e84dd151e75535843f7d",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6933,8 +6834,8 @@
       }
     },
     {
-      "path": "assets/history-cards/188.jpg",
-      "sha256": "d23bf8885ede84b15b73c8b1352a62a2f89a6b45ae8212895db807567cd0ba8c",
+      "path": "assets/history-cards/188.webp",
+      "sha256": "122937f799b6b0e88363b994cf47a45b36eabb2deb490159f9e4488d8e9834e5",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6947,8 +6848,8 @@
       }
     },
     {
-      "path": "assets/history-cards/189.jpg",
-      "sha256": "e0f95dca42951d7cf99c5548ed4b09cfffa4ce87bccddc9f70307714eff18820",
+      "path": "assets/history-cards/189.webp",
+      "sha256": "fdc8c6d639c87c989326f7899f07ccde2a43658220f7880c25f446f7ea607e59",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6961,8 +6862,8 @@
       }
     },
     {
-      "path": "assets/history-cards/19.jpg",
-      "sha256": "e1d3178c8c4f4304b6ca2d196e7bd6d2836fc2685f99e37b896300d8b31ab85b",
+      "path": "assets/history-cards/19.webp",
+      "sha256": "dd94bcee98c8c902b84abdc62760c689e9377f05709474978ff8b75aeaa3e571",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6975,8 +6876,8 @@
       }
     },
     {
-      "path": "assets/history-cards/190.jpg",
-      "sha256": "8162918d517de5f497918326e2906f894c496a5bb453e76a6c39a275a94ad3f1",
+      "path": "assets/history-cards/190.webp",
+      "sha256": "3879e0c8fabc786f57fc8c9dd1c1b4e4dfe5ed8eee6ed88d621dc6373643ce6c",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6989,8 +6890,8 @@
       }
     },
     {
-      "path": "assets/history-cards/2.jpg",
-      "sha256": "4586b899c7edab8b1015132d552ba86007947a3e112e17416b1d4c3b54875d15",
+      "path": "assets/history-cards/2.webp",
+      "sha256": "62ff1b5ff451a9bcb842e26270f12022784c5e31dba177f18a65c54f2025d75d",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7003,8 +6904,8 @@
       }
     },
     {
-      "path": "assets/history-cards/20.jpg",
-      "sha256": "96f33c5be3bf78a8835a9a023597c4cb2d2ba6fffcddf199e2e485fd9e2cd20d",
+      "path": "assets/history-cards/20.webp",
+      "sha256": "fb5901f7705dc419828b45c44709c6426f6c40b2a587ad370900d4e05b24370a",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7017,8 +6918,8 @@
       }
     },
     {
-      "path": "assets/history-cards/21.jpg",
-      "sha256": "dd05e972e50b33f66afb32b0deaa2aef5971e7d105a8a20d6433d9db556a67cb",
+      "path": "assets/history-cards/21.webp",
+      "sha256": "446dd7f311daf92369f0ea85a6e0a1c85917d9bc037f551673c4035679f99a25",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7031,8 +6932,8 @@
       }
     },
     {
-      "path": "assets/history-cards/22.jpg",
-      "sha256": "a5ec9ddd229411958d66498855cef16be6cb940b41ae3d6b0a003c87575c162f",
+      "path": "assets/history-cards/22.webp",
+      "sha256": "31cde69f13a1764abf1c7c39fe14f1798e5ff3c0f42c80805d0c79f400847604",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7045,8 +6946,8 @@
       }
     },
     {
-      "path": "assets/history-cards/23.jpg",
-      "sha256": "091bca58094909b63a76d25cda90d71ccd39260e663aa0d2667ffcd674a65a32",
+      "path": "assets/history-cards/23.webp",
+      "sha256": "550940abd9236fe0e2f6b237a0dccaeee2b0b01c710f1997a363d2db2fe6c3ce",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7059,8 +6960,8 @@
       }
     },
     {
-      "path": "assets/history-cards/24.jpg",
-      "sha256": "ee26557bf4e6c165c8a0db61ab1685ce766dcf1a38b0aa6832e38c7e485a0fa5",
+      "path": "assets/history-cards/24.webp",
+      "sha256": "0842f5f76c2cd999e54e04f4c711a80fe68e1cb27ca3f342591fedebadf0e00a",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7073,8 +6974,8 @@
       }
     },
     {
-      "path": "assets/history-cards/25.jpg",
-      "sha256": "0168066da184c0942d6a48fcb684094d3bac4ea403d3a505a1c3aab60713b3bb",
+      "path": "assets/history-cards/25.webp",
+      "sha256": "6c3b2d587f8c4547292958fb257cfd2efeae44c9a2061868f2aa50b598fbc026",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7087,8 +6988,8 @@
       }
     },
     {
-      "path": "assets/history-cards/26.jpg",
-      "sha256": "3de1b85b75d86404f230cc23a519e862a1ed5fa5f9864643dad107ab70b397f8",
+      "path": "assets/history-cards/26.webp",
+      "sha256": "bdd64c9f19831a0dd67c659e8945a9ab5c304eea3b164f39515f502db7e449b5",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7101,8 +7002,8 @@
       }
     },
     {
-      "path": "assets/history-cards/27.jpg",
-      "sha256": "8f039217fa1f218e150bb2332cefc63ca6def19ee7f2102b2d18310b5aca0c8b",
+      "path": "assets/history-cards/27.webp",
+      "sha256": "92c385c4fc4824514234ae5168f341a72266f8382d5bbb5e979c9c723343f6c8",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7115,8 +7016,8 @@
       }
     },
     {
-      "path": "assets/history-cards/28.jpg",
-      "sha256": "aaacc6d44f6001d2cb2d751538b2ebd85dcd74286a063f719876137739cd0957",
+      "path": "assets/history-cards/28.webp",
+      "sha256": "88fed32a304888f04b51fc9a656b9461c0deb9590b3c4d8f565e7c94a5e56764",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7129,8 +7030,8 @@
       }
     },
     {
-      "path": "assets/history-cards/29.jpg",
-      "sha256": "59c7348f8f25e2cd57c22de042d0a9b68f625b2050976e18ca9b089d72398cdf",
+      "path": "assets/history-cards/29.webp",
+      "sha256": "300a15d1cdcc29a2ad0bf08c35a7ec7fb06c812f97a5901a06f2fdbc7834e451",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7143,8 +7044,8 @@
       }
     },
     {
-      "path": "assets/history-cards/3.jpg",
-      "sha256": "a69dec8d6ec51fe3d7ac2225625842371bdc57d5b37e80742fa14ad54598a161",
+      "path": "assets/history-cards/3.webp",
+      "sha256": "1d4c3f3bcd64774f040a50c9015454db211e0bb99357a5a0e07142e41b70c9b8",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7157,8 +7058,8 @@
       }
     },
     {
-      "path": "assets/history-cards/30.jpg",
-      "sha256": "e1c08dcc4cf5aebdf014ee9975dc5c6bffedb040b3b9accdcd1a56dd7dbb2b61",
+      "path": "assets/history-cards/30.webp",
+      "sha256": "350ba7883efafab9cad5a55d9cffde2d55f2bf031f7de733962f9620853278b2",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7171,8 +7072,8 @@
       }
     },
     {
-      "path": "assets/history-cards/31.jpg",
-      "sha256": "264b0bf0173425ac328eb1e2f627112a3e8acb7eb299789d095c81cdf009291e",
+      "path": "assets/history-cards/31.webp",
+      "sha256": "269f0c309ca611eb2360839edb8fa65e3dee601e3fefe25781f26fc5d820e5fb",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7185,8 +7086,8 @@
       }
     },
     {
-      "path": "assets/history-cards/32.jpg",
-      "sha256": "ebac8a5bdc80c24aa525a1e1aac2b6040b9a5812fc52ecd98ca573caf757332a",
+      "path": "assets/history-cards/32.webp",
+      "sha256": "793803cf97cae13891e23f502a491739f8a9608417f67e080edd2d132bb47c92",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7199,8 +7100,8 @@
       }
     },
     {
-      "path": "assets/history-cards/33.jpg",
-      "sha256": "1ecfe1a12ee58006ea43af6cbe7453411e68e9f51dcbb2384b66c467c0911019",
+      "path": "assets/history-cards/33.webp",
+      "sha256": "8d42a25e4ad3f5b9566f7d3eecb5b707bd74c3151606719e418495d3c16f8a93",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7213,8 +7114,8 @@
       }
     },
     {
-      "path": "assets/history-cards/34.jpg",
-      "sha256": "206c03329b2d6853a1826875f50c6e43b60b8c29613f55bba27e465d1d575a44",
+      "path": "assets/history-cards/34.webp",
+      "sha256": "fcb2f2ac488c992752b0e60c59a8e7d8e114c58ca78e0dfd43b5a91c834ec624",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7227,8 +7128,8 @@
       }
     },
     {
-      "path": "assets/history-cards/35.jpg",
-      "sha256": "ab38748d16fb8ac4800ca2ebb47e6004de7cc4594a450aaa0db7bc524123b632",
+      "path": "assets/history-cards/35.webp",
+      "sha256": "5e189de0f9544dd0455f8d2ed1a008264ce714beeaca83925b5d530a3e99f20c",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7241,8 +7142,8 @@
       }
     },
     {
-      "path": "assets/history-cards/36.jpg",
-      "sha256": "21a5b1b70f784bd1f0e44be71df0769002ebda5d2795f6cb758a88a4a4c8c656",
+      "path": "assets/history-cards/36.webp",
+      "sha256": "f51ffd4a6d3d31aa0454c069855351ee98f3d8c03fa91a8674361613ca9a2dc9",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7255,8 +7156,8 @@
       }
     },
     {
-      "path": "assets/history-cards/37.jpg",
-      "sha256": "c2f1b32cbdfc65bfde60957f9b8d4b95cf7e62a21aa6a6cb67bd1090128f0cd7",
+      "path": "assets/history-cards/37.webp",
+      "sha256": "c1bf9397afa4f433fde8211bc1933d46b3826d5f17f577b58d80959215608f6e",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7269,8 +7170,8 @@
       }
     },
     {
-      "path": "assets/history-cards/38.jpg",
-      "sha256": "cb40755d0a765a3fe6a8781113a92ba905e552314831df7ecd8bf2e28324d6f1",
+      "path": "assets/history-cards/38.webp",
+      "sha256": "afae55ba55cd2538a19b0487ba94393c06a3e5b7a23a9f14ece4cd2b01035a97",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7283,8 +7184,8 @@
       }
     },
     {
-      "path": "assets/history-cards/39.jpg",
-      "sha256": "3b301283c39ae800fb1d2db3b2329c076522211ad2ad46e57dfa0a8031ae11e1",
+      "path": "assets/history-cards/39.webp",
+      "sha256": "40760d14935e1de2ae5362ac83ee569ea74f23ca916908a99d3a2da8f89be72a",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7297,8 +7198,8 @@
       }
     },
     {
-      "path": "assets/history-cards/4.jpg",
-      "sha256": "fa773af01f41354ee0e571f7efc472f449a9c7727d62440c8255b58302fa3146",
+      "path": "assets/history-cards/4.webp",
+      "sha256": "e558d5b5fe5e6db0431fe7065b7325b5a826cea1661f14241a57f9f42aa4e2f4",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7311,8 +7212,8 @@
       }
     },
     {
-      "path": "assets/history-cards/40.jpg",
-      "sha256": "177f94c5115ea950ad22cf06f683ed53980cf7e4309d31a9233359b43e2fc8f3",
+      "path": "assets/history-cards/40.webp",
+      "sha256": "2250916766af27d90a58460041b35f13812e0cde1cb16977b1ee2d3899d819a9",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7325,8 +7226,8 @@
       }
     },
     {
-      "path": "assets/history-cards/41.jpg",
-      "sha256": "12062f30531453b503eed5b50a1cdee09f56e66cb3a0cf8fe84b90892309141f",
+      "path": "assets/history-cards/41.webp",
+      "sha256": "8a66fe1558a0caa5ad7982e65d42e247eee7545ae9b0bebd6bcff37d7e178042",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7339,8 +7240,8 @@
       }
     },
     {
-      "path": "assets/history-cards/42.jpg",
-      "sha256": "566a86b4072c2d402e027b6dda7a76106563460c773406ebba6a2f44f43ee348",
+      "path": "assets/history-cards/42.webp",
+      "sha256": "4a24a304e1abd5a80f8a33a472a84de59aaedbf5da2794db51598bc537401b83",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7353,8 +7254,8 @@
       }
     },
     {
-      "path": "assets/history-cards/43.jpg",
-      "sha256": "041d0fa2c994643d221d93f1d39eba5b074dd10e2f0f4cc07ffa5fab746dbbde",
+      "path": "assets/history-cards/43.webp",
+      "sha256": "5a12d15227c918c47583963692b6a26b59261d3927efe27f0d29f34f90cb2fb8",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7367,8 +7268,8 @@
       }
     },
     {
-      "path": "assets/history-cards/44.jpg",
-      "sha256": "432f01b3861e235ed3f4b309141d4a8e459f94ff17427acdfd29eca994a1eea3",
+      "path": "assets/history-cards/44.webp",
+      "sha256": "f107ebb2479fc7b0e94d073f63bd2a2b46b5c6007a8699f72f26ae49beb22888",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7381,8 +7282,8 @@
       }
     },
     {
-      "path": "assets/history-cards/45.jpg",
-      "sha256": "dbadc2d837e0dc77ffb49d53ef1134ade85e812a0009840bc7f856e726fcad76",
+      "path": "assets/history-cards/45.webp",
+      "sha256": "138e0f882cbd840fc5a7113c573833f586ecdd794aa6a1706a9415be9101535e",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7395,8 +7296,8 @@
       }
     },
     {
-      "path": "assets/history-cards/46.jpg",
-      "sha256": "e362a39a9f9c4b48d42536d417ad1f947228f8fa09758cedff822316ed0647a1",
+      "path": "assets/history-cards/46.webp",
+      "sha256": "6537297492f7a731bd09f45ba4777493d009b9ed2c3341897e0cd0f5b82aedd2",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7409,8 +7310,8 @@
       }
     },
     {
-      "path": "assets/history-cards/47.jpg",
-      "sha256": "6ff9db24a4d73d1968e065233b95184b6196f0fb780f91b6daf62723ee3e2c52",
+      "path": "assets/history-cards/47.webp",
+      "sha256": "16a29e16a05b40bd1daf1207c78aaa23430c45128f4faaced4c38487e922a1b8",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7423,8 +7324,8 @@
       }
     },
     {
-      "path": "assets/history-cards/48.jpg",
-      "sha256": "c5d8787ea12c25f20549e20eca5a7601834261df1e39e0db4d793771f6befbbd",
+      "path": "assets/history-cards/48.webp",
+      "sha256": "f76aa1332a38032a5ad00f5035c675eadb904a832954fae0f970ecb451cfedc6",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7437,8 +7338,8 @@
       }
     },
     {
-      "path": "assets/history-cards/49.jpg",
-      "sha256": "7ca852342068006401c7b2635943af5011afe75bb4efa12f447d9dff35adc833",
+      "path": "assets/history-cards/49.webp",
+      "sha256": "4247d7504b5e1f2b48cc8e79553cc81fec658dc1b909d0f447e609ca5e4efe0d",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7451,8 +7352,8 @@
       }
     },
     {
-      "path": "assets/history-cards/5.jpg",
-      "sha256": "d6742fb516d1e7ab7fce3d5dbdbe09d0cef8a4330ae820c3ad7511422d669815",
+      "path": "assets/history-cards/5.webp",
+      "sha256": "2984a60e1a569864f846caffed82b033fececb79d85a8b0a13d462c9c7be8a8c",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7465,8 +7366,8 @@
       }
     },
     {
-      "path": "assets/history-cards/50.jpg",
-      "sha256": "7549df9eae06c01e13513368c53147cc630a21a16e315cf3117b37a0593a0f6c",
+      "path": "assets/history-cards/50.webp",
+      "sha256": "75d4e205fc95b3f69c726a104b7b3abbb4213b153201944d49f9d557e2f687ca",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7479,8 +7380,8 @@
       }
     },
     {
-      "path": "assets/history-cards/51.jpg",
-      "sha256": "e5807d2fb205f200254587ae05603136bf7ac7ef13e68428efb3dd43060d2112",
+      "path": "assets/history-cards/51.webp",
+      "sha256": "ed460749df99c4cefc0708db818de0f3df355df6d45746ca943c440787b4f458",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7493,8 +7394,8 @@
       }
     },
     {
-      "path": "assets/history-cards/52.jpg",
-      "sha256": "e20f937bb0094e42785d5aa40e7f64b415cfbd1cd07bb3e623404ab1ba8079bf",
+      "path": "assets/history-cards/52.webp",
+      "sha256": "3045fcc9e70b2abd5464521c4866f525f407c6dbba83b577fcbf202ffabab5c5",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7507,8 +7408,8 @@
       }
     },
     {
-      "path": "assets/history-cards/53.jpg",
-      "sha256": "2b5aadc423a3b0b5508117cecfadee8a72b824940b39ca3d7f13e736f484fbbc",
+      "path": "assets/history-cards/53.webp",
+      "sha256": "3e0464713b35a4363305eaf2f92cbda159b249bd8d041aaa70fe07e15c06500a",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7521,8 +7422,8 @@
       }
     },
     {
-      "path": "assets/history-cards/54.jpg",
-      "sha256": "b5dd50d6dbcc803dc5249168d4116fa36e20a0a3e2e7ba02269c4a23c0998cb2",
+      "path": "assets/history-cards/54.webp",
+      "sha256": "a0c40070d465aeeb55db0bcf85b44196df0ea479b55efd01aeced2240ad2dab1",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7535,8 +7436,8 @@
       }
     },
     {
-      "path": "assets/history-cards/55.jpg",
-      "sha256": "83642a881a327ecedb73c4af0c7556a033cbbc0f16cc1fa0f40fa72bfec1b5f8",
+      "path": "assets/history-cards/55.webp",
+      "sha256": "28c28486dd349d8ac6fc71b06489c8c57ae69a24cb28b2965fb670f32df5dbfd",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7549,8 +7450,8 @@
       }
     },
     {
-      "path": "assets/history-cards/56.jpg",
-      "sha256": "30980225d2dd0bbb311bb0e3e11d7edff7f257d352d2df31c858ec628bc5b261",
+      "path": "assets/history-cards/56.webp",
+      "sha256": "ed6e74afca6ca92116f294c44775723a2a9df872600ea19895efdcf0dbbf63b2",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7563,8 +7464,8 @@
       }
     },
     {
-      "path": "assets/history-cards/57.jpg",
-      "sha256": "642db7c81aebb066a5b73d3161715b5bb59ade55318f3d7f2ab3e625278b3bd7",
+      "path": "assets/history-cards/57.webp",
+      "sha256": "c3a94a0cdbc08f386fe7237d6c9ea3198d945045f830f4aba583510cc5f25ccb",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7577,8 +7478,8 @@
       }
     },
     {
-      "path": "assets/history-cards/58.jpg",
-      "sha256": "4952fab1239c213ae5d99705d883d162749731da40e499a9928618c7e00fae47",
+      "path": "assets/history-cards/58.webp",
+      "sha256": "5a154d5b82b169b792cf335f8d06b2aeff3c2b250bfc7adf493cbe23006fbbd0",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7591,8 +7492,8 @@
       }
     },
     {
-      "path": "assets/history-cards/59.jpg",
-      "sha256": "8e595dd4f1c7eb5ab496237a3072928c986c6e91a3df1f6e277f98d124ae5228",
+      "path": "assets/history-cards/59.webp",
+      "sha256": "26ef06002b4affef1b0d120a2b9253c99176ec46b1bbd969f41170f372c5696d",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7605,8 +7506,8 @@
       }
     },
     {
-      "path": "assets/history-cards/6.jpg",
-      "sha256": "155c7b74ab6294b73c853ac2e8457ca06ca4b98de64eb4062acf8aed6867fcca",
+      "path": "assets/history-cards/6.webp",
+      "sha256": "15c15680bd93eaf345d2820c50dd9f09d5e82d5732777c9772a9ccb9c492b086",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7619,8 +7520,8 @@
       }
     },
     {
-      "path": "assets/history-cards/60.jpg",
-      "sha256": "1b419e846c11f8f18f195b98e20fd2ab0e5f62b5bfc7b7c20f93126afe5986e9",
+      "path": "assets/history-cards/60.webp",
+      "sha256": "e2dbe542e9c4ae014e07142385194d016ac5c5189ddb6fc0c9371dacf0194e00",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7633,8 +7534,8 @@
       }
     },
     {
-      "path": "assets/history-cards/61.jpg",
-      "sha256": "b5a601821f79e01030f39384231322f7d96fe4007a99a378d2061837b9ca19b8",
+      "path": "assets/history-cards/61.webp",
+      "sha256": "8213973a96b41e8fa06f191ee7d05724024ba68bb84f05ff6e025c271867aa16",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7647,8 +7548,8 @@
       }
     },
     {
-      "path": "assets/history-cards/62.jpg",
-      "sha256": "7466d756d1da713c4e908800d79088c1c531128e9596f396555f0e02dbdd275e",
+      "path": "assets/history-cards/62.webp",
+      "sha256": "88ce0eba95f545ff574294970ba9e420265afc0083513871e11bd8e5a5a137e2",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7661,8 +7562,8 @@
       }
     },
     {
-      "path": "assets/history-cards/63.jpg",
-      "sha256": "8f36d7acd9fb0b8d724e2f3a0b0212b8652635e0193402b242848d3813ff447f",
+      "path": "assets/history-cards/63.webp",
+      "sha256": "40e0c79f58fcd52feae88b15fea89735debffd64801763fa20d9cf0f98be7426",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7675,8 +7576,8 @@
       }
     },
     {
-      "path": "assets/history-cards/64.jpg",
-      "sha256": "de9184c3efb74709db3a2a6d4472da345907ee62604108e2527365d189b35f29",
+      "path": "assets/history-cards/64.webp",
+      "sha256": "abc748971c3a3ce6f6f8647236e1227e22d59702f99961c96a571117be3c8ff8",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7689,8 +7590,8 @@
       }
     },
     {
-      "path": "assets/history-cards/65.jpg",
-      "sha256": "5001e61c4bd8e4d2507d805cc701b0e1d769e25bdf7af3e5230e08624d0c5047",
+      "path": "assets/history-cards/65.webp",
+      "sha256": "b5bb38977c88f85d469894e1ab4252bb8d51fa5287f1af1d99f18bf9c93fda6d",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7703,8 +7604,8 @@
       }
     },
     {
-      "path": "assets/history-cards/66.jpg",
-      "sha256": "4a1c459e1ca1bd0ca638bf98c770533456c12e39eef1c90c2f4d9d92cc478916",
+      "path": "assets/history-cards/66.webp",
+      "sha256": "d41aecfb2538e3fe370cdaf87ce0d05738134dc01122961ea7c5a9815c72ab78",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7717,8 +7618,8 @@
       }
     },
     {
-      "path": "assets/history-cards/67.jpg",
-      "sha256": "04070afaa84386381c19b0012601e0326ebc8ed95283e9807c01adebd17667de",
+      "path": "assets/history-cards/67.webp",
+      "sha256": "4da584ad0a2308ca81b23362db1c01c8c2945bddadcf89911cf736eac676d11b",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7731,8 +7632,8 @@
       }
     },
     {
-      "path": "assets/history-cards/68.jpg",
-      "sha256": "61d26c609dd71b012864cf96713e77f0c8d79d7db95b6d61e8590d3db847bf68",
+      "path": "assets/history-cards/68.webp",
+      "sha256": "ad2078283a81514780cf61006db296a8e57f50677b6a905523c33ff696997b50",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7745,8 +7646,8 @@
       }
     },
     {
-      "path": "assets/history-cards/69.jpg",
-      "sha256": "8fb64635613b0f0156b8458aa4cd1e4d7857c3eda648a60295e439a7bee8a39d",
+      "path": "assets/history-cards/69.webp",
+      "sha256": "49a3e2bcf1f3fd85ba2b34614dfc411416fb558aa19e12a566cae4206c5aeaf7",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7759,8 +7660,8 @@
       }
     },
     {
-      "path": "assets/history-cards/7.jpg",
-      "sha256": "8096319a2c9a5580ed452b11ab522e1f0e0909c4ba52621ac23cb3771cdc2d9b",
+      "path": "assets/history-cards/7.webp",
+      "sha256": "0d6284d3179e736dd4978a6ac71fb1edd2f0a3e6ac5d190827dda8c56169b6c0",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7773,8 +7674,8 @@
       }
     },
     {
-      "path": "assets/history-cards/70.jpg",
-      "sha256": "a73e2a2f7bb985928078aa0fdf1a340dcc2fe460ae007403579c35c76e0f6c3a",
+      "path": "assets/history-cards/70.webp",
+      "sha256": "2e978db38104545df4e45d8b8cab5b9c35e1b23ab5145f8e90fa8831f17c8732",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7787,8 +7688,8 @@
       }
     },
     {
-      "path": "assets/history-cards/71.jpg",
-      "sha256": "6a8c4510df6e8057cdacf1aac32fc16117924bfb6cc33f9ed18a8fe1119e3b48",
+      "path": "assets/history-cards/71.webp",
+      "sha256": "67b8f0026267920bf214885e23c90ab9f2a1424fdd33d7b5b2ddb755bc5e1051",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7801,8 +7702,8 @@
       }
     },
     {
-      "path": "assets/history-cards/72.jpg",
-      "sha256": "e42433e4f363b3ceb3a542fb086913a64151e05cc96b19adbd48a2a5cfd26472",
+      "path": "assets/history-cards/72.webp",
+      "sha256": "027a70dc192c6b3e68ca122f19267c53054a8dd3f19730200168b2624cb5bb59",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7815,8 +7716,8 @@
       }
     },
     {
-      "path": "assets/history-cards/73.jpg",
-      "sha256": "0c8d31e7c7a833dde51f687cdba0c8dffd6667ec231f7e4b805d8b72ed5494c4",
+      "path": "assets/history-cards/73.webp",
+      "sha256": "752e71e2796c0743d71eaa7d5d43bebeeedfab6d1d7ad53429e547c8f3b30367",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7829,8 +7730,8 @@
       }
     },
     {
-      "path": "assets/history-cards/74.jpg",
-      "sha256": "399d0a17e097fa92b394bdbb8e778a2fe701047dca20e2309d3c0835e03669e0",
+      "path": "assets/history-cards/74.webp",
+      "sha256": "947e831f4c80224cc6658aad6a3fb2dda0c77a31424d7723b1cd0084d9b5707f",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7843,8 +7744,8 @@
       }
     },
     {
-      "path": "assets/history-cards/75.jpg",
-      "sha256": "b32b1929f0e00f1d6e8006779d4728ad03d4e0950fbff607b1a54d3bc8d78ea1",
+      "path": "assets/history-cards/75.webp",
+      "sha256": "a9d9644cc39eb2a2c1fe9e03c2435888e22c81d0165696485fa2beabe8bb502f",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7857,8 +7758,8 @@
       }
     },
     {
-      "path": "assets/history-cards/76.jpg",
-      "sha256": "cd3ae8922a84b9921f9ea7f5aeca2f36a939cfe51868581574ba249b09436f25",
+      "path": "assets/history-cards/76.webp",
+      "sha256": "9bb8327c3f49a8809438b4576598c62bec97e1486ba4894e7843ec20587f45f3",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7871,8 +7772,8 @@
       }
     },
     {
-      "path": "assets/history-cards/77.jpg",
-      "sha256": "4d820db38c2bc4dc831763529d4be8690eaa23e6d58bb1f6a4edf80bf22bdfa2",
+      "path": "assets/history-cards/77.webp",
+      "sha256": "9ee9c9003f572bdfd64c5729505f35a81de84d5557be951431a87ba0994f2c37",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7885,8 +7786,8 @@
       }
     },
     {
-      "path": "assets/history-cards/78.jpg",
-      "sha256": "fcee2ba01c518e243a1d4a7cb5510b4b7cd8b5cec66caf2a4dd49cf8a9e2b23f",
+      "path": "assets/history-cards/78.webp",
+      "sha256": "adc4672b511cf9cdcc26ea8fcf8f526b925a91860011e559f815aa802158de78",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7899,8 +7800,8 @@
       }
     },
     {
-      "path": "assets/history-cards/79.jpg",
-      "sha256": "a194c65867b568272105877c5b37a5e3f4c83d1430c4cfe24144e64c6014ef16",
+      "path": "assets/history-cards/79.webp",
+      "sha256": "379ffa740bd4b894c4da6dc59ba96b24978227fc0243476c0ecad06add23d950",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7913,8 +7814,8 @@
       }
     },
     {
-      "path": "assets/history-cards/8.jpg",
-      "sha256": "daf469fb03a75e7b1610d5fa91e6a2347593cc4008e72ded7697491ad6b90869",
+      "path": "assets/history-cards/8.webp",
+      "sha256": "f6912debefc8ec7c4e5605e140d65806d68f22728975cb30dcb26172c7cbdb28",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7927,8 +7828,8 @@
       }
     },
     {
-      "path": "assets/history-cards/80.jpg",
-      "sha256": "09d714ca664a2fcb9d116140d06902cb257421143236efe18f56f2b1eb71d008",
+      "path": "assets/history-cards/80.webp",
+      "sha256": "ae77f81f28c1e08658dba872ba6508f9613781878b300f209aba62bdac21f9de",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7941,8 +7842,8 @@
       }
     },
     {
-      "path": "assets/history-cards/81.jpg",
-      "sha256": "0d01cbb5e7faba35aaeab7dd34ba14e1ce58afc5c76f15fc1e84251777512816",
+      "path": "assets/history-cards/81.webp",
+      "sha256": "076dee93151dbf5e91f347cc0acc15a80538e8554e3fd37485fe8cedebe0b0ff",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7955,8 +7856,8 @@
       }
     },
     {
-      "path": "assets/history-cards/82.jpg",
-      "sha256": "f162684ad11433a37d1d05e347c85960fefff9a5358348decb69c3e44e6bc9b3",
+      "path": "assets/history-cards/82.webp",
+      "sha256": "708d71277a57fe7ac59bd59b23e7a46049b0fa1d7ea659410b2e357c62dab597",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7969,8 +7870,8 @@
       }
     },
     {
-      "path": "assets/history-cards/83.jpg",
-      "sha256": "e67734734f0157a74b705e5fe5f5b3e3685996a545061657e429ea5474faa752",
+      "path": "assets/history-cards/83.webp",
+      "sha256": "2b0b66fc0ec796b63d6e70583876af622870bdd9ae18185fc62de57ff6637ef6",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7983,8 +7884,8 @@
       }
     },
     {
-      "path": "assets/history-cards/84.jpg",
-      "sha256": "27df4c6792c3d1443384620b972e25a08eb1857b8c4353f8052132b5db2074b3",
+      "path": "assets/history-cards/84.webp",
+      "sha256": "2d3b70015b13625e2f1bf7240cfea0d1c5f3b279c0c42f7bc00db2ab82781d0e",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7997,8 +7898,8 @@
       }
     },
     {
-      "path": "assets/history-cards/85.jpg",
-      "sha256": "5e3a6c6d4ba5b7f1c41775f50a697fca6faddd6eea04ed3514a6c993535abab4",
+      "path": "assets/history-cards/85.webp",
+      "sha256": "21d08907b5689a1da82f5f29bd8c2b5bf6526df3b49d9723ef17a0e6f0895dd3",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -8011,8 +7912,8 @@
       }
     },
     {
-      "path": "assets/history-cards/86.jpg",
-      "sha256": "9a8c3f4ae6ce6a3b70b1553a24892a1e4747ba7721b30c7cb647eceacc7f3aec",
+      "path": "assets/history-cards/86.webp",
+      "sha256": "04a53fc79be4d00a84e684150d28b5da9936e6db5b5bb4bfe46c2209bab0c2ba",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -8025,8 +7926,8 @@
       }
     },
     {
-      "path": "assets/history-cards/87.jpg",
-      "sha256": "e4011945dcc4d15b4f08d0f063a3ef6c21a1d7a670a73e06b62b009d9889f95b",
+      "path": "assets/history-cards/87.webp",
+      "sha256": "1bdb767015c4d07d70c49ca4f7a0ddde7cefde0cc06e5b2ab2d8638f35d70abf",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -8039,8 +7940,8 @@
       }
     },
     {
-      "path": "assets/history-cards/88.jpg",
-      "sha256": "d5ed64e303656a0c49fb530a01d1caa60fd01e59a179aa96c97bbbcc003c6e15",
+      "path": "assets/history-cards/88.webp",
+      "sha256": "7e8bf574cf8bab6ab03b4c3c049163889e41f525a63b5d2dcef73a02a8bea574",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -8053,8 +7954,8 @@
       }
     },
     {
-      "path": "assets/history-cards/89.jpg",
-      "sha256": "ef730dcc759a6606ba9bb7ac5cd6fe050eac17a2c29b9f7a1ade422e757079de",
+      "path": "assets/history-cards/89.webp",
+      "sha256": "123f196f86dae0337660ee8f65e85ed7ea649884883ebddcd05f1c0f33a02f5f",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -8067,8 +7968,8 @@
       }
     },
     {
-      "path": "assets/history-cards/9.jpg",
-      "sha256": "53817c86b28257509e37d9f3b827d137926f6c86781cebb5d5f2f9966ef2f39e",
+      "path": "assets/history-cards/9.webp",
+      "sha256": "9306b123facf9ae28b3dc3cd5c636a825ffd0b3e6a349196f83730d9749818a7",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -8081,8 +7982,8 @@
       }
     },
     {
-      "path": "assets/history-cards/90.jpg",
-      "sha256": "8947164170d5a22941f38fe1474c39e6142298f35107d82ecf850ff31047fecf",
+      "path": "assets/history-cards/90.webp",
+      "sha256": "4195d373b581770f12f3de8f502b8d680d11f3d2f2b75fef9bfd047d3cd3dd11",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -8095,8 +7996,8 @@
       }
     },
     {
-      "path": "assets/history-cards/91.jpg",
-      "sha256": "e563979b5d6f8bf7943fbfc058494bf0946bccf1546eae9ed77bf9727c41451d",
+      "path": "assets/history-cards/91.webp",
+      "sha256": "c9ce01abd5133abbec66d8bdc3fb2860320bf4f65fe9cba0e4aec168e5dc030c",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -8109,8 +8010,8 @@
       }
     },
     {
-      "path": "assets/history-cards/92.jpg",
-      "sha256": "85810c713d8c80e7c0c892220a2559cbf0223f8603df09b7d8f0b8d0966150d1",
+      "path": "assets/history-cards/92.webp",
+      "sha256": "75e5f0cbf6b02674f2b9f76911ef6d84f2d8c735e06a7852e3c249ecd5459eaf",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -8123,8 +8024,8 @@
       }
     },
     {
-      "path": "assets/history-cards/93.jpg",
-      "sha256": "af20916558f1745f79f1e595d1c1217030d1060338cc9c15baa92ea2f2233306",
+      "path": "assets/history-cards/93.webp",
+      "sha256": "fa2cf05ac2731f01aa96a35af2305245e4b6a178110249e0f526b525767a185b",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -8137,8 +8038,8 @@
       }
     },
     {
-      "path": "assets/history-cards/94.jpg",
-      "sha256": "74ac8da4260de8a61f219b12496b66c133c8c2fe37c8b20d43e8727c7fc46007",
+      "path": "assets/history-cards/94.webp",
+      "sha256": "adabd9b240dda5bb82d9ade191bde2373a3acc3585019b54095052f494b6563e",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -8151,8 +8052,8 @@
       }
     },
     {
-      "path": "assets/history-cards/95.jpg",
-      "sha256": "99be7d1762bd787331e1c3f3a11d30eb71541f0f16717bdb7910f908d8fcdb69",
+      "path": "assets/history-cards/95.webp",
+      "sha256": "a89db754db9292fab7a88dd0a99ab970c8d12f8331bafa4133ae099a4ebe98d9",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -8165,8 +8066,8 @@
       }
     },
     {
-      "path": "assets/history-cards/97.jpg",
-      "sha256": "8cebead92756448e089e0125f4260e6ec1b507f2b7f18d66519bf24797743729",
+      "path": "assets/history-cards/97.webp",
+      "sha256": "3e84699223964d5bd51161d30b32ce86101bc8375bcfe95b6e600ab3e75c7642",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -8179,8 +8080,8 @@
       }
     },
     {
-      "path": "assets/history-cards/98.jpg",
-      "sha256": "e95a3b9484df3c723f114180386f7b8e4562b330ee4fe90225164a1ec2a188ad",
+      "path": "assets/history-cards/98.webp",
+      "sha256": "58cc5337c7823dbdd0cf8d63377bcaac686b9c030a4056e17f7cefabebf7c923",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -8193,8 +8094,8 @@
       }
     },
     {
-      "path": "assets/history-cards/99.jpg",
-      "sha256": "7c8ac6ed5dab81007a0cdb59b10ef6632b93617f888f0cf3339dfa518ce6ca9d",
+      "path": "assets/history-cards/99.webp",
+      "sha256": "4b164a9894e22204e2a3fed5871785c9ab671008a771828004ac23cdc6527727",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -8236,14 +8137,14 @@
     },
     {
       "path": "assets/home-door-jugar.webp",
-      "sha256": "4d93db2376070ac48385b97a629748b31ff74405fc809b3248132f23d1735ca6",
+      "sha256": "27749d09499ba92e4d4a1bf77b381f101186d19761d5f4ee391a3efabed07dcb",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
         "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
         "exactPrompt": null,
-        "generatedAt": "2026-09-25",
+        "generatedAt": null,
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
@@ -10658,7 +10559,7 @@
     },
     {
       "path": "assets/menu-daily.webp",
-      "sha256": "f655bc2c2d1cd5d990b4a2267aa1a9c92289ba33de90ab64ac3c1558139917c2",
+      "sha256": "5a1d35e9a935eba1aa174889cc7fd8d1a6fd20f66f5c4f3244483a142f9f0456",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -10672,7 +10573,7 @@
     },
     {
       "path": "assets/menu-local.webp",
-      "sha256": "ca2e332e7d010036e536789bc7a8c66b665ee20e5f9e90d1a83043450834dec3",
+      "sha256": "5bf69b4244cda683fd84f67a7d5474a9c18abcbc65a34b63f11f5228edd28063",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -10686,7 +10587,7 @@
     },
     {
       "path": "assets/menu-online.webp",
-      "sha256": "30dabdd227f39fa826fabc1d9990c9fda9903658730f0f7955b5658b5a831adb",
+      "sha256": "797501cd3c614d96c1cb6c08ca486ca195974e4f5c51f7e52378144aec65cff3",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -10700,7 +10601,7 @@
     },
     {
       "path": "assets/menu-private.webp",
-      "sha256": "61e3ea24bc399b33ec128053f3634f03f4f72ff95690fb3e96c85f2921fe4819",
+      "sha256": "e077d6793db455eb7b2cc52481f3894f9b472c4c6ec8b867f6968a6cac79d050",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -10714,7 +10615,7 @@
     },
     {
       "path": "assets/menu-quick.webp",
-      "sha256": "5e7a7079e14e6fbccc2ee7d2cbe511affab22a84051bac7e31c27e0b342b0587",
+      "sha256": "fa9fa44977bd142f7c47114c59deb7d144ad37cf69284746b83f54dade49096c",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -10728,7 +10629,7 @@
     },
     {
       "path": "assets/menu-wifi.webp",
-      "sha256": "a8dcdd6d2495544cd87b6b317338e14d64dfccf7e02fd173a366c4feed3f9b10",
+      "sha256": "596fac522d67c02e6b5b7922ee17498a048698935c842c9c28f9752907058c5b",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -10742,7 +10643,7 @@
     },
     {
       "path": "assets/mode-walk-duel.webp",
-      "sha256": "124a34c94245bf4209f4735a31bea44f80be8a253f280a5846de992391bc44a9",
+      "sha256": "901bc6e8d3675c2bedd55ef2688fce59cce911f557391a4d7f30bce70953856f",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -10756,7 +10657,7 @@
     },
     {
       "path": "assets/mode-walk-multi.webp",
-      "sha256": "1d67f5b2fc2a1f52924cd6984b7a4e66483973852fd03e95e354c745e1d4eb22",
+      "sha256": "f7339cff7cf8b93a1e07f7decb010aad53b039d1881589ab5b72e3530e9356ce",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -10770,7 +10671,7 @@
     },
     {
       "path": "assets/mode-walk-solo.webp",
-      "sha256": "e66c2c0b50ae067b9b07880fbb7fda62b014f525b1236aef32c76c4b7e60ee78",
+      "sha256": "6aafaae2e3b70e1bd9ca295b7e79acf2043b3fca4dac409a85136a14c942eb84",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -13835,6 +13736,34 @@
     {
       "path": "assets/music-cards/youtube-music-video.webp",
       "sha256": "6858789a4d0a6a89a4869c24ba2c5ac7e9246280081efc40bf80d2fd9f64a28a",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/navigation-divider.svg",
+      "sha256": "904bccf7b3e4d746a66de6b18ab3f37c3adfaaf51d1ff63a60a240a41e02e7c4",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/navigation-filigree.svg",
+      "sha256": "8a97f00adc1beb78fa8a611054cd66502a526c466682cb675006a8207d47cf0d",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -22590,6 +22519,76 @@
       }
     },
     {
+      "path": "assets/ranking-trophy-v1.webp",
+      "sha256": "1eadacb003b902ce306011def8c7b40272cc618420bc80df85096bea5edf6175",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/saved-journey-v1.webp",
+      "sha256": "7dc949c20bd0b82ed03bd26cd34369e8128ba4214740aa5b0a5959560c716cd0",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/splash-card-hippocrates.webp",
+      "sha256": "bc11d84cdc99d34e7ac5fbf2517090b1dc4458c1579571a93028744cc5bce9ef",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/splash-card-marathon.webp",
+      "sha256": "13650dbca070984a9b4254488f33127b5a8ffd3d292371dfb973a48aff1c5728",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/splash-card-vesuvius.webp",
+      "sha256": "690443c3e24a3ad8b0da8909e42aee6006c6dd969d58c76a7fa984f58228d5ed",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
       "path": "assets/texturas/grano.svg",
       "sha256": "f0ca4fe4c3a0b1dc7235559e5a5d2ebe9d6721a91760c4aa7e27cc40c18b2ac1",
       "rightsEvidence": {
@@ -23866,6 +23865,76 @@
     {
       "path": "assets/videogame-cards/zelda-tears-of-the-kingdom.webp",
       "sha256": "22eccdc92fbc5d64a4a0b9ad66be143356d771e732ea22718ae433ce473cc722",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/voyage-account-v1.webp",
+      "sha256": "2d939aa5235b350d2d79e2410c23295965de01bf6645a7a13b676be5327624e3",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/voyage-collection-v1.webp",
+      "sha256": "f51479f834068d559665f9dab988a8ba38d7325199b1ebdfca2805f4bc9a7231",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/voyage-daily-v1.webp",
+      "sha256": "3910b6992b20e75c4fa6827df659b477cc1af1da9e5bf0510b2e794082fa639b",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/voyage-duels-v1.webp",
+      "sha256": "d50f24cc935c292fb395d61680e53b0c7af3047f05ecfcde6a796b5bb01949fb",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/voyage-journey-v1.webp",
+      "sha256": "1e1ac2e36d69f41ff9c897088ef15c3f65a6765b0e835647175e4d3c16f0e229",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
