@@ -44,6 +44,16 @@ jobs:
       - name: Compilar Android
         working-directory: android
         run: bash gradlew assembleDebug
+      # Google Play no admite un módulo base de más de 200 MB comprimidos. El APK de depuración es
+      # una buena aproximación: aquí solo se informa (no bloquea), para ver el tamaño en cada subida.
+      - name: Tamaño del paquete de Android
+        run: |
+          apk=android/app/build/outputs/apk/debug/app-debug.apk
+          bytes=$(stat -c%s "$apk")
+          mb=$(awk -v b="$bytes" 'BEGIN{printf "%.1f", b/1000000}')
+          mib=$(awk -v b="$bytes" 'BEGIN{printf "%.1f", b/1048576}')
+          echo "APK de depuración: $mb MB ($mib MiB, $bytes bytes). Límite de Google Play para el módulo base: 200 MB." | tee -a "$GITHUB_STEP_SUMMARY"
+          if [ "$bytes" -gt 200000000 ]; then echo "::warning::El APK de Android pesa $mb MB: supera los 200 MB del módulo base de Google Play."; fi
       - uses: actions/upload-artifact@v5
         with:
           name: Continuum-Android-debug
