@@ -150,27 +150,15 @@ for (const reduce of [false, true]) {
   // botón tiene que estar antes de que se monte nada y esperar lo que haga falta.
   const {w, advance, active} = splashClock();
   try {
-    let ambiente = true;
-    const cambios = [];
-    w.CONTINUUM = {
-      effectPrefs: () => ({ambience: ambiente}),
-      setAmbience: enabled => { ambiente = enabled; cambios.push(enabled); }
-    };
+    w.CONTINUUM = {};
     let abierto = false;
     w.CONTINUUM_SPLASH.gate().then(() => { abierto = true; });
     await new Promise(resolve => setImmediate(resolve));
     const boton = w.document.getElementById('splash-play');
     assert.ok(boton, 'la portada ofrece el botón de jugar');
     assert.equal(boton.textContent, 'Jugar');
-    const sonido = w.document.getElementById('splash-ambience');
-    assert.ok(sonido, 'la primera pantalla permite decidir la música');
-    assert.equal(sonido.tagName, 'BUTTON', 'la elección es un botón sutil, no un bloque de opciones');
-    assert.equal(sonido.getAttribute('aria-pressed'), 'true', 'el control refleja la configuración guardada');
-    assert.equal(sonido.getAttribute('aria-label'), 'Desactivar música ambiente');
-    sonido.click();
-    assert.deepEqual(cambios, [false], 'la elección actualiza la misma configuración de audio');
-    assert.equal(sonido.getAttribute('aria-pressed'), 'false');
-    assert.equal(sonido.getAttribute('aria-label'), 'Activar música ambiente');
+    assert.equal(w.document.getElementById('splash-ambience'), null, 'la portada ya no ofrece música');
+    assert.equal(w.document.querySelector('.splash-sound'), null, 'ni deja un botón de sonido en la esquina');
     advance(20000);
     assert.ok(active(), 'esperar a una persona no dispara el aviso de carga lenta');
     boton.click();
@@ -191,7 +179,7 @@ for (const reduce of [false, true]) {
   const {w, advance} = splashClock();
   try {
     let pedido = null;
-    w.CONTINUUM = { effectPrefs: () => ({ambience: false}), setAmbience() {}, has: () => true, DEFAULT_MODE: 'history',
+    w.CONTINUUM = { has: () => true, DEFAULT_MODE: 'history',
       Tutorial: { markup: (modo, opciones) => { pedido = {modo, opciones}; return '<section data-tutorial="history" data-portada></section>'; }, mountAll() {} } };
     let abierto = false;
     w.CONTINUUM_SPLASH.gate().then(() => { abierto = true; });
@@ -234,7 +222,7 @@ for (const reduce of [false, true]) {
   const arranque = read('boot.js');
   assert.match(arranque, /CONTINUUM_SPLASH\?\.gate\(\)/, 'el arranque espera al botón');
   assert.ok(arranque.indexOf('gate()') < arranque.indexOf('startAccounts('), 'y lo espera antes de montar la cuenta');
-  assert.match(arranque, /Ambience\?\.sync\(true\)/, 'y aprovecha ese toque para encender la música');
+  assert.doesNotMatch(arranque, /Ambience/, 'y ya no enciende música con ese toque');
   // Sin internet no hay invitado que preparar (accounts.js no llega a importarse), pero
   // el resto del juego —incluido el modo sin conexión— no necesita ninguno: entra
   // igualmente en vez de enseñar el aviso de "necesitas internet". accounts.js ya
@@ -409,11 +397,11 @@ console.log('Vista Android compacta: detección independiente y ampliación del 
     ['auto', 'light'], ['auto', 'dark', true], ['sepia', 'light'],
     ['contrast', 'light'], ['night', 'dark'], ['retirado', 'light']
   ]) {
-    const w = boot({ darkScheme, seen: true, saved: { 'hilo-ajustes-v1': JSON.stringify({ theme: legacy, textSize: '150', ambience: true }) } });
+    const w = boot({ darkScheme, seen: true, saved: { 'hilo-ajustes-v1': JSON.stringify({ theme: legacy, textSize: '150', ambience: true, ambienceVolume: 30 }) } });
     try {
       assert.equal(w.document.documentElement.dataset.theme, expected, `${legacy} migra a ${expected}`);
       const migrated = JSON.parse(w.localStorage.getItem('hilo-ajustes-v1'));
-      assert.deepEqual(migrated, { theme: expected, textSize: '150', ambience: true, haptics: false, depth: false, ambienceVolume: 50, sfx: true, sfxVolume: 70 });
+      assert.deepEqual(migrated, { theme: expected, textSize: '150', haptics: false, depth: false, sfx: true, sfxVolume: 70 });
       assert.deepEqual(colores(w), [COLORES[expected], COLORES[expected]]);
     } finally { w.close(); }
   }

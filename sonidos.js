@@ -1,7 +1,7 @@
 // Efectos de sonido de la mesa. No hay archivos: cada sonido se sintetiza al momento con
 // Web Audio, siempre en la misma escala pentatónica, así que nada desafina con nada y dos
 // aciertos seguidos nunca suenan idénticos. Solo decoran: ninguna jugada depende de ellos.
-// Tienen su propio contexto de audio, independiente de la música de ambience.js, y se
+// Tienen su propio contexto de audio, que se
 // duerme a los pocos segundos de silencio para no tener el audio del móvil despierto.
 (function () {
   'use strict';

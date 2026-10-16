@@ -26,4 +26,4 @@ generaron con ChatGPT/OpenAI. La procedencia de la imagen no sustituye la revisi
 comerciales del servicio ni la revisión independiente de textos, datos, marcas o elementos de
 terceros. Mantener la evidencia fuera de los recursos distribuidos si contiene datos privados.
 Revisar también tipografías, textos y dependencias (`docs/licencias-dependencias.json`,
-`docs/dependencias-seguridad.md`). La música está en `assets/audio/CREDITS.md`.
+`docs/dependencias-seguridad.md`).

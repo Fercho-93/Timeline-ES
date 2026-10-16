@@ -7,7 +7,7 @@ pieza y de qué otras depende.
 ## Cómo está hecho el juego, en cinco frases
 
 1. Continuum es una **página web**: archivos de texto con instrucciones (JavaScript, `.js`),
-   aspecto (hojas de estilo, `.css`) y estructura (`.html`), más imágenes y música.
+   aspecto (hojas de estilo, `.css`) y estructura (`.html`), más imágenes.
 2. Esa misma web se **empaqueta como app** de iPhone y de Android con una herramienta llamada
    Capacitor. Las carpetas `ios/` y `android/` son esos envoltorios.
 3. Las partidas **online** (con otras personas por internet), las cuentas y el ranking usan
@@ -52,7 +52,6 @@ Casi todo el juego vive suelto en la carpeta principal. Se agrupa aquí por func
 | `effects.js`, `immersion.js`, `mapa.js` | Animaciones, ambiente de la mesa y zoom de la línea de cartas. Solo decoran: no deciden jugadas. |
 | `drag.js`, `swipe.js` | Arrastrar cartas con el dedo y deslizar para volver atrás. |
 | `a11y.js` | Accesibilidad: poder jugar con teclado o con lector de pantalla. |
-| `ambience.js` | La música de fondo. |
 | `sonidos.js` | Los efectos de sonido (coger, colocar, acertar, fallar, fin de partida…), sintetizados al momento sin archivos de audio. |
 | `icon.svg`, `manifest.webmanifest` | Icono y ficha de la web cuando se instala en el móvil desde el navegador. |
 
@@ -132,7 +131,7 @@ Cada archivo es una lista de cartas con su título, su explicación, el valor qu
 | `package.json`, `package-lock.json` | La lista de herramientas que necesita el proyecto y los atajos (`npm test`, `npm run build`…). |
 | `capacitor.config.json` | Configuración del envoltorio de app móvil. |
 | `vite.config.js` | Servidor de pruebas en el ordenador (`npm run dev`). |
-| `asset-budget.json` | Límite de peso de imágenes y música, que comprueba `scripts/check-assets.mjs`. |
+| `asset-budget.json` | Límite de peso de las imágenes y del paquete (el de Google Play es de 200 MB), que comprueba `scripts/check-assets.mjs`. |
 | `CNAME`, `.nojekyll` | Hacen que la web se publique en GitHub Pages con el dominio `continuumjuego.es`. |
 | `.gitignore`, `.gitattributes` | Qué archivos no se guardan en git y cómo se tratan. |
 
@@ -140,7 +139,7 @@ Cada archivo es una lista de cartas con su título, su explicación, el valor qu
 
 | Carpeta | Qué hay |
 | --- | --- |
-| `assets/` | Imágenes y sonido. Una carpeta por mazo (`*-cards/`) con la ilustración de cada carta; `avatars/` (los 36 retratos), `audio/` (música, con sus créditos), `quick-cards/` (Retos rápidos), `texturas/`, y sueltas las portadas de cada sección (`hero-*`, `menu-*`, `mode-*`). |
+| `assets/` | Imágenes y sonido. Una carpeta por mazo (`*-cards/`) con la ilustración de cada carta; `avatars/` (los 36 retratos), `quick-cards/` (Retos rápidos), `texturas/`, y sueltas las portadas de cada sección (`hero-*`, `menu-*`, `mode-*`). |
 | `docs/` | Documentación de trabajo: tiendas, modelo de datos, auditorías de mazos y, en `.json`, las fuentes y la procedencia del arte de cada carta. `docs/promo/` guarda el vídeo promocional y la página de la que se graba. |
 | `tests/` | Las pruebas automáticas. Cada archivo comprueba una parte del juego; [tests/README.md](tests/README.md) dice qué hace cada una. |
 | `scripts/` | Pequeños programas de mantenimiento (ver abajo). |

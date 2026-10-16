@@ -1,7 +1,7 @@
 # Sonidos de transiciones
 
 Los sonidos de acción usan texturas suaves de papel y madera. Se activan con
-«Sonidos suaves de cartas y resultados» y son independientes de la música y la vibración.
+«Sonidos suaves de cartas y resultados» y son independientes de la vibración.
 
 | Acción | Respuesta | Punto de conexión |
 | --- | --- | --- |
@@ -45,11 +45,9 @@ suprime el sonido adicional de abrir su diálogo. Un repintado de red con el mis
 estado, una carta ya seleccionada o un zoom que no cambia no repiten el sonido.
 
 Las animaciones continuas (órbitas, esperas, cuenta atrás, profundidad, ejemplo de
-la guía, hover y desplazamiento) permanecen silenciosas. Con música activada,
-el reproductor intenta iniciarla durante el splash. Si el navegador bloquea el
-inicio automático, reintenta con el primer toque o tecla, sin reiniciar la pista
-al terminar la presentación. Movimiento reducido conserva los
-sonidos de las acciones, aunque omita sus animaciones.
+la guía, hover y desplazamiento) permanecen silenciosas. El juego no tiene música ambiente:
+solo suenan los sonidos de las acciones. Movimiento reducido conserva esos
+sonidos, aunque omita sus animaciones.
 
 El reproductor limita las voces a seis, amortigua el inicio y el final de cada
 textura, descarta sonidos que se hayan quedado esperando más de 300 ms al

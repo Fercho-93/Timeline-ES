@@ -27,13 +27,12 @@
   const menuIcon = name => `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${menuIcons[name]}</svg>`;
   // `help`, si lo hay, son los atributos de un botón de guía propio de la pantalla.
   function header(back = '', menu = '', inGame = false, title = '', help = '') {
-    // La tercera columna es una fila propia, no una sola celda: así aloja el interruptor
-    // de sonido y, cuando lo hay, el botón de menú, sin que ninguno de los dos tenga que
-    // adivinar el sitio del otro.
+    // La tercera columna es una fila propia, no una sola celda: así aloja los botones de
+    // guía y de menú, sin que ninguno de los dos tenga que adivinar el sitio del otro.
     return `<header class="topbar atlas-topbar${inGame ? ' atlas-game-topbar' : ''}">
       ${back ? `<button class="icon-btn atlas-back" ${back} aria-label="Volver a la pantalla anterior">${icon('back')}</button>` : '<span></span>'}
       ${inGame ? (title ? `<div class="topbar-title">${title}</div>` : '<span></span>') : '<div class="brand">Continuum</div>'}
-      <div class="atlas-topbar-actions"><i data-sound-slot></i>${help ? `<button class="icon-btn atlas-help" ${help} aria-label="Cómo se juega">${icon('guide')}</button>` : ''}${menu ? `<button class="icon-btn atlas-menu" ${menu} aria-label="Opciones de la partida" aria-haspopup="dialog">${icon('more')}</button>` : ''}</div>
+      <div class="atlas-topbar-actions">${help ? `<button class="icon-btn atlas-help" ${help} aria-label="Cómo se juega">${icon('guide')}</button>` : ''}${menu ? `<button class="icon-btn atlas-menu" ${menu} aria-label="Opciones de la partida" aria-haspopup="dialog">${icon('more')}</button>` : ''}</div>
     </header>`;
   }
   function nav(screen) {
@@ -739,11 +738,9 @@
       const zoom = container.querySelector('.timeline-zoom');
       const timelineHeading = wrap?.parentElement.querySelector('.hand-title');
       if (timelineHeading) timelineHeading.classList.add('timeline-toolbar');
-      // La lupa del zoom va en la barra superior, junto al sonido y el menú: es un ajuste de
-      // vista, no parte del tablero, y así no descuadra la cabecera de la línea.
-      // El zoom y el sonido viven en el menú ⋯ de la partida: la barra de arriba queda solo
+      // El zoom vive en el menú ⋯ de la partida: la barra de arriba queda solo
       // con volver, el título y el menú. Sin menú (algunas salas), el zoom sigue en la línea.
-      const menuButton = container.querySelector(':is(.topbar, .atlas-topbar) :is(.atlas-topbar-actions, .topbar-actions) > button:not(#ambience-toggle)');
+      const menuButton = container.querySelector(':is(.topbar, .atlas-topbar) :is(.atlas-topbar-actions, .topbar-actions) > button');
       container.classList.toggle('atlas-menu-tools', !!menuButton);
       if (zoom && !menuButton && timelineHeading) timelineHeading.append(zoom);
       const hand = container.querySelector('.hand');
@@ -813,29 +810,23 @@
     const where = before && after ? `entre ${before} y ${after}` : after ? `antes de ${after}` : before ? `después de ${before}` : '';
     slot.setAttribute('aria-label', `Posición elegida${where ? `: ${where}` : ''}`);
   }
-  // Al abrir el menú ⋯ de una partida se añade arriba un bloque «Vista» con el zoom y la
-  // música. Se engancha a cualquier menú de la barra superior, sea cual sea la modalidad.
+  // Al abrir el menú ⋯ de una partida se añade arriba un bloque «Vista» con el zoom.
+  // Se engancha a cualquier menú de la barra superior, sea cual sea la modalidad.
   document.addEventListener('click', event => {
-    const opener = event.target.closest?.('#app.atlas-menu-tools :is(.atlas-topbar-actions, .topbar-actions) > button:not(#ambience-toggle)');
+    const opener = event.target.closest?.('#app.atlas-menu-tools :is(.atlas-topbar-actions, .topbar-actions) > button');
     if (!opener) return;
     setTimeout(() => {
       const modal = [...document.querySelectorAll('#app > .overlay .modal')].at(-1);
       if (!modal || modal.querySelector('.menu-view-tools')) return;
       const zoom = document.querySelector('#app .timeline-zoom');
       const levels = zoom ? [...zoom.querySelectorAll('.zoom-menu [data-zoom-level]')] : [];
-      const on = () => CT.effectPrefs?.().ambience === true;
+      if (!levels.length) return;
       const block = document.createElement('div');
       block.className = 'menu-view-tools';
-      block.innerHTML = `${levels.length ? `<div class="menu-view-row"><span>Zoom de las cartas</span><div class="menu-view-zoom" role="group" aria-label="Zoom de las cartas">${levels.map(b => `<button type="button" data-zoom-level="${b.dataset.zoomLevel}" aria-pressed="${b.getAttribute('aria-pressed')}">${b.textContent}</button>`).join('')}</div></div>` : ''}<div class="menu-view-row"><span>Música</span><button type="button" class="menu-view-sound" aria-pressed="${on()}">${on() ? 'Activada' : 'Desactivada'}</button></div>`;
+      block.innerHTML = `${levels.length ? `<div class="menu-view-row"><span>Zoom de las cartas</span><div class="menu-view-zoom" role="group" aria-label="Zoom de las cartas">${levels.map(b => `<button type="button" data-zoom-level="${b.dataset.zoomLevel}" aria-pressed="${b.getAttribute('aria-pressed')}">${b.textContent}</button>`).join('')}</div></div>` : ''}`;
       block.addEventListener('click', e => {
         const level = e.target.closest('[data-zoom-level]');
         if (level) setTimeout(() => block.querySelectorAll('[data-zoom-level]').forEach(b => b.setAttribute('aria-pressed', String(b === level))), 0);
-        const sound = e.target.closest('.menu-view-sound');
-        if (sound) {
-          CT.setAmbience?.(!on());
-          sound.setAttribute('aria-pressed', String(on()));
-          sound.textContent = on() ? 'Activada' : 'Desactivada';
-        }
       });
       const title = modal.querySelector('h2');
       if (title) title.after(block); else modal.prepend(block);
@@ -1012,5 +1003,5 @@
   document.addEventListener('visibilitychange', refreshDepth);
   window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', refreshDepth);
   CT.UI = {isPlaying: screen => playing.has(screen), header, nav, mount, captureBoard, compactResult, confirmExit, askDialog, confirmDialog, pulseGiftDialog, reveal, openSurface, closeSurface, requestDepth,
-    updateEffects() { refreshDepth(); CT.Ambience?.sync(true); }};
+    updateEffects() { refreshDepth(); }};
 })();

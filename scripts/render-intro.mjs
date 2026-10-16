@@ -2,7 +2,9 @@
 // Detiene todas las animaciones CSS y las sitúa fotograma a fotograma, así el
 // resultado no depende de la velocidad de la máquina.
 //
-//   node scripts/render-intro.mjs [salida.mp4] [--sin-musica]
+//   node scripts/render-intro.mjs [salida.mp4]
+//
+// El vídeo sale sin sonido: Continuum ya no tiene música ambiente.
 //
 // Necesita Playwright (o PLAYWRIGHT_MODULE) y FFmpeg (o FFMPEG con su ruta).
 import { createServer } from 'node:http';
@@ -16,9 +18,7 @@ const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ? pathToFileURL(
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const args = process.argv.slice(2);
 const output = resolve(args.find(arg => !arg.startsWith('--')) ?? join(ROOT, 'docs/promo/continuum-intro.mp4'));
-const withMusic = !args.includes('--sin-musica');
 const FPS = 30, DURATION = 8.5, SCALE = 2;
-const MUSIC = join(ROOT, 'assets/audio/v1.mp3');
 
 // La máscara del destello necesita servir la página por HTTP, no desde file://.
 const TYPES = { '.html': 'text/html', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.css': 'text/css', '.js': 'text/javascript' };
@@ -43,16 +43,11 @@ await page.evaluate(async () => {
 });
 const stage = page.locator('.stage');
 
-const audioInput = withMusic ? ['-i', MUSIC] : [];
-const audioOutput = withMusic
-  ? ['-map', '0:v', '-map', '1:a', '-af', `afade=t=in:d=0.8,afade=t=out:st=${DURATION - 1.6}:d=1.6`, '-c:a', 'aac', '-b:a', '160k', '-shortest']
-  : [];
 const ffmpeg = spawn(process.env.FFMPEG ?? 'ffmpeg', [
   '-y', '-loglevel', 'error',
   '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'png', '-i', '-',
-  ...audioInput,
   '-c:v', 'libx264', '-preset', 'slow', '-crf', '22', '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
-  ...audioOutput,
+  '-an',
   '-t', String(DURATION),
   output,
 ], { stdio: ['pipe', 'inherit', 'inherit'] });

@@ -34,7 +34,7 @@ try {
 for (const savedSound of [false, true]) {
   const w = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g,''), {runScripts:'outside-only',url:'https://continuum.test/',pretendToBeVisual:true}).window;
   w.scrollTo=()=>{};w.matchMedia=()=>({matches:true});w.Element.prototype.scrollIntoView=()=>{};
-  w.localStorage.setItem('hilo-ajustes-v1',JSON.stringify({sound:savedSound,sfx:false,ambience:false,haptics:true}));
+  w.localStorage.setItem('hilo-ajustes-v1',JSON.stringify({sound:savedSound,sfx:false,ambience:true,ambienceVolume:30,haptics:true}));
   let contexts=0;
   w.AudioContext=w.webkitAudioContext=function(){contexts++;throw Error('No debe crearse audio de efectos');};
   for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[1]));
@@ -47,17 +47,15 @@ for (const savedSound of [false, true]) {
     }
     w.document.querySelector('[data-settings-action="open"]').click();
     assert.equal(w.document.querySelector('[data-settings-action="sound"]'),null,'no queda un interruptor sin función');
-    assert.ok(w.document.querySelector('[data-settings-action="ambience"]'),'la música conserva su ajuste');
+    assert.equal(w.document.querySelector('[data-settings-action="ambience"]'),null,'ya no hay ajuste de música, ni aunque quede guardado uno antiguo');
+    assert.equal(w.document.querySelector('[data-settings-action="ambience-volume"]'),null,'ni su volumen');
     assert.equal(w.document.querySelector('[data-settings-action="sfx"]').checked,false,'los efectos tienen su interruptor, aquí apagado');
     assert.ok(w.document.querySelector('[data-settings-action="haptics"]'),'la vibración conserva su ajuste');
-    // Los créditos de la música se leen dentro del juego y se cierran sin salir de Ajustes.
-    assert.equal(w.document.querySelector('a[href*="CREDITS.md"]'),null,'los créditos no abren un archivo de texto');
-    w.document.querySelector('[data-settings-action="music-credits"]').click();
-    assert.match(w.document.querySelector('[data-overlay="music-credits"]')?.textContent||'',/Música original de Continuum/);
-    w.document.querySelector('[data-overlay="music-credits"] [data-settings-action="close"]').click();
-    assert.ok(w.document.querySelector('[data-overlay="settings"]'),'cerrar los créditos deja Ajustes abierto');
+    assert.equal(w.document.querySelector('[data-settings-action="music-credits"]'),null,'sin música no hay créditos de la música');
+    assert.ok(!/música/i.test(w.document.querySelector('[data-overlay="settings"]').textContent),'Ajustes no menciona la música');
+    assert.ok(!('ambience' in w.CONTINUUM.effectPrefs()) && !w.CONTINUUM.setAmbience && !w.CONTINUUM.Ambience,'el juego no expone música ambiente');
     // Ni siquiera otro módulo con preferencias antiguas puede hacerlos sonar.
-    w.CONTINUUM.effectPrefs=()=>({sound:true,haptics:false,ambience:false});
+    w.CONTINUUM.effectPrefs=()=>({sound:true,haptics:false});
     const effects=w.CONTINUUM.Effects;
     effects.feedback(true);effects.feedback(false);effects.tap();effects.stamp();effects.page();effects.page(true);
     for(const kind of ['page','back','unroll','expand','open','close','select','place','return','hover','flip','deal','turn','end','zoom','notice']) effects.transition(kind);
@@ -65,10 +63,10 @@ for (const savedSound of [false, true]) {
     assert.equal(contexts,0,'todas las acciones y transiciones son silenciosas');
   } finally {w.close();}
 }
-console.log('Efectos apagados, preferencias antiguas y ajustes de ambiente/vibración: OK');
+console.log('Efectos apagados, preferencias antiguas y ajustes de vibración, sin música: OK');
 
 // Efectos de sonido encendidos (lo que trae una instalación nueva): cada momento de la
-// jugada suena, el volumen sigue al ajuste, y apagarlos los calla sin tocar la música.
+// jugada suena, el volumen sigue al ajuste, y apagarlos los calla.
 {
   const w = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g,''), {runScripts:'outside-only',url:'https://continuum.test/',pretendToBeVisual:true}).window;
   w.scrollTo=()=>{};w.matchMedia=()=>({matches:true});w.Element.prototype.scrollIntoView=()=>{};
@@ -159,7 +157,7 @@ console.log('Efectos apagados, preferencias antiguas y ajustes de ambiente/vibra
     const toggle=w.document.querySelector('[data-settings-action="sfx"]');
     toggle.checked=false;toggle.dispatchEvent(new w.Event('change',{bubbles:true}));
     await new Promise(resolve=>w.setTimeout(resolve,0));
-    assert.equal(CT.effectPrefs().sfx,false);assert.equal(CT.effectPrefs().ambience,false,'la música no cambia');
+    assert.equal(CT.effectPrefs().sfx,false);assert.equal('ambience' in CT.effectPrefs(),false,'no hay música que cambiar');
     const antes=notas;
     CT.Effects.feedback(true);CT.Effects.transition('lift');CT.Effects.transition('end');CT.Effects.clock(1);
     assert.equal(notas,antes,'apagados, nada suena');

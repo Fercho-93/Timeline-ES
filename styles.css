@@ -1995,42 +1995,6 @@ body::before {
 .turn-duel-profile-row>button{display:grid;gap:5px;text-align:left;min-width:0;overflow-wrap:anywhere}
 @media(max-width:420px){.turn-duel-profile-row{grid-template-columns:minmax(0,1fr)}.turn-duel-rival{flex-wrap:wrap}.turn-duel-row-actions{max-width:none;width:100%}}
 
-/* Interruptor de música: un solo nodo (vive fuera de #app para conservar sus escuchas
-   entre repintados) que cada cabecera aloja en su propio hueco [data-sound-slot]. No
-   flota ni se posiciona a mano: es un elemento más del reparto flex/grid de esa
-   cabecera, así que nunca puede quedar encima de otro botón. */
-.ambience-toggle {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  color: var(--muted);
-  background: var(--surface);
-  opacity: .38;
-  cursor: pointer;
-  transition: opacity 160ms ease, color 160ms ease, transform 120ms ease;
-}
-.ambience-toggle svg { width: 16px; height: 16px; overflow: visible; }
-.ambience-toggle path { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.ambience-toggle .sound-speaker { fill: currentColor; stroke: none; }
-.ambience-toggle .sound-muted { display: none; }
-.ambience-toggle[data-enabled="false"] .sound-waves { display: none; }
-.ambience-toggle[data-enabled="false"] .sound-muted { display: block; }
-.ambience-toggle:focus-visible, .ambience-toggle:active { opacity: 1; }
-.ambience-toggle:active { transform: scale(.92); }
-@media (hover: hover) { .ambience-toggle:hover { opacity: 1; } }
-.ambience-toggle:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-/* Mientras dura el telón, el interruptor todavía no tiene hueco donde vivir (#app sigue
-   vacío): se queda oculto en vez de aparecer suelto al final de la página. */
-html.splash-active .ambience-toggle { display: none; }
-/* La cabecera común de cada pantalla (#app .atlas-topbar-actions), la de las salas de
-   varios móviles (#app .topbar-actions) y la del duelo por turnos
-   (#app .turn-duel-nav-actions) son las que reparten este hueco; ver edition.css. */
-
 /* Mesa pública: estado arriba, jugadores y minijuego debajo (ver renderPublicLobby). */
 .public-lobby { display: grid; gap: 14px; }
 .public-lobby-head h2 { margin: 6px 0 2px; font-size: clamp(1.7rem, calc(7 * var(--vw)), 2.4rem); line-height: 1.05; }

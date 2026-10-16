@@ -103,19 +103,13 @@ console.log("\nService worker");
     .map(file => `./assets/language-cards/${file}`);
   const languageNoPrecargadas = languageAssets.filter(file => !cachedAssets.has(file));
   ok(`las ${languageAssets.length} ilustraciones de idiomas sí se precargan al instalar${languageNoPrecargadas.length ? ` (faltan ${languageNoPrecargadas.join(", ")})` : ""}`, !languageNoPrecargadas.length);
-  // Lo mismo con las seis canciones —27 MB de un ajuste que viene apagado—: instalar no
-  // las baja, pero quedan guardadas para poder sonar sin conexión.
-  const musica = Array.from({ length: 6 }, (unused, i) => `./assets/audio/v${i + 1}.mp3`);
-  ok("las seis canciones NO se precargan al instalar", musica.every(file => !cachedAssets.has(file)));
+  // El juego ya no lleva música: ni se precarga ni se descarga nada al activar la versión.
+  ok("la precarga no incluye audio", ![...cachedAssets].some(file => /\/audio\/|\.(mp3|ogg|m4a|wav)$/i.test(file)));
   let activada;
   sw.listeners.activate({ waitUntil: tarea => { activada = tarea; } });
   await activada;
-  // La descarga va aparte del `waitUntil`: activar no puede quedarse esperando 27 MB,
-  // porque mientras tanto las peticiones de la página no se atienden.
-  ok("activar no espera a que baje la música", sw.guardado.get(musica[5]) === undefined);
   for (let i = 0; i < 8; i++) await espera();
-  ok("y la música se guarda al activar la versión", musica.every(file => sw.guardado.get(file)?.cuerpo === `${file} del servidor`));
-  ok("activar solo va a la red a por la música", sw.peticiones.every(url => musica.includes(url)));
+  ok("activar la versión no va a la red a por nada", sw.peticiones.length === 0);
 }
 {
   // Al activarse, la versión nueva no recarga en seco a quien puede estar escribiendo:

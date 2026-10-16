@@ -58,7 +58,6 @@
   }
   // Los sonidos los sintetiza sonidos.js y dependen de su propio ajuste («Efectos de
   // sonido»), no de la antigua preferencia sound:true, que sigue sin reactivar nada.
-  // La música ambiente tiene su reproductor independiente en ambience.js.
   CT.Effects = {
     hapticsAvailable,
     stamp() { void vibration("confirm"); },

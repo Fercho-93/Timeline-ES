@@ -104,7 +104,6 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `movimiento.mjs` | test | Navegación, arrastre con el dedo, deslizar para volver, foco y movimiento reducido. |
 | `multijugador-cercano.mjs` | test | Salas cercanas entre iPhones con un sistema simulado, incluido el código de 4 cifras. |
 | `multijugador-local.mjs` | test | La sala Wi-Fi sobre el DOM real: crear, vestíbulo y partida entera con transporte simulado. |
-| `musica-ambiente.mjs` | test | Música: seis pistas barajadas, fundidos, pausa, desbloqueo por gesto y segundo plano. |
 | `navegacion-volver-browser.mjs` | navegador | En cada pantalla se ve la flecha de volver y lleva a la anterior. |
 | `navegacion-volver.mjs` | test | La flecha de volver lleva a la pantalla inmediatamente anterior, también en Retos rápidos. |
 | `online-e2e-harness.mjs` | (auxiliar) | Arnés de `online-e2e.mjs`: la app real en Chromium contra los emuladores. |
@@ -182,5 +181,5 @@ sustituyen la inspección en un navegador o un iPhone. Para revisar a mano, `npm
 archivos con Vite (Node 20.19+ o 22.12+) y `/tests/preview.html` enseña la interfaz a varios
 anchos; la web publicada sigue siendo estática.
 
-Las pruebas de música, efectos y Fantasma usan relojes y azar deterministas; la comprobación
+Las pruebas de efectos y Fantasma usan relojes y azar deterministas; la comprobación
 auditiva y la prueba en Safari de un iPhone físico siguen siendo necesarias.

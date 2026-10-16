@@ -26,11 +26,8 @@ for (const archivo of ["index.html", "actualizar.html", "manifest.webmanifest", 
   ok(`dist/${archivo} existe`, fs.existsSync(path.join(DIST, archivo)));
 }
 ok("dist/assets existe y no está vacío", fs.existsSync(path.join(DIST, "assets")) && fs.readdirSync(path.join(DIST, "assets")).length > 0);
-for (let i = 1; i <= 6; i++) {
-  const file = `assets/audio/v${i}.mp3`;
-  ok(`dist/ incluye ${file} completo para reproducirlo sin internet`,
-    fs.existsSync(path.join(DIST, file)) && fs.readFileSync(path.join(DIST, file)).equals(fs.readFileSync(path.join(REPO, file))));
-}
+ok("el juego ya no lleva música: dist/ no incluye assets/audio ni ambience.js",
+  !fs.existsSync(path.join(DIST, "assets", "audio")) && !fs.existsSync(path.join(DIST, "ambience.js")));
 
 const capacitorConfig = JSON.parse(fs.readFileSync(path.join(REPO, "capacitor.config.json"), "utf8"));
 ok("Capacitor apunta a dist/ como webDir", capacitorConfig.webDir === "dist");

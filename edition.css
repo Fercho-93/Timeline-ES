@@ -330,7 +330,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
    partida (⋮). Crece con su contenido —una o dos monedas de 44 px— en vez de forzar un
    ancho fijo que solo cabría una. */
 #app .atlas-topbar-actions { grid-column: 3; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
-#app .atlas-topbar-actions .ambience-toggle { width: 36px; height: 36px; }
 #app.atlas-has-nav > .shell { padding-bottom: calc(96px + var(--safe-bottom)); }
 #app .atlas-nav { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); width: 100%; max-width: none; left: 0; transform: none; background: var(--edition-surface); min-height: 64px; z-index: 30; }
 #app .atlas-nav button { min-height: 50px; min-width: 0; }
@@ -4340,19 +4339,17 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 58px; tr
 #app.atlas-board[data-platform][data-screen] .atlas-topbar-actions .timeline-zoom button.zoom-toggle { height: 36px !important; min-height: 36px !important; padding: 0 10px !important; gap: 4px; font-size: .72rem !important; }
 #app .atlas-topbar-actions .timeline-zoom .zoom-menu { top: calc(100% + 6px); right: 0; z-index: 60; }
 
-/* Barra superior despejada en partida: el zoom y la música pasan al menú ⋯. */
+/* Barra superior despejada en partida: el zoom pasa al menú ⋯. */
 #app.atlas-menu-tools .timeline-zoom { display: none !important; }
-#app.atlas-menu-tools :is(.atlas-topbar-actions, .topbar-actions) > #ambience-toggle { display: none !important; }
 .menu-view-tools { display: grid; gap: 10px; margin: 4px 0 14px; padding: 12px 14px; border: 1px solid #d8c6a4; border-radius: 12px; background: #fbf4e4; }
 .menu-view-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .menu-view-row > span { color: #5a4330; font: 600 .82rem/1.2 var(--ui-font); }
 .menu-view-zoom { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid #cdb994; border-radius: 999px; background: #fff9ee; }
-.menu-view-zoom button, .menu-view-sound { min-height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: #4a3626; font: 600 .78rem/1 var(--ui-font); cursor: pointer; }
-.menu-view-zoom button[aria-pressed="true"], .menu-view-sound[aria-pressed="true"] { background: #8a3f2f; color: #fff6e8; }
-.menu-view-sound { border: 1px solid #cdb994; background: #fff9ee; }
+.menu-view-zoom button { min-height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: #4a3626; font: 600 .78rem/1 var(--ui-font); cursor: pointer; }
+.menu-view-zoom button[aria-pressed="true"] { background: #8a3f2f; color: #fff6e8; }
 .menu-view-row > span { text-align: left; }
 .menu-view-zoom { flex: none; }
-#app .modal .menu-view-zoom button, #app .modal .menu-view-sound { width: auto !important; min-width: 0; white-space: nowrap; padding: 0 11px; }
+#app .modal .menu-view-zoom button { width: auto !important; min-width: 0; white-space: nowrap; padding: 0 11px; }
 
 /* Gran mezcla: la carta de la mano se ve igual que en Grandes colecciones. La temática ya no es
    una pastilla que tapa el «valor oculto» y el reverso: queda como un pequeño sello con su icono
@@ -4388,8 +4385,8 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 58px; tr
 :root[data-theme="dark"] #app.atlas-board .quick-shell .quick-pass { background: #3a2a1d; border-color: #9a7648; color: #f0d9b0; }
 :root[data-theme="dark"] .menu-view-tools { background: #2b2118; border-color: #6b5230; }
 :root[data-theme="dark"] .menu-view-row > span { color: #eadcc0; }
-:root[data-theme="dark"] .menu-view-zoom, :root[data-theme="dark"] .menu-view-sound { background: #3a2a1d; border-color: #7a5d38; }
-:root[data-theme="dark"] .menu-view-zoom button, :root[data-theme="dark"] .menu-view-sound { color: #f0e2c6; }
+:root[data-theme="dark"] .menu-view-zoom { background: #3a2a1d; border-color: #7a5d38; }
+:root[data-theme="dark"] .menu-view-zoom button { color: #f0e2c6; }
 #app.atlas-board .game-head.game-head-slim .deck-count { aspect-ratio: auto !important; height: auto !important; min-height: 0 !important; display: inline-flex; }
 #app.atlas-board .game-head.game-head-slim > * { align-self: center; }
 #app.atlas-board .game-head.game-head-slim > .scoreboard-panel { flex: 0 1 auto; min-width: 0; margin: 0 0 0 auto !important; }
@@ -5160,13 +5157,6 @@ html #app .tiempo-segmented .segmented-option::after { content: none !important;
 #app .bienvenida .bienvenida-datos { margin-top: 10px; font-size: .74rem; line-height: 1.45; }
 #app .bienvenida .bienvenida-datos a { color: inherit; text-decoration: underline; }
 
-/* Enlaces que abren algo dentro del juego (créditos de la música): se ven como enlace, son botones. */
-#app .link-button { padding: 0; border: 0; background: none; color: var(--accent, #8a3f2f); font: inherit; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
-#app .link-button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; border-radius: 2px; }
-#app .credits-modal { max-width: 26rem; text-align: left; }
-#app .credits-modal h2 { margin-top: 0; }
-#app .credits-modal .btn { margin-top: 12px; }
-#app .credits-modal .hint { text-align: left; }
 
 /* Vidas en solitario: corazones más visibles, y el que se pierde se rompe con un latido. */
 #app .solo-lives .vida { display: inline-block; color: #b03a2e; }

@@ -1,4 +1,4 @@
-// Comprueba las imágenes y la música: que no falte ninguna y que no se pase del peso permitido
+// Comprueba las imágenes: que no falte ninguna y que no se pase del peso permitido
 // (asset-budget.json).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -10,8 +10,6 @@ const budget=JSON.parse(fs.readFileSync(path.join(root,'asset-budget.json'),'utf
 function walk(folder){return fs.readdirSync(folder,{withFileTypes:true}).flatMap(item=>item.isDirectory()?walk(path.join(folder,item.name)):[path.join(folder,item.name)]);}
 const files=walk(path.join(root,'assets'));
 const total=files.reduce((n,file)=>n+fs.statSync(file).size,0);
-const musicBytes=Array.from({length:6},(_,i)=>fs.statSync(path.join(root,`assets/audio/v${i+1}.mp3`)).size).reduce((a,b)=>a+b,0);
-assert.ok(musicBytes<=budget.musicBytes,`Música: ${musicBytes} bytes; presupuesto ${budget.musicBytes}`);
 assert.ok(total<=budget.assetsBytes,`Recursos: ${total} bytes; presupuesto ${budget.assetsBytes}`);
 for(const file of files.filter(f=>/\.(webp|jpg|jpeg|png)$/i.test(f)))assert.ok(fs.statSync(file).size<=budget.singleImageBytes,`Imagen demasiado pesada: ${path.relative(root,file)}`);
 for(const file of files.filter(f=>f.includes('-cards') && /\.(webp|jpg|png)$/i.test(f))) {

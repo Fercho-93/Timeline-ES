@@ -26,11 +26,8 @@
     const accounts = import('./accounts.js');
     accounts.catch(() => { /* El fallo se atiende abajo, al pedir el módulo. */ });
     try {
-      // Entrar es un acto de quien juega, no del reloj. Y ese primer toque es lo único
-      // que deja al navegador encender el audio, así que la música arranca aquí y ya
-      // está sonando cuando aparece el menú.
+      // Entrar es un acto de quien juega, no del reloj.
       await window.CONTINUUM_SPLASH?.gate();
-      window.CONTINUUM?.Ambience?.sync(true);
       // Pulsar «Jugar» en la intro lleva siempre al Inicio: la pantalla que dejó la pestaña
       // (recarga, vuelta a la app) no se restaura por encima.
       try { sessionStorage.removeItem('continuum-tab-view-v1'); } catch { /* sin almacenamiento */ }

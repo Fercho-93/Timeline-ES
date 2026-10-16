@@ -8,7 +8,7 @@
   const CT = window.CONTINUUM;
   const KEY = "hilo-ajustes-v1";
   const TEXT_SIZES = [['100','Normal'],['125','Grande'],['150','Muy grande'],['200','Doble']];
-  const DEFAULTS = { theme: "light", textSize: "100", haptics: false, ambience: false, depth: false, ambienceVolume: 50, sfx: true, sfxVolume: 70 };
+  const DEFAULTS = { theme: "light", textSize: "100", haptics: false, depth: false, sfx: true, sfxVolume: 70 };
   // Las dos apariencias, en un solo sitio: de aquí salen el desplegable, la validación
   // de lo guardado y el color de la barra del navegador.
   const THEMES = {
@@ -34,6 +34,8 @@
     try {
       const stored = JSON.parse(CT.Storage.getItem(KEY));
       const settings = { ...DEFAULTS, ...stored };
+      // La música ambiente se quitó del juego: se descartan sus ajustes guardados.
+      delete settings.ambience; delete settings.ambienceVolume;
       // La versión anterior ofrecía seis aspectos. Se reducen a los dos equivalentes
       // sin tocar el resto de preferencias y se persiste la migración para hacerla una
       // sola vez. Un valor desconocido vuelve al aspecto principal.
@@ -115,13 +117,6 @@
           <input id="ajuste-volumen-efectos" type="range" min="0" max="100" step="5" value="${Math.max(0, Math.min(100, Number(s.sfxVolume) || 0))}" data-settings-action="sfx-volume" aria-describedby="sfx-help">
           <p class="hint" id="sfx-help">Notas suaves al coger y colocar cartas, acertar o fallar. En iPhone respetan el modo silencio.</p>
         </div>
-        <label class="opt-row"><span>Música ambiente</span><input type="checkbox" data-settings-action="ambience" ${s.ambience === true ? "checked" : ""}></label>
-        <div class="field settings-volume">
-          <label for="ajuste-volumen">Volumen de la música <output id="ajuste-volumen-valor">${Number(s.ambienceVolume) || 0}%</output></label>
-          <input id="ajuste-volumen" type="range" min="0" max="100" step="5" value="${Math.max(0, Math.min(100, Number(s.ambienceVolume) || 0))}" data-settings-action="ambience-volume" aria-describedby="volume-help">
-          <p class="hint" id="volume-help">Puedes dejar la música activa y bajar su volumen hasta 0 %.</p>
-        </div>
-        <p class="hint"><button type="button" class="link-button" data-settings-action="music-credits">Créditos de la música</button></p>
         <label class="opt-row"><span>Profundidad al mover el móvil</span><input type="checkbox" data-settings-action="depth" ${s.depth === true ? "checked" : ""}></label>
         <p class="hint" data-depth-help>La profundidad solo actúa en las portadas y respeta «reducir movimiento».</p>
         <p class="hint">Los efectos acompañan al resultado; toda la información también se muestra en texto.</p>
@@ -186,7 +181,7 @@
     const cap = window.Capacitor;
     const native = cap?.isNativePlatform?.() === true;
     say(`Plataforma: ${native ? 'app nativa (' + (cap.getPlatform?.() || '?') + ')' : 'navegador'} · ${CT.APP_VERSION || 'versión desconocida'}`);
-    say(`Ajustes: vibración ${settings.haptics ? 'sí' : 'no'} · efectos ${settings.sfx ? 'sí' : 'no'} (${settings.sfxVolume}%) · música ${settings.ambience ? 'sí' : 'no'} · profundidad ${settings.depth ? 'sí' : 'no'} · volumen ${settings.ambienceVolume}%`);
+    say(`Ajustes: vibración ${settings.haptics ? 'sí' : 'no'} · efectos ${settings.sfx ? 'sí' : 'no'} (${settings.sfxVolume}%) · profundidad ${settings.depth ? 'sí' : 'no'}`);
     // El permiso se solicita dentro del gesto, antes de esperar al audio o al plugin.
     let orientationPermission = null;
     try {
@@ -217,14 +212,6 @@
       osc.start(); osc.stop(ctx.currentTime + 0.5);
       say('Sonido: pitido de 0,5 s enviado (¿lo has oído?)');
     } catch (error) { say(`Sonido: ERROR ${error?.message || error}`); }
-    try {
-      const data = await CT.AudioAssets.read('assets/audio/v1.mp3');
-      say(`Música: pista leída (${Math.round(data.byteLength / 1024)} KB)`);
-      if (ctx) {
-        const decoded = await ctx.decodeAudioData(data);
-        say(`Música: decodificada (${Math.round(decoded.duration)} s)`);
-      }
-    } catch (error) { say(`Música: ERROR ${error?.message || error}`); }
     // Movimiento (profundidad)
     try {
       if (!window.DeviceOrientationEvent) throw new Error('sin sensor de orientación');
@@ -260,8 +247,6 @@
     draftLook = { theme: settings.theme, textSize: settings.textSize };
     save();
     applyTheme();
-    CT.setAmbience?.(false);
-    CT.Ambience?.setVolume?.(settings.ambienceVolume / 100);
     CT.UI?.updateEffects();
     CT.closeDialog();
     showToast('Preferencias restablecidas');
@@ -270,33 +255,13 @@
   // Cada motor pinta a su manera, así que abrir y cerrar el panel pasa por lo que ya
   // tienen: `CT.openDialog`/`CT.closeDialog`, los mismos diálogos que usan las reglas o
   // el menú de partida.
-  // Los créditos se leen dentro del juego, encima de Ajustes, y se cierran sin salir de la app.
-  // El archivo técnico (assets/audio/CREDITS.md) sigue en el repositorio para la documentación.
-  function openMusicCredits() {
-    if (document.querySelector('[data-overlay="music-credits"]')) return;
-    document.getElementById("app").insertAdjacentHTML("beforeend", `<div class="overlay" data-overlay="music-credits"><div class="modal credits-modal" role="dialog" aria-modal="true" aria-labelledby="music-credits-title">
-      <h2 id="music-credits-title" tabindex="-1" data-dialog-focus>Créditos de la música</h2>
-      <p>Música original de Continuum: seis piezas creadas para acompañar el juego.</p>
-      <p class="hint">Suenan en bucle mientras juegas. Puedes apagarlas o bajar su volumen en «Sonido y movimiento».</p>
-      <button class="btn btn-primary btn-block" data-settings-action="close">Cerrar</button>
-    </div></div>`);
-    CT.openDialog(document.querySelector('[data-overlay="music-credits"]'), true);
-  }
-
   function open() {
     draftLook = { theme: settings.theme, textSize: settings.textSize };
     document.getElementById("app").insertAdjacentHTML("beforeend", panelHtml());
     CT.openDialog(document.querySelector('[data-overlay="settings"]'), true);
   }
 
-  CT.effectPrefs = () => ({ sound: false, haptics: settings.haptics === true, ambience: settings.ambience === true, depth: settings.depth === true, ambienceVolume: settings.ambienceVolume / 100, sfx: settings.sfx === true, sfxVolume: settings.sfxVolume / 100 });
-  CT.setAmbience = enabled => {
-    settings.ambience = enabled === true;
-    save();
-    CT.UI?.updateEffects();
-    document.dispatchEvent(new CustomEvent('continuum:settings-changed'));
-    return settings.ambience;
-  };
+  CT.effectPrefs = () => ({ sound: false, haptics: settings.haptics === true, depth: settings.depth === true, sfx: settings.sfx === true, sfxVolume: settings.sfxVolume / 100 });
   function previewLook() {
     const preview=document.querySelector('[data-look-preview]'), apply=document.querySelector('[data-settings-action="apply-look"]');
     if(!preview||!apply)return;
@@ -306,15 +271,6 @@
     apply.textContent=apply.disabled?'Apariencia aplicada':'Aplicar apariencia';
   }
   document.addEventListener("change", async event => {
-    if (event.target.dataset.settingsAction === 'ambience-volume') {
-      const volume = Math.max(0, Math.min(100, Number(event.target.value) || 0));
-      settings.ambienceVolume = volume;
-      const output = document.getElementById('ajuste-volumen-valor');
-      if (output) output.value = `${volume}%`;
-      save();
-      CT.Ambience?.setVolume?.(volume / 100);
-      return;
-    }
     if (event.target.dataset.settingsAction === 'sfx-volume') {
       const volume = Math.max(0, Math.min(100, Number(event.target.value) || 0));
       settings.sfxVolume = volume;
@@ -328,7 +284,7 @@
       if (!['100','125','150','200'].includes(event.target.value)) return;
       draftLook.textSize = event.target.value; previewLook(); CT.Effects?.transition?.('select'); return;
     }
-    if (["haptics", "ambience", "depth", "sfx"].includes(event.target.dataset.settingsAction)) {
+    if (["haptics", "depth", "sfx"].includes(event.target.dataset.settingsAction)) {
       const key = event.target.dataset.settingsAction;
       let enabled = event.target.checked;
       if (key === 'depth' && enabled) {
@@ -339,8 +295,7 @@
         const help = document.querySelector('[data-depth-help]');
         if (!enabled && help) help.textContent = 'Este dispositivo no ha permitido usar el movimiento. Las portadas siguen funcionando.';
       }
-      if (key === 'ambience') CT.setAmbience(enabled);
-      else { settings[key] = enabled; save(); CT.UI?.updateEffects(); }
+      settings[key] = enabled; save(); CT.UI?.updateEffects();
       CT.Effects?.transition?.('select');
       if (key === 'haptics') {
         const test = document.querySelector('[data-settings-action="test-haptics"]');
@@ -365,7 +320,6 @@
       settings.theme=draftLook.theme;settings.textSize=draftLook.textSize;save();applyTheme();CT.Effects?.transition?.('select');previewLook();
     }
     else if (target.dataset.settingsAction === "feedback") sendFeedback();
-    else if (target.dataset.settingsAction === "music-credits") openMusicCredits();
     else if (target.dataset.settingsAction === "reset-preferences") resetPreferences();
     else if (target.dataset.settingsAction === "test-haptics") void testHaptics();
     else if (target.dataset.settingsAction === "device-check") void runDeviceCheck();

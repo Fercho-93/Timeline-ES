@@ -26,7 +26,6 @@
     el?.setAttribute('aria-hidden', 'true');
     el?.classList.remove('splash-ready', 'splash-exit', 'splash-gate', 'splash-entering');
     document.getElementById('splash-actions')?.remove();
-    document.getElementById('splash-ambience')?.remove();
     document.getElementById('splash-status')?.remove();
     startedAt = null;
     if (repinta) [0, 200, 600, 1500].forEach(ms => setTimeout(empuja, ms));
@@ -85,7 +84,8 @@
     const nuevoAbajo = Math.max(Math.min(vh - globo + 10, vh * .45), 18);
     if (globo < vh) actions.style.bottom = `${Math.round(nuevoAbajo)}px`;
     else if (abajo > vh * .3) actions.style.bottom = `${Math.round(vh * .22)}px`;
-    const techo = (document.getElementById('splash-ambience')?.getBoundingClientRect().bottom || 0) + 8;
+    // Margen superior que la marca respeta (el que antes ocupaba el botón de sonido de la esquina).
+    const techo = 80;
     // Dónde queda el bloque al terminar su entrada (mientras entra va 12 px más abajo): se
     // calcula con su `bottom` y su alto, no con lo que mide en este instante.
     const tope = () => vh - (parseFloat(getComputedStyle(actions).bottom) || 0) - actions.offsetHeight - 22;
@@ -116,9 +116,7 @@
   // Con la tipografía definitiva el nombre y el lema cambian de tamaño: se vuelve a encajar.
   document.fonts?.ready?.then(() => { if (startedAt !== null) encaja(); });
 
-  // El juego no entra solo: entra cuando alguien pulsa «Jugar». Ese toque es además lo
-  // único que permite encender el audio —ningún navegador deja sonar nada antes—, así
-  // que es lo que hace que la música ya esté puesta cuando aparece el menú.
+  // El juego no entra solo: entra cuando alguien pulsa «Jugar».
   const gate = () => new Promise(resolve => {
     const el = splash();
     if (!el) { resolve(); return; }
@@ -131,28 +129,6 @@
       actions = document.createElement('div');
       actions.id = 'splash-actions';
       actions.className = 'splash-actions';
-
-      const sound = document.createElement('button');
-      sound.type = 'button';
-      sound.className = 'splash-sound';
-      sound.id = 'splash-ambience';
-      sound.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">
-        <path class="sound-speaker" d="M4 9v6h4l5 4V5L8 9H4Z"/>
-        <path class="sound-waves" d="M16 8.2a5 5 0 0 1 0 7.6M18.6 5.7a8.5 8.5 0 0 1 0 12.6"/>
-        <path class="sound-muted" d="m16.5 9 5 5m0-5-5 5"/>
-      </svg>`;
-      const reflectSound = enabled => {
-        sound.dataset.enabled = enabled ? 'true' : 'false';
-        sound.setAttribute('aria-pressed', String(enabled));
-        sound.setAttribute('aria-label', enabled ? 'Desactivar música ambiente' : 'Activar música ambiente');
-        sound.title = enabled ? 'Silenciar música' : 'Activar música';
-      };
-      reflectSound(window.CONTINUUM?.effectPrefs?.().ambience === true);
-      sound.addEventListener('click', () => {
-        const enabled = sound.dataset.enabled !== 'true';
-        window.CONTINUUM?.setAmbience?.(enabled);
-        reflectSound(enabled);
-      });
 
       button = document.createElement('button');
       button.id = 'splash-play';
@@ -169,8 +145,7 @@
       actions.append(button, guide);
       const elapsed = performance.now() - introStart;
       actions.style.animationDelay = `${Math.max(0, 5000 - elapsed)}ms`;
-      sound.style.animationDelay = `${Math.max(0, 5200 - elapsed)}ms`;
-      el.append(sound, actions);
+      el.append(actions);
     }
     encaja();
     let entered = false;
@@ -178,7 +153,6 @@
       if (entered) return;
       entered = true;
       actions?.remove();
-      document.getElementById('splash-ambience')?.remove();
       el.classList.remove('splash-gate');
       resolve();
     };
@@ -221,7 +195,7 @@
     CT.Tutorial.mountAll(capa);
     try { capa.querySelector('.splash-video-close').focus({ preventScroll: true }); } catch { /* sin foco */ }
   };
-  // Segundo telón, ya con la música sonando: ahora sí se está montando la partida.
+  // Segundo telón: ahora sí se está montando la partida.
   const entering = (text = 'Entrando al juego…') => {
     const el = splash();
     if (!el) return;
@@ -246,7 +220,7 @@
     finishTimer = setTimeout(() => {
       splash()?.classList.add('splash-exit');
       // El juego no se descubre de golpe: el telón se disuelve mientras la pantalla que
-      // hay detrás se aclara, con la música ya subiendo. Solo se anima la opacidad —una
+      // hay detrás se aclara. Solo se anima la opacidad —una
       // transformación aquí convertiría a `#app` en el marco de su barra fija.
       const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
       const app = document.getElementById('app');

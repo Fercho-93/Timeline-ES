@@ -140,11 +140,9 @@ html.splash-active #app-splash::before {
 html.splash-active #app-splash.splash-exit { opacity: 0; }
 html.splash-active #app-splash.splash-exit .splash-masthead,
 html.splash-active #app-splash.splash-exit .splash-actions,
-html.splash-active #app-splash.splash-exit .splash-sound,
 html.splash-active #app-splash.splash-exit .splash-status { opacity: 0; }
 html.splash-active #app-splash .splash-masthead { transition: opacity 420ms cubic-bezier(.22,.61,.36,1); }
 html.splash-active #app-splash .splash-actions,
-html.splash-active #app-splash .splash-sound,
 html.splash-active #app-splash .splash-status { transition: opacity 460ms ease-out; }
 
 #app.app-arrive { animation: app-arrive 420ms cubic-bezier(.22,.61,.36,1) backwards; }
@@ -437,8 +435,8 @@ html.splash-active #app-splash .splash-masthead {
 #app-splash .splash-video-head { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; width: min(100%, 520px); color: #f3e6cc; font: italic 400 1.15rem/1.2 var(--font-display, Georgia, serif); text-align: center; }
 #app-splash .splash-video-close { width: 44px; height: 44px; border: 1px solid #e7c98f66; border-radius: 50%; background: #ffffff12; color: #fff5df; font-size: 1.2rem; cursor: pointer; }
 #app-splash .splash-video-close:focus-visible { outline: 2px solid #f8e2af; outline-offset: 2px; }
-/* Mientras se ve el vídeo, «Jugar» y el sonido se esconden del todo: el velo es translúcido y se transparentaban. */
-#app-splash.splash-viendo .splash-sound, #app-splash.splash-viendo .splash-actions { visibility: hidden; }
+/* Mientras se ve el vídeo, «Jugar» se esconde del todo: el velo es translúcido y se transparentaban. */
+#app-splash.splash-viendo .splash-actions { visibility: hidden; }
 @keyframes splash-video-in { from { opacity: 0; } }
 #app-splash .splash-guide:focus-visible { outline: 2px solid #f8e2af; outline-offset: 2px; border-radius: 6px; }
 @media (hover: hover) and (pointer: fine) {
@@ -447,38 +445,6 @@ html.splash-active #app-splash .splash-masthead {
 @media (hover: hover) and (pointer: fine) {
   #app-splash .splash-play:hover { filter: brightness(1.08) saturate(1.05); }
 }
-
-#app-splash .splash-sound {
-  position: fixed;
-  z-index: 2;
-  top: max(24px, env(safe-area-inset-top));
-  right: max(22px, env(safe-area-inset-right));
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  border: 1px solid #8f3c27;
-  border-radius: 50%;
-  color: #86351f;
-  background: #f7eddaeb;
-  box-shadow: 0 7px 20px #40220e2f, inset 0 0 0 1px #fff9e7;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  cursor: pointer;
-  transition: color 160ms ease, background-color 160ms ease, transform 120ms ease;
-  animation: splash-sound-in 460ms 5.2s ease-out both;
-}
-@keyframes splash-sound-in { from { opacity: 0; } }
-#app-splash .splash-sound svg { width: 23px; height: 23px; overflow: visible; }
-#app-splash .splash-sound path { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-#app-splash .splash-sound .sound-speaker { fill: currentColor; stroke: none; }
-#app-splash .splash-sound .sound-muted { display: none; }
-#app-splash .splash-sound[data-enabled="true"] { color: #6c2919; background: #fff7e8f5; }
-#app-splash .splash-sound[data-enabled="false"] .sound-waves { display: none; }
-#app-splash .splash-sound[data-enabled="false"] .sound-muted { display: block; }
-#app-splash .splash-sound:active { transform: scale(.94); }
-#app-splash .splash-sound:focus-visible { outline: 3px solid #8f3c27; outline-offset: 3px; }
 
 #app-splash .splash-status {
   position: absolute;
@@ -541,8 +507,7 @@ html.splash-active #app-splash .splash-masthead {
   html.splash-active #app-splash,
   html.splash-active #app-splash .splash-masthead,
   html.splash-active #app-splash .splash-actions,
-  html.splash-active #app-splash .splash-sound,
-  html.splash-active #app-splash .splash-status { transition: none; }
+    html.splash-active #app-splash .splash-status { transition: none; }
   #app.app-arrive { animation: none; }
   html.splash-active #app-splash * { animation: none !important; }
 }
