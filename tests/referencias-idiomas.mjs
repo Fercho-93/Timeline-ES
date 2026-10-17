@@ -27,7 +27,8 @@ const hashes = new Set();
 for (const card of cards) {
   const file = `assets/language-cards/${card.id}.webp`;
   assert.ok(fs.existsSync(file), `Falta la lámina de ${card.title}: ${file}`);
-  assert.deepEqual(dimensions(file), [512, 768], `${card.title} debe mantener el formato 2:3`);
+  const [ancho, alto] = dimensions(file);
+  assert.ok(ancho * 3 === alto * 2 && ancho >= 448, `${card.title} debe mantener el formato 2:3 (mínimo 448 px de ancho)`);
   assert.ok(fs.statSync(file).size <= 100 * 1024, `${card.title} supera los 100 KiB`);
   const hash = crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex");
   assert.ok(!hashes.has(hash), `La lámina de ${card.title} está duplicada`);

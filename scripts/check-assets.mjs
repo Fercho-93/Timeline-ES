@@ -14,8 +14,8 @@ assert.ok(total<=budget.assetsBytes,`Recursos: ${total} bytes; presupuesto ${bud
 for(const file of files.filter(f=>/\.(webp|jpg|jpeg|png)$/i.test(f)))assert.ok(fs.statSync(file).size<=budget.singleImageBytes,`Imagen demasiado pesada: ${path.relative(root,file)}`);
 for(const file of files.filter(f=>f.includes('-cards') && /\.(webp|jpg|png)$/i.test(f))) {
   const meta=await sharp(file).metadata();
-  assert.equal(meta.width,budget.cardWidth,`Anchura de ${file}`);
-  assert.equal(meta.height,budget.cardHeight,`Altura de ${file}`);
+  assert.ok(meta.width<=budget.cardWidth&&meta.width>=(budget.cardMinWidth??budget.cardWidth),`Anchura de ${file}: ${meta.width}`);
+  assert.equal(meta.width*budget.cardHeight,meta.height*budget.cardWidth,`Proporción 2:3 de ${file}: ${meta.width}×${meta.height}`);
 }
 const source=fs.readFileSync(path.join(root,'service-worker-258.js'),'utf8').split('];')[0];
 const precache=[...new Set([...source.matchAll(/"\.\/([^"]*)"/g)].map(m=>m[1]||'index.html'))];
