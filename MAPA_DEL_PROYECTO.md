@@ -122,6 +122,10 @@ Cada archivo es una lista de cartas con su título, su explicación, el valor qu
 | Archivo | Qué es |
 | --- | --- |
 | `privacidad.html` | Política de privacidad (la que ve el jugador). `PRIVACIDAD.md` es la misma en el repositorio. |
+| `terminos.html` | Condiciones de uso: conducta, nombres, denuncias, propiedad intelectual y responsabilidad. |
+| `aviso-legal.html` | Identificación del titular (LSSI art. 10). Lleva huecos `[PENDIENTE: …]` (NIF, domicilio) que rellena el titular. |
+| `soporte.html` | Contacto y preguntas frecuentes; es la URL de soporte de las tiendas. |
+| `borrar-cuenta.html` | Cómo borrar la cuenta (en el juego o por correo): la URL pública que pide Google Play. |
 | `licencias.html` | Licencias de las piezas de otros autores. Se genera con `scripts/licencias.mjs`. |
 | `LICENSE` | Los derechos del propio juego: es privado, todos los derechos reservados. |
 

@@ -6,7 +6,7 @@ Esta página explica qué datos trata Continuum, para qué, con quién se compar
 
 ## Responsable y contacto
 
-Continuum es un proyecto personal. El responsable del tratamiento es **Fernando Sirvent Merino**, a título individual y no como empresa. Para cualquier asunto de privacidad (acceso a tus datos, rectificación, borrado u otra petición) escribe a **feedbackcontinuum@gmail.com**. Antes de publicar en App Store o Google Play se añadirá aquí la dirección postal que exijan la tienda y la normativa.
+Continuum es un proyecto personal. El responsable del tratamiento es **Fernando Sirvent Merino**, a título individual y no como empresa. Para cualquier asunto de privacidad (acceso a tus datos, rectificación, borrado u otra petición) escribe a **feedbackcontinuum@gmail.com**. Antes de publicar en App Store o Google Play se añadirá aquí la dirección postal que exijan la tienda y la normativa. Los datos de identificación del titular están también en el [aviso legal](aviso-legal.html).
 
 ## Tu invitado y tu progreso
 
@@ -94,7 +94,7 @@ Una tarea automática diaria aplica estos plazos. Los datos caducados se borran 
 
 ## Borrar tu cuenta
 
-Desde el Atlas («Tu cuenta y tus datos») puedes eliminar tu invitado o tu cuenta: se borran tu perfil, tu alias, tu progreso, todas tus filas del ranking, tus listas de bloqueados y archivados, tus registros técnicos y la copia en este dispositivo. La acción pide confirmación y no se puede deshacer. Lo que compartiste con otras personas (tu nombre y tus jugadas en salas y duelos con ellas, o tu alias si alguien te bloqueó) se mantiene hasta que esas partidas caducan, y las denuncias de nombres hasta cumplir sus 90 días según los plazos de arriba. Desinstalar la app o borrar los datos del navegador no borra el invitado del servidor: se borra solo pasado un año sin uso, o antes si nos lo pides.
+Desde el Atlas («Tu cuenta y tus datos») puedes eliminar tu invitado o tu cuenta: se borran tu perfil, tu alias, tu progreso, todas tus filas del ranking, tus listas de bloqueados y archivados, tus registros técnicos y la copia en este dispositivo. La acción pide confirmación y no se puede deshacer. Lo que compartiste con otras personas (tu nombre y tus jugadas en salas y duelos con ellas, o tu alias si alguien te bloqueó) se mantiene hasta que esas partidas caducan, y las denuncias de nombres hasta cumplir sus 90 días según los plazos de arriba. Desinstalar la app o borrar los datos del navegador no borra el invitado del servidor: se borra solo pasado un año sin uso, o antes si nos lo pides. Si no puedes entrar en el juego, [aquí se explica cómo pedir el borrado por correo](borrar-cuenta.html).
 
 ## Tus derechos
 
@@ -121,4 +121,4 @@ Las ilustraciones de las cartas, portadas, icono, logo, splash y demás recursos
 
 [Información de privacidad de Firebase](https://firebase.google.com/support/privacy)
 
-[Licencias de terceros](licencias.html)
+[Condiciones de uso](terminos.html) · [Aviso legal](aviso-legal.html) · [Soporte](soporte.html) · [Borrar mi cuenta](borrar-cuenta.html) · [Licencias de terceros](licencias.html)

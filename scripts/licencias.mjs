@@ -30,7 +30,7 @@ ${block(qrcode)}
 ${block(capacitor)}
 <h2>Licencia Apache 2.0 · jsQR, Firebase y AndroidX</h2>
 ${block(apache)}
-<p><a href="privacidad.html">Privacidad</a> · <a href="index.html">Volver a Continuum</a></p></main></body></html>
+<p><a href="privacidad.html">Privacidad</a> · <a href="terminos.html">Condiciones de uso</a> · <a href="aviso-legal.html">Aviso legal</a> · <a href="soporte.html">Soporte</a> · <a href="index.html">Volver a Continuum</a></p></main></body></html>
 `;
 await fs.writeFile(new URL('../licencias.html', import.meta.url), html);
 console.log('licencias.html escrita');

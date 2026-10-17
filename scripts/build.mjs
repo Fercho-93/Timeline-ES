@@ -18,7 +18,7 @@ const dist = path.join(root, "dist");
 // instalado, como si abriera la aplicación por primera vez sin conexión.
 const FILES = [
   "tiempo.js", "quick-room.js", "quick-network.js", "quick-online.js", "quick-challenges.css", "quick-challenges-data.js", "quick-challenges-engine.js", "quick-challenges.js",
-  "invitation.html", "invitation.js", "index.html", "actualizar.html", "privacidad.html", "licencias.html", "manifest.webmanifest", "icon.svg",
+  "invitation.html", "invitation.js", "index.html", "actualizar.html", "privacidad.html", "terminos.html", "aviso-legal.html", "soporte.html", "borrar-cuenta.html", "licencias.html", "manifest.webmanifest", "icon.svg",
   "splash.css", "splash.js", "styles.css", "edition.css", "atlas-voyage.css", "navigation-nautical.css", "guide-journal.css", "tutorial.css", "tutorial.js", "home-modes-v1.css", "home-modes-v1.js", "service-worker-258.js",
   "cards.js", "movies.js", "music.js", "videogames.js", "animals.js",
   "lifespan.js", "speed.js", "inventos.js", "mundo.js", "astronomy.js",

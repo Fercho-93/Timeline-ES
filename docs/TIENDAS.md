@@ -21,8 +21,15 @@ se revisa aquí antes de enviarla.
 - Modelo: gratuita, **sin compras, sin publicidad y sin seguimiento**.
 - Política de privacidad: `https://continuumjuego.es/privacidad.html` (misma información que
   [PRIVACIDAD.md](../PRIVACIDAD.md)). Soporte: `feedbackcontinuum@gmail.com`.
-- Responsable: Fernando Sirvent Merino, a título individual. Falta la dirección postal que
-  piden las tiendas y la normativa.
+- URL de soporte (ficha de App Store y Play): `https://continuumjuego.es/soporte.html`.
+- URL pública de borrado de cuenta (la pide Google Play; Apple pide el borrado dentro de la app, que
+  existe): `https://continuumjuego.es/borrar-cuenta.html`.
+- Condiciones de uso: `https://continuumjuego.es/terminos.html`. Aviso legal (identificación del titular,
+  LSSI art. 10): `https://continuumjuego.es/aviso-legal.html`.
+- Responsable: Fernando Sirvent Merino, a título individual. **Faltan el NIF y el domicilio**: están como
+  `[PENDIENTE: …]` en `aviso-legal.html` y la dirección en la política. Las tiendas los piden para
+  declararse «comerciante» (Reglamento de Servicios Digitales de la UE) aunque el juego sea gratis;
+  `grep PENDIENTE *.html` los localiza.
 
 ## Textos de la ficha
 
@@ -150,8 +157,7 @@ Check (Play Integrity exige estar publicada en Google Play) ni avisos activos.
   progreso, estadísticas, retos diarios, jugadas y resultados. Funcionalidad de la app.
 - **Cifrado en tránsito:** sí (HTTPS / TLS de Firebase).
 - **Borrado:** sí, desde el juego (Atlas → «Tu cuenta y tus datos») o escribiendo al correo de
-  soporte; hace falta una URL pública para pedir el borrado sin instalar la app (la política de
-  privacidad sirve si explica el procedimiento).
+  soporte. La URL pública para pedir el borrado sin instalar la app es `borrar-cuenta.html` (ver arriba).
 - No marcar «no se recogen datos»: la autenticación anónima también es un dato de usuario.
 
 ## Inventario de datos

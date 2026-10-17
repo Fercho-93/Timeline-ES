@@ -1,6 +1,6 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v757";
+const CACHE = "continuum-v758";
 // Las láminas de animales —5,5 MB en casi cien archivos— no se precargan: quien nunca
 // abre ese bloque no debería pagar esa descarga solo por instalar la aplicación. La ruta
 // `fetch` de más abajo ya guarda en caché cualquier respuesta válida la primera vez que
@@ -22,7 +22,7 @@ const ASSETS = [
   "./assets/menu-online.webp", "./assets/menu-local.webp", "./assets/menu-wifi.webp", "./assets/menu-private.webp",
   "./assets/voyage-collection-v1.webp", "./assets/voyage-daily-v1.webp", "./assets/voyage-duels-v1.webp", "./assets/voyage-journey-v1.webp", "./assets/voyage-account-v1.webp", "./assets/atlas-ocean-v1.webp", "./assets/ranking-trophy-v1.webp", "./assets/menu-quick.webp", "./assets/menu-daily.webp", "./assets/menu-collections.webp",
   "./deployment.js", "./accounts.css", "./firebase-client.js", "./account-storage.js", "./recent-players.js", "./accounts.js", "./boot.js",
-  "./privacidad.html", "./licencias.html",
+  "./privacidad.html", "./terminos.html", "./aviso-legal.html", "./soporte.html", "./borrar-cuenta.html", "./licencias.html",
   "./engine.js", "./final.js", "./tournament.js", "./links.js",
   "./", "./index.html", "./home-modes-v1.js", "./home-modes-v1.css", "./splash.css", "./splash.js", "./styles.css", "./edition.css", "./atlas-voyage.css", "./navigation-nautical.css", "./guide-journal.css", "./tutorial.css", "./tutorial.js", "./assets/guide-notebook-v1.webp", "./assets/saved-journey-v1.webp", "./service-worker-258.js", "./cards.js", "./movies.js", "./music.js", "./videogames.js",
   "./animals.js", "./lifespan.js", "./speed.js", "./inventos.js", "./mundo.js", "./astronomy.js",

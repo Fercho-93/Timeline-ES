@@ -578,7 +578,7 @@
         <button class="btn btn-primary btn-block" type="submit">Empezar a jugar <span aria-hidden="true">→</span></button>
       </form>
       <p class="hint" id="bienvenida-pista">Toca el avatar para elegirlo. Podrás cambiarlo después.</p>
-      <p class="hint bienvenida-datos" id="bienvenida-datos">Mejor un apodo que tu nombre real. Tu progreso se guarda en un servidor junto a tu apodo, sin pedirte correo ni nombre real. El ranking es opcional: te preguntaremos al terminar tu primer reto diario. <a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a></p>
+      <p class="hint bienvenida-datos" id="bienvenida-datos">Mejor un apodo que tu nombre real. Tu progreso se guarda en un servidor junto a tu apodo, sin pedirte correo ni nombre real. El ranking es opcional: te preguntaremos al terminar tu primer reto diario. <a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a> · <a href="terminos.html" target="_blank" rel="noopener">Condiciones</a></p>
     </section></div>`);
   }
 

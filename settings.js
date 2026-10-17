@@ -132,11 +132,11 @@
       ${window.CONTINUUM?.Accounts?.ready ? `<details class="settings-section settings-support settings-privacy"><summary><span><b>Privacidad y ranking</b><small>Qué se guarda y quién lo ve</small></span><i aria-hidden="true">+</i></summary><div class="settings-support-body">
         <p class="hint" style="text-align:left">Tu progreso (partidas, aciertos, logros y retos diarios) se guarda en un servidor (Firebase) para que no se pierda, sin correo ni datos personales. El ranking del reto diario es público y opcional: solo apareces si lo decides.</p>
         <label class="opt-row"><span>Aparecer en el ranking público <small>Nombre de perfil, avatar, aciertos y tiempo</small></span><input type="checkbox" data-ranking-toggle ${window.CONTINUUM.Accounts.rankingPublico === true ? "checked" : ""}></label>
-        <p class="hint" style="text-align:left"><a href="privacidad.html" target="_blank" rel="noopener noreferrer">Política de privacidad</a> · Para borrar tus datos: Atlas → Tu cuenta y tus datos.</p>
+        <p class="hint" style="text-align:left"><a href="privacidad.html" target="_blank" rel="noopener noreferrer">Política de privacidad</a> · <a href="borrar-cuenta.html" target="_blank" rel="noopener noreferrer">Cómo borrar tus datos</a> (en el juego: Atlas → Tu cuenta y tus datos).</p>
       </div></details>` : ""}
 
       <details class="settings-section settings-support"><summary><span><b>Ayuda y comentarios</b><small>Cuéntanos cómo mejorar tu experiencia</small></span><i aria-hidden="true">+</i></summary><div class="settings-support-body">
-        <p class="hint" style="text-align:left;margin-top:0"><a href="privacidad.html#arte" target="_blank" rel="noopener noreferrer">Privacidad, datos y procedencia del arte</a> · <a href="licencias.html" target="_blank" rel="noopener noreferrer">Licencias de terceros</a></p>
+        <p class="hint" style="text-align:left;margin-top:0"><a href="privacidad.html#arte" target="_blank" rel="noopener noreferrer">Privacidad, datos y procedencia del arte</a> · <a href="terminos.html" target="_blank" rel="noopener noreferrer">Condiciones de uso</a> · <a href="aviso-legal.html" target="_blank" rel="noopener noreferrer">Aviso legal</a> · <a href="soporte.html" target="_blank" rel="noopener noreferrer">Soporte</a> · <a href="licencias.html" target="_blank" rel="noopener noreferrer">Licencias de terceros</a></p>
         <div class="field">
           <label for="feedback-note">Tu comentario</label>
           <textarea id="feedback-note" rows="3" maxlength="4000" placeholder="Qué ocurrió y qué esperabas"></textarea>

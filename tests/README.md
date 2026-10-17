@@ -135,6 +135,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `result-preview.mjs` | test | La pantalla de resultado: acierto, corrección del fallo, foco y movimiento reducido. |
 | `push-apagado.mjs` | test | Los avisos push del móvil siguen apagados (`deployment.nativePush`): sin él, `push.start()` no pide permiso ni llama a `register()`. |
 | `borrado-cuenta.mjs` | test | El borrado de cuenta del servidor (`functions/account-purge.js`) con una base en memoria: borra todo lo de la cuenta, incluidas las filas de ranking y subcolecciones, sin tocar otras cuentas. |
+| `legal.mjs` | test | Condiciones de uso, aviso legal, soporte y página de borrado: enlaces y anclas, caché, app móvil, coherencia con la política y lista de huecos `[PENDIENTE: …]` por rellenar. |
 | `moderacion.mjs` | test | El filtro de nombres (ofensivos y reservados bloqueados, nombres normales intactos) y el botón de denuncia. |
 | `moderacion-reglas.mjs` | reglas | Nombres reservados, el nombre se libera al borrar el perfil, denuncias de solo escritura y topes de tamaño. |
 | `retencion.mjs` | test | Los plazos de `functions/retention.js` coinciden con la política, y `PRIVACIDAD.md` y `privacidad.html` tienen las mismas secciones. |
