@@ -349,7 +349,17 @@ for (let r = 0; r < 3; r++) {
   const references = [...resultPanel.querySelectorAll('a')].map(a => a.href);
   assert.ok(references.includes(discovered.source));
   assert.ok(references.includes(discovered.curiositySource));
-  click('[data-quick="ack"]'); click('[data-quick="bank"]'); click('[data-quick="bank"]');
+  click('[data-quick="ack"]');
+  // Plantarse es un botón propio a todo el ancho (no un adorno de la barra) con el texto completo: sin
+  // aciertos solo pasa el reto; con aciertos los asegura y va destacado.
+  const bankNow = () => w.document.querySelector('[data-quick="bank"]');
+  assert.equal(bankNow().textContent.trim(), 'Pasar reto');
+  assert.ok(!bankNow().classList.contains('has-points'));
+  assert.equal(bankNow().closest('.quick-bar'), null, 'el botón no va dentro de la barra del marcador');
+  click('[data-quick="bank"]');
+  assert.ok(bankNow().classList.contains('has-points'));
+  assert.match(bankNow().textContent, /Plantarme y asegurar 1 acierto$/);
+  click('[data-quick="bank"]');
   assert.equal(E.restore(JSON.parse(w.localStorage.getItem(key))).phase, 'round-end');
   const finalList = w.document.querySelector('details.quick-panel');
   assert.ok(finalList.textContent.includes(discovered.curiosity));

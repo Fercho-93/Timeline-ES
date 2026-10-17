@@ -4294,10 +4294,16 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 58px; tr
 #app.atlas-board .scoreboard-panel .score > em strong { font: 800 .82rem/1 var(--font-display); }
 #app.atlas-board .scoreboard-panel .score > em small { display: none !important; }
 
-/* Retos rápidos: «Pasar reto» es un botón pequeño y discreto arriba a la izquierda, sobre el título. */
-#app.atlas-board .quick-shell .quick-pass { min-height: 24px; padding: 0 10px; border: 1px solid #c9a55a99; border-radius: 999px; background: #efe0bd80; color: #7a5a2c; font: 600 .64rem/1 var(--ui-font); letter-spacing: .03em; cursor: pointer; box-shadow: none; }
-#app.atlas-board .quick-shell .quick-pass:active { background: #e4cf9e; }
-#app.atlas-board .quick-shell .quick-pass:focus-visible { outline: 2px solid #8a3f2f; outline-offset: 2px; }
+/* Retos rápidos: «Plantarme y asegurar N aciertos» (o «Pasar reto» si aún no hay ninguno) es un botón a todo
+   el ancho bajo la barra de la partida: lo primero que se ve al empezar el turno. Verde y lleno cuando hay
+   aciertos que asegurar; con el mismo alto, pero solo con borde, cuando únicamente se pasa el reto. */
+#app.atlas-board .quick-shell .quick-bank { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 44px; margin: 0 0 8px; padding: 6px 14px; border: 1.5px solid #8f6b3a; border-radius: 12px; background: #f6ead0; color: #6b4a22; font: 700 .9rem/1.15 var(--ui-font); letter-spacing: .02em; text-align: center; cursor: pointer; box-shadow: none; }
+#app.atlas-board .quick-shell .quick-bank.has-points { border-color: #1f4a33; background: linear-gradient(180deg, #3f8059, #2b5d41); color: #fff; font-size: 1rem; box-shadow: 0 3px 0 #1f4a33, 0 8px 16px #2b5d4140; }
+#app.atlas-board .quick-shell .quick-bank-mark { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #fff; color: #2b5d41; font-size: .95rem; line-height: 1; }
+#app.atlas-board .quick-shell .quick-bank:active { transform: translateY(2px); background: #ecdcb6; }
+#app.atlas-board .quick-shell .quick-bank.has-points:active { background: #2b5d41; box-shadow: 0 1px 0 #1f4a33; }
+#app.atlas-board .quick-shell .quick-bank:focus-visible { outline: 3px solid #8a3f2f; outline-offset: 2px; }
+#app.atlas-board .quick-shell .quick-bank:disabled { opacity: .5; cursor: default; }
 
 /* Las flechas de la mano van a los lados del abanico (ya no ocupan una fila debajo): más sitio
    para la carta de la línea. El contador queda solo para lectores de pantalla. */
@@ -4313,13 +4319,12 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 58px; tr
    giradas ya no toca el borde superior del bloque. */
 #app.atlas-board .atlas-hand-section + .board-timeline-section, #app.atlas-board .atlas-hand-section ~ .board-timeline-section { margin-top: 22px !important; }
 
-/* «Pasar reto» junto al título de la línea de cartas, a la derecha, en el hueco que quedó libre. */
+/* El título de la línea de cartas. */
 #app.atlas-board .quick-shell .board-timeline-section > .hand-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-#app.atlas-board .quick-shell .board-timeline-section > .hand-title .quick-pass { flex: none; margin-right: 2px; }
 
 /* ===== Cabecera limpia de la mesa =====
    Barra superior: ← · título del mazo · sonido y menú. Debajo, una sola franja: cartas
-   pendientes a la izquierda; «Pasar reto» y jugadores a la derecha. La lupa del zoom vive en
+   pendientes a la izquierda; jugadores a la derecha. La lupa del zoom vive en
    la cabecera de la línea, que es lo que amplía. */
 #app .atlas-topbar .topbar-title { min-width: 0; text-align: center; color: #8a3f2f; font: 700 .78rem/1.2 var(--font-display); letter-spacing: .08em; text-transform: uppercase; text-wrap: balance; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 #app.atlas-board .quick-shell .quick-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 2px 0 6px; padding-bottom: 6px; border-bottom: 1px solid color-mix(in srgb, var(--edition-line, #cdb994) 70%, transparent); }
@@ -4327,7 +4332,6 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 58px; tr
 #app.atlas-board .quick-shell .quick-left b { color: #4a3626; font: 700 1rem/1 var(--font-display); margin-right: 2px; }
 #app.atlas-board .quick-shell .quick-right { display: flex; align-items: center; gap: 8px; min-width: 0; }
 #app.atlas-board .quick-shell .quick-right .scoreboard { margin: 0; flex-wrap: nowrap; }
-#app.atlas-board .quick-shell .quick-pass { min-height: 28px; padding: 0 11px; }
 #app.atlas-board .board-timeline-section > .timeline-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 #app.atlas-board .board-timeline-section > .timeline-toolbar > .timeline-zoom { position: relative; flex: none; margin: 0 !important; padding: 0; border: 0; background: none; box-shadow: none; }
 #app.atlas-board .board-timeline-section > .timeline-toolbar > .timeline-zoom .zoom-menu { top: calc(100% + 6px); right: 0; }
@@ -4382,7 +4386,11 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 58px; tr
 :root[data-theme="dark"] #app.atlas-board .timeline-ends,
 :root[data-theme="dark"] #app.atlas-board .quick-shell .quick-left b { color: #e9b48f; }
 :root[data-theme="dark"] #app.atlas-board .quick-shell .quick-left { color: #d8c6aa; }
-:root[data-theme="dark"] #app.atlas-board .quick-shell .quick-pass { background: #3a2a1d; border-color: #9a7648; color: #f0d9b0; }
+/* Modo oscuro: el botón de plantarse conserva el verde (más claro) y el de pasar pasa a cobre sobre fondo oscuro. */
+:root[data-theme="dark"] #app.atlas-board .quick-shell .quick-bank { background: #3a2a1d; border-color: #9a7648; color: #f0d9b0; }
+:root[data-theme="dark"] #app.atlas-board .quick-shell .quick-bank.has-points { background: linear-gradient(180deg, #4a9368, #2f6b4a); border-color: #8fd1a8; color: #fff; box-shadow: 0 3px 0 #1f4a33, 0 8px 16px #00000066; }
+:root[data-theme="dark"] #app.atlas-board .quick-shell .quick-bank-mark { color: #2f6b4a; }
+:root[data-theme="dark"] #app.atlas-board .quick-shell .quick-bank:focus-visible { outline-color: #f0d9b0; }
 :root[data-theme="dark"] .menu-view-tools { background: #2b2118; border-color: #6b5230; }
 :root[data-theme="dark"] .menu-view-row > span { color: #eadcc0; }
 :root[data-theme="dark"] .menu-view-zoom { background: #3a2a1d; border-color: #7a5d38; }
