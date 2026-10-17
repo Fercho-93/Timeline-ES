@@ -34,7 +34,7 @@ Cada dato se explica con más detalle, con su base jurídica, en las secciones s
 
 ## Responsable y contacto
 
-Continuum es un proyecto personal. El responsable del tratamiento es **Fernando Sirvent Merino**, a título individual y no como empresa. Para cualquier asunto de privacidad (acceso a tus datos, rectificación, borrado u otra petición) escribe a **feedbackcontinuum@gmail.com**. Antes de publicar en App Store o Google Play se añadirá aquí la dirección postal que exijan la tienda y la normativa. Los datos de identificación del titular están también en el [aviso legal](aviso-legal.html).
+Continuum es un proyecto personal. El responsable del tratamiento es **Fernando Sirvent Merino**, a título individual y no como empresa. Para cualquier asunto de privacidad (acceso a tus datos, rectificación, borrado u otra petición) escribe a **feedbackcontinuum@gmail.com**. Continuum es gratuito y no tiene actividad comercial; si eso cambiara, se completarán aquí los datos de identificación que exija la normativa. Los datos del titular están también en el [aviso legal](aviso-legal.html).
 
 ## Tu invitado y tu progreso
 
@@ -106,7 +106,7 @@ La web se aloja en GitHub Pages, que recibe las peticiones necesarias para servi
 - **Otros jugadores**, solo en lo descrito en «Partidas online», «Ranking» y «Partidas entre móviles cercanos».
 - Las apps que tú elijas para compartir enlaces o enviar comentarios (por ejemplo, WhatsApp o tu correo).
 
-Google, Apple y GitHub pueden tratar datos en Estados Unidos u otros países fuera del Espacio Económico Europeo. Esas transferencias se amparan en el Marco de Privacidad de Datos UE-EE. UU. o en las cláusulas contractuales tipo de la Comisión Europea que ofrecen estos proveedores.
+Los datos de Firestore se almacenan en servidores de la Unión Europea. Aun así, Google, Apple y GitHub pueden tratar datos en Estados Unidos u otros países fuera del Espacio Económico Europeo. Esas transferencias se amparan en el Marco de Privacidad de Datos UE-EE. UU. o en las cláusulas contractuales tipo de la Comisión Europea que ofrecen estos proveedores.
 
 ## Cuánto tiempo se guardan
 

@@ -1,8 +1,8 @@
 // Textos legales públicos: terminos.html, aviso-legal.html, soporte.html y borrar-cuenta.html.
 // Comprueba que existen, que todo enlace interno (y su ancla) lleva a algún sitio, que viajan en
 // la app y en la caché, que el juego y la política los enlazan y que repiten los datos de contacto
-// y los plazos de la política de privacidad. Los huecos «[PENDIENTE: …]» (NIF y domicilio) los
-// rellena el titular: esta prueba los lista para que no se publiquen por descuido.
+// y los plazos de la política de privacidad. Si queda algún hueco «[PENDIENTE: …]» sin rellenar,
+// esta prueba lo lista para que no se publique por descuido.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const read = file => fs.readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
@@ -52,4 +52,4 @@ assert.ok(html['privacidad.html'].indexOf('id="esencial"') < html['privacidad.ht
 assert.match(read('PRIVACIDAD.md'), /Versión 2 · Actualizada/);
 
 const pending = PAGES.flatMap(page => [...html[page].matchAll(/\[PENDIENTE: ([^\]]+)\]/g)].map(m => `${page}: ${m[1]}`));
-console.log(`Textos legales: enlaces, caché, app y coherencia con la política: OK${pending.length ? `\n  Por rellenar antes de publicar en tiendas: ${pending.join('; ')}` : ''}`);
+console.log(`Textos legales: enlaces, caché, app y coherencia con la política: OK${pending.length ? `\n  Huecos por rellenar: ${pending.join('; ')}` : ''}`);
