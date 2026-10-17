@@ -982,7 +982,7 @@ function publicRosterMarkup() {
     const state = !mine && seatSilent(uid) ? ["Sin señal", "is-silent"]
       : cardDrawn ? (answeredStarter(uid) ? ["Ha respondido ✓", "is-done"] : ["Pensando su cifra…", "is-thinking"])
       : ["En la mesa", "is-ready"];
-    return `<li class="public-seat ${state[1]}${mine ? " is-you" : ""}"><span class="public-seat-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'uid:' + uid, id: mine ? CT.Avatares.ownId() : player.avatarId })}</span><span class="public-seat-copy"><b>${escapeHtml(player.name)}${mine ? ' <span class="public-you">tú</span>' : ""}</b><small>${state[0]}</small></span></li>`;
+    return `<li class="public-seat ${state[1]}${mine ? " is-you" : ""}"><span class="public-seat-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'uid:' + uid, id: mine ? CT.Avatares.ownId() : player.avatarId })}</span><span class="public-seat-copy"><b>${escapeHtml(player.name)}${mine ? ' <span class="public-you">tú</span>' : ""}</b><small>${state[0]}</small>${mine ? '' : CT.Moderacion?.botonDenuncia(uid, player.name, 'mesa') || ''}</span></li>`;
   }).join("");
 }
 

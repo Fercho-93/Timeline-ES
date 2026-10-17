@@ -104,3 +104,13 @@
 .ranking-optin { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:12px 14px; margin-bottom:14px; border:1px dashed var(--edition-line); border-radius:12px; font:.8rem/1.4 var(--ui-font); }
 .ranking-optin p { margin:0; }
 .ranking-consent .actions .btn { width:100%; }
+
+/* «Denunciar»: junto a cada nombre ajeno, discreto pero siempre a mano (moderacion.js). */
+.report-btn { min-height: 28px; padding: 2px 8px; border: 0; background: none; color: var(--muted, #7a6a58); font: inherit; font-size: .72rem; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; opacity: .8; }
+.report-btn:hover, .report-btn:focus-visible { opacity: 1; }
+.report-btn:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; border-radius: 4px; }
+.report-btn.report-compact { min-width: 28px; padding: 2px 4px; font-size: .9rem; text-decoration: none; }
+.report-modal { max-width: 26rem; text-align: left; }
+.report-modal h2 { margin-top: 0; }
+.report-reasons { margin: 12px 0; padding: 0; border: 0; }
+.report-modal .actions { display: flex; gap: 8px; flex-wrap: wrap; }

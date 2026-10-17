@@ -91,7 +91,7 @@ externa o una decisión del titular. Las listas de comprobación de la beta est�
 - [ ] App Check en Android: Play Integrity exige que la app esté en Google Play.
 - [ ] Aplicar el *enforcement* de App Check.
 - [ ] Límites, alertas y procedimiento de cierre ante abuso o costes anómalos.
-- [ ] Moderación de alias (filtro y denuncia) si las tiendas lo exigen.
+- [x] Moderación de alias: filtro de nombres ofensivos y reservados, botón «Denunciar» y colección `reports` (ver [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#denuncias-de-nombres)). Falta, si se quiere, bloqueo en las mesas públicas.
 - [ ] Mantener fuera la competición pública arbitrada: exigiría un servidor autoritativo.
 
 ## 5. Cuentas

@@ -103,6 +103,9 @@ const nameRef = key => doc(db,'playerNames',key);
 const nameKey = alias => alias.toLowerCase();
 function validateAlias(alias) {
   if (alias.length < 2 || alias.length > 24 || !/^[a-z0-9áéíóúüñ_-](?:[a-z0-9áéíóúüñ _-]*[a-z0-9áéíóúüñ_-])$/i.test(alias)) throw Error('Usa de 2 a 24 caracteres: letras, números, espacios, guion o guion bajo.');
+  // Lo ofensivo y lo reservado (moderacion.js): el nombre lo ven otras personas.
+  const motivo = CT.Moderacion?.problema(alias);
+  if (motivo) throw Error(motivo);
 }
 async function ensureProfile(uid) {
   const ref=refs(uid).profile;
@@ -129,6 +132,38 @@ async function ensureProfile(uid) {
 function accountDialog(html) {
   app.insertAdjacentHTML('beforeend',html);
   CT.openDialog(app.lastElementChild,true);
+}
+// «Denunciar»: junto a cualquier nombre ajeno hay un botón (moderacion.js). Escribe una denuncia en
+// `reports` —una por pareja denunciante-denunciado—, que nadie puede leer desde el juego: la lee quien
+// gestiona el proyecto en la consola de Firebase (ver CONFIGURAR_MULTIJUGADOR.md).
+const REPORT_REASONS = [['nombre-ofensivo', 'Nombre ofensivo'], ['suplantacion', 'Se hace pasar por otra persona o por Continuum'], ['otro', 'Otro motivo']];
+const REPORT_CONTEXTS = ['ranking', 'mesa', 'duelo', 'sala'];
+function reportDialog({ uid, alias, context }) {
+  if (!identity || !uid || uid === identity.uid) return;
+  const target = String(uid), name = String(alias || 'esta persona').slice(0, 24);
+  accountDialog(`<div class="overlay" data-overlay="report"><section class="modal report-modal" role="dialog" aria-modal="true" aria-labelledby="report-title">
+    <h2 id="report-title" tabindex="-1" data-dialog-focus>Denunciar a ${esc(name)}</h2>
+    <p>Cuéntanos qué pasa con este nombre y una persona lo revisará.</p>
+    <fieldset class="report-reasons"><legend class="solo-lectores">Motivo</legend>${REPORT_REASONS.map(([value, label], i) => `<label class="opt-row"><span>${label}</span><input type="radio" name="report-reason" value="${value}"${i === 0 ? ' checked' : ''}></label>`).join('')}</fieldset>
+    <p id="report-message" class="hint" role="status"></p>
+    <div class="actions"><button type="button" class="btn btn-primary" id="report-send">Enviar denuncia</button><button type="button" class="btn btn-secondary" id="report-cancel" data-account-action="close">Cancelar</button></div>
+  </section></div>`);
+  document.getElementById('report-send').onclick = async event => {
+    const send = event.currentTarget, message = document.getElementById('report-message');
+    const reason = document.querySelector('input[name="report-reason"]:checked')?.value || 'otro';
+    send.disabled = true; message.textContent = 'Enviando…';
+    try {
+      const batch = writeBatch(db);
+      batch.set(doc(db, 'reports', `${identity.uid}_${target}`), { reporter: identity.uid, target, targetAlias: name, reason, context: REPORT_CONTEXTS.includes(context) ? context : 'sala', createdAt: serverTimestamp() });
+      await batch.commit();
+      message.textContent = 'Gracias. Hemos recibido tu denuncia y la revisaremos.';
+      send.hidden = true; document.getElementById('report-cancel').textContent = 'Cerrar';
+    } catch (error) {
+      // Las reglas solo dejan una denuncia por pareja: «sin permiso» aquí es «ya la enviaste».
+      if (error?.code === 'permission-denied') { message.textContent = 'Ya habías denunciado a esta persona. Gracias.'; send.hidden = true; document.getElementById('report-cancel').textContent = 'Cerrar'; }
+      else { message.textContent = 'No se ha podido enviar la denuncia. Comprueba tu conexión e inténtalo de nuevo.'; send.disabled = false; }
+    }
+  };
 }
 function editNameScreen() {
   accountDialog(`<div class="overlay"><section class="modal"><h2>Cambiar nombre</h2><p>Este nombre será público en el ranking. No uses datos personales.</p><label>Nombre<input id="account-alias" minlength="2" maxlength="24" autocomplete="nickname" value="${esc(profile.alias)}"></label><p id="account-delete-message" role="status"></p><button class="btn btn-primary" data-account-action="rename">Guardar nombre</button><button class="btn btn-secondary" data-account-action="close">Cancelar</button></section></div>`,true);
@@ -596,8 +631,8 @@ async function ranking(tab = 'day', key = '', all = false) {
   const rankAvatar = (v, size) => CT.Avatares.markup(v.alias, { size, seed: 'uid:' + v.id, id: v.id === uid ? CT.Avatares.ownId() : v.avatar });
   const you = v => v.id===uid?'<small class="ranking-you">Tú</small>':'';
   const time = v => Number.isFinite(ms(v)) ? `<small class="ranking-time">${duration(ms(v))}</small>` : '';
-  const player=(v,i)=>`<tr class="${v.id===uid?'is-you':''}"><td><span class="ranking-place">${position(i)}</span></td><td><span aria-hidden="true">${rankAvatar(v, 32)}</span> <span class="ranking-name">${esc(v.alias)}</span>${you(v)}</td><td><b>${hits(v)}</b>${time(v)}</td></tr>`;
-  const podium=entries.slice(0,3).map((v,i)=>`<article class="ranking-medallion ranking-medallion-${i+1}${v.id===uid?' is-you':''}"><span class="ranking-medal" aria-label="Puesto ${position(i)}">${['Ⅰ','Ⅱ','Ⅲ'][i]}</span><span class="ranking-avatar" aria-hidden="true">${rankAvatar(v, 46)}</span><b>${esc(v.alias)}</b>${you(v)}<strong>${hits(v)}</strong><span>aciertos</span>${time(v)}</article>`).join('');
+  const player=(v,i)=>`<tr class="${v.id===uid?'is-you':''}"><td><span class="ranking-place">${position(i)}</span></td><td><span aria-hidden="true">${rankAvatar(v, 32)}</span> <span class="ranking-name">${esc(v.alias)}</span>${you(v)}${v.id===uid?'':CT.Moderacion?.botonDenuncia(v.id,v.alias,'ranking',true)||''}</td><td><b>${hits(v)}</b>${time(v)}</td></tr>`;
+  const podium=entries.slice(0,3).map((v,i)=>`<article class="ranking-medallion ranking-medallion-${i+1}${v.id===uid?' is-you':''}"><span class="ranking-medal" aria-label="Puesto ${position(i)}">${['Ⅰ','Ⅱ','Ⅲ'][i]}</span><span class="ranking-avatar" aria-hidden="true">${rankAvatar(v, 46)}</span><b>${esc(v.alias)}</b>${you(v)}${v.id===uid?'':CT.Moderacion?.botonDenuncia(v.id,v.alias,'ranking',true)||''}<strong>${hits(v)}</strong><span>aciertos</span>${time(v)}</article>`).join('');
   const esActual = key === actual;
   const fecha = k => new Date(`${k}T12:00:00`).toLocaleDateString('es-ES', {weekday: semana ? undefined : 'long', day:'numeric', month:'long'});
   const titulo = semana ? (esActual ? 'Esta semana' : `Semana del ${fecha(key)}`) : (esActual ? 'Hoy' : fecha(key).replace(/^./, c => c.toUpperCase()));
@@ -636,7 +671,7 @@ async function discoveryRanking(section = 'all', all = false) {
   const localValue = {all: local.found, collections: local.foundCollections, quick: local.foundQuick}[section];
   const rankAvatar = (v, size) => CT.Avatares.markup(v.alias, { size, seed: 'uid:' + v.id, id: v.id === uid ? CT.Avatares.ownId() : v.avatar });
   const you = v => v.id === uid ? '<small class="ranking-you">Tú</small>' : '';
-  const player = (v, i) => `<tr class="${v.id === uid ? 'is-you' : ''}"><td><span class="ranking-place">${position(i)}</span></td><td><span aria-hidden="true">${rankAvatar(v, 32)}</span> <span class="ranking-name">${esc(v.alias)}</span>${you(v)}</td><td><b>${value(v)}</b></td></tr>`;
+  const player = (v, i) => `<tr class="${v.id === uid ? 'is-you' : ''}"><td><span class="ranking-place">${position(i)}</span></td><td><span aria-hidden="true">${rankAvatar(v, 32)}</span> <span class="ranking-name">${esc(v.alias)}</span>${you(v)}${v.id===uid?'':CT.Moderacion?.botonDenuncia(v.id,v.alias,'ranking',true)||''}</td><td><b>${value(v)}</b></td></tr>`;
   const podium = entries.slice(0, 3).map((v, i) => `<article class="ranking-medallion ranking-medallion-${i + 1}${v.id === uid ? ' is-you' : ''}"><span class="ranking-medal" aria-label="Puesto ${position(i)}">${['Ⅰ','Ⅱ','Ⅲ'][i]}</span><span class="ranking-avatar" aria-hidden="true">${rankAvatar(v, 46)}</span><b>${esc(v.alias)}</b>${you(v)}<strong>${value(v)}</strong><span>cartas</span></article>`).join('');
   const tabs = `<div class="ranking-tabs" role="group" aria-label="Tabla"><button type="button" class="btn btn-secondary" data-account-action="ranking-day" aria-pressed="false">Por días</button><button type="button" class="btn btn-secondary" data-account-action="ranking-week" aria-pressed="false">Por semanas</button><button type="button" class="btn btn-primary" data-account-action="ranking-discoveries" aria-pressed="true">Cartas</button></div>`;
   const sections = `<div class="ranking-tabs ranking-sections" role="group" aria-label="Sección">${Object.entries(FOUND_SECTIONS).map(([key, [, name]]) => `<button type="button" class="btn ${key === section ? 'btn-primary' : 'btn-secondary'}" data-account-action="ranking-found-${key}" aria-pressed="${key === section}">${esc(name)}</button>`).join('')}</div>`;
@@ -693,6 +728,13 @@ export async function startAccounts(callback) {
   window.addEventListener('online',()=>flush().catch(e=>{if(!failedConflict)syncNotice(message(e));}));
   document.addEventListener('visibilitychange',()=>{if(document.hidden)void flush().catch(()=>{});});
   window.addEventListener('beforeunload',event=>{if(metadata().dirty){event.preventDefault();event.returnValue='';}});
+  // El botón «Denunciar» de cualquier lista de nombres (moderacion.js). En captura: algunos botones viven
+  // dentro de filas que también reaccionan al toque.
+  document.addEventListener('click',event=>{
+    const button=event.target.closest?.('[data-report-uid]');if(!button)return;
+    event.preventDefault();event.stopPropagation();
+    reportDialog({uid:button.dataset.reportUid,alias:button.dataset.reportAlias,context:button.dataset.reportContext});
+  },true);
   document.addEventListener('click',event=>{
     const target=event.target.closest('[data-account-action]');if(!target)return;
     const action=target.dataset.accountAction;

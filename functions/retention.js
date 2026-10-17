@@ -12,6 +12,7 @@ const RETENTION = Object.freeze({
   roomCreation: 7 * DAY,
   duelNotificationEvents: 30 * DAY,
   duelReminderBudgets: 30 * DAY,
+  reports: 90 * DAY,          // denuncias de nombres (botón «Denunciar»)
   ranking: 90 * DAY,          // filas del ranking diario y semanal (la tabla enseña ocho semanas)
   anonymousAccounts: 365 * DAY // invitados sin vincular que llevan un año sin abrir el juego
 });
@@ -19,7 +20,7 @@ const RETENTION = Object.freeze({
 const ACTIVITY = Object.freeze({
   rooms: 'updatedAt', quickRooms: 'updatedAt', turnDuels: 'updatedAt', publicTables: 'updatedAt',
   publicQueues: 'updatedAt', quickPublicQueues: 'updatedAt', creationQuota: 'lastCreatedAt',
-  roomCreation: 'lastCreatedAt', duelNotificationEvents: 'claimedAt', duelReminderBudgets: 'lastSentAt'
+  roomCreation: 'lastCreatedAt', duelNotificationEvents: 'claimedAt', duelReminderBudgets: 'lastSentAt', reports: 'createdAt'
 });
 const cutoff = (collection, now) => new Date(now - RETENTION[collection]);
 // Las tablas del ranking van por fecha (`dailyScores/2026-10-09`, `weeklyScores/2026-10-05`): se

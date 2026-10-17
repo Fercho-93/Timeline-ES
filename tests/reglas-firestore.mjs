@@ -55,8 +55,15 @@ await check("el anfitrión crea la sala", "allow", createRoomForTest(ROOM,base()
 await check("crear sala con hostUid ajeno", "deny", setDoc(doc(ctx(P2), "rooms", "ZZZZ2345"), { ...base(), roomCode: "ZZZZ2345" }));
 await check("crear sala repartiéndose cartas", "deny", setDoc(doc(ctx(P2), "rooms", "YYYY2345"), { ...base(), roomCode: "YYYY2345", hostUid: P2, playerOrder: [P2], players: { [P2]: { name: "Bea", hand: [1, 2, 3], joinedAt: 1 } } }));
 
+// La ficha de quien entra solo lleva las claves que escribe el juego y con tope: antes admitía cualquier clave, de cualquier tamaño.
+await check("crear sala con una clave extra en la ficha", "deny", createRoomForTest("EXTR2345", { ...base(), roomCode: "EXTR2345", players: { [HOST]: { name: "Ana", hand: [], joinedAt: 1, basura: "x".repeat(2000) } } }));
+await check("crear sala con un avatar de 41 caracteres", "deny", createRoomForTest("AVAT2345", { ...base(), roomCode: "AVAT2345", players: { [HOST]: { name: "Ana", hand: [], joinedAt: 1, avatarId: "a".repeat(41) } } }));
 await seed(base());
 await check("un invitado entra en el vestíbulo", "allow", updateDoc(ref(ctx(P2)), { players: { ...base().players, [P2]: { name: "Bea", hand: [], joinedAt: 2 } }, playerOrder: [HOST, P2], version: 2, updatedAt: serverTimestamp() }));
+await seed(base());
+await check("entrar con una clave extra en la ficha", "deny", updateDoc(ref(ctx(P2)), { players: { ...base().players, [P2]: { name: "Bea", hand: [], joinedAt: 2, basura: "x".repeat(2000) } }, playerOrder: [HOST, P2], version: 2, updatedAt: serverTimestamp() }));
+await check("entrar con un avatar de 41 caracteres", "deny", updateDoc(ref(ctx(P2)), { players: { ...base().players, [P2]: { name: "Bea", hand: [], joinedAt: 2, avatarId: "a".repeat(41) } }, playerOrder: [HOST, P2], version: 2, updatedAt: serverTimestamp() }));
+await check("entrar con un avatar nulo (el juego lo escribe así sin avatar)", "allow", updateDoc(ref(ctx(P2)), { players: { ...base().players, [P2]: { name: "Bea", avatarId: null, hand: [], joinedAt: 2 } }, playerOrder: [HOST, P2], version: 2, updatedAt: serverTimestamp() }));
 await seed(base());
 await check("entrar con nombre de 30 caracteres", "deny", updateDoc(ref(ctx(P2)), { players: { ...base().players, [P2]: { name: "B".repeat(30), hand: [], joinedAt: 2 } }, playerOrder: [HOST, P2], version: 2, updatedAt: serverTimestamp() }));
 await check("entrar borrando al anfitrión", "deny", updateDoc(ref(ctx(P2)), { players: { [P2]: { name: "Bea", hand: [], joinedAt: 2 } }, playerOrder: [P2], version: 2, updatedAt: serverTimestamp() }));

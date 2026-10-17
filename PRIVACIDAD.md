@@ -1,6 +1,6 @@
 # Privacidad de Continuum
 
-Actualizada el 15 de octubre de 2026.
+Actualizada el 17 de octubre de 2026.
 
 Esta página explica qué datos trata Continuum, para qué, con quién se comparten, cuánto tiempo se guardan y cómo puedes decidir sobre ellos. Continuum no tiene publicidad, no usa analítica de terceros y no vende ni cede datos a nadie con fines comerciales.
 
@@ -38,7 +38,7 @@ Las salas con amigos, las mesas públicas, los Retos rápidos y los duelos por t
 - Si bloqueas a alguien, el juego guarda su alias en tu lista de bloqueados, que solo ves tú.
 - Internamente, el ranking, las salas y los duelos usan el identificador seudónimo de cada cuenta, que otra persona podría ver con herramientas técnicas. No revela quién eres, pero no equivale a anonimato absoluto.
 
-Evita poner información privada en los nombres. Para evitar abusos, el juego anota la hora de la última partida que creaste y limita las altas a una cada pocos segundos. **Base jurídica:** la prestación del servicio (art. 6.1.b del RGPD) y, para los límites contra el abuso, el interés legítimo en proteger el juego y su coste (art. 6.1.f).
+Evita poner información privada en los nombres. No se admiten nombres ofensivos ni que se hagan pasar por el juego o por quien lo gestiona. Junto al nombre de otras personas hay un botón «Denunciar»: al usarlo se guardan tu identificador seudónimo, el de la persona denunciada, su nombre, el motivo que eliges, dónde lo viste y la fecha. Solo las lee el responsable del proyecto para revisar el caso, y se borran a los **90 días**. **Base jurídica:** el interés legítimo en mantener un juego seguro (art. 6.1.f del RGPD). Para evitar abusos, el juego anota la hora de la última partida que creaste y limita las altas a una cada pocos segundos. **Base jurídica:** la prestación del servicio (art. 6.1.b del RGPD) y, para los límites contra el abuso, el interés legítimo en proteger el juego y su coste (art. 6.1.f).
 
 ## Partidas entre móviles cercanos
 
@@ -87,13 +87,14 @@ Google, Apple y GitHub pueden tratar datos en Estados Unidos u otros países fue
 - Las salas online, con su presencia y sus respuestas: **siete días** sin actividad.
 - Los duelos por turnos y las salas de Retos rápidos: **30 días** sin actividad (un duelo sin jugar caduca a los siete días).
 - Las mesas del tablón público y las colas de partida rápida: un día.
+- Las denuncias de nombres: **90 días**.
 - Los registros del límite de altas: siete días; los registros técnicos de los avisos: 30 días.
 
 Una tarea automática diaria aplica estos plazos. Los datos caducados se borran en la siguiente pasada.
 
 ## Borrar tu cuenta
 
-Desde el Atlas («Tu cuenta y tus datos») puedes eliminar tu invitado o tu cuenta: se borran tu perfil, tu alias, tu progreso, todas tus filas del ranking, tus listas de bloqueados y archivados, tus registros técnicos y la copia en este dispositivo. La acción pide confirmación y no se puede deshacer. Lo que compartiste con otras personas (tu nombre y tus jugadas en salas y duelos con ellas, o tu alias si alguien te bloqueó) se mantiene hasta que esas partidas caducan según los plazos de arriba. Desinstalar la app o borrar los datos del navegador no borra el invitado del servidor: se borra solo pasado un año sin uso, o antes si nos lo pides.
+Desde el Atlas («Tu cuenta y tus datos») puedes eliminar tu invitado o tu cuenta: se borran tu perfil, tu alias, tu progreso, todas tus filas del ranking, tus listas de bloqueados y archivados, tus registros técnicos y la copia en este dispositivo. La acción pide confirmación y no se puede deshacer. Lo que compartiste con otras personas (tu nombre y tus jugadas en salas y duelos con ellas, o tu alias si alguien te bloqueó) se mantiene hasta que esas partidas caducan, y las denuncias de nombres hasta cumplir sus 90 días según los plazos de arriba. Desinstalar la app o borrar los datos del navegador no borra el invitado del servidor: se borra solo pasado un año sin uso, o antes si nos lo pides.
 
 ## Tus derechos
 

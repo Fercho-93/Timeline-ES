@@ -95,10 +95,17 @@ actual es el candidato, sujeto a la elección del titular.
   del propio juego) y los resultados. No hay chat. Se puede bloquear a alguien en los duelos.
 - La política de privacidad y el soporte están en las URL de arriba.
 
-**Riesgo a valorar antes de enviar:** la guía 1.2 de Apple pide, en apps con contenido creado
-por usuarios, filtrar contenido inapropiado, poder denunciarlo y bloquear a quien abusa. Hoy
-el único contenido de este tipo son los alias; existe el bloqueo de retos, pero no un filtro de
-alias ni un botón de denuncia.
+**Moderación (guía 1.2 de Apple):** el único contenido creado por usuarios son los alias, y la
+app ya tiene las tres piezas que pide la guía: un filtro de nombres ofensivos y reservados
+(`moderacion.js`, también al cambiar de nombre), un botón «Denunciar» junto a los nombres ajenos
+(ranking, tablón y plazas de las mesas, rivales de los duelos) y el bloqueo de retos en los duelos.
+Las denuncias llegan a la colección `reports` y las revisa el responsable en la consola de Firebase
+(ver «Denuncias de nombres» en [CONFIGURAR_MULTIJUGADOR.md](../CONFIGURAR_MULTIJUGADOR.md)). Apple
+también espera un contacto publicado (el correo de soporte) y responder a las denuncias con rapidez:
+comprométete a revisarlas en un plazo razonable antes de enviar la app. Lo que no existe: bloqueo en
+las mesas públicas (solo en los duelos) y chat (no lo hay, así que no hace falta moderarlo).
+Notas para App Review: «Los nombres se filtran, se pueden denunciar desde cualquier lista y se
+bloquean los retos de quien abusa; las denuncias las revisa el equipo.»
 
 ## App Store: «Privacidad de la app»
 

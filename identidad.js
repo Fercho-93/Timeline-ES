@@ -22,7 +22,8 @@
     if (n.length > MAX) return `Como mucho ${MAX} caracteres.`;
     if (!/^[a-z0-9áéíóúüñ_-](?:[a-z0-9áéíóúüñ _-]*[a-z0-9áéíóúüñ_-])?$/i.test(n)) return "Usa letras, números, espacios, guion o guion bajo.";
     if (PUESTO_POR_EL_JUEGO.test(n)) return "Elige un nombre tuyo.";
-    return null;
+    // Lo ofensivo y lo reservado (moderacion.js): el nombre lo ven otras personas.
+    return CT.Moderacion?.problema(n) || null;
   }
 
   function leer() {

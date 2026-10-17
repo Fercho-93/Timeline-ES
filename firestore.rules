@@ -303,6 +303,8 @@ service cloud.firestore {
             && d.playersOrder[0] == r.playersOrder[0]
             && d.playersOrder[1] == request.auth.uid
             && d.players.diff(r.players).affectedKeys().hasOnly([request.auth.uid])
+            && d.players[request.auth.uid].keys().hasOnly(['alias'])
+            && d.players[request.auth.uid].alias is string && d.players[request.auth.uid].alias.size() <= 24
             && d.scores.diff(r.scores).affectedKeys().hasOnly([request.auth.uid])
             && d.scores[request.auth.uid] == 0
             && d.status == 'playing'
@@ -391,10 +393,17 @@ service cloud.firestore {
         && d.aliasKey == d.alias.lower()
         && getAfter(/databases/$(database)/documents/playerNames/$(d.aliasKey)).data.uid == uid;
     }
+    // Nombres que nadie puede reservar: los del propio juego y los de quien lo gestiona. Solo se
+    // comprueba al reservar uno nuevo, para no tocar a quien ya lo tenía. El filtro de palabras
+    // ofensivas vive en el cliente (moderacion.js): aquí solo hay lo que un cliente modificado no puede saltarse.
+    function reservedName(key) {
+      return key.matches('.*continuum.*')
+        || key in ['admin', 'administrador', 'administrator', 'moderador', 'moderator', 'mod', 'soporte', 'support', 'staff', 'oficial', 'official', 'sistema', 'system', 'root'];
+    }
     match /playerNames/{key} {
       allow get: if registered();
       allow list: if false;
-      allow create: if registered() && request.resource.data.keys().hasOnly(['uid'])
+      allow create: if registered() && !reservedName(key) && request.resource.data.keys().hasOnly(['uid'])
         && request.resource.data.uid == request.auth.uid
         && getAfter(/databases/$(database)/documents/playerProfiles/$(request.auth.uid)).data.aliasKey == key;
       allow update: if registered() && resource.data.uid == request.auth.uid && request.resource.data == resource.data;
@@ -420,12 +429,17 @@ service cloud.firestore {
           || !existsAfter(/databases/$(database)/documents/playerNames/$(resource.data.aliasKey)))
         && request.resource.data.alias is string
         && request.resource.data.alias.size() >= 2 && request.resource.data.alias.size() <= 24;
-      allow delete: if owner(uid);
+      // Borrar el perfil sin soltar el nombre dejaba el nombre reservado para siempre y permitía acaparar
+      // nombres con una sola cuenta: el nombre se borra en la misma operación (como hace el borrado de cuenta).
+      allow delete: if owner(uid)
+        && (!('aliasKey' in resource.data)
+          || !existsAfter(/databases/$(database)/documents/playerNames/$(resource.data.aliasKey))
+          || getAfter(/databases/$(database)/documents/playerNames/$(resource.data.aliasKey)).data.uid != uid);
       match /pushTokens/{tokenId} {
         allow get, list: if owner(uid);
         allow create, update: if owner(uid)
           && request.resource.data.keys().hasOnly(['token','platform','updatedAt'])
-          && request.resource.data.token is string && request.resource.data.token.size() > 10
+          && request.resource.data.token is string && request.resource.data.token.size() > 10 && request.resource.data.token.size() <= 4096
           && request.resource.data.platform in ['android','ios']
           && request.resource.data.updatedAt == request.time;
         allow delete: if owner(uid);
@@ -547,6 +561,22 @@ service cloud.firestore {
     match /capabilities/multiCompetition {
       allow get: if registered();
       allow write, list: if false;
+    }
+    // Denuncias de nombres (botón «Denunciar»): cualquiera con sesión puede escribir una, una sola por
+    // pareja denunciante-denunciado, y nadie puede leerlas desde el juego: las lee quien administra el
+    // proyecto en la consola de Firebase (ver CONFIGURAR_MULTIJUGADOR.md). Se borran a los 90 días.
+    match /reports/{reportId} {
+      allow create: if registered()
+        && request.resource.data.keys().hasOnly(['reporter', 'target', 'targetAlias', 'reason', 'context', 'createdAt'])
+        && request.resource.data.reporter == request.auth.uid
+        && request.resource.data.target is string && request.resource.data.target.size() > 0 && request.resource.data.target.size() <= 128
+        && request.resource.data.target != request.auth.uid
+        && reportId == request.auth.uid + '_' + request.resource.data.target
+        && request.resource.data.targetAlias is string && request.resource.data.targetAlias.size() <= 24
+        && request.resource.data.reason in ['nombre-ofensivo', 'suplantacion', 'otro']
+        && request.resource.data.context in ['ranking', 'mesa', 'duelo', 'sala']
+        && request.resource.data.createdAt == request.time;
+      allow read, update, delete: if false;
     }
     // Cartel remoto (versión mínima de la app y pausa del online): lo escribe solo quien administra el
     // proyecto desde la consola; los clientes únicamente lo leen (ver app-config.js).
@@ -1016,6 +1046,10 @@ service cloud.firestore {
           && request.resource.data.players.diff(resource.data.players).affectedKeys().hasOnly([request.auth.uid])
           && validName(request.resource.data.players[request.auth.uid].name)
           && request.resource.data.players[request.auth.uid].hand.size() == 0
+          // Solo las claves que escribe el juego y con tope: antes la ficha admitía cualquier clave, de cualquier tamaño.
+          && request.resource.data.players[request.auth.uid].keys().hasOnly(['name', 'avatarId', 'hand', 'joinedAt', 'clientVersion'])
+          && (request.resource.data.players[request.auth.uid].get('avatarId', null) == null
+            || (request.resource.data.players[request.auth.uid].avatarId is string && request.resource.data.players[request.auth.uid].avatarId.size() <= 40))
           && bumped();
       }
 
@@ -1586,6 +1620,9 @@ service cloud.firestore {
         && request.resource.data.players.size() == 1
         && request.resource.data.get('turnSeconds', 20) in [0, 15, 20, 30, 45]
         && validName(request.resource.data.players[request.auth.uid].name)
+        && request.resource.data.players[request.auth.uid].keys().hasOnly(['name', 'avatarId', 'hand', 'joinedAt', 'clientVersion'])
+        && (request.resource.data.players[request.auth.uid].get('avatarId', null) == null
+          || (request.resource.data.players[request.auth.uid].avatarId is string && request.resource.data.players[request.auth.uid].avatarId.size() <= 40))
         && request.resource.data.players[request.auth.uid].hand.size() == 0
         && request.resource.data.deck.size() == 0
         && request.resource.data.timeline.size() == 0

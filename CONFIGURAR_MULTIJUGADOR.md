@@ -105,6 +105,32 @@ compatibilidad de las reglas con clientes anteriores (`tests/compatibilidad-vers
 salida de emergencia para cuando algo se rompe de todos modos. Lo prueban `tests/config-remota.mjs` y
 `tests/config-remota-reglas.mjs`.
 
+## Denuncias de nombres
+
+Junto al nombre de otra persona (ranking, tablón y plazas de las mesas, rivales de los duelos) hay un
+botón «Denunciar». Escribe un documento en la colección `reports`, que **ningún jugador puede leer**:
+se mira en la consola de Firebase → Firestore Database → Datos → `reports` (ordena por `createdAt`).
+Cada documento se llama `{denunciante}_{denunciado}` y lleva:
+
+| Campo | Qué es |
+| --- | --- |
+| `target` | El identificador (UID) de la persona denunciada |
+| `targetAlias` | Su nombre cuando se denunció |
+| `reason` | `nombre-ofensivo`, `suplantacion` u `otro` |
+| `context` | Dónde se vio: `ranking`, `mesa`, `duelo` o `sala` |
+| `reporter` | El identificador de quien denuncia |
+| `createdAt` | Cuándo |
+
+Una persona solo puede denunciar a otra una vez. La limpieza diaria (`purgeExpiredData`) las borra a los
+90 días, como dice la política de privacidad; **esa función se publica a mano** (ver «Cloud Functions»
+arriba): hasta publicarla con este cambio, las denuncias no caducan.
+
+Qué hacer con una denuncia (a mano, sin herramienta propia todavía): en Authentication busca el UID de
+`target` y pulsa «Inhabilitar cuenta» para que no pueda volver a entrar; en Firestore, `playerProfiles/{UID}`
+tiene su nombre (`alias`, `aliasKey`) y `playerNames/{aliasKey}` lo reserva. Borrar el nombre de
+`playerNames` lo libera para otra persona. Apple espera que respondas con rapidez: conviene mirar
+`reports` cada pocos días mientras haya jugadores.
+
 ## Qué validan las reglas
 
 Cada escritura en una sala entra por una sola rama de las reglas, según lo que intente cambiar:

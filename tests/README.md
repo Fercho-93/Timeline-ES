@@ -134,6 +134,8 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `reglas-firestore.mjs` | reglas | Quién puede escribir en una sala y qué: entrar, empezar, colocar, saltar, expulsar y trampas. |
 | `result-preview.mjs` | test | La pantalla de resultado: acierto, corrección del fallo, foco y movimiento reducido. |
 | `push-apagado.mjs` | test | Los avisos push del móvil siguen apagados (`deployment.nativePush`): sin él, `push.start()` no pide permiso ni llama a `register()`. |
+| `moderacion.mjs` | test | El filtro de nombres (ofensivos y reservados bloqueados, nombres normales intactos) y el botón de denuncia. |
+| `moderacion-reglas.mjs` | reglas | Nombres reservados, el nombre se libera al borrar el perfil, denuncias de solo escritura y topes de tamaño. |
 | `retencion.mjs` | test | Los plazos de `functions/retention.js` coinciden con la política, y `PRIVACIDAD.md` y `privacidad.html` tienen las mismas secciones. |
 | `revancha-local.mjs` | test | La revancha en un solo móvil recupera la mesa anterior. |
 | `reverso-mano.mjs` | test | La mano enseña el reverso de la colección en todos los modos. |

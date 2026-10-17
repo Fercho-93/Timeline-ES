@@ -276,4 +276,54 @@ assert.doesNotMatch(read('online.js'),/signInAnonymously/);
  assert.equal(w.document.querySelector('[data-account-action="ranking-day"]').getAttribute('aria-pressed'),'true');
  dom.window.close();
 }
+{
+ // Moderación: el nombre elegido pasa por el filtro, y el botón «Denunciar» abre un diálogo que escribe una
+ // denuncia por pareja (las reglas impiden repetirla: «sin permiso» significa «ya la enviaste»).
+ const {w,dom,data}=setup(user('a'),{'playerProfiles/a':{...profile,aliasKey:'fer'},'playerNames/fer':{uid:'a'}});
+ w.eval(read('moderacion.js'));
+ await w.testAccounts.startAccounts(()=>{});
+ for(const malo of ['Gilipollas','Admin','Continuum oficial']){
+  w.testAccounts.editNameScreen();w.document.getElementById('account-alias').value=malo;
+  await assert.rejects(w.testAccounts.rename(),/reservado|no está permitido/,`el nombre «${malo}» se rechaza`);
+  w.CONTINUUM.closeDialog?.();
+ }
+ assert.equal(data.get('playerProfiles/a').alias,'Fer','un nombre rechazado no cambia el perfil');
+ const escrituras=[];let fallo=null;
+ w.writeBatch=()=>({set:(key,value)=>escrituras.push([key,value]),delete(){},commit:async()=>{if(fallo)throw fallo;}});
+ const app=w.document.getElementById('app');
+ app.insertAdjacentHTML('beforeend','<div id="lista">'+w.CONTINUUM.Moderacion.botonDenuncia('b','Bea','ranking',true)+'</div>');
+ const boton=()=>w.document.querySelector('#lista [data-report-uid]');
+ assert.equal(boton().getAttribute('aria-label'),'Denunciar a Bea');
+ boton().click();
+ assert.ok(w.document.querySelector('[data-overlay="report"]'),'el botón abre el diálogo de denuncia');
+ assert.match(w.document.querySelector('#report-title').textContent,/Denunciar a Bea/);
+ assert.equal(w.document.querySelectorAll('input[name="report-reason"]').length,3);
+ w.document.querySelector('input[name="report-reason"][value="suplantacion"]').click();
+ w.document.getElementById('report-send').click();
+ await new Promise(r=>setTimeout(r,0));
+ assert.equal(escrituras.length,1);
+ const [clave,denuncia]=escrituras[0];
+ assert.equal(clave,'reports/a_b','una sola denuncia por pareja: denunciante_denunciado');
+ assert.deepEqual({...denuncia,createdAt:undefined},{reporter:'a',target:'b',targetAlias:'Bea',reason:'suplantacion',context:'ranking',createdAt:undefined});
+ assert.match(w.document.getElementById('report-message').textContent,/Gracias/);
+ assert.equal(w.document.getElementById('report-send').hidden,true,'tras enviarla no se repite desde el mismo diálogo');
+ w.CONTINUUM.closeDialog?.();
+ // Ya denunciada: las reglas la rechazan y el juego lo explica sin alarmar.
+ fallo=Object.assign(Error('denegado'),{code:'permission-denied'});
+ boton().click();w.document.getElementById('report-send').click();await new Promise(r=>setTimeout(r,0));
+ assert.match(w.document.getElementById('report-message').textContent,/Ya habías denunciado/);
+ w.CONTINUUM.closeDialog?.();
+ // Sin red: se puede reintentar.
+ fallo=Object.assign(Error('sin red'),{code:'unavailable'});
+ boton().click();w.document.getElementById('report-send').click();await new Promise(r=>setTimeout(r,0));
+ assert.match(w.document.getElementById('report-message').textContent,/No se ha podido enviar/);
+ assert.equal(w.document.getElementById('report-send').disabled,false,'tras un fallo de red se puede volver a intentar');
+ w.CONTINUUM.closeDialog?.();
+ // Uno mismo no se denuncia.
+ const antes=w.document.querySelectorAll('[data-overlay="report"]').length;
+ app.insertAdjacentHTML('beforeend','<div id="yo">'+w.CONTINUUM.Moderacion.botonDenuncia('a','Fer','ranking')+'</div>');
+ w.document.querySelector('#yo [data-report-uid]').click();
+ assert.equal(w.document.querySelectorAll('[data-overlay="report"]').length,antes,'no se puede denunciar a uno mismo');
+ dom.window.close();
+}
 console.log('Invitados: alta automática, reentrada, error de conexión, cambio de nombre, ranking, aislamiento y conflictos correctos.');

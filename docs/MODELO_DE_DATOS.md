@@ -52,6 +52,7 @@ Lo que borra la eliminación de una cuenta está en
 | --- | --- | --- | --- | --- |
 | `creationQuota/{uid}` | Última partida online creada (duelo, sala de Retos o mesa pública): una cada 10 s | Su dueño | Su dueño, en la misma operación que crea la partida | 7 días; con la cuenta |
 | `roomCreation/{uid}` | Última sala privada creada: una cada 30 s | Su dueño | Su dueño, igual | 7 días; con la cuenta |
+| `reports/{denunciante}_{denunciado}` | Denuncia de un nombre: denunciante, denunciado, su nombre, motivo, dónde se vio y fecha | Nadie desde el juego: solo la consola de Firebase | Quien denuncia, una vez por pareja | 90 días (limpieza diaria) |
 | `appConfig/current` | Cartel remoto: `minBuild`, `onlineEnabled`, `message`, `updateUrl` (ver «Cartel remoto» en CONFIGURAR_MULTIJUGADOR.md). Sin datos personales | Con sesión | Nadie desde el juego: solo la consola de Firebase | — |
 | `capabilities/secretFinal`, `capabilities/multiCompetition` | Lectura de prueba: si las reglas publicadas la permiten, el cliente sabe que admiten la final privada y la competición. El documento no existe | Con sesión | Nadie | — |
 

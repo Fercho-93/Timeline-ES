@@ -178,7 +178,7 @@
       return `<li class="public-table">
         <span class="public-table-avatar">${avatar}</span>
         <span class="public-table-copy"><b>${escapeHtml(game)}</b><small>Mesa de ${escapeHtml(host)} · ${t.kind === 'quick' && t.length ? `${t.length} ${t.length === 1 ? 'reto' : 'retos'} · ` : t.kind !== 'quick' && t.handSize ? `${t.handSize} ${t.handSize === 1 ? 'carta' : 'cartas'} · ` : ''}${tableTime(t.seconds)}</small>
-          <span class="public-table-seats" aria-label="${t.players} de ${t.capacity} plazas ocupadas">${seats}<em>${t.players}/${t.capacity}</em></span></span>
+          <span class="public-table-seats" aria-label="${t.players} de ${t.capacity} plazas ocupadas">${seats}<em>${t.players}/${t.capacity}</em></span>${t.hostUid && t.hostUid !== CT.Accounts?.user?.uid ? CT.Moderacion?.botonDenuncia(t.hostUid, host, 'mesa') || '' : ''}</span>
         <button type="button" class="btn btn-primary public-table-join" data-action="public-join" data-code="${escapeHtml(t.code)}" data-kind="${t.kind === 'quick' ? 'quick' : 'collections'}" data-capacity="${t.capacity}" aria-label="Unirme a la mesa de ${escapeHtml(host)} · ${escapeHtml(game)}">Unirme</button>
       </li>`;
     }).join('');
