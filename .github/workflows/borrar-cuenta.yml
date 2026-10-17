@@ -1,0 +1,59 @@
+name: Borrar cuenta de un jugador
+
+# Borrado manual por moderación o a petición de la persona (por correo, tras comprobar que la cuenta es
+# suya). Hace lo mismo que el botón de Ajustes: datos, filas del ranking, nombre y acceso. Solo se lanza a
+# mano: pestaña Actions -> «Borrar cuenta de un jugador» -> «Run workflow», también desde el móvil.
+#
+# Usa la misma credencial que las reglas y las Functions (FIREBASE_SERVICE_ACCOUNT). No hay vuelta atrás.
+on:
+  workflow_dispatch:
+    inputs:
+      jugador:
+        description: Nombre del jugador (como sale en el ranking o en la denuncia) o su identificador
+        required: true
+        type: string
+      motivo:
+        description: Motivo (queda anotado en el registro de la ejecución)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: borrar-cuenta
+  cancel-in-progress: false
+
+jobs:
+  borrar:
+    name: Borrar la cuenta
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Instalar las dependencias de las Functions
+        run: npm ci --prefix functions --no-audit --no-fund
+      - name: Escribir la credencial
+        env:
+          CUENTA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$CUENTA" ]; then
+            echo "Falta el secreto FIREBASE_SERVICE_ACCOUNT del repositorio." >&2
+            exit 1
+          fi
+          printf '%s' "$CUENTA" > "$RUNNER_TEMP/cuenta.json"
+      - name: Borrar la cuenta
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/cuenta.json
+          JUGADOR: ${{ inputs.jugador }}
+          MOTIVO: ${{ inputs.motivo }}
+        # Los datos escritos por quien lanza el flujo van por variables de entorno, nunca pegados en el
+        # comando: así un nombre con comillas o símbolos no se interpreta como código.
+        run: |
+          echo "Motivo: $MOTIVO"
+          node scripts/borrar-cuenta.mjs "$JUGADOR"
+      - name: Borrar la credencial
+        if: always()
+        run: rm -f "$RUNNER_TEMP/cuenta.json"

@@ -44,8 +44,9 @@ dispositivo.
   (el documento no necesita existir) detectan si las reglas publicadas admiten la final privada y
   la competición multijugador; sin ellas, el cliente avisa antes de empezar en vez de fallar a
   mitad de partida.
-- **Borrado y limpieza.** Borrado completo de la cuenta desde el juego y limpieza diaria de lo
-  caducado (`purgeExpiredData`).
+- **Borrado y limpieza.** Borrado completo de la cuenta desde el juego (lo hace el servidor con
+  `deleteMyAccount`, y el móvil si el servidor no responde), borrado manual por el titular (workflow
+  «Borrar cuenta de un jugador») y limpieza diaria de lo caducado (`purgeExpiredData`).
 
 ## App Check
 

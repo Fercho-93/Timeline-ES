@@ -34,7 +34,9 @@ externa o una decisión del titular. Las listas de comprobación de la beta est�
 - **Iniciar sesión con Apple** en iPhone, con vinculación del invitado, cierre de sesión y
   borrado de cuenta con revocación del acceso.
 - **Borrado de cuenta** desde el Atlas: perfil, alias, progreso, ranking, bloqueados,
-  archivados, avisos y registros de cuota (`purgeServerData` en `accounts.js`).
+  archivados, avisos y registros de cuota. Lo hace el servidor (`deleteMyAccount`, con las filas de ranking de
+  todos los días y el acceso) y, si no responde, el móvil (`purgeServerData` en `accounts.js`). El titular puede
+  borrar a cualquiera con el workflow «Borrar cuenta de un jugador».
 - **Limpieza diaria** de datos caducados (`purgeExpiredData`, plazos en `functions/retention.js`,
   ver [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#conservación-y-limpieza-de-datos)).
 - **App Check** en la web (reCAPTCHA Enterprise) y en iPhone (App Attest). El *enforcement* aún

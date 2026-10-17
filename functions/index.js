@@ -1,13 +1,16 @@
 // Tareas automáticas en la nube (Cloud Functions): avisos de duelos al móvil, mantenimiento de duelos
-// caducados y la limpieza diaria de datos caducados (purgeExpiredData). Se publican a mano.
+// caducados, el borrado de cuenta (deleteMyAccount) y la limpieza diaria de datos caducados
+// (purgeExpiredData). Se publican a mano.
 const { initializeApp } = require('firebase-admin/app');
 const { getFirestore, FieldValue, FieldPath } = require('firebase-admin/firestore');
 const { getMessaging } = require('firebase-admin/messaging');
 const { onDocumentUpdated, onDocumentCreated } = require('firebase-functions/v2/firestore');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
+const { onCall, HttpsError } = require('firebase-functions/v2/https');
 const { DAY, millis, lifecycle, movementMessage } = require('./duel-policy');
 const { getAuth } = require('firebase-admin/auth');
 const { ACTIVITY, cutoff, expiredRankingKey, staleAnonymous } = require('./retention');
+const { deleteAccount } = require('./account-purge');
 
 initializeApp();
 
@@ -121,16 +124,6 @@ async function purgeRanking(collection, now) {
   }
   return removed;
 }
-// Todo lo que pertenece a una cuenta, como al borrarla desde el juego.
-async function purgeAccount(uid) {
-  const aliasKey = (await db.doc(`playerProfiles/${uid}`).get()).data()?.aliasKey;
-  for (const path of [`playerProfiles/${uid}`, `playerProgress/${uid}`, `socialRanking/${uid}`, `dailyRanking/${uid}`, `discoveryScores/${uid}`,
-    `duelPreferences/${uid}`, `creationQuota/${uid}`, `roomCreation/${uid}`, `duelReminderBudgets/${uid}`]) await db.recursiveDelete(db.doc(path));
-  if (aliasKey) {
-    const name = db.doc(`playerNames/${aliasKey}`);
-    if ((await name.get()).data()?.uid === uid) await name.delete();
-  }
-}
 // Invitados anónimos que llevan un año sin abrir el juego: nadie puede volver a entrar en ellos.
 async function purgeStaleGuests(now, limit = 500) {
   let token, removed = 0;
@@ -139,14 +132,22 @@ async function purgeStaleGuests(now, limit = 500) {
     for (const user of page.users) {
       if (removed >= limit) return removed;
       if (!staleAnonymous(user, now)) continue;
-      await purgeAccount(user.uid);
-      await getAuth().deleteUser(user.uid);
+      await deleteAccount(db, getAuth(), user.uid);
       removed++;
     }
     token = page.pageToken;
   } while (token);
   return removed;
 }
+// Borrado de la cuenta de quien llama, desde Ajustes. Borra todo lo que el servidor guarda de ella y su
+// acceso. Solo actúa sobre la cuenta autenticada: no recibe ningún identificador.
+exports.deleteMyAccount = onCall({ timeoutSeconds: 120, maxInstances: 10 }, async request => {
+  const uid = request.auth?.uid;
+  if (!uid) throw new HttpsError('unauthenticated', 'Hay que iniciar sesión.');
+  try { await deleteAccount(db, getAuth(), uid); }
+  catch (error) { console.warn('Account deletion failed', error.code || error.message); throw new HttpsError('internal', 'No se pudo borrar la cuenta.'); }
+  return { deleted: true };
+});
 exports.purgeExpiredData = onSchedule({ schedule: 'every day 04:17', timeZone: 'Europe/Madrid', timeoutSeconds: 540, maxInstances: 1 }, async () => {
   const now = Date.now(), summary = {};
   for (const name of Object.keys(ACTIVITY)) {

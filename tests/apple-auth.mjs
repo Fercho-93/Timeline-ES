@@ -14,7 +14,7 @@ function setup({enabled = true, ios = true, apple = false} = {}) {
   data.set('playerProfiles/guest',{alias:'Player 1234',avatar:'compass',season:'launch-1',privacyVersion:1});
   w.Capacitor = {isNativePlatform:()=>ios,getPlatform:()=>ios?'ios':'web',Plugins:{AppleSignIn:{availability:async()=>({enabled}),authorize:async()=>{calls.authorize++;return {idToken:'apple-token',rawNonce:'random-request-nonce',authorizationCode:'codigo-apple'};}}}};
   const snap = key => ({exists:()=>data.has(key),data:()=>data.get(key)});
-  Object.assign(w,{auth,db:{},appleReloads:0,browserLocalPersistence:{},setPersistence:async()=>{},signInAnonymously:async()=>({user:u}),onAuthStateChanged:(_,fn)=>{listener=fn;},doc:(_,...parts)=>parts.join('/'),getDocFromServer:async key=>snap(key),serverTimestamp:()=>123,
+  Object.assign(w,{auth,db:{},firebaseApp:{id:'app'},appleReloads:0,browserLocalPersistence:{},setPersistence:async()=>{},signInAnonymously:async()=>({user:u}),onAuthStateChanged:(_,fn)=>{listener=fn;},doc:(_,...parts)=>parts.join('/'),getDocFromServer:async key=>snap(key),serverTimestamp:()=>123,
     runTransaction:async(_,fn)=>fn({get:async key=>snap(key),set:(key,value)=>data.set(key,value),delete:key=>data.delete(key)}),
     OAuthProvider:class {constructor(id){assert.equal(id,'apple.com');}credential(value){assert.equal(value.rawNonce,'random-request-nonce');return value;}static credentialFromError(error){return error.credential||null;}},
     linkWithCredential:async(user,credential)=>{calls.link++;assert.equal(credential.idToken,'apple-token');user.providerData=[{providerId:'apple.com'}];user.isAnonymous=false;listener?.(user);return {user};},
@@ -26,7 +26,7 @@ function setup({enabled = true, ios = true, apple = false} = {}) {
     writeBatch:()=>({set(){},delete(){},update(){},commit:async()=>{calls.batch++;}})
   });
   const source=read('accounts.js').replace(/^import .*;\n/gm,'').replace('export async function startAccounts','async function startAccounts').replaceAll('location.reload()','window.appleReloads++');
-  w.eval(source+'\nwindow.appleTest={startAccounts,signInApple,signOutApple,deleteScreen,removeAccount};');
+  w.eval(source+'\nwindow.appleTest={startAccounts,signInApple,signOutApple,deleteScreen,removeAccount,setLoader:f=>{loadFunctions=f;}};');
   return {w,dom,data,auth,calls};
 }
 // Al vincular una cuenta que ya tenía progreso, el juego pregunta cuál conservar.
@@ -104,6 +104,23 @@ async function conEleccion(w, choice) {
   w.appleTest.deleteScreen();assert.match(w.document.body.textContent+w.document.getElementById('app').textContent,/Apple te pedirá confirmar/);
   await w.appleTest.removeAccount();
   assert.equal(calls.authorize,1);assert.equal(calls.reauth,1);assert.deepEqual(calls.revoke,['codigo-apple']);
+  assert.equal(calls.batch,1);assert.equal(calls.deleted,1);dom.window.close();
+}
+{
+  // Con la función del servidor disponible, ella borra datos y acceso: el móvil solo cierra la sesión.
+  const {w,dom,calls}=setup({apple:true});await w.appleTest.startAccounts(()=>{});
+  const served=[];
+  w.appleTest.setLoader(async()=>({getFunctions:app=>{assert.equal(app.id,'app');return 'functions';},httpsCallable:(functions,name)=>async()=>{served.push([functions,name]);return {data:{deleted:true}};}}));
+  await w.appleTest.removeAccount();
+  assert.deepEqual(served,[['functions','deleteMyAccount']]);
+  assert.deepEqual(calls.revoke,['codigo-apple'],'Apple se revoca antes, en el móvil');
+  assert.equal(calls.batch,0);assert.equal(calls.deleted,0);assert.equal(calls.logout,1);dom.window.close();
+}
+{
+  // Si la función no está disponible (sin publicar, sin red), se borra desde el móvil como siempre.
+  const {w,dom,calls}=setup({apple:true});await w.appleTest.startAccounts(()=>{});
+  w.appleTest.setLoader(async()=>({getFunctions:()=>'f',httpsCallable:()=>async()=>{throw Object.assign(Error('not-found'),{code:'functions/not-found'});}}));
+  await w.appleTest.removeAccount();
   assert.equal(calls.batch,1);assert.equal(calls.deleted,1);dom.window.close();
 }
 {

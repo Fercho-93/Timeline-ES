@@ -50,7 +50,7 @@ Como se publica en producción al momento, antes de subir un cambio de reglas:
 
 ### Cloud Functions
 
-Las Functions (`functions/index.js`) son cinco:
+Las Functions (`functions/index.js`) son seis:
 
 | Función | Disparo | Qué hace |
 | --- | --- | --- |
@@ -58,6 +58,7 @@ Las Functions (`functions/index.js`) son cinco:
 | `notifyQuickDuel` | Al actualizarse un `quickRooms/{code}` de un duelo de Retos rápidos | Avisa a quien le toca o del final |
 | `notifyDuelInvitation` | Al crearse un `turnDuels/{id}` con invitado | Avisa del reto, salvo bloqueo |
 | `maintainTurnDuels` | Cada 60 minutos (Europe/Madrid) | Recordatorio a las 48 h sin jugar y caducidad a los 7 días |
+| `deleteMyAccount` | Al pulsar «Eliminar» en el Atlas (llamada del juego) | Borra todo lo que el servidor guarda de la cuenta de quien llama —datos, filas de ranking de todos los días y semanas, nombre— y su acceso (`functions/account-purge.js`) |
 | `purgeExpiredData` | Cada día a las 04:17 (Europe/Madrid) | Limpieza según `functions/retention.js` |
 
 Se publican solo a mano, con el workflow **Publicar Cloud Functions**: GitHub → Actions →
@@ -125,11 +126,27 @@ Una persona solo puede denunciar a otra una vez. La limpieza diaria (`purgeExpir
 90 días, como dice la política de privacidad; **esa función se publica a mano** (ver «Cloud Functions»
 arriba): hasta publicarla con este cambio, las denuncias no caducan.
 
-Qué hacer con una denuncia (a mano, sin herramienta propia todavía): en Authentication busca el UID de
-`target` y pulsa «Inhabilitar cuenta» para que no pueda volver a entrar; en Firestore, `playerProfiles/{UID}`
-tiene su nombre (`alias`, `aliasKey`) y `playerNames/{aliasKey}` lo reserva. Borrar el nombre de
-`playerNames` lo libera para otra persona. Apple espera que respondas con rapidez: conviene mirar
+Qué hacer con una denuncia: en Authentication busca el UID de `target` y pulsa «Inhabilitar cuenta» para que
+no pueda volver a entrar, o bórrala del todo con el workflow **Borrar cuenta de un jugador** (ver abajo);
+en Firestore, `playerProfiles/{UID}` tiene su nombre (`alias`, `aliasKey`). Apple espera que respondas con rapidez: conviene mirar
 `reports` cada pocos días mientras haya jugadores.
+
+### Borrar la cuenta de un jugador
+
+Dos caminos, que borran lo mismo (`functions/account-purge.js`):
+
+- **El propio jugador**, desde el Atlas → «Tu cuenta y tus datos» → «Eliminar». El móvil llama a la función
+  `deleteMyAccount`; si no está publicada o no responde, borra desde el móvil como hacían las versiones
+  anteriores. Por eso **la función hay que publicarla a mano** (workflow «Publicar Cloud Functions»): hasta
+  entonces el borrado sigue funcionando por el camino antiguo.
+- **El titular**, por moderación o porque alguien lo pide por correo: GitHub → Actions → **Borrar cuenta de un
+  jugador** → «Run workflow», con el nombre del jugador (o su UID) y el motivo. Antes de borrar por petición de
+  correo, comprueba que quien escribe es la persona de la cuenta (por ejemplo, que pueda decir su nombre en el
+  juego y cambiarlo por otro que le indiques). Usa la misma credencial que el resto
+  (`FIREBASE_SERVICE_ACCOUNT`); no hay vuelta atrás.
+
+Lo que no se borra al momento, por ser compartido con otras personas (salas, duelos, retos rápidos, denuncias), caduca
+según los plazos de conservación.
 
 ## Qué validan las reglas
 

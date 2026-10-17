@@ -163,6 +163,7 @@ Cada archivo es una lista de cartas con su título, su explicación, el valor qu
 | `audit-licenses.mjs` | Lista las licencias de las herramientas instaladas. |
 | `licencias.mjs` | Genera `licencias.html`. |
 | `icons.mjs` | Genera los iconos y pantallas de carga de iPhone y Android en todos los tamaños. |
+| `borrar-cuenta.mjs` | Borra la cuenta de un jugador entera; lo lanza el workflow «Borrar cuenta de un jugador». |
 | `domain-associations.mjs` | Genera los archivos que permiten abrir los enlaces del juego directamente en la app. |
 | `render-intro.mjs` | Graba el vídeo promocional de la intro. |
 
@@ -170,7 +171,8 @@ Cada archivo es una lista de cartas con su título, su explicación, el valor qu
 
 | Archivo | Qué hace |
 | --- | --- |
-| `index.js` | Las tareas: avisos de duelos, mantenimiento de duelos caducados y `purgeExpiredData`, la limpieza diaria de las 04:17. |
+| `index.js` | Las tareas: avisos de duelos, mantenimiento de duelos caducados, `deleteMyAccount` (borrado de cuenta) y `purgeExpiredData`, la limpieza diaria de las 04:17. |
+| `account-purge.js` | Todo lo que se borra al eliminar una cuenta. Lo usan la función de borrado, la limpieza de invitados y el borrado manual. |
 | `retention.js` | Cuánto tiempo se guarda cada tipo de dato. Debe coincidir con la política de privacidad. |
 | `duel-policy.js` | Cuándo se manda un recordatorio de duelo y con qué texto. |
 
@@ -206,6 +208,7 @@ que en iPhone) y `res/` (iconos, pantallas de carga y textos).
 | `zoom-visual.yml` («Pruebas en navegador») | Al cambiar la interfaz | Abre el juego en navegadores de verdad y prueba pantallas pequeñas, zoom, duelos y partidas online. |
 | `reglas-firestore.yml` | Al cambiar `firestore.rules` | Prueba las reglas y **las publica en producción**. |
 | `functions.yml` | Solo a mano | Publica las Cloud Functions. |
+| `borrar-cuenta.yml` | Solo a mano | Borra la cuenta de un jugador (moderación o petición por correo). |
 | `beta-firmada.yml` | Al cambiar `.github/beta-request.json` | Compila la app firmada y la sube a TestFlight. Solo cuando lo pida el titular. |
 
 ## Documentación

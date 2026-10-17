@@ -1,6 +1,6 @@
 // Cuentas del jugador: crea el invitado automático, permite entrar con Apple, sincroniza el progreso con
 // la nube, gestiona el ranking opcional y borra la cuenta con todos sus datos cuando se pide.
-import { auth, db } from './firebase-client.js';
+import { auth, db, firebaseApp } from './firebase-client.js';
 import { signInAnonymously, setPersistence, browserLocalPersistence, deleteUser, onAuthStateChanged, OAuthProvider, linkWithCredential, signInWithCredential, reauthenticateWithCredential, revokeAccessToken, signOut } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
 import { doc, getDocFromServer, runTransaction, serverTimestamp, writeBatch, collection, query, orderBy, limit, getDocsFromServer } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
 
@@ -691,6 +691,17 @@ function deleteScreen() {
   if (CT.isSessionActive?.()) throw Error('Sal de la partida antes de eliminar ' + (apple ? 'tu cuenta' : 'el invitado') + '.');
   accountDialog(`<div class="overlay"><section class="modal"><h2>${apple ? 'Eliminar cuenta y progreso' : 'Eliminar invitado y progreso'}</h2><p>Se borrarán tu perfil, progreso y entrada en el ranking. Esta acción no se puede deshacer. Al volver a entrar se creará un invitado nuevo desde cero.</p>${apple ? '<p>Apple te pedirá confirmar que eres tú y el juego dejará de tener acceso a tu cuenta de Apple.</p>' : ''}<button class="btn btn-ghost" data-account-action="delete-confirm">Eliminar definitivamente</button><button class="btn btn-primary" data-account-action="close">Cancelar</button><p id="account-delete-message" role="status"></p></section></div>`,true);
 }
+// Carga perezosa: si la librería no llega, el borrado sigue por el camino de siempre.
+let loadFunctions = () => import('https://www.gstatic.com/firebasejs/12.15.0/firebase-functions.js');
+// Pide a la función `deleteMyAccount` que borre todo lo de esta cuenta en el servidor, incluido el acceso.
+// Devuelve false si no se pudo (la función no está publicada, sin red, error del servidor).
+async function deleteOnServer() {
+  try {
+    const { getFunctions, httpsCallable } = await loadFunctions();
+    await httpsCallable(getFunctions(firebaseApp), 'deleteMyAccount')();
+    return true;
+  } catch (error) { console.warn('El borrado en el servidor no está disponible', error?.code || error?.message); return false; }
+}
 async function removeAccount() {
   const u=auth.currentUser, wasApple=appleUser(u);
   if (wasApple) {
@@ -702,9 +713,16 @@ async function removeAccount() {
     await revokeAccessToken(auth, result.authorizationCode);
   }
   clearTimeout(timer);stopStorage?.();if (saving) await saving;
-  await purgeServerData(u.uid, profile?.aliasKey);
+  // Lo normal: el servidor borra los datos y el acceso a la vez. Si la función no responde (aún sin publicar
+  // o sin red hacia ella), se borra desde aquí como siempre.
   active=false;
-  try { await deleteUser(u); } catch(error) { active=true; throw error; }
+  if (await deleteOnServer()) { await signOut(auth).catch(() => {}); }
+  else {
+    active=true;
+    await purgeServerData(u.uid, profile?.aliasKey);
+    active=false;
+    try { await deleteUser(u); } catch(error) { active=true; throw error; }
+  }
   CT.AccountStorage.clear();forgetLocalDuels(u.uid);try{localStorage.removeItem(HANDOFF);}catch{}ready=false;if (wasApple) await afterNativeSheet();location.reload();
 }
 export async function startAccounts(callback) {
