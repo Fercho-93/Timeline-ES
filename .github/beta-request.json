@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 727,
+  "cache": 762,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Guía en vídeo interactiva (de qué va, cómo colocar cartas y modalidades), «Ver el manual» en la portada que reproduce el vídeo y vuelve, y portada encajada sobre el globo sin solapes"
+  "reason": "Láminas de cartas más ligeras (448×672, assets de unos 176 a 103,5 MiB), moderación de nombres y botón «Denunciar», borrado de cuenta, textos legales y política de privacidad, identificación solo con nombre y correo, aviso remoto de actualización, sin cofre ni música ambiente, y mejoras de menús, guía y Retos rápidos"
 }
