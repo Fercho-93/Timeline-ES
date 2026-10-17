@@ -1659,6 +1659,10 @@ body::before {
 .art-modal img { display:block; width:100%; max-height:calc(65 * var(--dvh)); object-fit:contain; margin-block:12px; }
 .modal { overflow-wrap:anywhere; }
 .modal a, .rules a { color:var(--accent-dark); }
+.rules .table-scroll { overflow-x:auto; margin-block:10px; }
+.rules table { width:100%; border-collapse:collapse; font:.85rem/1.4 system-ui,sans-serif; }
+.rules th, .rules td { border:1px solid var(--line); padding:6px 8px; text-align:left; vertical-align:top; }
+.rules th { background:rgba(0,0,0,.05); }
 .modal input[type="file"], .modal textarea { width:100%; max-width:100%; min-width:0; box-sizing:border-box; }
 .modal textarea { color:var(--ink); background:var(--campo); border:1px solid var(--line); padding:10px; border-radius:8px; font:inherit; }
 @media (max-width:600px) {

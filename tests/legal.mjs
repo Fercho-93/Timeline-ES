@@ -46,5 +46,10 @@ assert.match(html['borrar-cuenta.html'], /un mes/, 'el plazo del RGPD');
 assert.match(read('accounts.js'), /Tu cuenta y tus datos/, 'el juego tiene la sección que nombran los textos');
 for (const plazo of ['90 días', '30 días']) assert.ok(html['borrar-cuenta.html'].includes(plazo) || html['privacidad.html'].includes(plazo));
 
+// La política abre con el resumen y la tabla de datos, y lleva versión.
+assert.match(html['privacidad.html'], /Versión 2 · Actualizada/);
+assert.ok(html['privacidad.html'].indexOf('id="esencial"') < html['privacidad.html'].indexOf('id="datos"') && html['privacidad.html'].indexOf('id="datos"') < html['privacidad.html'].indexOf('Responsable y contacto'), 'resumen, tabla y luego el detalle');
+assert.match(read('PRIVACIDAD.md'), /Versión 2 · Actualizada/);
+
 const pending = PAGES.flatMap(page => [...html[page].matchAll(/\[PENDIENTE: ([^\]]+)\]/g)].map(m => `${page}: ${m[1]}`));
 console.log(`Textos legales: enlaces, caché, app y coherencia con la política: OK${pending.length ? `\n  Por rellenar antes de publicar en tiendas: ${pending.join('; ')}` : ''}`);

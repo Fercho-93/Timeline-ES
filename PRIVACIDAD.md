@@ -1,8 +1,36 @@
 # Privacidad de Continuum
 
-Actualizada el 17 de octubre de 2026.
+Versión 2 · Actualizada el 17 de octubre de 2026.
 
 Esta página explica qué datos trata Continuum, para qué, con quién se comparten, cuánto tiempo se guardan y cómo puedes decidir sobre ellos. Continuum no tiene publicidad, no usa analítica de terceros y no vende ni cede datos a nadie con fines comerciales.
+
+## Lo esencial
+
+- Puedes jugar sin dar correo, contraseña ni nombre real: el juego te crea un invitado con un identificador aleatorio.
+- Tu progreso y las partidas online se guardan en servidores de Google (Firebase). Las partidas sin conexión y entre móviles cercanos no pasan por nuestros servidores.
+- Aparecer en el ranking es opcional y lo decides tú; puedes dejarlo cuando quieras.
+- No hay publicidad, ni analítica de terceros, ni compras. No vendemos ni cedemos tus datos.
+- No se envían informes de errores automáticos: solo mandas un comentario si tú quieres.
+- Puedes borrar tu cuenta y tus datos desde el juego en cualquier momento.
+
+## Qué datos tratamos
+
+| Qué | Ejemplos | Dónde se guarda | ¿Sale de tu dispositivo? |
+| --- | --- | --- | --- |
+| Tu invitado | Un identificador aleatorio y un alias y avatar que eliges tú | Firebase (Google) y tu dispositivo | Sí |
+| Tu progreso | Estadísticas, logros, cartas descubiertas, récords, rachas y retos diarios de los últimos 60 días | Firebase (Google) y tu dispositivo | Sí |
+| Cuenta de Apple (opcional) | El identificador que Apple asigna a esta app | Firebase (Google) | Sí, solo si la vinculas |
+| Ranking (opcional) | Alias, avatar, aciertos, tiempo y cartas descubiertas | Firebase (Google) | Sí; lo ven otros jugadores |
+| Partidas online | Alias, avatar, jugadas y resultados de salas, mesas, Retos rápidos y duelos | Firebase (Google) | Sí; lo ven quienes juegan contigo |
+| Denuncias de nombres | Quién denuncia, a quién, el motivo, dónde y cuándo | Firebase (Google) | Sí; solo las lee el responsable |
+| Límite de altas | La hora de la última partida que creaste | Firebase (Google) | Sí |
+| Partidas entre móviles cercanos | Nombre de la sala y dirección IP local | Directo entre los móviles | No pasa por nuestros servidores |
+| Verificación de la app | Señales técnicas del navegador o de la app y la dirección IP | Google (reCAPTCHA) o Apple (App Attest) | Sí |
+| Comentarios (opcional) | Tu texto y un diagnóstico de versión y dispositivo | Tu correo | Solo si tú lo envías |
+| Avisos del móvil (si se activan) | Un identificador del dispositivo | Firebase (Google) y Apple | Sí |
+| Ajustes y copia de seguridad | Ajustes, sesión y copias del progreso | Tu dispositivo | No |
+
+Cada dato se explica con más detalle, con su base jurídica, en las secciones siguientes.
 
 ## Responsable y contacto
 
@@ -98,7 +126,7 @@ Desde el Atlas («Tu cuenta y tus datos») puedes eliminar tu invitado o tu cuen
 
 ## Tus derechos
 
-Puedes ejercer los derechos de acceso, rectificación, supresión, oposición, limitación del tratamiento y portabilidad, y retirar en cualquier momento tu consentimiento para aparecer en el ranking. Muchos los puedes ejercer tú mismo en el juego (cambiar el alias, dejar el ranking, eliminar la cuenta); para el resto, como pedir una copia de tus datos, escribe a feedbackcontinuum@gmail.com. Responderemos en el plazo de un mes que marca el RGPD. Si crees que no se han atendido bien tus derechos, puedes reclamar ante la Agencia Española de Protección de Datos ([www.aepd.es](https://www.aepd.es)).
+Puedes ejercer los derechos de acceso, rectificación, supresión, oposición, limitación del tratamiento y portabilidad, y retirar en cualquier momento tu consentimiento para aparecer en el ranking. Muchos los puedes ejercer tú mismo en el juego (cambiar el alias, dejar el ranking, eliminar la cuenta); para el resto, como pedir una copia de tus datos, escribe a feedbackcontinuum@gmail.com. Responderemos en el plazo de un mes que marca el RGPD. Si crees que no se han atendido bien tus derechos, puedes reclamar ante la Agencia Española de Protección de Datos ([www.aepd.es](https://www.aepd.es)) o ante la autoridad de protección de datos de tu país.
 
 ## Menores
 
