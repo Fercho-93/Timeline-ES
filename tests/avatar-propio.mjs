@@ -29,7 +29,7 @@ await click('[data-action="solo-hub"]');
 await click('[data-solo-route="quick"]');
 await click('[data-quick="start-free"]');
 await click('[data-quick="ready"]');
-assert.ok(src('.score-avatar img').includes(elegido), `Retos rápidos en solitario muestra el avatar elegido (${src('.score-avatar img')})`);
+assert.ok(src('.quick-score-avatar img').includes(elegido), `Retos rápidos en solitario muestra el avatar elegido (${src('.quick-score-avatar img')})`);
 
 console.log('✓ Tu avatar elegido es el mismo en el Atlas y en las partidas');
 w.close();

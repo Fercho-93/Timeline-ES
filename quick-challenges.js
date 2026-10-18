@@ -830,8 +830,17 @@
     else if (state.players.length > 1 && state.phase === 'turn' && state.current !== before) CT.Effects?.transition?.('turn');
     record.commands.push(command); save(); selected = null; slot = null; render();
   }
+  // Una ficha por jugador, con el nombre y su marcador: lo asegurado y, si lo hay, «+N» en juego (aciertos
+  // provisionales de este reto). Con «seguir hasta el final» solo hay una cifra. Quien ya se ha plantado (✓) o
+  // ha fallado (✕) lo lleva marcado; el nombre y las cifras se recortan solos, nunca se salen de la ficha.
   function scores() {
-    return `<div class="scoreboard" aria-label="Marcador">${state.players.map((p, i) => `<span class="score ${i === state.current ? 'active' : ''}" aria-label="${esc(p.name)}: ${E.keepPlaying(state) ? `${p.points + p.score} aciertos. Sigue jugando` : `${p.score} asegurados, ${p.points} en juego. ${p.status === 'failed' ? 'Fuera de este reto' : p.status === 'banked' ? 'Se ha plantado' : 'Sigue jugando'}`}"><i class="score-avatar">${playerAvatar(p, i)}</i><b>${esc(p.name)}</b><em>${E.keepPlaying(state) ? p.score + p.points : `${p.score}${p.points ? ` +${p.points}` : ''}${p.status !== 'active' ? ' ·' : ''}`}</em></span>`).join('')}</div>`;
+    const keep = E.keepPlaying(state), n = state.players.length;
+    return `<div class="quick-scores" data-n="${n}" style="--cols:${Math.min(n, 4)}" role="group" aria-label="Marcador">${state.players.map((p, i) => {
+      const out = !keep && p.status === 'failed', banked = !keep && p.status === 'banked';
+      const label = `${p.name}: ${keep ? `${p.points + p.score} aciertos. Sigue jugando` : `${p.score} asegurados, ${p.points} en juego. ${out ? 'Fuera de este reto' : banked ? 'Se ha plantado' : 'Sigue jugando'}`}`;
+      const figures = keep ? `<strong>${p.score + p.points}</strong>` : `<strong>${p.score}</strong>${p.points && !out && !banked ? `<small class="quick-score-open">+${p.points}</small>` : ''}${banked ? '<small class="quick-score-state" aria-hidden="true">✓</small>' : out ? '<small class="quick-score-state" aria-hidden="true">✕</small>' : ''}`;
+      return `<span class="quick-score${i === state.current ? ' is-active' : ''}${out ? ' is-out' : ''}${banked ? ' is-banked' : ''}"${i === state.current ? ' aria-current="true"' : ''} role="group" aria-label="${esc(label)}"><i class="quick-score-avatar">${playerAvatar(p, i)}</i><span class="quick-score-copy"><b>${esc(p.name)}</b><em>${figures}</em></span></span>`;
+    }).join('')}</div>`;
   }
   // En solitario la única persona eres tú (se llama «Tú», no por tu nombre); en una sala,
   // el sitio que ocupa tu identificador. Los demás se reconocen por su nombre o su plaza.
@@ -969,12 +978,10 @@
     const get = id => c.cards.find(item => item.id === id);
     topTitle = `${state.config.rounds.length === 1 ? '' : `${state.index + 1}/${state.config.rounds.length} · `}${esc(c.title)}`;
     const keep = E.keepPlaying(state);
-    // Plantarse: botón a todo el ancho bajo la barra, para verlo a la primera. Con aciertos provisionales
-    // los asegura y va destacado; sin ninguno solo pasa el reto, con el mismo alto pero más discreto.
-    const pass = keep ? '' : p.points
-      ? `<button class="quick-bank has-points" data-quick="bank"><span class="quick-bank-mark" aria-hidden="true">✓</span>Plantarme y asegurar ${p.points} ${p.points === 1 ? 'acierto' : 'aciertos'}</button>`
-      : `<button class="quick-bank" data-quick="bank">Pasar reto</button>`;
-    const heading = `${room && outboxHere() ? '<p class="hint" role="status">Sin conexión: tu jugada está guardada en este móvil y se enviará sola al volver.</p>' : ''}${room ? `<p class="hint">${room.members.length < state.players.length ? 'Juega tu turno: después le mandas el duelo a tu amigo' : myTurn() ? "Tu turno" : `Turno de ${esc(p.name)}`} · ${connection?.kind==='local' ? 'Red Wi-Fi local' : 'Sala por internet'}</p>` : ''}<h1 class="solo-lectores" data-focus tabindex="-1">${esc(c.title)}${!room && state.players.length === 1 ? '' : ` · Turno de ${esc(p.name)}`}</h1><div class="quick-bar"><span class="quick-left"><b>${state.remaining.length}</b> por colocar</span><div class="quick-right">${scores()}</div></div>${state.phase === 'turn' && myTurn() ? pass : ''}`;
+    // Plantarse: botón a todo el ancho bajo la barra, para verlo a la primera. Siempre dice con cuántos puntos
+    // te plantas (los aciertos provisionales de este reto); con ninguno va más discreto, con el mismo alto.
+    const pass = keep ? '' : `<button class="quick-bank${p.points ? ' has-points' : ''}" data-quick="bank">${p.points ? '<span class="quick-bank-mark" aria-hidden="true">✓</span>' : ''}Plantarme con ${p.points} ${p.points === 1 ? 'punto' : 'puntos'}</button>`;
+    const heading = `${room && outboxHere() ? '<p class="hint" role="status">Sin conexión: tu jugada está guardada en este móvil y se enviará sola al volver.</p>' : ''}${room ? `<p class="hint">${room.members.length < state.players.length ? 'Juega tu turno: después le mandas el duelo a tu amigo' : myTurn() ? "Tu turno" : `Turno de ${esc(p.name)}`} · ${connection?.kind==='local' ? 'Red Wi-Fi local' : 'Sala por internet'}</p>` : ''}<h1 class="solo-lectores" data-focus tabindex="-1">${esc(c.title)}${!room && state.players.length === 1 ? '' : ` · Turno de ${esc(p.name)}`}</h1><div class="quick-bar${state.players.length > 2 ? ' quick-bar-many' : ''}"><span class="quick-left"><b>${state.remaining.length}</b> por colocar</span>${scores()}</div>${state.phase === 'turn' && myTurn() ? pass : ''}`;
     if (room?.resigned) {
       const yo = room.resigned === myId, rival = esc(state.players.find((_, i) => room.members[i] !== myId)?.name || 'Tu rival');
       shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Duelo con un amigo · Retos rápidos</div><h2 data-focus tabindex="-1">${yo ? 'Te has rendido' : `${rival} se ha rendido`}</h2></div></section>

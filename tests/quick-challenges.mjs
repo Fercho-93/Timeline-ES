@@ -350,15 +350,30 @@ for (let r = 0; r < 3; r++) {
   assert.ok(references.includes(discovered.source));
   assert.ok(references.includes(discovered.curiositySource));
   click('[data-quick="ack"]');
-  // Plantarse es un botón propio a todo el ancho (no un adorno de la barra) con el texto completo: sin
-  // aciertos solo pasa el reto; con aciertos los asegura y va destacado.
+  // Plantarse es un botón propio a todo el ancho (no un adorno de la barra) que dice con cuántos puntos te
+  // plantas, también con ninguno; con aciertos va destacado.
   const bankNow = () => w.document.querySelector('[data-quick="bank"]');
-  assert.equal(bankNow().textContent.trim(), 'Pasar reto');
+  assert.equal(bankNow().textContent.trim(), 'Plantarme con 0 puntos');
   assert.ok(!bankNow().classList.contains('has-points'));
   assert.equal(bankNow().closest('.quick-bar'), null, 'el botón no va dentro de la barra del marcador');
+  // Marcador: una ficha por jugador dentro de la barra, con una sola marcada como turno actual y las cifras
+  // en elementos propios (no en un círculo de tamaño fijo, que es lo que las sacaba del recuadro).
+  const chips = [...w.document.querySelectorAll('.quick-bar > .quick-scores > .quick-score')];
+  assert.equal(chips.length, E.restore(JSON.parse(w.localStorage.getItem(key))).players.length);
+  assert.equal(chips.filter(chip => chip.getAttribute('aria-current') === 'true').length, 1);
+  assert.ok(chips.every(chip => chip.querySelector('.quick-score-copy > b') && /^\d+/.test(chip.querySelector('.quick-score-copy > em').textContent)));
+  // Las cifras de la ficha activa son las del motor: lo asegurado y, solo si lo hay, «+N» en juego.
+  const activeFigures = () => {
+    const live = E.restore(JSON.parse(w.localStorage.getItem(key))), me = live.players[live.current];
+    const figures = w.document.querySelector('.quick-score.is-active .quick-score-copy > em');
+    assert.equal(figures.querySelector('strong').textContent, String(me.score));
+    assert.equal(figures.querySelector('.quick-score-open')?.textContent ?? null, me.points ? `+${me.points}` : null);
+  };
+  activeFigures();
   click('[data-quick="bank"]');
   assert.ok(bankNow().classList.contains('has-points'));
-  assert.match(bankNow().textContent, /Plantarme y asegurar 1 acierto$/);
+  assert.match(bankNow().textContent, /Plantarme con 1 punto$/);
+  activeFigures();
   click('[data-quick="bank"]');
   assert.equal(E.restore(JSON.parse(w.localStorage.getItem(key))).phase, 'round-end');
   const finalList = w.document.querySelector('details.quick-panel');

@@ -4324,18 +4324,38 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 58px; tr
 
 /* ===== Cabecera limpia de la mesa =====
    Barra superior: ← · título del mazo · sonido y menú. Debajo, una sola franja: cartas
-   pendientes a la izquierda; jugadores a la derecha. La lupa del zoom vive en
+   pendientes a la izquierda; jugadores a la derecha (a su propia fila si son más de dos). La lupa del zoom vive en
    la cabecera de la línea, que es lo que amplía. */
 #app .atlas-topbar .topbar-title { min-width: 0; text-align: center; color: #8a3f2f; font: 700 .78rem/1.2 var(--font-display); letter-spacing: .08em; text-transform: uppercase; text-wrap: balance; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-#app.atlas-board .quick-shell .quick-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 2px 0 6px; padding-bottom: 6px; border-bottom: 1px solid color-mix(in srgb, var(--edition-line, #cdb994) 70%, transparent); }
-#app.atlas-board .quick-shell .quick-left { color: var(--edition-muted, #7a6a58); font: .74rem/1.2 var(--ui-font); letter-spacing: .02em; white-space: nowrap; }
+#app.atlas-board .quick-shell .quick-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 2px 0 6px; padding-bottom: 6px; border-bottom: 1px solid color-mix(in srgb, var(--edition-line, #cdb994) 70%, transparent); }
+#app.atlas-board .quick-shell .quick-left { flex: none; color: var(--edition-muted, #7a6a58); font: .74rem/1.2 var(--ui-font); letter-spacing: .02em; white-space: nowrap; }
 #app.atlas-board .quick-shell .quick-left b { color: #4a3626; font: 700 1rem/1 var(--font-display); margin-right: 2px; }
-#app.atlas-board .quick-shell .quick-right { display: flex; align-items: center; gap: 8px; min-width: 0; }
-#app.atlas-board .quick-shell .quick-right .scoreboard { margin: 0; flex-wrap: nowrap; }
+/* Marcador: una ficha por jugador en una cuadrícula que reparte el ancho (hasta 4 por fila), así que ninguna ficha
+   se sale de la pantalla ni hace falta desplazarse. Con 1 o 2 jugadores va en la fila del contador; con más baja
+   a la suya. El nombre se recorta con «…» y las cifras (en una píldora que crece con ellas) nunca desbordan. */
+#app.atlas-board .quick-shell .quick-scores { flex: 1 1 0; min-width: 0; display: grid; grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr)); gap: 6px; }
+#app.atlas-board .quick-shell .quick-scores[data-n="1"] { grid-template-columns: minmax(0, 1fr); justify-items: end; }
+#app.atlas-board .quick-shell .quick-bar-many .quick-scores { flex-basis: 100%; }
+#app.atlas-board .quick-shell .quick-score { display: flex; align-items: center; gap: 5px; min-width: 0; padding: 4px 6px 4px 4px; border: 1px solid #c9b48f; border-radius: 12px; background: #fbf4e4; color: #4a3626; box-shadow: 0 1px 3px #5a3f1f22; }
+#app.atlas-board .quick-shell .quick-score-avatar { flex: none; display: block; width: 26px; height: 26px; font-style: normal; }
+#app.atlas-board .quick-shell .quick-score-avatar .avatar-art { width: 100%; height: 100%; box-shadow: none; border-width: 1.5px; }
+#app.atlas-board .quick-shell .quick-score-copy { flex: 1 1 0; min-width: 0; display: grid; gap: 3px; }
+#app.atlas-board .quick-shell .quick-score-copy > b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 .72rem/1.05 var(--font-display); color: inherit; }
+#app.atlas-board .quick-shell .quick-score-copy > em { display: flex; align-items: center; gap: 4px; min-width: 0; font-style: normal; white-space: nowrap; }
+#app.atlas-board .quick-shell .quick-score-copy strong { font: 800 .92rem/1 var(--font-display); }
+#app.atlas-board .quick-shell .quick-score-copy small { padding: 1px 5px; border-radius: 999px; background: #ecd9ae; color: #6b4a22; font: 700 .66rem/1.1 var(--ui-font); }
+#app.atlas-board .quick-shell .quick-score-copy small.quick-score-state { padding: 0; background: none; font-size: .72rem; }
+#app.atlas-board .quick-shell .quick-score.is-banked .quick-score-state { color: #2b6a47; }
+#app.atlas-board .quick-shell .quick-score.is-out { opacity: .6; }
+#app.atlas-board .quick-shell .quick-score.is-out .quick-score-state { color: #8a3f2f; }
+#app.atlas-board .quick-shell .quick-score.is-active { background: linear-gradient(135deg, #a84a37, #7d3223); border-color: #7d3223; color: #fff6e8; box-shadow: 0 2px 6px #7d322340; }
+#app.atlas-board .quick-shell .quick-score.is-active small { background: #fff3; color: #fff6e8; }
+#app.atlas-board .quick-shell .quick-score.is-active.is-banked .quick-score-state, #app.atlas-board .quick-shell .quick-score.is-active.is-out .quick-score-state { color: #fff6e8; }
+#app.atlas-board[data-board-fit="tight"] .quick-shell .quick-score-avatar { width: 22px; height: 22px; }
+#app.atlas-board[data-board-fit="tight"] .quick-shell .quick-score { padding: 2px 5px 2px 3px; }
 #app.atlas-board .board-timeline-section > .timeline-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 #app.atlas-board .board-timeline-section > .timeline-toolbar > .timeline-zoom { position: relative; flex: none; margin: 0 !important; padding: 0; border: 0; background: none; box-shadow: none; }
 #app.atlas-board .board-timeline-section > .timeline-toolbar > .timeline-zoom .zoom-menu { top: calc(100% + 6px); right: 0; }
-#app.atlas-board .quick-shell .quick-right .scoreboard, #app.atlas-board .quick-shell .quick-right .score { box-shadow: none; } #app.atlas-board .quick-shell .quick-right .scoreboard { padding: 0; background: none; border: 0; }
 
 /* Lupa del zoom en la barra superior: misma altura que los botones redondos de al lado. */
 #app .atlas-topbar-actions { display: flex; align-items: center; gap: 6px; }
@@ -4386,6 +4406,13 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 58px; tr
 :root[data-theme="dark"] #app.atlas-board .timeline-ends,
 :root[data-theme="dark"] #app.atlas-board .quick-shell .quick-left b { color: #e9b48f; }
 :root[data-theme="dark"] #app.atlas-board .quick-shell .quick-left { color: #d8c6aa; }
+/* Modo oscuro: marcador de Retos rápidos. */
+:root[data-theme="dark"] #app.atlas-board .quick-shell .quick-score { background: #3a2a1d; border-color: #7a5d38; color: #f0e2c6; box-shadow: none; }
+:root[data-theme="dark"] #app.atlas-board .quick-shell .quick-score-copy small { background: #5a4630; color: #f0e2c6; }
+:root[data-theme="dark"] #app.atlas-board .quick-shell .quick-score.is-banked .quick-score-state { color: #8fd1a8; }
+:root[data-theme="dark"] #app.atlas-board .quick-shell .quick-score.is-out .quick-score-state { color: #e9b48f; }
+:root[data-theme="dark"] #app.atlas-board .quick-shell .quick-score.is-active { background: linear-gradient(135deg, #a84a37, #7d3223); border-color: #c4705a; color: #fff6e8; }
+:root[data-theme="dark"] #app.atlas-board .quick-shell .quick-score.is-active small { background: #fff3; color: #fff6e8; }
 /* Modo oscuro: el botón de plantarse conserva el verde (más claro) y el de pasar pasa a cobre sobre fondo oscuro. */
 :root[data-theme="dark"] #app.atlas-board .quick-shell .quick-bank { background: #3a2a1d; border-color: #9a7648; color: #f0d9b0; }
 :root[data-theme="dark"] #app.atlas-board .quick-shell .quick-bank.has-points { background: linear-gradient(180deg, #4a9368, #2f6b4a); border-color: #8fd1a8; color: #fff; box-shadow: 0 3px 0 #1f4a33, 0 8px 16px #00000066; }
