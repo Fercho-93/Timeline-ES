@@ -133,7 +133,10 @@ assert.match(read('edition.css'), /\.hand\.hand-fan:not\(\.hand-placement-pendin
     assert.ok(document.querySelectorAll('.hand-card').length > 1, 'el reto mantiene todas las cartas comunes');
     click(document, '[data-quick="select"]');
     assert.equal(document.querySelectorAll('.hand-card.selected').length, 1);
-    assert.ok(document.querySelectorAll('.hand-fan .hand-card:not(.fan-away)').length <= 5, 'la mano larga ocupa un abanico compacto');
+    // El abanico deja ver el fondo (hasta cuatro cartas a cada lado) para que no parezca que solo hay las cinco del
+    // centro; una mano más larga sigue recortada a esas nueve.
+    const handTotal = document.querySelectorAll('.hand-fan .hand-card').length;
+    assert.equal(document.querySelectorAll('.hand-fan .hand-card:not(.fan-away)').length, Math.min(handTotal, 9), 'la mano larga muestra el fondo del abanico, no más de nueve cartas');
     const before = document.querySelector('.hand-card.selected').dataset.id;
     const hand = document.querySelector('.hand-fan');
     for (const [type, x] of [['pointerdown', 220], ['pointermove', 150], ['pointerup', 120]]) {

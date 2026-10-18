@@ -313,59 +313,112 @@
     const center = Math.max(0, chosen);
     const enabled = cards.some(card => !card.disabled);
     const key = cards.map(card => card.dataset.id).join('|');
-    const distance = (index, active) => {
-      let delta = index - active;
-      if (delta > cards.length / 2) delta -= cards.length;
-      if (delta < -cards.length / 2) delta += cards.length;
-      return delta;
-    };
+    // Un carrusel: las cartas dan la vuelta, así que no hay un extremo. Cada una se coloca por su posición
+    // respecto a la del centro, en «cartas»: entera en reposo y con decimales mientras el dedo arrastra o el giro
+    // se asienta. `lo` es donde empieza la vuelta, siempre entre dos posiciones de reposo, para que ninguna carta
+    // quede justo en la costura (con un número par de cartas no cabe una simétrica).
+    const total = cards.length;
+    const RANGE = 4;
+    const lo = total % 2 ? -total / 2 : -total / 2 + .5;
+    const wrap = position => (((position - lo) % total) + total) % total + lo;
+    const distance = (index, active) => wrap(index - active);
+    const pending = hand.classList.contains('hand-placement-pending');
     // El paso entre cartas se lee del propio CSS (la traslación de una carta en reposo),
     // para que el arrastre y la postura final coincidan en cualquier tamaño de pantalla.
-    // La postura reproduce la regla de edition.css: traslación, caída, giro y escala.
     let step = Math.min(CT.Mesa.ancho() * .147, 54.6);
-    const pose = offset => `translateX(${offset * step}px) translateY(${Math.abs(offset) * 11.2}px) rotate(${offset * 6}deg) scale(${Math.max(.5, 1 - Math.abs(offset) * .14)})`;
+    // La postura de una carta a `position` cartas del centro. Hasta dos cartas el abanico se abre como
+    // siempre; más allá el fondo se va apilando —cada carta asoma un poco por detrás de la anterior, más
+    // pequeña y más oscura (sin transparencia, que dejaría ver el texto de las de atrás)— para que se vea que
+    // quedan más por descubrir al girar. En los extremos de lo visible (y en la costura de la vuelta) la carta
+    // se desvanece, así que entrar y salir no da saltos.
+    const pose = position => {
+      const away = Math.abs(position), side = Math.sign(position);
+      const lean = away <= 2 ? away : away <= 3 ? 2 + (away - 2) * .5 : 2.5 + (away - 3) * .4;
+      const depth = away <= 2 ? away : 2 + (away - 2) * .6;
+      const drop = away <= 2 ? away : 2 + (away - 2) * .4;
+      const seam = Math.min(position - lo, lo + total - position);
+      const visible = Math.max(0, Math.min(1, (RANGE + .5 - away) / .5, seam / .5));
+      // Con una colocación pendiente toda la mano queda tenue; si no, las cartas son opacas y lo que las
+      // jerarquiza es la escala y lo oscuras que sean.
+      const base = pending ? .8 : 1;
+      return {
+        transform: `translateX(${side * lean * step}px) translateY(${drop * 11.2}px) rotate(${side * lean * 4}deg) scale(${1 - depth * .14})`,
+        opacity: String(+(base * visible).toFixed(3)), z: String(Math.round(100 - away * 10)), visible: visible > .01,
+        filter: away > .05 ? `brightness(${(1 - Math.min(away, 2) * .035 - Math.max(0, away - 2) * .08).toFixed(3)})` : 'none'
+      };
+    };
+    const paint = (card, position) => {
+      const next = pose(position);
+      card.style.transform = next.transform; card.style.opacity = next.opacity; card.style.zIndex = next.z;
+      if (next.filter !== 'none' || card.style.filter) card.style.filter = next.filter === 'none' ? '' : next.filter;
+      card.classList.toggle('fan-center', Math.abs(position) < .5);
+      card.classList.toggle('fan-away', !next.visible);
+    };
     // Un muelle: pasa un poco de su sitio y vuelve. Es lo que da peso a las cartas.
-    const SPRING = 'cubic-bezier(.3,1.45,.5,1)';
+    const spring = t => 1 + 2.3 * Math.pow(t - 1, 3) + 1.3 * Math.pow(t - 1, 2);
+    // Anima una carta de una posición a otra pasando por las de en medio, que pueden cruzar la costura de la
+    // vuelta: por eso se muestrea la trayectoria en vez de dar solo los dos extremos.
+    const travel = (card, from, to, duration) => {
+      if (!card.animate || from === to) return;
+      const count = Math.max(8, Math.round(duration / 16)), frames = [];
+      for (let i = 0; i <= count; i++) {
+        const next = pose(wrap(from + (to - from) * spring(i / count)));
+        frames.push({transform: next.transform, opacity: next.opacity, zIndex: next.z, filter: next.filter, visibility: next.visible ? 'visible' : 'hidden', offset: i / count});
+      }
+      card.animate(frames, {duration, easing: 'linear'});
+    };
     const offsets = new Map();
     cards.forEach((card, index) => {
       const offset = distance(index, center);
       card.style.setProperty('--fan-offset', offset);
       card.style.setProperty('--fan-depth', Math.abs(offset));
-      card.style.zIndex = String(10 - Math.abs(offset));
-      card.classList.toggle('fan-center', index === center);
-      card.classList.toggle('fan-away', Math.abs(offset) > 2);
       card.tabIndex = index === center && enabled ? 0 : -1;
       card.setAttribute('aria-label', `${card.querySelector('strong')?.textContent || 'Carta'}. ${index + 1} de ${cards.length}`);
       offsets.set(card.dataset.id, offset);
     });
     const sample = cards.find(card => offsets.get(card.dataset.id));
     if (sample && typeof DOMMatrixReadOnly === 'function') {
+      sample.style.removeProperty('transform');
       const moved = new DOMMatrixReadOnly(getComputedStyle(sample).transform).e / offsets.get(sample.dataset.id);
       if (Number.isFinite(moved) && Math.abs(moved) > 1) step = Math.abs(moved);
     }
-    if (!reduced()) cards.forEach(card => {
-      const offset = offsets.get(card.dataset.id);
-      if (Math.abs(offset) > 2) return;
-      // Cambió la carta del centro (deslizar o flechas): cada carta sale de donde estaba,
-      // incluido lo que el dedo ya la había arrastrado, y llega con rebote.
-      if (previousFan?.key === key && previousFan.center !== center) {
-        const before = previousFan.offsets.get(card.dataset.id) + (previousFan.drag || 0);
-        card.animate?.([{transform: pose(before)}, {transform: pose(offset)}], {duration: 420, easing: SPRING});
-      // Salió una carta de la mano: las demás se recolocan y se asientan con un rebote.
-      } else if (previousFan && previousFan.key !== key && previousFan.offsets.has(card.dataset.id)) {
+    cards.forEach(card => paint(card, offsets.get(card.dataset.id)));
+    if (!reduced() && previousFan?.key === key && previousFan.center !== center) {
+      // Cambió la carta del centro (deslizar, flechas o tocar otra): cada carta sale de donde estaba,
+      // incluido lo que el dedo ya la había arrastrado, y recorre las cartas que hagan falta, con rebote.
+      const delta = center - previousFan.center;
+      const moved = previousFan.steps !== null && (((previousFan.steps - delta) % total) + total) % total === 0 ? previousFan.steps : wrap(delta);
+      const duration = Math.min(900, 400 + 90 * Math.max(0, Math.abs(moved) - 1));
+      cards.forEach(card => {
         const before = previousFan.offsets.get(card.dataset.id);
-        if (before !== offset) card.animate?.([{transform: pose(before)}, {transform: pose(offset)}], {duration: 460, easing: SPRING});
-      }
-    });
-    previousFan = {key, center, offsets, drag: 0};
+        if (before === undefined) return;
+        travel(card, before + (previousFan.drag || 0), before - moved, duration);
+      });
+    // Salió una carta de la mano: las demás se recolocan y se asientan con un rebote.
+    } else if (!reduced() && previousFan && previousFan.key !== key && cards.some(card => previousFan.offsets.has(card.dataset.id))) {
+      cards.forEach(card => {
+        const offset = offsets.get(card.dataset.id), before = previousFan.offsets.get(card.dataset.id);
+        if (Math.abs(offset) > RANGE) return;
+        // Una carta que no estaba a la vista, o que tendría que cruzar el abanico entero, entra con un fundido.
+        if (before === undefined || Math.abs(before - offset) > 3) { card.animate?.([{opacity: 0}, {opacity: pose(offset).opacity}], {duration: 360, easing: 'ease-out'}); return; }
+        travel(card, before, offset, 460);
+      });
+    }
+    previousFan = {key, center, offsets, drag: 0, steps: null};
     if (cards.length === 1) return;
     const controls = document.createElement('div');
     controls.className = 'hand-fan-controls';
     controls.innerHTML = `<button type="button" aria-label="Carta anterior" data-fan-step="-1">‹</button><span>${center + 1} / ${cards.length}</span><button type="button" aria-label="Carta siguiente" data-fan-step="1">›</button>`;
     hand.insertAdjacentElement('afterend', controls);
-    const select = direction => {
-      if (!enabled || !hand.isConnected) return;
-      cards[(center + direction + cards.length) % cards.length].click();
+    // Mueve el centro `steps` cartas (con signo): se elige la que quede en el centro. Si es la misma
+    // carta (una vuelta entera) no hay nada que elegir. Devuelve si se eligió otra.
+    const select = steps => {
+      if (!enabled || !hand.isConnected) return false;
+      const target = (((center + steps) % total) + total) % total;
+      if (target === center) return false;
+      if (previousFan) previousFan.steps = steps;
+      cards[target].click();
+      return true;
     };
     controls.querySelectorAll('button').forEach(button => {
       button.disabled = !enabled;
@@ -378,37 +431,31 @@
       document.querySelector('.hand-fan .fan-center')?.focus({preventScroll: true});
     });
     let gesture = null;
-    // Mientras el dedo arrastra en horizontal, el abanico entero lo sigue: cada carta se
-    // desplaza por su arco hacia la posición de al lado. Más allá de una carta cede cada
-    // vez menos, como una goma.
-    const dragTo = drag => {
-      cards.forEach(card => {
-        const offset = offsets.get(card.dataset.id);
-        if (Math.abs(offset) > 3) return;
-        card.style.transition = 'none';
-        card.style.transform = pose(offset + drag);
-      });
+    // Mientras el dedo arrastra en horizontal, el abanico entero lo sigue 1 a 1: cada carta recorre su
+    // arco y pasa a la posición de al lado, sin tope. `drag` son cartas, con el signo del dedo.
+    let drag = 0;
+    const dragTo = value => {
+      drag = value;
+      cards.forEach(card => paint(card, wrap(offsets.get(card.dataset.id) + value)));
     };
-    const settle = from => {
-      cards.forEach(card => card.style.removeProperty('transition'));
-      if (reduced()) { cards.forEach(card => card.style.removeProperty('transform')); return; }
-      cards.forEach(card => {
-        const offset = offsets.get(card.dataset.id);
-        if (Math.abs(offset) > 3) return;
-        card.style.removeProperty('transform');
-        card.animate?.([{transform: pose(offset + from)}, {transform: pose(offset)}], {duration: 380, easing: SPRING});
-      });
+    // Suelta el abanico en `target` cartas (entero): vuelve a su sitio o sigue girando por inercia. Sin
+    // repintar la mano, así que los estilos quedan ya en su postura final y la animación solo recorre el camino.
+    const settle = (from, target) => {
+      cards.forEach(card => card.getAnimations?.().forEach(animation => animation.cancel()));
+      cards.forEach(card => paint(card, offsets.get(card.dataset.id)));
+      drag = 0;
+      if (reduced()) return;
+      const duration = Math.min(900, 380 + 90 * Math.max(0, Math.abs(target) - 1));
+      cards.forEach(card => travel(card, offsets.get(card.dataset.id) + from, offsets.get(card.dataset.id) + target, duration));
     };
-    const rubber = value => {
-      const limit = 1, sign = Math.sign(value), abs = Math.abs(value);
-      return abs <= limit ? value : sign * (limit + (1 - 1 / ((abs - limit) * 1.5 + 1)) * .4);
-    };
-    hand.addEventListener('pointerdown', event => {
+    // Las flechas están encima de las cartas de los lados: deslizar empezando en una también gira el abanico.
+    const onFan = (type, handler, options) => { hand.addEventListener(type, handler, options); controls.addEventListener(type, handler, options); };
+    onFan('pointerdown', event => {
       if (!enabled || event.pointerType === 'mouse' || event.isPrimary === false) return;
-      gesture = {id: event.pointerId, x: event.clientX, y: event.clientY, horizontal: false, drag: 0};
+      gesture = {id: event.pointerId, x: event.clientX, y: event.clientY, horizontal: false, samples: [{t: event.timeStamp, x: event.clientX}]};
       hand.classList.add('fan-touch');
     });
-    hand.addEventListener('pointermove', event => {
+    onFan('pointermove', event => {
       if (!gesture || event.pointerId !== gesture.id) return;
       if (document.body.classList.contains('dragging-card')) { gesture = null; return; }
       const dx = event.clientX - gesture.x, dy = event.clientY - gesture.y;
@@ -416,34 +463,49 @@
       if (!gesture.horizontal && Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) * 1.4) {
         gesture.horizontal = true;
         hand.setPointerCapture?.(event.pointerId);
+        // Si el giro anterior aún se estaba asentando, se corta: el dedo coge el abanico donde ya está.
+        cards.forEach(card => card.getAnimations?.().forEach(animation => animation.cancel()));
       }
+      // La velocidad se mide con lo último que hizo el dedo (unos 100 ms), no con todo el recorrido.
+      gesture.samples.push({t: event.timeStamp, x: event.clientX});
+      while (gesture.samples.length > 2 && event.timeStamp - gesture.samples[0].t > 100) gesture.samples.shift();
       if (gesture.horizontal) {
         event.preventDefault();
-        if (!reduced()) { gesture.drag = rubber(dx / CT.Mesa.escala() / step); dragTo(gesture.drag); }
+        if (!reduced()) dragTo(dx / CT.Mesa.escala() / step);
       }
     }, {passive: false});
-    hand.addEventListener('pointerup', event => {
+    onFan('pointerup', event => {
       const move = gesture; gesture = null;
       hand.classList.remove('fan-touch');
       if (!move || event.pointerId !== move.id || !move.horizontal || document.body.classList.contains('dragging-card')) {
-        if (move?.drag) settle(move.drag);
+        if (drag) settle(drag, 0);
         return;
       }
-      const dx = event.clientX - move.x;
-      // Poco recorrido: el abanico vuelve a su sitio con un rebote, sin cambiar de carta.
-      if (Math.abs(dx) < 35) { settle(move.drag); return; }
-      // La carta nueva arranca desde donde el dedo dejó el abanico.
-      if (previousFan) previousFan.drag = move.drag;
       event.preventDefault();
       // Evita que el clic sintético del dedo seleccione otra carta tras repintar.
       const swallow = click => { if (click.isTrusted) { click.preventDefault(); click.stopImmediatePropagation(); } };
       document.addEventListener('click', swallow, true);
       setTimeout(() => document.removeEventListener('click', swallow, true), 350);
-      select(dx < 0 ? 1 : -1);
+      const dx = event.clientX - move.x, unit = CT.Mesa.escala() * step;
+      const first = move.samples[0], last = move.samples[move.samples.length - 1];
+      const speed = last.t > first.t ? (last.x - first.x) / (last.t - first.t) : 0;
+      // Hasta dónde llegaría el abanico con la inercia del dedo (la de unos 120 ms más), redondeado a una
+      // carta entera: así queda una carta en el centro, y un gesto lento y corto vuelve a su sitio.
+      const here = reduced() ? dx / unit : drag;
+      let carried = Math.round(here + speed / unit * 120);
+      if (carried === 0 && Math.abs(dx) >= 35) carried = Math.sign(dx);
+      carried = Math.max(-12, Math.min(12, carried));
+      // Los dedos van hacia el lado contrario al de las cartas que llegan: arrastrar a la izquierda trae las siguientes.
+      // El repintado de la mano llega dentro de `select`: lo que el dedo ya movió tiene que estar apuntado antes.
+      if (carried !== 0 && previousFan) previousFan.drag = drag;
+      if (carried === 0 || !select(-carried)) {
+        if (previousFan) previousFan.drag = 0;
+        settle(drag, carried);
+      }
     });
-    hand.addEventListener('pointercancel', () => {
-      if (gesture?.drag) settle(gesture.drag);
+    onFan('pointercancel', () => {
       gesture = null; hand.classList.remove('fan-touch');
+      if (drag) settle(drag, 0);
     });
   }
   // Ajusta la mesa según el espacio visible real. Safari puede cambiar la altura al

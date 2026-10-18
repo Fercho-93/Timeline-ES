@@ -4310,6 +4310,8 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 58px; tr
 #app.atlas-board .atlas-hand-section > .hand-fan-controls { position: relative; z-index: 3; display: flex; align-items: flex-start; justify-content: space-between; height: 0; margin: 0 !important; padding: 0 2px; gap: 0; pointer-events: none; transform: translateY(calc(-0.5 * clamp(112px, calc(22 * var(--dvh)), 176px) - 18px)); }
 #app.atlas-board .atlas-hand-section > .hand-fan-controls button { width: 38px !important; height: 38px !important; min-height: 38px !important; pointer-events: auto; font-size: 1.4rem; background: #fbf4e4cc; }
 #app.atlas-board .atlas-hand-section > .hand-fan-controls span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* Las flechas también son zona de deslizamiento: el gesto horizontal es del abanico, no del navegador. */
+#app.atlas-board .hand-fan-controls, #app.atlas-board .hand-fan-controls button { touch-action: pan-y; }
 
 /* El contador de cartas y la lupa van en la misma fila (ahorran una fila entera): ese alto
    se da a la mano para que los títulos se lean completos. */
