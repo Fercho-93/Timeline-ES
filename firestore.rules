@@ -165,7 +165,9 @@ service cloud.firestore {
         && request.resource.data.revision==0 && request.resource.data.phase=='lobby';
       allow update: if registered() && valid(request.resource.data)
         && request.resource.data.revision==resource.data.revision+1
-        && (starting(resource.data,request.resource.data) || joining(resource.data,request.resource.data) || drawing(resource.data,request.resource.data) || guessing(resource.data,request.resource.data) || leaving(resource.data,request.resource.data) || kicking(resource.data,request.resource.data) || playing(resource.data,request.resource.data) || joiningStarted(resource.data,request.resource.data) || resigning(resource.data,request.resource.data) || declining(resource.data,request.resource.data));
+        && (starting(resource.data,request.resource.data) || joining(resource.data,request.resource.data) || drawing(resource.data,request.resource.data) || guessing(resource.data,request.resource.data) || leaving(resource.data,request.resource.data) || playing(resource.data,request.resource.data) || joiningStarted(resource.data,request.resource.data) || resigning(resource.data,request.resource.data) || declining(resource.data,request.resource.data)
+          // Al final: expulsar es lo menos frecuente, y así las jugadas (que van cerca del límite de expresiones) no pagan su coste.
+          || kicking(resource.data,request.resource.data));
       allow delete: if registered() && request.auth.uid==resource.data.host
         && (!(resource.data.capacity==2 && resource.data.config!=null && resource.data.config.get('kind','')=='duel')
           || (resource.data.members.size()==1 && resource.data.phase!='finished'));
