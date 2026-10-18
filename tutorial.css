@@ -101,7 +101,7 @@
 :is(#app, #app-splash) .tv-card small { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 2px; font: .52rem/1.2 var(--ui-font); text-align: center; color: var(--tv-ink-soft); hyphens: auto; }
 /* El dato oculto: un sello con la interrogación y, debajo, qué dato es. */
 :is(#app, #app-splash) .tv-card .tv-secret { display: none; margin-top: 4px; color: #9b411d; font: 700 .74rem/1 var(--ui-font); text-align: center; }
-:is(#app, #app-splash) .tv-card .tv-secret i { display: block; margin-top: 2px; font: 600 .42rem/1.2 var(--ui-font); font-style: normal; letter-spacing: .06em; text-transform: uppercase; color: #8a6b45; }
+:is(#app, #app-splash) .tv-card .tv-secret i { display: block; margin-top: 2px; font: 600 .42rem/1.2 var(--ui-font); font-style: normal; letter-spacing: .06em; text-transform: uppercase; color: #6b4f2c; }
 :is(#app, #app-splash) .tv-card.is-hidden .tv-value { display: none; }
 :is(#app, #app-splash) .tv-card.is-hidden .tv-secret { display: block; }
 :is(#app, #app-splash) .tv-card.is-hidden { background: linear-gradient(160deg, #fff7e4, #ecdcbb); }

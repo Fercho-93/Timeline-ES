@@ -648,7 +648,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .cal-title { color: var(--edition-brass); font: 700 .6rem/1 var(--ui-font); letter-spacing: .15em; text-transform: uppercase; }
 #app .cal-count { color: var(--edition-muted); font: .7rem/1 var(--ui-font); font-variant-numeric: tabular-nums; }
 #app .cal-weekdays, #app .cal-card .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
-#app .cal-weekdays span { color: var(--edition-muted); font: 600 .56rem/1 var(--ui-font); letter-spacing: .06em; text-align: center; opacity: .75; }
+#app .cal-weekdays span { color: var(--edition-muted); font: 600 .56rem/1 var(--ui-font); letter-spacing: .06em; text-align: center; }
 #app .cal-card .cal-grid { margin-top: 7px; }
 #app .cal-card .cal-day, #app .cal-swatch { border: 0; border-radius: 7px; background: color-mix(in srgb, var(--edition-line) 42%, transparent); }
 #app .cal-card :is(.cal-day, .cal-swatch).cal-bajo { background: color-mix(in srgb, var(--accent) 30%, transparent); }
@@ -782,7 +782,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   padding: 0; margin: 0; opacity: 1; z-index: -1; overflow: hidden; background: #f3eee4;
 }
 #app .carta-reverso::after { content: none; }
-#app .hand-card > .hidden-date { color: #66451f; position: relative; }
+#app .hand-card > .hidden-date { color: #4a3014; position: relative; }
 #app .hand-card > strong { color: #302d27; position: relative; text-shadow: none; }
 
 /* La carta levantada conserva proporción 2:3 aunque la mano sea horizontal. */
@@ -790,7 +790,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 .drag-card-preview .carta-reverso { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; z-index: -1; overflow: hidden; }
 .drag-card-preview .carta-reverso { background: #f3eee4; }
 .drag-card-preview .carta-reverso::after { content: none; }
-.drag-card-preview > .hidden-date { position: relative; color: #66451f; font-size: .65rem; }
+.drag-card-preview > .hidden-date { position: relative; color: #4a3014; font-size: .65rem; }
 .drag-card-preview > strong { position: relative; margin-top: auto; margin-bottom: 0; font-size: 1rem; line-height: 1.2; color: #302d27; text-shadow: none; }
 #app.atlas-board .slot.drop-target { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); border-radius: 12px; }
 
@@ -1245,7 +1245,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 @media (prefers-reduced-motion: reduce) { .guide-chapter summary i { transition: none; } }
 
 /* Ajustes muestra una mini página aislada: elegir no cambia toda la app hasta confirmar. */
-.settings-look-preview { --preview-paper:#f3eee4; --preview-surface:#fbf8f2; --preview-ink:#302d27; --preview-muted:#756d62; --preview-accent:#9e4a2a; margin: 10px 0 14px; padding: 12px; border-radius: 13px; background: #7c746b; box-shadow: inset 0 0 0 1px #ffffff24; }
+.settings-look-preview { --preview-paper:#f3eee4; --preview-surface:#fbf8f2; --preview-ink:#302d27; --preview-muted:#625b50; --preview-accent:#9e4a2a; margin: 10px 0 14px; padding: 12px; border-radius: 13px; background: #7c746b; box-shadow: inset 0 0 0 1px #ffffff24; }
 .settings-look-preview[data-preview-theme="dark"] { --preview-paper:#18110b;--preview-surface:#2a1d11;--preview-ink:#f3e7cf;--preview-muted:#c8b995;--preview-accent:#e39a68; }
 .look-preview-page { min-height: 142px; padding: 15px; border: 1px solid color-mix(in srgb,var(--preview-muted) 42%,transparent); border-radius: 8px; background: var(--preview-paper); color: var(--preview-ink); box-shadow: 0 7px 15px #17110b38; overflow: hidden; }
 .look-preview-page > span { color: var(--preview-accent); font: 700 calc(.5rem * var(--preview-text))/1.2 var(--ui-font); letter-spacing: .15em; }
@@ -3268,7 +3268,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 #app .solo-home .solo-panel .field { margin-top: 18px; }
 #app .solo-home .solo-panel .field-label {
   display: flex; align-items: center; gap: 10px; margin-bottom: 9px;
-  color: #8a5a2e; font: 700 .68rem/1.2 var(--ui-font); letter-spacing: .2em; text-transform: uppercase;
+  color: #74491f; font: 700 .68rem/1.2 var(--ui-font); letter-spacing: .2em; text-transform: uppercase;
 }
 #app .solo-home .solo-panel .field-label::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, #b8935a80, transparent); }
 
@@ -3350,7 +3350,7 @@ html:not(:has(#app[data-screen="home"]))::before {
   object-fit: contain; transform: translate(-50%, -50%);
   opacity: .94; filter: drop-shadow(0 4px 5px #6340214d);
 }
-#app .hand-card > .hidden-date, .drag-card-preview > .hidden-date { color: #775234; }
+#app .hand-card > .hidden-date, .drag-card-preview > .hidden-date { color: #5b3d22; }
 #app .hand-card > strong, .drag-card-preview > strong {
   color: #30271e; background: #fbf4e9e8; border-top-color: #b994686b;
 }
@@ -4543,7 +4543,7 @@ html #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell { 
 }
 :root:not([data-theme="dark"]) #app .comp-splash .chapter-art::after { background: linear-gradient(transparent 55%, #faf1e4); }
 #app .comp-splash .chapter-number { color: #8a3f2f; font-family: var(--font-display); letter-spacing: .22em; }
-#app .comp-splash-lead { color: #7a6a58; }
+#app .comp-splash-lead { color: #65584a; }
 #app .comp-splash h2 { color: #2a1a10; }
 #app .comp-splash-start { border: 1px solid #7a3a2c; background: #8a3f2f; color: #fff6e8; box-shadow: 0 5px 14px #8a3f2f2e; }
 #app .comp-topic {
@@ -5167,7 +5167,7 @@ html #app .tiempo-field .tiempo-segmented .segmented-option:has(input:focus-visi
 /* El título, también igual en todas: versalitas doradas con una línea fina, como en Solitario. */
 html #app :is(.tiempo-field, .poderes-field) > .field-label {
   display: flex; align-items: center; gap: 10px; margin: 0 0 9px; padding: 0;
-  color: #8a5a2e; font: 700 .68rem/1.2 var(--ui-font); letter-spacing: .2em; text-transform: uppercase;
+  color: #74491f; font: 700 .68rem/1.2 var(--ui-font); letter-spacing: .2em; text-transform: uppercase;
 }
 html #app :is(.tiempo-field, .poderes-field) > .field-label::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, #b8935a80, transparent); }
 :root[data-theme="dark"] #app :is(.tiempo-field, .poderes-field) > .field-label { color: #e0b77e; }
@@ -5604,7 +5604,7 @@ html #app[data-screen] .setup-art-panel .quick-length-more { min-height: 44px; b
 #app .hand-card > .card-hint {
   position: absolute; z-index: 2; right: -4px; top: calc(100% + 10px); bottom: auto;
   display: inline-flex; align-items: center; gap: 3px; max-width: calc(100% - 20px);
-  margin: 0; padding: 0; color: #8a6a3f; opacity: .85; pointer-events: none;
+  margin: 0; padding: 0; color: #6f5230; opacity: 1; pointer-events: none;
   font: 600 .5rem/1 var(--ui-font); letter-spacing: .02em; white-space: nowrap; overflow: hidden;
 }
 #app .hand-card > .card-hint svg { flex: none; width: 11px; height: 11px; stroke-width: 2; }
@@ -5645,7 +5645,7 @@ html #app[data-screen] .setup-art-panel .quick-length-more { min-height: 44px; b
   --edition-paper: #edddba;
   --edition-line: #cbb58b;
   --edition-muted: #655b49;
-  --edition-brass: #785a2d;
+  --edition-brass: #6c4f22;
 }
 :root:not([data-theme="dark"]) #app:not(.atlas-board) .solo-home .solo-panel {
   border-color: var(--edition-line);
@@ -5850,3 +5850,68 @@ html #app[data-screen][data-screen] .tiempo-field .segmented-option:has(input:fo
 html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-option.is-on {
   color: #fff3d9; border-color: #d8b37e; background: linear-gradient(145deg, #765236, #493020);
 }
+
+/* Contraste de noche. Las superficies de papel (la carta de la línea, la página final,
+   la ficha del resultado, la vista previa del hueco) son claras en los dos temas, pero
+   sus textos y sus piezas internas leían las variables del tema, que de noche son crema y
+   cuero oscuro: crema sobre crema, o una ficha oscura con tinta oscura. Dentro de ellas se
+   restauran las variables del tema claro (los valores de `:root` de styles.css y de la
+   cabecera de este archivo), así vale cualquier regla que ya las use sin tocarla una a una.
+   Si se cambia la paleta clara, hay que cambiarla también aquí. */
+:root[data-theme="dark"] :is(#app .timeline-card, #app .atlas-final-page, #app .board-result-layer .modal.board-result, #app .timeline-detail-modal, #app.atlas-board .slot-confirm-card.preview-card) {
+  color-scheme: light;
+  --ink: #3b2816; --muted: #66502f; --line: #b88b50; --paper: #ead09a; --surface: rgba(248,225,177,.88);
+  --accent: #8a3a18; --accent-dark: #6f2c13; --accent-soft: #d6ad69; --teal: #526c65; --green: #5e6f3a;
+  --vitela: rgba(246,222,174,.88); --vitela-luz: rgba(255,243,211,.36); --vitela-borde: rgba(135,87,39,.48);
+  --borde-suave: rgba(132,84,35,.48); --boton-suave: rgba(245,221,174,.78); --boton-icono: rgba(246,221,170,.62);
+  --boton-icono-luz: rgba(255,246,213,.28); --campo: rgba(250,232,194,.74); --ficha: rgba(244,220,173,.75);
+  --contador: rgba(233,199,134,.75); --hueco: rgba(235,204,146,.64); --fila: rgba(249,228,184,.66);
+  --fila-activa: rgba(216,174,104,.62); --reja: rgba(130,81,35,.3); --estante: rgba(242,216,164,.64);
+  --formato-detalle: #76583a; --promo: rgba(230,196,133,.72);
+  --edition-paper: #f3eee4; --edition-surface: #fcfaf5; --edition-ink: #302d27; --edition-muted: #5e584d;
+  --edition-line: #d7cbb6; --edition-brass: #7a5a26; --atlas-selection: #9b452b;
+}
+:root[data-theme="dark"] :is(#app .atlas-final-page, #app .board-result-layer .modal.board-result, #app .timeline-detail-modal) { color: var(--edition-ink); }
+
+/* El selector de avatar tenía el papel escrito a mano (#f8f0df) y la tinta del tema: de
+   noche, título y nombres se perdían. Sigue el tema como el resto de diálogos. */
+:root[data-theme="dark"] #app .avatar-picker { background: var(--modal-fondo, #25180e); border-color: var(--edition-line); }
+:root[data-theme="dark"] #app .avatar-picker-close { background: var(--edition-surface); }
+:root[data-theme="dark"] #app .avatar-picker-option.is-selected { background: #d4bb8b26; box-shadow: inset 0 0 0 1px #d4bb8b40; }
+@media (hover: hover) { :root[data-theme="dark"] #app .avatar-picker-option:hover { background: #d4bb8b1f; } }
+
+/* Competición y reto diario: el titular y los rótulos estaban fijados en tinta oscura
+   (#2a1a10, #8a3f2f) para el pergamino, y el color de la escena (un marrón oscuro) hacía de
+   texto y de fondo de botón a la vez; de noche quedaban oscuro sobre oscuro. */
+:root[data-theme="dark"] #app .comp-splash h2 { color: var(--edition-ink); }
+:root[data-theme="dark"] #app .comp-splash-lead { color: var(--edition-muted); }
+:root[data-theme="dark"] #app :is(.comp-splash, .daily-splash) .chapter-number { color: var(--edition-brass); }
+:root[data-theme="dark"] #app .daily-reel-kicker,
+:root[data-theme="dark"] #app .daily-splash.is-revealed .daily-reel-kicker { color: var(--edition-brass); }
+:root[data-theme="dark"] #app .daily-splash .comp-splash-start { color: #fff9ed; }
+
+/* La mesa de noche: el resplandor claro tras la línea de tiempo (pensado para el papel)
+   aclaraba el fondo justo bajo el título y los extremos, que van en crema. Aquí se queda
+   en un velo de latón; la nota provisional de la mano, con el papel escrito a mano, pasa
+   a la superficie del tema; y los corazones y la etiqueta «Aquí» usan tonos que se leen
+   sobre oscuro. */
+:root[data-theme="dark"] #app.atlas-board > .shell > section:has(.timeline-wrap) {
+  background: radial-gradient(ellipse at 50% 0%, #d4bb8b1c, transparent 74%);
+  box-shadow: inset 0 1px 0 #d4bb8b26, inset 0 -10px 24px #00000030;
+}
+:root[data-theme="dark"] #app.atlas-board .provisional-hand-note { background: var(--edition-surface); }
+:root[data-theme="dark"] #app :is(.solo-lives .vida, .vidas-aviso-corazones) { color: #e8705c; }
+:root[data-theme="dark"] #app :is(.board-result, .atlas-final-page) .solo-lives .vida { color: #b03a2e; }
+/* Los paneles de preparación llevaban un resplandor casi blanco (pensado para el papel) bajo
+   rótulos de latón claro: de noche, solo un velo de latón. */
+:root[data-theme="dark"] #app :is(.setup-art-panel, .solo-shortcut-resume, .quick-free-setup .solo-panel) {
+  background-image: radial-gradient(ellipse at 10% 0, #d4bb8b14, transparent 65%);
+  box-shadow: inset 0 0 0 5px #d4bb8b0d, inset 0 0 0 6px #d4bb8b1c, 0 9px 22px #0006;
+}
+:root[data-theme="dark"] #app .slot-correct small { color: #f4dcbb; }
+
+/* Rótulos que llevaban un acento pensado para papel claro sobre fondo oscuro (el de Retos
+   rápidos es un terracota oscuro) y los números de capítulo de la guía, que en el tema claro
+   eran el tono de cada capítulo sin oscurecer. */
+:root[data-theme="dark"] #app :is(.quick-ready, .quick-free-setup) .solo-intro .eyebrow { color: var(--edition-brass); }
+:root:not([data-theme="dark"]) #app .guide-handbook .guide-chapter-number { color: color-mix(in srgb, var(--chapter-tone) 68%, #000); }
