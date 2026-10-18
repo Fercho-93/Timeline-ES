@@ -171,6 +171,46 @@ try {
   assert.equal(sinAna.host,'guest');
   await assertFails(write(guest,{...sinAna,host:'host'}));
   await assertSucceeds(write(host,sinAna));
+  // Expulsar de la sala de espera: solo quien la lleva, en una sala privada y antes de empezar.
+  await env.clearFirestore();
+  {
+    let sala=R.create('host','Ana',4);
+    await assertSucceeds(write(host,sala));
+    sala=R.reduce(sala,'guest',{type:'join',name:'Bea'});await assertSucceeds(write(guest,sala));
+    sala=R.reduce(sala,'outsider',{type:'join',name:'Cid'});await assertSucceeds(write(out,sala));
+    sala=R.reduce(sala,'host',{type:'starter-draw',modeKey:'history',cardId:1});await assertSucceeds(write(host,sala));
+    sala=R.reduce(sala,'guest',{type:'starter-guess',value:1900});await assertSucceeds(write(guest,sala));
+    const sinBea=R.reduce(sala,'host',{type:'kick',target:'guest'});
+    assert.equal(JSON.stringify(sinBea.starter.guesses),'{}','su respuesta del minijuego se va con ella');
+    // Solo quien la lleva: ni quien se va, ni otra persona de la mesa, ni alguien de fuera.
+    await assertFails(write(guest,sinBea));
+    await assertFails(write(out,sinBea));
+    await assertFails(write(out,R.reduce(sala,'host',{type:'kick',target:'outsider'})));
+    // Se va una persona que no es quien la lleva: ni ella misma (que se queda la primera), ni dos, ni ninguna.
+    await assertFails(write(host,{...sala,members:['guest','outsider'],names:['Bea','Cid'],host:'guest',actor:'guest',starter:sinBea.starter,revision:sala.revision+1}));
+    await assertFails(write(host,{...sinBea,members:['host'],names:['Ana'],starter:{...sinBea.starter,guesses:{}}}));
+    // Nadie entra por la puerta de atrás mientras se echa a otro, y no cambia nada más de la sala.
+    await assertFails(write(host,{...sinBea,members:['host','intruso'],names:['Ana','Intruso']}));
+    await assertFails(write(host,{...sinBea,capacity:3}));
+    await assertFails(write(host,{...sinBea,matchmaking:'public'}));
+    await assertSucceeds(write(host,sinBea));
+    assert.equal(JSON.stringify((await getDoc(ref(host))).data().members),'["host","outsider"]');
+    // Quien ha sido expulsado ya no está: no puede responder como si estuviera, pero con el código puede volver a entrar.
+    await assertFails(write(guest,{...sinBea,starter:{...sinBea.starter,guesses:{...sinBea.starter.guesses,guest:5}},revision:sinBea.revision+1}));
+    const volvio=R.reduce(sinBea,'guest',{type:'join',name:'Bea'});
+    await assertSucceeds(write(guest,volvio));
+    // Empezada la partida ya no se echa a nadie.
+    const empezada=R.reduce(volvio,'host',{type:'start',rounds});await assertSucceeds(write(host,empezada));
+    await assertFails(write(host,{...empezada,members:['host','outsider'],names:['Ana','Cid'],revision:empezada.revision+1}));
+  }
+  // En una mesa pública se sienta quien llega: quien la lleva tampoco puede echar a nadie.
+  await env.clearFirestore();
+  {
+    let mesa2=R.create('host','Ana',4);mesa2.matchmaking='public';
+    mesa2=R.reduce(mesa2,'guest',{type:'join',name:'Bea'});
+    await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'quickRooms','ABCDEFGH23'),{...JSON.parse(JSON.stringify(mesa2)),catalog:1,updatedAt:new Date()}));
+    await assertFails(write(host,{...mesa2,members:['host'],names:['Ana'],revision:mesa2.revision+1}));
+  }
   // Duelo por turnos: quien lo crea empieza sin esperar y el amigo entra a mitad de partida.
   await env.clearFirestore();
   const duelRounds=Array.from({length:3},()=>({id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}));
@@ -255,6 +295,24 @@ try {
     {const lob=Object.assign(R.create('host','Ana',2),{invitedUid:'guest',invitedName:'Bea'});await assertSucceeds(write(host,lob));await assertSucceeds(write(host,R.reduce(lob,'host',{type:'start',rounds:rounds3,kind:'duel'})));}
     await assertFails(deleteDoc(ref(guest)));
     await assertSucceeds(deleteDoc(ref(host)));
+  }
+  // Expulsar por internet con el adaptador de producción: quien se queda sin plaza lo ve en su sala, y nadie más puede echar.
+  {
+    await env.clearFirestore();
+    const lead=adapter('host',host,true),other=adapter('guest',guest,true);
+    const seen={host:null,guest:null};
+    const a=await lead.connect({name:'Ana',capacity:4,create:true,onChange:r=>{seen.host=r;},onError:e=>{throw e;}});
+    await new Promise(resolve=>setTimeout(resolve,100));
+    const b=await other.connect({name:'Bea',code:a.code,onChange:r=>{seen.guest=r;},onError:e=>{throw e;}});
+    await wait(()=>seen.host?.members.length===2&&seen.guest?.members.length===2);
+    await assert.rejects(b.act({type:'kick',target:'host'}),/expulsar/,'quien no lleva la sala no echa a nadie');
+    await a.act({type:'kick',target:'guest'});
+    await wait(()=>seen.guest?.members.length===1&&seen.host?.members.length===1);
+    assert.equal(JSON.stringify(seen.guest.members),'["host"]','quien ha sido expulsado ve la sala ya sin él');
+    // Con el código puede volver a entrar.
+    const again=await other.connect({name:'Bea',code:a.code,onChange:r=>{seen.guest=r;},onError:e=>{throw e;}});
+    await wait(()=>seen.host?.members.length===2);
+    again.close();a.close();b.close();
   }
   console.log('Retos online: reglas de acceso, turnos, historial, sala real, sincronización y reconexión: OK');
   // The production transaction retries a saved command after a lost response, exactly once.

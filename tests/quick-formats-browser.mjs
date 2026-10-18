@@ -95,6 +95,33 @@ try {
   if(await host.locator('[data-quick="bank"]').count())await host.locator('[data-quick="bank"]').click();
   await host.locator('.quick-panel h2').waitFor();await guest.locator('.quick-panel h2').waitFor();
   await host.close();await guest.close();
+  // Quien lleva la sala echa a alguien de la sala de espera: se le avisa, vuelve a la entrada y la conexión se
+  // cierra sin ningún error de red; quien no la lleva no ve el botón.
+  {
+    const lead=await open('Cris'),other=await open('Dani');
+    await toFriends(lead);
+    await lead.locator('.quick-length-chip[data-length="1"]').click();
+    await lead.locator('label:has(input[name="quick-live-net"][value="wifi"])').click();
+    await lead.locator('[data-quick="live-room"]').click();
+    await lead.locator('[data-quick="invite-peer"]').click();
+    const invitation=await lead.locator('#quick-signal').inputValue();
+    await openPlay(other);await other.locator('.mode-join-shortcut').click();
+    await other.locator('#friends-join-code').fill(invitation);await other.locator('[data-friends-join-form] [type="submit"]').click();
+    await other.locator('#quick-signal').waitFor();
+    await lead.locator('#quick-answer').fill(await other.locator('#quick-signal').inputValue());await lead.locator('[data-quick="accept-answer"]').click();
+    await lead.locator('[data-quick="start-room"]:enabled').waitFor();
+    await other.locator('.lobby-table').waitFor();
+    assert.equal(await other.locator('[data-quick="kick"]').count(),0,'quien no lleva la sala no puede echar a nadie');
+    assert.equal(await lead.locator('[data-quick="kick"]').count(),1,'quien la lleva puede echar a la otra persona (y no a sí mismo)');
+    await lead.locator('[data-quick="kick"]').click();
+    await lead.locator('.modal button',{hasText:'Expulsar'}).click();
+    await other.locator('#toast.show',{hasText:'El anfitrión te ha sacado de la sala'}).waitFor();
+    assert.equal(await other.locator('.lobby-table').count(),0,'quien ha sido expulsado ya no está en la sala de espera');
+    await lead.waitForFunction(()=>!document.querySelector('.lobby-table')?.textContent.includes('Dani'));
+    assert.equal(await lead.locator('[data-quick="start-room"]').isDisabled(),true,'sin nadie más, no se puede empezar');
+    assert.equal(await lead.locator('#quick-error').innerText(),'','y quien lleva la sala no ve ningún error de conexión');
+    await lead.close();await other.close();
+  }
   assert.deepEqual(errors,[]);
-  console.log('Retos rápidos: solo, mismas cartas por enlace y sala por Wi-Fi con WebRTC real en dos móviles: OK');
+  console.log('Retos rápidos: solo, mismas cartas por enlace y sala por Wi-Fi con WebRTC real en dos móviles y expulsar de la sala de espera: OK');
 } finally {await browser?.close();await new Promise(resolve=>server.close(resolve));}

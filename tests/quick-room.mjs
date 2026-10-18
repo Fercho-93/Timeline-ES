@@ -118,4 +118,35 @@ console.log('Duelo por turnos: empieza el creador, el amigo entra después y el 
   assert.ok(R.sameCommand(t.commands.at(-1),{type:'place',cardId:'poker-2',index:1},'a'),'una jugada pendiente se reconoce ya firmada');
   assert.ok(!R.sameCommand(t.commands.at(-1),{type:'place',cardId:'poker-2',index:1},'b'));
 }
-console.log('Quién empieza en una sala en directo: sorteo, respuesta única y primer turno: OK');
+
+{
+  // Expulsar: solo quien lleva la sala, en una sala privada y antes de empezar.
+  let t=R.create('a','Ana',4);t=R.reduce(t,'b',{type:'join',name:'Bea'});t=R.reduce(t,'c',{type:'join',name:'Cid'});
+  assert.throws(()=>R.reduce(t,'b',{type:'kick',target:'c'}),/expulsar/,'quien no la lleva no echa a nadie');
+  assert.throws(()=>R.reduce(t,'c',{type:'kick',target:'a'}),/expulsar/,'nadie echa a quien la lleva');
+  assert.throws(()=>R.reduce(t,'a',{type:'kick',target:'a'}),/expulsar/,'quien la lleva no se echa a sí mismo');
+  assert.throws(()=>R.reduce(t,'a',{type:'kick',target:'z'}),/expulsar/,'quien no está no se puede echar');
+  assert.throws(()=>R.reduce(t,'a',{type:'kick'}),/expulsar/);
+  // Con el minijuego en marcha, su respuesta se va con él y el resto se conserva.
+  t=R.reduce(t,'a',{type:'starter-draw',modeKey:'history',cardId:1});
+  t=R.reduce(t,'b',{type:'starter-guess',value:1900});t=R.reduce(t,'c',{type:'starter-guess',value:5});
+  const after=R.reduce(t,'a',{type:'kick',target:'b'});
+  assert.equal(JSON.stringify(after.members),'["a","c"]');assert.equal(JSON.stringify(after.names),'["Ana","Cid"]');assert.equal(after.host,'a');
+  assert.equal(JSON.stringify(after.starter.guesses),'{"c":5}','la respuesta de quien se va se borra');
+  assert.equal(after.revision,t.revision+1);assert.equal(after.phase,'lobby');
+  assert.doesNotThrow(()=>R.validate(after));
+  assert.equal(JSON.stringify(t.members),'["a","b","c"]','el reductor no toca la sala de entrada');
+  // Se puede volver a entrar (con el código), como en las colecciones, y la plaza queda libre mientras tanto.
+  const again=R.reduce(after,'b',{type:'join',name:'Bea'});
+  assert.equal(JSON.stringify(again.members),'["a","c","b"]');
+  // Ya empezada, no: la partida se reconstruye con los nombres con los que empezó.
+  const started=R.reduce(t,'a',{type:'start',rounds});
+  assert.throws(()=>R.reduce(started,'a',{type:'kick',target:'b'}),/expulsar/,'no se echa en mitad de una partida');
+  // En una mesa pública se sienta quien llega: ahí no se echa.
+  const mesa={...R.reduce(R.create('a','Ana',3),'b',{type:'join',name:'Bea'}),matchmaking:'public'};
+  assert.throws(()=>R.reduce(mesa,'a',{type:'kick',target:'b'}),/expulsar/,'en una mesa pública no se echa');
+  // Con dos en la sala, quedarse solo es válido.
+  const pareja=R.reduce(R.reduce(R.create('a','Ana',2),'b',{type:'join',name:'Bea'}),'a',{type:'kick',target:'b'});
+  assert.equal(JSON.stringify(pareja.members),'["a"]');
+}
+console.log('Quién empieza en una sala en directo: sorteo, respuesta única y primer turno; expulsar de la sala de espera: OK');

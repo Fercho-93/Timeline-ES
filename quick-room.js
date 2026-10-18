@@ -76,6 +76,14 @@
       r.members.splice(at, 1); r.names.splice(at, 1);
       if (r.starter) delete r.starter.guesses[id];
       r.host = r.members[0]; r.actor = r.host;
+    } else if (action.type === 'kick') {
+      // Echar a alguien de la sala de espera: solo quien la lleva, en una sala privada (en una mesa pública se
+      // sienta quien llega) y antes de empezar; no puede echarse a sí mismo (si quiere irse, cierra la sala).
+      // Su respuesta del minijuego de quién empieza se borra con él. Puede volver a entrar con el código.
+      const at = r.members.indexOf(action.target);
+      if (id !== r.host || r.matchmaking === 'public' || r.phase !== 'lobby' || at < 1) throw Error('No se puede expulsar a esa persona.');
+      r.members.splice(at, 1); r.names.splice(at, 1);
+      if (r.starter) delete r.starter.guesses[action.target];
     } else if (action.type === 'starter-draw') {
       // Sortear la carta: solo quien lleva la sala, con al menos dos personas; repetirlo borra las respuestas.
       if (r.phase !== 'lobby' || id !== r.host || r.members.length < 2 || typeof action.modeKey !== 'string' || !action.modeKey || action.modeKey.length > 32 || !Number.isInteger(action.cardId)) throw Error('No se puede sortear ahora.');

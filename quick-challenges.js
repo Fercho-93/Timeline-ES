@@ -75,7 +75,7 @@
   }
   function guide() {
     const layer=document.createElement('div'); layer.className='overlay';
-    layer.innerHTML=`<div class="modal rules quick-guide-modal"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-quick="close-menu" aria-label="Cerrar guía">×</button></div><div class="guide-content"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2>Cómo se juega</h2><section><h3>Un reto, una línea</h3><p>Comienza con una carta de referencia y coloca cada carta nueva en el hueco que le corresponde. El dato se revela al confirmar.</p></section><section><h3>Si juegas solo (o en un duelo por enlace)</h3><p>Cada carta bien colocada suma un acierto. Un fallo cuenta como fallo, pero sigues hasta terminar el reto: no te echa.</p></section><section><h3>Si juegas con amigos</h3><p>En un solo móvil, en una sala o por turnos, quien prepara la partida elige qué pasa al fallar. «Arriesgar o plantarse»: cada acierto es provisional y puedes plantarte para asegurarlo; si fallas, pierdes los provisionales de ese reto y quedas fuera hasta el siguiente. «Seguir hasta el final»: un fallo no suma, pero se juega todo el reto y gana quien acierte más.</p></section><section><h3>Mesa pública</h3><p>La partida rápida son tres retos sorpresa con desconocidos, arriesgando o plantándote. Quien crea una mesa elige cuántos retos se juegan y qué pasa al fallar.</p></section><section><h3>Mazos sorpresa</h3><p>Los mazos se sortean automáticamente. Solo conocerás la temática cuando empiece el reto; los siguientes permanecen ocultos.</p></section><section><h3>Turnos justos</h3><p>El primer turno rota en cada reto. En partidas por Internet o por enlace, siempre juega una persona cada vez.</p></section></div><button class="btn btn-primary btn-block" data-quick="close-menu">Entendido</button></div>`;
+    layer.innerHTML=`<div class="modal rules quick-guide-modal"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-quick="close-menu" aria-label="Cerrar guía">×</button></div><div class="guide-content"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2>Cómo se juega</h2><section><h3>Un reto, una línea</h3><p>Comienza con una carta de referencia y coloca cada carta nueva en el hueco que le corresponde. El dato se revela al confirmar.</p></section><section><h3>Si juegas solo (o en un duelo por enlace)</h3><p>Cada carta bien colocada suma un acierto. Un fallo cuenta como fallo, pero sigues hasta terminar el reto: no te echa.</p></section><section><h3>Si juegas con amigos</h3><p>En un solo móvil, en una sala o por turnos, quien prepara la partida elige qué pasa al fallar. «Arriesgar o plantarse»: cada acierto es provisional y puedes plantarte para asegurarlo; si fallas, pierdes los provisionales de ese reto y quedas fuera hasta el siguiente. «Seguir hasta el final»: un fallo no suma, pero se juega todo el reto y gana quien acierte más. Quien crea una sala puede echar a alguien mientras esperan, con la «×» de su plaza.</p></section><section><h3>Mesa pública</h3><p>La partida rápida son tres retos sorpresa con desconocidos, arriesgando o plantándote. Quien crea una mesa elige cuántos retos se juegan y qué pasa al fallar.</p></section><section><h3>Mazos sorpresa</h3><p>Los mazos se sortean automáticamente. Solo conocerás la temática cuando empiece el reto; los siguientes permanecen ocultos.</p></section><section><h3>Turnos justos</h3><p>El primer turno rota en cada reto. En partidas por Internet o por enlace, siempre juega una persona cada vez.</p></section></div><button class="btn btn-primary btn-block" data-quick="close-menu">Entendido</button></div>`;
     app().append(layer); CT.openDialog(layer,true);
   }
   function myTurn() {return !room || room.actor === myId;}
@@ -369,7 +369,22 @@
       ${net && readJSON(NET) ? button('reconnect','Volver a mi sala','btn btn-secondary btn-block') : ''}
       <p class="hint">El primer turno rota en cada reto para que todos tengan las mismas oportunidades.</p><p id="quick-error" role="alert"></p></section>`);
   }
+  // Aviso breve (el mismo cartel de toda la aplicación) para lo que pasa fuera de la pantalla en la que se está.
+  function notice(message) {
+    CT.announce?.(message);
+    const toast=document.getElementById('toast');if(!toast)return;
+    CT.Effects?.transition?.('notice');
+    toast.textContent=message;toast.classList.add('show');
+    clearTimeout(notice.timer);notice.timer=setTimeout(()=>toast.classList.remove('show'),3500);
+  }
+  // Quien lleva la sala te ha echado de la sala de espera: no queda sala que enseñar ni a la que volver sola.
+  function kickedOut() {
+    CT.Storage.removeItem(NET);
+    toEntry();
+    notice('El anfitrión te ha sacado de la sala.');
+  }
   function roomChanged(next,id,code) {
+    if(room&&!room.config&&room.members.includes(id)&&!next.members.includes(id)&&next.phase==='lobby'){kickedOut();return;}
     const wasLobby=page==='network-lobby'&&!room?.config;
     const previous=serverRoom;
     const freshOwnPlace=room && previous && room.members.includes(id) && next.commands.length===previous.commands.length+1
@@ -577,7 +592,7 @@
     slots.forEach((slot,i)=>{
       const name=room.names[i], mine=room.members[i]===myId;
       table[slot]=name
-        ? `<div class="table-seat occupied${mine?' is-you':''}"><span class="seat-avatar">${CT.Avatares.forUser(name,room.members[i],{size:44})}</span><strong>${esc(name)}${mine?' · tú':''}</strong><small>${room.members[i]===room.host?'Anfitrión':`Plaza ${i+1}`}</small><i class="ready-seal">Listo</i></div>`
+        ? `<div class="table-seat occupied${mine?' is-you':''}"><span class="seat-avatar">${CT.Avatares.forUser(name,room.members[i],{size:44})}</span><strong>${esc(name)}${mine?' · tú':''}</strong><small>${room.members[i]===room.host?'Anfitrión':`Plaza ${i+1}`}</small><i class="ready-seal">Listo</i>${host&&room.members[i]!==room.host?`<button class="kick-btn" data-quick="kick" data-uid="${esc(room.members[i])}" aria-label="Expulsar a ${esc(name)}">×</button>`:''}</div>`
         : `<div class="table-seat empty" aria-label="Plaza ${i+1} libre"><span>+</span><small>Libre</small></div>`;
     });
     const length=roomLength||3;
@@ -1093,6 +1108,11 @@
     const target = event.target.closest('[data-quick]');
     if (!target || !app().contains(target) || !paint) return;
     const action = target.dataset.quick;
+    if (action === 'kick') {
+      const uid = target.dataset.uid, at = room ? room.members.indexOf(uid) : -1, name = at > 0 ? room.names[at] : 'esta persona';
+      CT.UI.confirmDialog('Saldrá de la sala de espera. Si quiere volver, tendrá que entrar de nuevo con el código.', () => {CT.closeDialog?.(); void networkAction({type: 'kick', target: uid});}, {title: `¿Expulsar a ${name}?`, confirmLabel: 'Expulsar', cancelLabel: 'Cancelar'});
+      return;
+    }
     const formatActions=['live-room','formats','leave-public','share-duel','create-room','join-room','start-room','room-starter-draw','room-starter-guess','share-room','qr-room','qr-signal','scan-code','scan-answer','share-signal','invite-peer','accept-answer','reconnect','duels-list','rematch-room','accept-invite','decline-invite','back-invite'];
     if(formatActions.includes(action)){target.disabled=true;Promise.resolve(formatAction(action)).catch(errorNotice).finally(()=>{if(target.isConnected)target.disabled=false;});return;}
     if (action === 'add-player' || action === 'remove-player') {

@@ -21,6 +21,12 @@ dispositivo.
   (`quick-room.js`) reconstruye la partida en cada cliente y rechaza un comando cuyo autor no sea
   el participante de turno (o el anfitrión, para pasar de reto). Así nadie juega las cartas de
   otro apuntándose como `actor`. Los comandos sin firma de salas anteriores se siguen aceptando.
+- **Expulsar de la sala de espera de Retos rápidos.** Solo quien lleva la sala (`host`, siempre el
+  primero de `members`) puede echar a otra persona, y solo en una sala privada y antes de empezar
+  (rama `kicking` de las reglas, y la acción `kick` de `QuickRoom.reduce`); no se echa en mitad de
+  una partida ni en una mesa pública. Lo único que cambia además es la respuesta del minijuego de
+  quién empieza de quien se va. Quien es expulsado puede volver a entrar con el código: no hay lista
+  de bloqueados, como en las colecciones.
 - **Final numérica validada contra la carta.** La final de las salas guarda cada respuesta de forma
   inmutable en `rooms/{sala}/finalRounds/{ronda}/answers/{uid}` con un recibo público en la misma
   transacción; antes de que todos respondan solo la lee su autor. Las reglas comprueban las
