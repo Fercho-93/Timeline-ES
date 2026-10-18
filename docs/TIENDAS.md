@@ -26,13 +26,16 @@ se revisa aquí antes de enviarla.
   existe): `https://continuumjuego.es/borrar-cuenta.html`.
 - Condiciones de uso: `https://continuumjuego.es/terminos.html`. Aviso legal (identificación del titular,
   LSSI art. 10): `https://continuumjuego.es/aviso-legal.html`.
-- Responsable: Fernando Sirvent Merino, a título individual. **No se publican NIF ni domicilio** mientras el
-  juego sea gratuito, sin publicidad, compras ni ingresos: en App Store Connect (Negocio → Estado de
-  comerciante) y en Play Console hay que declararse **«no comerciante»**, y las fichas no muestran dirección ni
-  teléfono. Apple obliga a declararlo a todo el que publique, aunque sea gratis. **Si algún día se añaden
-  publicidad, compras o donaciones**, hay que declararse comerciante (las tiendas mostrarán dirección,
-  teléfono y correo en la UE; se puede usar una domiciliación postal) y completar NIF y domicilio en
-  `aviso-legal.html` y en la política. Criterio pendiente de revisión por un abogado.
+- Responsable: Fernando Sirvent Merino, a título individual. **Se venderán colecciones y mazos dentro de la
+  app**, así que en App Store Connect (Negocio → Estado de comerciante) y en Play Console hay que declararse
+  **«comerciante» desde la primera ficha**, aunque la primera versión sea gratuita: cambiarlo después obliga a
+  rehacer la ficha y la declaración deja de ser cierta en cuanto hay una venta. Las fichas de la UE mostrarán
+  dirección, teléfono y correo; para no poner el domicilio particular se usa una **domiciliación postal**
+  (y un teléfono de empresa). Antes de crear las fichas hacen falta: NIF, dirección de la domiciliación y
+  teléfono, y completarlos en `aviso-legal.html` y en la política (hoy dicen que se añadirán antes de vender).
+  Antes de lanzar las ventas: alta fiscal con una gestoría, condiciones de venta (precio, desistimiento,
+  restauración de compras) y revisión de la política («no hay compras»). Criterio pendiente de revisión por un
+  abogado.
 
 ## Textos de la ficha
 

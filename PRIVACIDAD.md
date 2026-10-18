@@ -34,7 +34,7 @@ Cada dato se explica con más detalle, con su base jurídica, en las secciones s
 
 ## Responsable y contacto
 
-Continuum es un proyecto personal. El responsable del tratamiento es **Fernando Sirvent Merino**, a título individual y no como empresa. Para cualquier asunto de privacidad (acceso a tus datos, rectificación, borrado u otra petición) escribe a **feedbackcontinuum@gmail.com**. Continuum es gratuito y no tiene actividad comercial; si eso cambiara, se completarán aquí los datos de identificación que exija la normativa. Los datos del titular están también en el [aviso legal](aviso-legal.html).
+Continuum es un proyecto personal. El responsable del tratamiento es **Fernando Sirvent Merino**, a título individual y no como empresa. Para cualquier asunto de privacidad (acceso a tus datos, rectificación, borrado u otra petición) escribe a **feedbackcontinuum@gmail.com**. Antes de ofrecer contenido de pago en el juego se añadirán aquí el NIF y el domicilio del responsable que exige la normativa. Los datos del titular están también en el [aviso legal](aviso-legal.html).
 
 ## Tu invitado y tu progreso
 

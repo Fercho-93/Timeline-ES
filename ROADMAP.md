@@ -130,7 +130,8 @@ porque no se desplegó. Si algún día se quiere competición pública arbitrada
 
 - [ ] Comprobar la disponibilidad de Continuum en OEPM/EUIPO y tiendas.
 - [ ] Decidir la licencia definitiva del proyecto.
-- [ ] Confirmar con un abogado que, siendo gratuito y sin ingresos, basta con nombre y correo (sin NIF ni domicilio) en el aviso legal y la política; y declararse «no comerciante» en App Store y Google Play. Si se añaden publicidad, compras o donaciones, hay que completar NIF y domicilio y declararse comerciante.
+- [ ] Identificación para vender dentro de la app: NIF, domiciliación postal y teléfono en `aviso-legal.html` y la política; declararse «comerciante» en App Store y Google Play desde la primera ficha; alta fiscal con una gestoría.
+- [ ] Lanzar las compras (colecciones y mazos): condiciones de venta, política de privacidad sin «no hay compras», restauración de compras, reglas de menores de las tiendas.
 - [ ] Revisión legal de la política de privacidad, las condiciones de uso, el aviso legal, la conservación y el borrado.
 - [ ] Cuestionarios de edad, «Privacidad de la app» y «Seguridad de los datos» (borradores en
       [docs/TIENDAS.md](docs/TIENDAS.md)).

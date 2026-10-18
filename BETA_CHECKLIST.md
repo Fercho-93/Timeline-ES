@@ -155,7 +155,8 @@ Detalle en [docs/TIENDAS.md](docs/TIENDAS.md).
 - [x] Procedencia del arte documentada.
 - [x] Cartas de Naturaleza con fuente.
 - [ ] Política de privacidad revisada profesionalmente.
-- [x] Responsable y soporte: nombre y correo puestos. Sin NIF ni domicilio mientras el juego sea gratuito y sin ingresos; revisar con un abogado y declararse «no comerciante» en las tiendas.
+- [ ] Responsable y soporte: nombre y correo puestos. Faltan NIF, domiciliación postal y teléfono: al vender dentro de la app hay que declararse «comerciante» en App Store y Google Play desde la primera ficha (ver `docs/TIENDAS.md`).
+- [ ] Alta fiscal (gestoría) y condiciones de venta antes de lanzar las compras; revisar entonces «gratuito / sin compras» en `terminos.html`, la política y la ficha.
 - [ ] Condiciones de uso, aviso legal, soporte y página de borrado (borradores publicados; no son asesoramiento jurídico): revisión por un abogado antes del lanzamiento.
 - [ ] «Privacidad de la app» (App Store) y «Seguridad de los datos» (Google Play).
 - [ ] Clasificación de edad.

@@ -123,7 +123,7 @@ Cada archivo es una lista de cartas con su título, su explicación, el valor qu
 | --- | --- |
 | `privacidad.html` | Política de privacidad (la que ve el jugador). `PRIVACIDAD.md` es la misma en el repositorio. |
 | `terminos.html` | Condiciones de uso: conducta, nombres, denuncias, propiedad intelectual y responsabilidad. |
-| `aviso-legal.html` | Identificación del titular (LSSI art. 10): nombre y correo. Sin NIF ni domicilio mientras el juego sea gratis y sin ingresos (ver `docs/TIENDAS.md`). |
+| `aviso-legal.html` | Identificación del titular (LSSI art. 10): nombre y correo. El NIF y el domicilio se añaden antes de vender dentro de la app (ver `docs/TIENDAS.md`). |
 | `soporte.html` | Contacto y preguntas frecuentes; es la URL de soporte de las tiendas. |
 | `borrar-cuenta.html` | Cómo borrar la cuenta (en el juego o por correo): la URL pública que pide Google Play. |
 | `licencias.html` | Licencias de las piezas de otros autores. Se genera con `scripts/licencias.mjs`. |
