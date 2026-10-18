@@ -994,11 +994,7 @@
     const jugador = escapeHtml(starterDraw.names[starterDraw.step]);
     renderStarterDialog(`<h2 data-dialog-focus tabindex="-1">Pasa el móvil a ${jugador}</h2>
       <div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta || "")}</span></div>
-      <div class="field cifra-field">
-        <label for="starter-guess-input">Tu respuesta${regla.unidad ? ` <span class="cifra-unidad">(en ${escapeHtml(regla.unidad)})</span>` : ""}</label>
-        <input id="starter-guess-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send">
-        <p class="hint">${escapeHtml(regla.pista || "")}</p>
-      </div>
+      ${CT.Duelo.Cifras.campo(selectedModeKey, "starter-guess-input")}
       <div class="actions"><button class="btn btn-primary btn-block" data-action="starter-guess-submit">Adivinar <span>→</span></button></div>`);
     const campo = app.querySelector("#starter-guess-input");
     // El teclado no se abre solo: taparía la carta y el botón. Se abre al tocar el campo; mientras tanto el
@@ -3442,11 +3438,7 @@
       <section class="cifra-panel">
         ${cifrasConReloj() ? relojMarkup(restante, plazoCifras()) : ""}
         <div class="cifra-card" id="cifra-pregunta">${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta)}</span></div>
-        <div class="field cifra-field">
-          <label for="cifra-input">Tu respuesta${regla.unidad ? ` <span class="cifra-unidad">(en ${escapeHtml(regla.unidad)})</span>` : ""}</label>
-          <input id="cifra-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send" aria-describedby="cifra-pregunta cifra-unidades" placeholder="${escapeHtml(regla.unidad || "")}" ${cerrada ? "disabled" : "data-autofocus"}>
-          <p class="hint" id="cifra-unidades">${escapeHtml(regla.pista || "")}${unidadesMarkup(cifras.mode)}</p>
-        </div>
+        ${CT.Duelo.Cifras.campo(cifras.mode, "cifra-input", { attrs: `aria-describedby="cifra-pregunta cifra-unidades" placeholder="${escapeHtml(regla.unidad || "")}" ${cerrada ? "disabled" : "data-autofocus"}`, hintId: "cifra-unidades" })}
         <button class="btn btn-primary btn-block" data-action="cifra-answer" ${cerrada ? "disabled" : ""}>Responder <span>→</span></button>
         ${cifrasConReloj() ? '<p class="hint cifra-aviso">El reloj no se para. Si sales de la aplicación, la carta se cierra.</p>' : '<p class="hint cifra-aviso">Sin tiempo: la rapidez solo desempata.</p>'}
       </section>
@@ -3456,14 +3448,6 @@
     if (!cerrada && cifrasConReloj()) arrancaReloj();
   }
 
-  // Las unidades que admite el mazo, tal cual las declara su eje. No es decoración: en
-  // peso, longevidad y velocidad el valor interno está en una unidad y las cartas se
-  // enseñan en otra, así que sin esto no hay manera de saber en qué se responde.
-  function unidadesMarkup(modeKey) {
-    const lista = Cifras.unidades(modeKey);
-    if (lista.length < 2) return "";
-    return `<span class="cifra-unidades">Se aceptan: ${lista.map(u => escapeHtml(u.nombre)).join(" · ")}</span>`;
-  }
 
   // El resultado de una carta: lo que valía, lo que se respondió y lo que suma. Aquí ya
   // se puede enseñar el detalle de la carta, que antes de responder muchas veces lleva la

@@ -284,6 +284,70 @@
     return alias ? factorDe(modeKey, alias) : null;
   }
 
+  // ——— El campo donde se escribe una cifra ———
+  //
+  // Una sola pieza para todos los sitios donde alguien teclea una cifra —el sorteo de quién empieza, el
+  // duelo de cifras, el duelo por turnos—, para que la etiqueta, el teclado y la ayuda digan lo mismo. La
+  // etiqueta da la unidad que se entiende cuando no se escribe ninguna; el teclado es el numérico, que no
+  // deja escribir «días» ni un menos; así que las demás unidades del mazo van debajo como botones: se teclea
+  // «3», se toca «días» y queda «3 días». Lo que la ayuda promete se hace tocando, no tecleando.
+  function opcionesCifra(modeKey) {
+    const vistas = new Set(), lista = [];
+    // Los sinónimos de una misma unidad («millones» y «M», «t» y «toneladas») no necesitan un botón cada uno.
+    for (const { nombre, factor } of unidades(modeKey)) {
+      if (!vistas.has(factor)) { vistas.add(factor); lista.push({ tipo: "unidad", texto: nombre }); }
+    }
+    // Con una sola unidad no hay nada que elegir (en fechas, un año es un año).
+    if (lista.length < 2) lista.length = 0;
+    // Antes de Cristo es un menos delante, que el teclado numérico tampoco tiene.
+    if (reglaCifra(modeKey).negativos) lista.push({ tipo: "signo", texto: "a. C." });
+    return lista;
+  }
+
+  // Lo que queda escrito al tocar un botón: la unidad detrás del número (cambiando la que hubiera) o el
+  // menos delante (poniéndolo o quitándolo). Sin número todavía, la unidad queda a la espera: al teclear
+  // la cifra delante se completa sola.
+  function aplicaOpcion(texto, tipo, valor) {
+    const escrito = String(texto || "").trim().replace(/[−–—]/g, "-");
+    if (tipo === "signo") return escrito.startsWith("-") ? escrito.slice(1).trim() : "-" + escrito;
+    const partido = escrito.match(/^(-?[\d.,\s ]*\d)\s*(.*)$/);
+    if (partido) return `${partido[1].trim()} ${valor}`;
+    return escrito || ` ${valor}`;
+  }
+
+  function botonesCifra(modeKey, id) {
+    const lista = opcionesCifra(modeKey);
+    if (!lista.length) return "";
+    const esc = CT.escapeHtml;
+    return `<div class="cifra-chips" role="group" aria-label="Unidad de la respuesta" data-cifra-para="${esc(id)}">${lista.map(opcion => `<button type="button" class="cifra-chip" data-cifra-${opcion.tipo}="${esc(opcion.texto)}">${esc(opcion.texto)}</button>`).join("")}</div>`;
+  }
+
+  // `attrs` son atributos extra del campo (desactivado, enfoque automático…) y `hintId`, el id de la ayuda.
+  function campoCifra(modeKey, id, { attrs = "", hintId = "" } = {}) {
+    const regla = reglaCifra(modeKey), esc = CT.escapeHtml;
+    return `<div class="field cifra-field"><label for="${id}">Tu respuesta${regla.unidad ? ` <span class="cifra-unidad">(en ${esc(regla.unidad)})</span>` : ""}</label>`
+      + `<input id="${id}" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send"${attrs ? ` ${attrs}` : ""}>`
+      + `${botonesCifra(modeKey, id)}<p class="hint"${hintId ? ` id="${hintId}"` : ""}>${esc(regla.pista || "")}</p></div>`;
+  }
+
+  // Un solo oyente para todos los botones, vengan de la pantalla que vengan: se repintan a menudo y así no
+  // hay que volver a engancharlos. Al tocarlos el teclado no se cierra.
+  if (typeof document !== "undefined") {
+    const botonDe = evento => evento.target?.closest?.(".cifra-chip");
+    document.addEventListener("pointerdown", evento => { if (botonDe(evento)) evento.preventDefault(); });
+    document.addEventListener("click", evento => {
+      const boton = botonDe(evento);
+      if (!boton) return;
+      const campo = document.getElementById(boton.closest(".cifra-chips")?.dataset.cifraPara || "");
+      if (!campo || campo.disabled) return;
+      const signo = boton.hasAttribute("data-cifra-signo");
+      campo.value = aplicaOpcion(campo.value, signo ? "signo" : "unidad", boton.dataset.cifraUnidad);
+      campo.focus({ preventScroll: true });
+      if (campo.value.startsWith(" ")) campo.setSelectionRange?.(0, 0);
+      campo.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+  }
+
   // Un número tal cual se guarda en el enlace: sin notación científica, que no pasaría
   // la validación al volver, y con los decimales que admita el mazo.
   function textoCifra(modeKey, valor) {
@@ -520,7 +584,7 @@
     Cifras: {
       CARTAS: CIFRAS_CARTAS, SEGUNDOS: CIFRAS_SEGUNDOS, MS: CIFRAS_MS, GRACIA_MS, SIN_RELOJ_MS, tope,
       PUNTOS_CARTA, PUNTOS_TINO, PUNTOS_PRISA, MAX_CIFRA,
-      regla: reglaCifra, unidades, factorDe, leer: leerCifra, reparto: repartoCifras, cartas: cartasCifras,
+      regla: reglaCifra, unidades, factorDe, leer: leerCifra, campo: campoCifra, opciones: opcionesCifra, aplica: aplicaOpcion, reparto: repartoCifras, cartas: cartasCifras,
       banda, puntosCarta, puntosPartida, acierto, aciertos: aciertosPartida, tiempo: tiempoPartida, compara: comparaCifras, formato: formatoCifra, texto: textoCifra,
       codificar: codificarCifras, invitacion: invitacionCifras, marcador: marcadorCifras, rejilla: rejillaCifras
     }

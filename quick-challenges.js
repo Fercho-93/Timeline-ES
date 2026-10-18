@@ -409,7 +409,7 @@
     const regla=CT.axis(s.modeKey).cifra||{}, mine=Number.isFinite(s.guesses[myId]), done=CT.QuickRoom.starterComplete(room);
     const cardBox=detail=>`<div class="cifra-card starter-card"><strong>${esc(card.title)}</strong><span>${detail}</span></div>`;
     const redo=host&&!auto?`<button type="button" class="btn btn-ghost btn-block" data-quick="room-starter-draw">🂠 Repetir el minijuego</button>`:'';
-    if(!mine)return `${head}${cardBox(esc(regla.pregunta||''))}<div class="field cifra-field"><label for="quick-room-starter-input">Tu respuesta${regla.unidad?` <span class="cifra-unidad">(en ${esc(regla.unidad)})</span>`:''}</label><input id="quick-room-starter-input" type="text" inputmode="${regla.decimales?'decimal':'numeric'}" autocomplete="off" enterkeyhint="send"><p class="hint">${esc(regla.pista||'')}</p></div><button type="button" class="btn btn-primary btn-block" data-quick="room-starter-guess">Adivinar <span>→</span></button>${redo}`;
+    if(!mine)return `${head}${cardBox(esc(regla.pregunta||''))}${CT.Duelo.Cifras.campo(s.modeKey,'quick-room-starter-input')}<button type="button" class="btn btn-primary btn-block" data-quick="room-starter-guess">Adivinar <span>→</span></button>${redo}`;
     if(!done){
       const faltan=room.members.filter(who=>!Number.isFinite(s.guesses[who])).map(who=>esc(room.names[room.members.indexOf(who)]));
       return `${head}${cardBox(esc(regla.pregunta||''))}<p class="hint">Has respondido. Esperando a: ${faltan.join(', ')}.</p>${redo}`;
@@ -774,7 +774,7 @@
   function starterAsk() {
     const {modeKey, card, names, step} = starterDraw, regla = CT.axis(modeKey).cifra || {};
     starterPaint(`<h2 data-dialog-focus tabindex="-1">Pasa el móvil a ${esc(names[step])}</h2><div class="cifra-card starter-card"><strong>${esc(card.title)}</strong><span>${esc(regla.pregunta || '')}</span></div>
-      <div class="field cifra-field"><label for="quick-starter-input">Tu respuesta${regla.unidad ? ` <span class="cifra-unidad">(en ${esc(regla.unidad)})</span>` : ''}</label><input id="quick-starter-input" type="text" inputmode="${regla.decimales ? 'decimal' : 'numeric'}" autocomplete="off" enterkeyhint="send"><p class="hint">${esc(regla.pista || '')}</p></div>
+      ${CT.Duelo.Cifras.campo(modeKey, 'quick-starter-input')}
       <div class="actions"><button class="btn btn-primary btn-block" data-quick="starter-guess">Adivinar <span>→</span></button><button class="btn btn-ghost btn-block" data-quick="starter-back">Volver a la preparación</button></div>`);
     const field = app().querySelector('#quick-starter-input');
     field?.addEventListener('keydown', e => {if (e.key === 'Enter') {e.preventDefault(); starterGuess();}});

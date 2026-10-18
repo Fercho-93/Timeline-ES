@@ -944,7 +944,11 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .starter-card-art .animal-card-art { display: block; width: 100%; height: min(calc(30 * var(--vw)), 160px); object-fit: contain; }
 .cifra-field input { font-size: 1.3rem; font-variant-numeric: tabular-nums; text-align: center; }
 .cifra-unidad { font-weight: 400; text-transform: none; }
-.cifra-unidades { display: block; margin-top: 4px; font-size: .72rem; color: var(--muted); }
+/* Las unidades de la respuesta, como botones bajo el campo: el teclado numérico no deja escribirlas. */
+.cifra-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.cifra-chip { min-height: 34px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font: inherit; font-family: var(--ui-font, inherit); font-size: .84rem; font-weight: 600; line-height: 1; cursor: pointer; }
+.cifra-chip:active { background: var(--paper); }
+.cifra-chip:focus-visible { outline: 2px solid var(--accent-solid); outline-offset: 2px; }
 .cifra-aviso { text-align: center; }
 .cifra-puntos { margin-top: 10px; font-size: 1.05rem; }
 .cifra-puntos b { font-size: 1.5rem; color: var(--accent-dark); }

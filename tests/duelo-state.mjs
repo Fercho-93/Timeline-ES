@@ -20,7 +20,7 @@ w.CONTINUUM = {
   placementHint: () => 'Debía ir después de Primera.',
   timelineEnds: () => '', timelineMap: () => '',
   Accounts: { user: { uid: 'me' }, profile: { alias: 'Yo' } },
-  Duelo: { CARTAS: 2, reparto: () => [1,2,3], Cifras: { CARTAS: 2, reparto: () => [2,3], leer: (_, value) => Number(value), puntosCarta: () => 75, acierto: () => true, banda: () => ({ nombre: 'Muy cerca' }), formato: (_, v) => `${v} años`, regla: () => ({ anos: true }) } }
+  Duelo: { CARTAS: 2, reparto: () => [1,2,3], Cifras: { CARTAS: 2, reparto: () => [2,3], leer: (_, value) => Number(value), campo: (_, id) => `<input id="${id}">`, puntosCarta: () => 75, acierto: () => true, banda: () => ({ nombre: 'Muy cerca' }), formato: (_, v) => `${v} años`, regla: () => ({ anos: true }) } }
 };
 w.eval(fs.readFileSync('links.js', 'utf8'));
 w.__deps = {

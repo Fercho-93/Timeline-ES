@@ -112,7 +112,7 @@
       // en el año 200 como en el 1900.
       cifra: { pregunta: "¿En qué año fue?", unidad: "año", decimales: 0, anos: true, negativos: true,
         unidades: [["d. C.", 1]], ejemplo: "1492",
-        pista: "El año. Los anteriores a Cristo, con un menos delante: −218" },
+        pista: "El año. Para los anteriores a Cristo, toca «a. C.»" },
       bands: [
         { limit: 711, key: "antigua", name: "Hispania antigua", symbol: "Ⅻ" },
         { limit: 1492, key: "medieval", name: "Edad Media", symbol: "♜" },
@@ -135,7 +135,7 @@
       question: "¿Menos o más gente?",
       cifra: { pregunta: "¿Cuántos habitantes tiene?", unidad: "habitantes", decimales: 0,
         unidades: [["habitantes", 1], ["mil", 1e3], ["millones", 1e6], ["millón", 1e6], ["M", 1e6]], ejemplo: "47 millones",
-        pista: "Vale «47 millones» o el número entero: 47000000" },
+        pista: "Sin unidad se entiende en habitantes. Toca «mil» o «millones»: «47 millones»" },
       bands: [
         { limit: 100000, key: "minusculo", name: "Minúsculo", symbol: "·" },
         { limit: 2000000, key: "muypequeno", name: "Muy pequeño", symbol: "▪" },
@@ -156,7 +156,7 @@
       question: "¿Menos o más hablantes?",
       cifra: { pregunta: "¿Cuántos hablantes tiene?", unidad: "hablantes", decimales: 0,
         unidades: [["hablantes", 1], ["mil", 1e3], ["millones", 1e6], ["millón", 1e6], ["M", 1e6]], ejemplo: "93 millones",
-        pista: "Vale «93 millones» o el número entero: 93000000" },
+        pista: "Sin unidad se entiende en hablantes. Toca «mil» o «millones»: «93 millones»" },
       // Los cortes están puestos sobre el rango real del mazo, que va del aragonés (25.000)
       // al chino mandarín (929 millones). Con estos siete tramos caen 5, 6, 10, 7, 13, 5 y
       // 4 cartas, sin ninguna banda vacía.
@@ -182,7 +182,7 @@
       question: "¿Más pequeño o más grande?",
       cifra: { pregunta: "¿Cuántos kilómetros cuadrados tiene?", unidad: "km²", decimales: 0,
         unidades: [["km²", 1], ["millones de km²", 1e6], ["ha", 0.01], ["m²", 1e-6]], ejemplo: "505.000 km²",
-        pista: "En km². Vale «17 millones de km²» para los enormes" },
+        pista: "Sin unidad se entiende en km². Toca «millones de km²» para los enormes" },
       bands: [
         { limit: 1000, key: "diminuto", name: "Diminuto", symbol: "·" },
         { limit: 50000, key: "pequeno", name: "Pequeño", symbol: "▪" },
@@ -203,7 +203,7 @@
       question: "¿Más ligero o más pesado?",
       cifra: { pregunta: "¿Cuánto pesa?", unidad: "kg", decimales: 6,
         unidades: [["kg", 1], ["g", 1e-3], ["mg", 1e-6], ["t", 1e3], ["toneladas", 1e3]], ejemplo: "2,5 t",
-        pista: "Con su unidad: «40 g», «2,5 t», «1 mg». Sin unidad se entiende en kg" },
+        pista: "Sin unidad se entiende en kg. Toca otra unidad: «40 g», «2,5 t»" },
       bands: [
         { limit: 0.01, key: "microscopico", name: "Minúsculo", symbol: "·" },
         { limit: 1, key: "pequenisimo", name: "Muy pequeño", symbol: "▪" },
@@ -225,7 +225,7 @@
       question: "¿Vive menos o más?",
       cifra: { pregunta: "¿Cuántos años vive?", unidad: "años", decimales: 6,
         unidades: [["años", 1], ["meses", 1 / 12], ["semanas", 7 / 365], ["días", 1 / 365], ["horas", 1 / 8760], ["minutos", 1 / 525600]], ejemplo: "18 meses",
-        pista: "Con su unidad: «3 días», «18 meses», «40 minutos». Sin unidad se entiende en años" },
+        pista: "Sin unidad se entiende en años. Toca otra unidad: «3 días», «18 meses»" },
       bands: [
         { limit: 1, key: "fugaz", name: "Fugaz", symbol: "·" },
         { limit: 10, key: "breve", name: "Breve", symbol: "▪" },
@@ -246,7 +246,7 @@
       question: "¿Más lento o más rápido?",
       cifra: { pregunta: "¿A qué velocidad llega?", unidad: "km/h", decimales: 6,
         unidades: [["km/h", 1], ["m/s", 3.6], ["m/h", 1e-3], ["cm/s", 0.036], ["mm/s", 0.0036]], ejemplo: "30 m/s",
-        pista: "Con su unidad: «30 m/s», «5 cm/s». Sin unidad se entiende en km/h" },
+        pista: "Sin unidad se entiende en km/h. Toca otra unidad: «30 m/s», «5 cm/s»" },
       bands: [
         { limit: 1, key: "pausado", name: "Pausado", symbol: "·" },
         { limit: 20, key: "tranquilo", name: "Tranquilo", symbol: "▪" },
@@ -267,7 +267,7 @@
       question: "¿Más cerca o más lejos?",
       cifra: { pregunta: "¿A cuántos kilómetros está?", unidad: "km", decimales: 3,
         unidades: [["km", 1], ["m", 1e-3]], ejemplo: "1.800 km",
-        pista: "En kilómetros: 1800. Sin unidad se entiende en km" },
+        pista: "Sin unidad se entiende en km: 1800. Toca «m» si son distancias cortas" },
       bands: [
         { limit: 100, key: "cercana", name: "Cercana", symbol: "·" },
         { limit: 500, key: "regional", name: "Regional", symbol: "▪" },

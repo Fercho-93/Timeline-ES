@@ -530,12 +530,50 @@ console.log("\nLa respuesta admite la unidad, porque la carta no siempre va en l
   ok("en fechas no hay unidades que elegir", C.unidades("history").length <= 1);
 }
 
+console.log("\nEtiqueta, ayuda, teclado y botones del campo de cifra cuentan lo mismo");
+{
+  const w = boot();
+  const CT = w.CONTINUUM, C = CT.Duelo.Cifras;
+  const modos = Object.keys(CT.MODES || {}).filter(key => CT.axis(key)?.cifra);
+  ok("hay mazos con cifra que revisar", modos.length >= 6);
+  for (const modo of modos) {
+    const regla = CT.axis(modo).cifra, opciones = C.opciones(modo), unidades = opciones.filter(o => o.tipo === "unidad").map(o => o.texto);
+    const html = C.campo(modo, "campo-prueba");
+    const pista = regla.pista || "";
+    // La ayuda nunca manda teclear lo que el teclado no tiene: se toca.
+    ok(`${modo}: la ayuda no pide escribir la unidad ni un menos`, !/Con su unidad|con un menos delante|Vale «/.test(pista));
+    // Con varias unidades hay un botón por cada una y la ayuda dice cuál es la de por defecto.
+    if (C.unidades(modo).length > 1) {
+      ok(`${modo}: tiene botones de unidad`, unidades.length >= 2 && html.includes('class="cifra-chips"'));
+      ok(`${modo}: la unidad por defecto es la de la etiqueta y la de la ayuda`, C.unidades(modo)[0].nombre === regla.unidad && pista.includes(`Sin unidad se entiende en ${regla.unidad}`));
+      ok(`${modo}: cada botón es una unidad que se lee`, unidades.every(u => C.factorDe(modo, u) !== null));
+    } else ok(`${modo}: sin unidades que elegir, sin botones de unidad`, unidades.length === 0);
+    // Antes de Cristo: botón propio, porque el teclado numérico no tiene el menos.
+    ok(`${modo}: el menos va con su botón`, !!regla.negativos === opciones.some(o => o.tipo === "signo") && (!regla.negativos || /a\. C\./.test(pista)));
+    ok(`${modo}: teclado numérico`, /inputmode="(decimal|numeric)"/.test(html));
+  }
+  ok("poner y quitar el antes de Cristo", C.aplica("", "signo") === "-" && C.aplica("218", "signo") === "-218" && C.aplica("-218", "signo") === "218" && C.leer("history", C.aplica("218", "signo")) === -218);
+  ok("la unidad espera al número si aún no hay ninguno", C.aplica("", "unidad", "días") === " días" && Math.abs(C.leer("lifespan", "3" + C.aplica("", "unidad", "días")) - 3 / 365) < 1e-12);
+  ok("una unidad detrás de un decimal con coma", C.aplica("2,5", "unidad", "t") === "2,5 t");
+}
+
 console.log("\nEl campo de respuesta dice en qué se puede responder");
 {
   const w = boot();
   await abreDuelo(w, { block: "naturaleza", mode: "animals" });
-  ok("se enseñan las unidades admitidas", /Se aceptan:/.test(texto(w)) && /kg/.test(texto(w)) && /mg/.test(texto(w)));
-  ok("y se dice cuál se entiende si no pones ninguna", /\(en kg\)/.test(texto(w)));
+  // El teclado numérico no deja escribir «mg»: las unidades se tocan, y quedan escritas tras el número.
+  const botones = [...w.document.querySelectorAll("#cifra-input ~ .cifra-chips .cifra-chip")].map(b => b.textContent);
+  ok("se ofrecen como botones las unidades admitidas", ["kg", "g", "mg", "t"].every(u => botones.includes(u)));
+  ok("sin un botón repetido por cada sinónimo", !botones.includes("toneladas"));
+  ok("y se dice cuál se entiende si no pones ninguna", /\(en kg\)/.test(texto(w)) && /Sin unidad se entiende en kg/.test(texto(w)));
+  const campoCifra = w.document.getElementById("cifra-input");
+  campoCifra.value = "40";
+  w.document.querySelector('#cifra-input ~ .cifra-chips [data-cifra-unidad="g"]').click();
+  ok("tocar «g» tras «40» deja «40 g»", campoCifra.value === "40 g");
+  w.document.querySelector('#cifra-input ~ .cifra-chips [data-cifra-unidad="t"]').click();
+  ok("tocar otra unidad cambia la anterior", campoCifra.value === "40 t");
+  ok("y se lee como esa unidad", w.CONTINUUM.Duelo.Cifras.leer("animals", campoCifra.value) === 40000);
+  campoCifra.value = "";
 
   // Escribir con unidad puntúa como el valor convertido, no como el número a secas.
   const guardado = estado(w, "animals");
