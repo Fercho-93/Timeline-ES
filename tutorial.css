@@ -369,7 +369,7 @@
    Se limita al reproductor: no modifica los menús ni las cartas de una partida. */
 :is(#app, #app-splash) .tv-player {
   --tv-cardback: radial-gradient(ellipse at 50% 43%, #fffaf0 0 18%, transparent 55%), repeating-conic-gradient(from 0deg at 50% 43%, #b897600b 0deg 1deg, transparent 1deg 15deg), repeating-linear-gradient(45deg, #a77b380b 0 1px, transparent 1px 10px), repeating-linear-gradient(-45deg, #a77b380b 0 1px, transparent 1px 10px), linear-gradient(145deg, #f9efdb, #e7d0a6);
-  --tv-paper: #f3eee4; --tv-paper-2: #e8ddc9; --tv-ink: #302d27; --tv-ink-soft: #70695d;
+  --tv-paper: #f3eee4; --tv-paper-2: #e8ddc9; --tv-ink: #302d27; --tv-ink-soft: #5e584d;
 }
 :is(#app, #app-splash) .tv-stage .tv-menu-art { display: block; object-fit: contain; pointer-events: none; }
 :is(#app, #app-splash) .tv-door,

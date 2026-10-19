@@ -5858,7 +5858,7 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
    restauran las variables del tema claro (los valores de `:root` de styles.css y de la
    cabecera de este archivo), así vale cualquier regla que ya las use sin tocarla una a una.
    Si se cambia la paleta clara, hay que cambiarla también aquí. */
-:root[data-theme="dark"] :is(#app .timeline-card, #app .atlas-final-page, #app .board-result-layer .modal.board-result, #app .timeline-detail-modal, #app.atlas-board .slot-confirm-card.preview-card) {
+:root[data-theme="dark"] :is(#app .timeline-card, #app .tv-card, #app .atlas-final-page, #app .board-result-layer .modal.board-result, #app .timeline-detail-modal, #app.atlas-board .slot-confirm-card.preview-card) {
   color-scheme: light;
   --ink: #3b2816; --muted: #66502f; --line: #b88b50; --paper: #ead09a; --surface: rgba(248,225,177,.88);
   --accent: #8a3a18; --accent-dark: #6f2c13; --accent-soft: #d6ad69; --teal: #526c65; --green: #5e6f3a;
@@ -5915,3 +5915,32 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
    eran el tono de cada capítulo sin oscurecer. */
 :root[data-theme="dark"] #app :is(.quick-ready, .quick-free-setup) .solo-intro .eyebrow { color: var(--edition-brass); }
 :root:not([data-theme="dark"]) #app .guide-handbook .guide-chapter-number { color: color-mix(in srgb, var(--chapter-tone) 68%, #000); }
+
+/* «Reto preparado» y la preparación de Retos rápidos fijaban un terracota oscuro como
+   acento (kicker, sello, filetes) y un rosa claro como tinte del resplandor: de noche, rojo
+   oscuro sobre cuero y un halo casi blanco detrás del sello. */
+:root[data-theme="dark"] :is(.quick-ready, .quick-free-setup) {
+  --accent: #e39a68; --accent-dark: #f0b88a; --accent-soft: #5b351b;
+}
+:root[data-theme="dark"] .quick-ready-asof { color: var(--edition-muted); }
+
+/* La lámpara de la mesa (html::after) mezcla rayos casi blancos con `screen`. De noche su
+   parpadeo llegaba a opacidad 1 —la animación pisa el `opacity: .5` del tema— y dejaba un
+   abanico gris claro justo detrás de la marca y de los titulares crema. Versión nocturna:
+   el mismo movimiento, con un tercio de luz. */
+@keyframes lampara-noche {
+  0%, 100% { opacity: .15; }
+  21% { opacity: .28; }
+  38% { opacity: .2; }
+  55% { opacity: .26; }
+  74% { opacity: .12; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-theme="dark"]::after,
+  :root[data-theme="dark"]:has(#app.atlas-board)::after { animation-name: lampara-haz, lampara-noche; }
+}
+
+/* Recorrido de la competición: el paso actual llevaba papel claro con el óxido del tema
+   (que de noche es crema apagado). */
+:root[data-theme="dark"] .chapter-stop.current > span { background: var(--edition-surface); border-color: var(--edition-brass); color: var(--edition-brass); }
+:root[data-theme="dark"] .chapter-stop.current > :is(b, small) { color: var(--edition-brass); }
