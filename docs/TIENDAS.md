@@ -39,6 +39,23 @@ se revisa aquí antes de enviarla.
   restauración de compras) y revisión de la política («no hay compras»). Criterio pendiente de revisión por un
   abogado.
 
+### Datos del aviso legal al vender (modelo de los estudios españoles)
+
+Los estudios españoles con juegos de pago publican en su aviso legal, como pide el art. 10 de la LSSI, lo
+mismo que hará falta aquí (ejemplo revisado: el de Toro Games, SL, en torogames.es):
+
+| Dato | Como autónomo | Como sociedad (SL) |
+| --- | --- | --- |
+| Titular | Fernando Sirvent Merino | Denominación social |
+| Identificación fiscal | NIF | CIF |
+| Domicilio | Dirección física para notificaciones (la de la domiciliación; un apartado de correos no suele bastar) | Domicilio social |
+| Registro | — | Registro Mercantil (tomo, folio, hoja) |
+| Contacto | Correo y, como hacen la mayoría, teléfono | Igual |
+
+La misma dirección y el mismo teléfono son los que mostrará la ficha de la UE como comerciante (Apple admite
+un apartado de correos si se justifica con un recibo, pero conviene usar la misma dirección física en los dos
+sitios). Preguntar también a la gestoría si el juego digital está sujeto a depósito legal.
+
 ## Textos de la ficha
 
 Revisar el límite de caracteres de cada campo al rellenarlo; los de abajo son el contenido.
