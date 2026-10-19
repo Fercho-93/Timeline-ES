@@ -32,7 +32,9 @@ se revisa aquí antes de enviarla.
   rehacer la ficha y la declaración deja de ser cierta en cuanto hay una venta. Las fichas de la UE mostrarán
   dirección, teléfono y correo; para no poner el domicilio particular se usa una **domiciliación postal**
   (y un teléfono de empresa). Antes de crear las fichas hacen falta: NIF, dirección de la domiciliación y
-  teléfono, y completarlos en `aviso-legal.html` y en la política (hoy dicen que se añadirán antes de vender).
+  teléfono, y completarlos en `aviso-legal.html` (la política de privacidad no los necesita: basta con el nombre y
+  el correo, y remite al aviso legal). Las apps de empresas extranjeras (por ejemplo, una sociedad británica)
+  no publican NIF porque no les aplica la LSSI española; a un particular residente en España sí.
   Antes de lanzar las ventas: alta fiscal con una gestoría, condiciones de venta (precio, desistimiento,
   restauración de compras) y revisión de la política («no hay compras»). Criterio pendiente de revisión por un
   abogado.
