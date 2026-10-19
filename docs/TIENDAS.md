@@ -26,35 +26,31 @@ se revisa aquí antes de enviarla.
   existe): `https://continuumjuego.es/borrar-cuenta.html`.
 - Condiciones de uso: `https://continuumjuego.es/terminos.html`. Aviso legal (identificación del titular,
   LSSI art. 10): `https://continuumjuego.es/aviso-legal.html`.
-- Responsable: Fernando Sirvent Merino, a título individual. **Se venderán colecciones y mazos dentro de la
-  app**, así que en App Store Connect (Negocio → Estado de comerciante) y en Play Console hay que declararse
-  **«comerciante» desde la primera ficha**, aunque la primera versión sea gratuita: cambiarlo después obliga a
-  rehacer la ficha y la declaración deja de ser cierta en cuanto hay una venta. Las fichas de la UE mostrarán
-  dirección, teléfono y correo; para no poner el domicilio particular se usa una **domiciliación postal**
-  (y un teléfono de empresa). Antes de crear las fichas hacen falta: NIF, dirección de la domiciliación y
-  teléfono, y completarlos en `aviso-legal.html` (la política de privacidad no los necesita: basta con el nombre y
-  el correo, y remite al aviso legal). Las apps de empresas extranjeras (por ejemplo, una sociedad británica)
-  no publican NIF porque no les aplica la LSSI española; a un particular residente en España sí.
-  Antes de lanzar las ventas: alta fiscal con una gestoría, condiciones de venta (precio, desistimiento,
-  restauración de compras) y revisión de la política («no hay compras»). Criterio pendiente de revisión por un
-  abogado.
+- Responsable: Fernando Sirvent Merino, a título individual. **El juego se publica gratis, sin publicidad,
+  compras ni ingresos**, así que en App Store Connect (Negocio → Estado de comerciante) y en Play Console hay
+  que declararse **«no comerciante»**: las fichas no muestran dirección ni teléfono, y en la web solo constan el
+  nombre y el correo (sin NIF ni domicilio). Decisión del titular (octubre de 2026): no vender por ahora, porque
+  vender obliga a publicar NIF y una dirección física y, con los ingresos esperados (unos cientos de euros), no
+  compensa el alta, las cuotas ni la exposición.
 
-### Datos del aviso legal al vender (modelo de los estudios españoles)
+### Si algún día se vende algo dentro del juego
 
-Los estudios españoles con juegos de pago publican en su aviso legal, como pide el art. 10 de la LSSI, lo
-mismo que hará falta aquí (ejemplo revisado: el de Toro Games, SL, en torogames.es):
+Vender (también anuncios o donaciones) convierte al titular en comerciante, y entonces hace falta **antes de
+la primera venta**: declararse comerciante en las dos tiendas (muestran dirección, teléfono y correo en la UE),
+completar el aviso legal (art. 10 de la LSSI) y pasar por una gestoría (alta, IVA, cuotas, depósito legal). Los
+estudios españoles con juegos de pago lo publican así (ejemplo revisado: Toro Games, SL, en torogames.es):
 
 | Dato | Como autónomo | Como sociedad (SL) |
 | --- | --- | --- |
 | Titular | Fernando Sirvent Merino | Denominación social |
 | Identificación fiscal | NIF | CIF |
-| Domicilio | Dirección física para notificaciones (la de la domiciliación; un apartado de correos no suele bastar) | Domicilio social |
+| Domicilio | Dirección física para notificaciones (sin domiciliación contratada, sería la de casa) | Domicilio social |
 | Registro | — | Registro Mercantil (tomo, folio, hoja) |
 | Contacto | Correo y, como hacen la mayoría, teléfono | Igual |
 
-La misma dirección y el mismo teléfono son los que mostrará la ficha de la UE como comerciante (Apple admite
-un apartado de correos si se justifica con un recibo, pero conviene usar la misma dirección física en los dos
-sitios). Preguntar también a la gestoría si el juego digital está sujeto a depósito legal.
+Además: condiciones de venta (precio, desistimiento, restauración de compras), una sección «Compras» en la
+política y quitar «gratuito / sin compras» de `terminos.html`, la política y la ficha. Vender sin publicar
+estos datos incumple la LSSI (infracción leve, multa de hasta 30.000 €).
 
 ## Textos de la ficha
 
