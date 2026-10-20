@@ -698,8 +698,8 @@ function deleteScreen() {
 let loadFunctions = () => import('https://www.gstatic.com/firebasejs/12.15.0/firebase-functions.js');
 // Pide a la función `deleteMyAccount` que borre todo lo de esta cuenta en el servidor, incluido el acceso.
 // Devuelve false si no se pudo (la función no está publicada, sin red, error del servidor).
-// Primero en Europa (donde viven ahora); después en la región anterior, por si aún no se han vuelto a publicar.
-const FUNCTIONS_REGIONS = ['europe-west1', 'us-central1'];
+// Primero en Madrid (donde viven ahora); después en la región anterior, por si aún no se han vuelto a publicar.
+const FUNCTIONS_REGIONS = ['europe-southwest1', 'europe-west1'];
 async function deleteOnServer() {
   let lib;
   try { lib = await loadFunctions(); } catch (error) { console.warn('El borrado en el servidor no está disponible', error?.message); return false; }

@@ -13,9 +13,9 @@ const { getAuth } = require('firebase-admin/auth');
 const { ACTIVITY, cutoff, expiredRankingKey, staleAnonymous } = require('./retention');
 const { deleteAccount } = require('./account-purge');
 
-// En Europa, como la base de datos: los datos de las cuentas no salen de la UE para procesarse.
-// El juego llama a `deleteMyAccount` en esta región (accounts.js, FUNCTIONS_REGIONS).
-setGlobalOptions({ region: 'europe-west1' });
+// En Madrid, junto a la base de datos: los datos no salen de España para procesarse y los avisos
+// de Firestore no cruzan de región. El juego llama a `deleteMyAccount` aquí (accounts.js, FUNCTIONS_REGIONS).
+setGlobalOptions({ region: 'europe-southwest1' });
 initializeApp();
 
 const db = getFirestore();

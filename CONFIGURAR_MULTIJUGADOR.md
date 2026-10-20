@@ -61,10 +61,12 @@ Las Functions (`functions/index.js`) son seis:
 | `deleteMyAccount` | Al pulsar «Eliminar» en el Atlas (llamada del juego) | Borra todo lo que el servidor guarda de la cuenta de quien llama —datos, filas de ranking de todos los días y semanas, nombre— y su acceso (`functions/account-purge.js`) |
 | `purgeExpiredData` | Cada día a las 04:17 (Europe/Madrid) | Limpieza según `functions/retention.js` |
 
-Todas corren en **`europe-west1`** (Bélgica), como la base de datos, para que los datos no salgan de la UE al
-procesarse (`setGlobalOptions` en `functions/index.js`). Hasta octubre de 2026 estaban en la región por defecto,
-`us-central1`: la primera publicación tras ese cambio crea las nuevas en Europa y borra las antiguas (por el
-`--force` del workflow). Mientras tanto el juego llama primero a Europa y, si no responde, a la región antigua.
+Todas corren en **`europe-southwest1`** (Madrid), junto a la base de datos, para que los datos no salgan de
+España al procesarse y los avisos de Firestore no crucen de región (`setGlobalOptions` en `functions/index.js`).
+Historia: hasta octubre de 2026 la mayoría estaba en `us-central1` y los avisos de duelos en Madrid; el 20 de
+octubre pasaron todas a `europe-west1` (Bélgica) y después a Madrid. Cada publicación crea las nuevas en su región
+y borra las de las demás (por el `--force` del workflow). El juego llama a `deleteMyAccount` primero en Madrid y,
+si no responde, en Bélgica; si tampoco, borra desde el móvil.
 
 Se publican solo a mano, con el workflow **Publicar Cloud Functions**: GitHub → Actions →
 «Publicar Cloud Functions» → «Run workflow». Funciona desde el móvil y usa el mismo secreto
