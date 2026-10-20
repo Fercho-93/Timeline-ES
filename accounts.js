@@ -568,6 +568,7 @@ async function removeRankingRows() {
   await deleteAll([...rankingRows(uid), refs(uid).ranking, foundScore(uid)]);
 }
 async function setRanking(value) {
+  if (value === true && CT.Edad && !CT.Edad.permiteOnline()) { CT.Storage.notice('Con menos de 14 años necesitas el permiso de tu madre, padre o tutor para aparecer en el ranking.', [['Entendido', () => document.getElementById('storage-notice')?.remove()]]); refreshCard(); return; }
   const records = readRecords();
   records.rankingPublico = value === true;
   CT.Storage.setItem(R, JSON.stringify(records));
@@ -578,6 +579,8 @@ async function setRanking(value) {
 function refreshCard() { const card = document.querySelector('.account-card'); if (card) card.outerHTML = accountCard(); }
 function askRanking() {
   if (!ready || rankingPublico() !== null || document.querySelector('.ranking-consent')) return;
+  // Con menos de 14 años y sin permiso no se pregunta: el ranking necesita el de su madre, padre o tutor (edad.js).
+  if (CT.Edad && !CT.Edad.permiteOnline()) return;
   accountDialog(`<div class="overlay"><section class="modal ranking-consent"><h2>¿Quieres aparecer en el ranking?</h2>
     <p>El ranking es público: lo ven los demás jugadores. Si aceptas, mostrará tu nombre de perfil, tu avatar, tus aciertos y tu tiempo en el reto diario (del día y de la semana) y cuántas cartas has descubierto.</p>
     <p class="hint">Puedes cambiarlo cuando quieras en Ajustes o en el Atlas.</p>
@@ -695,12 +698,16 @@ function deleteScreen() {
 let loadFunctions = () => import('https://www.gstatic.com/firebasejs/12.15.0/firebase-functions.js');
 // Pide a la función `deleteMyAccount` que borre todo lo de esta cuenta en el servidor, incluido el acceso.
 // Devuelve false si no se pudo (la función no está publicada, sin red, error del servidor).
+// Primero en Europa (donde viven ahora); después en la región anterior, por si aún no se han vuelto a publicar.
+const FUNCTIONS_REGIONS = ['europe-west1', 'us-central1'];
 async function deleteOnServer() {
-  try {
-    const { getFunctions, httpsCallable } = await loadFunctions();
-    await httpsCallable(getFunctions(firebaseApp), 'deleteMyAccount')();
-    return true;
-  } catch (error) { console.warn('El borrado en el servidor no está disponible', error?.code || error?.message); return false; }
+  let lib;
+  try { lib = await loadFunctions(); } catch (error) { console.warn('El borrado en el servidor no está disponible', error?.message); return false; }
+  for (const region of FUNCTIONS_REGIONS) {
+    try { await lib.httpsCallable(lib.getFunctions(firebaseApp, region), 'deleteMyAccount')(); return true; }
+    catch (error) { console.warn('El borrado en el servidor no está disponible', region, error?.code || error?.message); }
+  }
+  return false;
 }
 async function removeAccount() {
   const u=auth.currentUser, wasApple=appleUser(u);

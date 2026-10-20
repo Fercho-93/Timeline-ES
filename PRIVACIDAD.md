@@ -130,7 +130,7 @@ Puedes ejercer los derechos de acceso, rectificación, supresión, oposición, l
 
 ## Menores
 
-Si tienes menos de 14 años, necesitas el permiso de tu madre, padre o tutor para jugar online y para aparecer en el ranking. El juego no pide la edad: usa siempre un apodo y no compartas datos personales.
+Si tienes menos de 14 años, necesitas el permiso de tu madre, padre o tutor para jugar online y para aparecer en el ranking. Al abrir el juego por primera vez te preguntamos si tienes 14 años o más y, si no, si tienes ese permiso; la respuesta se guarda solo en tu dispositivo y puedes cambiarla en Ajustes → Ayuda y comentarios. Sin permiso, Continuum funciona sin conexión: no se conecta a nuestros servidores, no hay partidas online ni ranking y tu progreso se guarda solo en el dispositivo. Usa siempre un apodo y no compartas datos personales.
 
 ## Lo que no hacemos
 

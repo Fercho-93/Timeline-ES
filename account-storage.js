@@ -5,7 +5,8 @@
   const SEASON = 'launch-1';
   let uid = null;
   const listeners = new Set();
-  const deviceKeys = new Set(['hilo-ajustes-v1']);
+  // Del dispositivo, no de la cuenta: los ajustes y la edad declarada (edad.js).
+  const deviceKeys = new Set(['hilo-ajustes-v1', 'continuum-edad-v1']);
   const scoped = key => !deviceKeys.has(key) && /^(hilo-|continuum-)/.test(key);
   const physical = key => scoped(key) ? `continuum-account:${SEASON}:${uid || 'locked'}:${key}` : key;
   CT.AccountStorage = {

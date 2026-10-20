@@ -61,6 +61,11 @@ Las Functions (`functions/index.js`) son seis:
 | `deleteMyAccount` | Al pulsar «Eliminar» en el Atlas (llamada del juego) | Borra todo lo que el servidor guarda de la cuenta de quien llama —datos, filas de ranking de todos los días y semanas, nombre— y su acceso (`functions/account-purge.js`) |
 | `purgeExpiredData` | Cada día a las 04:17 (Europe/Madrid) | Limpieza según `functions/retention.js` |
 
+Todas corren en **`europe-west1`** (Bélgica), como la base de datos, para que los datos no salgan de la UE al
+procesarse (`setGlobalOptions` en `functions/index.js`). Hasta octubre de 2026 estaban en la región por defecto,
+`us-central1`: la primera publicación tras ese cambio crea las nuevas en Europa y borra las antiguas (por el
+`--force` del workflow). Mientras tanto el juego llama primero a Europa y, si no responde, a la región antigua.
+
 Se publican solo a mano, con el workflow **Publicar Cloud Functions**: GitHub → Actions →
 «Publicar Cloud Functions» → «Run workflow». Funciona desde el móvil y usa el mismo secreto
 `FIREBASE_SERVICE_ACCOUNT` que las reglas. Requisitos:

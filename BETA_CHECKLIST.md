@@ -157,8 +157,8 @@ Detalle en [docs/TIENDAS.md](docs/TIENDAS.md).
 - [ ] Política de privacidad revisada profesionalmente.
 - [x] Responsable y soporte: nombre y correo. Juego gratuito y sin ingresos: declararse «no comerciante» en App Store y Google Play (ver `docs/TIENDAS.md`).
 - [ ] Condiciones de uso, aviso legal, soporte y página de borrado (borradores publicados; no son asesoramiento jurídico): revisión por un abogado antes del lanzamiento.
-- [ ] «Privacidad de la app» (App Store) y «Seguridad de los datos» (Google Play).
-- [ ] Clasificación de edad.
+- [ ] «Privacidad de la app» (App Store) y «Seguridad de los datos» (Google Play): copiar las respuestas de `docs/TIENDAS.md`.
+- [ ] Clasificación de edad y público objetivo: respuestas en `docs/TIENDAS.md`.
 - [ ] Capturas reales e icono definitivo.
 - [ ] Descripción de tienda revisada.
 - [x] Certificados y secretos fuera del repositorio (secretos de GitHub Actions).

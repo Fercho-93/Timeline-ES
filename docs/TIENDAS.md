@@ -17,7 +17,7 @@ se revisa aquí antes de enviarla.
 - Versión de la beta: `0.1.1` (`versionName` en `android/app/build.gradle` y
   `MARKETING_VERSION` en el proyecto de Xcode).
 - Categoría propuesta: Juegos / Trivia. Secundaria posible: Educación o Juegos de mesa.
-- Público: familias y grupos de amigos.
+- Público: jóvenes y adultos, también para jugar en familia o con amigos (no dirigido a niños pequeños; ver «Clasificación por edades»).
 - Modelo: gratuita, **sin compras, sin publicidad y sin seguimiento**.
 - Política de privacidad: `https://continuumjuego.es/privacidad.html` (misma información que
   [PRIVACIDAD.md](../PRIVACIDAD.md)). Soporte: `feedbackcontinuum@gmail.com`.
@@ -118,6 +118,8 @@ actual es el candidato, sujeto a la elección del titular.
   Firebase (Authentication, Firestore, Cloud Functions). Firebase App Check con App Attest
   comprueba que las peticiones vienen de la app.
 - Las partidas en un solo móvil y en solitario funcionan sin conexión una vez abierto el juego.
+- Al abrirse, el juego pregunta si se tienen 14 años o más. Para revisar todo, responder «Sí»: con
+  menos de 14 y sin permiso de los padres, el juego funciona solo sin conexión.
 - Sin publicidad, sin compras, sin seguimiento ni analítica de terceros.
 - Lo único que los jugadores ven de otros es el alias, el avatar ilustrado (elegido entre 36
   del propio juego) y los resultados. No hay chat. Se puede bloquear a alguien en los duelos.
@@ -137,49 +139,83 @@ bloquean los retos de quien abusa; las denuncias las revisa el equipo.»
 
 ## App Store: «Privacidad de la app»
 
-Respuestas preparadas a partir de [privacidad.html](../privacidad.html) para la app de iPhone tal
-como está. Confirmar contra la compilación enviada.
+Respuestas para App Store Connect → la app → «Privacidad de la app», tal como está el juego en
+octubre de 2026 (sin anuncios, compras ni avisos del móvil activos). Si algo de eso cambia, cambian
+las respuestas.
 
-- **¿Se recogen datos?** Sí.
-- **Seguimiento (tracking):** No. No se combinan datos con los de otras empresas ni se usan para
-  publicidad; no hay SDK publicitario ni identificador de publicidad.
+**Pregunta inicial.** «¿Usted o sus socios externos recopilan datos de esta app?» → **Sí.**
 
-| Tipo de dato (Apple) | Qué es en Continuum | Finalidad | ¿Vinculado al usuario? | ¿Seguimiento? |
-| --- | --- | --- | --- | --- |
-| Identificadores → ID de usuario | UID de Firebase del invitado o de la cuenta de Apple | Funcionalidad de la app | Sí | No |
-| Contenido del usuario → Contenido de juego | Progreso, estadísticas por carta, récords, rachas, retos diarios, jugadas y resultados de salas y duelos | Funcionalidad de la app | Sí | No |
-| Contenido del usuario → Otro contenido del usuario | Alias y avatar elegidos; lista de bloqueados | Funcionalidad de la app | Sí | No |
+**Tipos de datos que hay que marcar** (los demás, sin marcar):
 
-- **No se recogen:** datos de contacto (correo, teléfono, dirección), salud, finanzas,
-  ubicación, contactos, historial de navegación o búsqueda, compras, identificador del
-  dispositivo ni datos de diagnóstico automáticos.
-- **Notas:**
-  - Los avisos del móvil aún no están activos; si se activan, el token del dispositivo pasa a
-    declararse como «Identificadores → ID del dispositivo» (funcionalidad, vinculado).
-  - El comentario desde Ajustes abre un correo que la persona revisa y envía; encaja en el
-    criterio de declaración opcional de Apple (voluntario, infrecuente y visible al enviarlo).
-    Si se prefiere prudencia, declararlo como «Diagnóstico → Otros datos de diagnóstico».
-  - Las cuentas de Apple vinculadas antes del 10 de octubre de 2026 pudieron entregar un correo
-    que Firebase conserva en el registro de acceso y que el juego no usa. Decidir con la revisión
-    legal si eso obliga a declarar «Dirección de correo electrónico».
-  - App Attest lo gestiona Apple y no aporta datos personales al juego.
+| Categoría → tipo | Qué es en Continuum |
+| --- | --- |
+| Identificadores → **ID de usuario** | El identificador de Firebase del invitado o de la cuenta de Apple |
+| Contenido del usuario → **Contenido de juego** | Progreso, estadísticas por carta, récords, rachas, retos diarios (aciertos y tiempo), jugadas y resultados de salas y duelos, presencia en la sala |
+| Contenido del usuario → **Otro contenido del usuario** | Alias y avatar elegidos, lista de bloqueados y archivados, denuncias de nombres |
+
+**Para cada uno de los tres**, las mismas respuestas:
+- «¿Para qué se usan?» → solo **Funcionalidad de la app**. (Las denuncias y la cuota de altas
+  sirven también contra el abuso, que Apple cuenta como funcionalidad.)
+- «¿Están vinculados a la identidad del usuario?» → **Sí** (van unidos al identificador de la
+  cuenta, aunque no se sepa quién es).
+- «¿Se usan para rastrear?» → **No.**
+
+**Lo que no se marca, y por qué:**
+- *Información de contacto* (nombre, correo, teléfono, dirección): el juego no la pide. Con Apple
+  se recibe solo el identificador, no el nombre ni el correo. Excepción a decidir con la revisión
+  legal: las cuentas de Apple vinculadas antes del 10 de octubre de 2026 pudieron entregar un correo
+  que Firebase conserva y el juego no usa.
+- *Identificador del dispositivo*: no mientras los avisos del móvil sigan apagados. Si se activan,
+  marcar «Identificadores → ID del dispositivo» (funcionalidad, vinculado, sin rastreo).
+- *Diagnóstico*: no hay informes automáticos. El comentario de Ajustes abre un correo que la
+  persona revisa y envía: es voluntario y visible, y Apple no lo exige. Si se prefiere prudencia,
+  «Diagnóstico → Otros datos de diagnóstico».
+- *Ubicación, salud, finanzas, contactos, historial, compras, datos sensibles*: no se recogen.
+- *Uso de la app*: no hay analítica. La presencia en una sala se declara como contenido de juego.
+- App Attest (App Check) lo gestiona Apple y no entrega datos personales al juego.
+
+**Rastreo:** sin SDK publicitario ni identificador de publicidad: no hace falta el aviso de
+App Tracking Transparency.
 
 ## Google Play: «Seguridad de los datos»
 
-Borrador para cuando exista la ficha de Android. La compilación Android actual no lleva App
-Check (Play Integrity exige estar publicada en Google Play) ni avisos activos.
+Respuestas para Play Console → Política de la app → «Seguridad de los datos». La versión de Android
+no lleva App Check (Play Integrity exige estar publicada) ni avisos activos.
 
-- **Datos recogidos:** sí. **Compartidos con terceros:** no (Google actúa como encargado del
-  tratamiento, lo que Google Play no cuenta como «compartir»).
-- **Información personal → Nombre:** el alias (Google incluye los apodos). Funcionalidad de la
-  app y gestión de la cuenta; obligatorio para jugar online.
-- **Información personal → ID de usuario:** UID de Firebase. Funcionalidad de la app.
-- **Actividad en la app → Otro contenido generado por el usuario / interacciones en la app:**
-  progreso, estadísticas, retos diarios, jugadas y resultados. Funcionalidad de la app.
-- **Cifrado en tránsito:** sí (HTTPS / TLS de Firebase).
-- **Borrado:** sí, desde el juego (Atlas → «Tu cuenta y tus datos») o escribiendo al correo de
-  soporte. La URL pública para pedir el borrado sin instalar la app es `borrar-cuenta.html` (ver arriba).
-- No marcar «no se recogen datos»: la autenticación anónima también es un dato de usuario.
+**Preguntas generales:**
+- «¿Tu app recoge o comparte alguno de los tipos de datos de usuario obligatorios?» → **Sí.**
+- «¿Todos los datos de usuario que recoge tu app están cifrados en tránsito?» → **Sí** (HTTPS de Firebase).
+- «¿Ofreces una forma de que los usuarios soliciten que se eliminen sus datos?» → **Sí**: desde
+  la app (Atlas → «Tu cuenta y tus datos» → Eliminar) y en `https://continuumjuego.es/borrar-cuenta.html`.
+  Esa misma URL va en el campo «Enlace para eliminar la cuenta».
+- «¿Tu app permite crear una cuenta?» → **Sí** (el invitado se crea solo y es una cuenta).
+
+**Tipos de datos que hay que marcar** (todos: *recogidos* sí, *compartidos* no, *procesados de
+forma efímera* no):
+
+| Tipo de Google | Qué es en Continuum | ¿Obligatorio? | Finalidades |
+| --- | --- | --- | --- |
+| Información personal → **Nombre** | El alias (Google incluye los apodos) | Obligatorio | Funcionalidad de la app; Gestión de la cuenta |
+| Información personal → **ID de usuario** | Identificador de Firebase | Obligatorio | Funcionalidad de la app; Gestión de la cuenta; Prevención de fraudes, seguridad y cumplimiento |
+| Actividad en la app → **Interacciones con la app** | Jugadas, resultados, presencia en salas, retos diarios | Obligatorio | Funcionalidad de la app |
+| Actividad en la app → **Otro contenido generado por el usuario** | Avatar elegido, bloqueados, denuncias de nombres | Opcional | Funcionalidad de la app; Prevención de fraudes, seguridad y cumplimiento |
+
+- **Compartidos: no.** Google (Firebase) trata los datos por encargo del responsable, y Google Play
+  no cuenta eso como «compartir». Lo que ven otros jugadores (alias, resultados) tampoco es
+  «compartir» con terceros en el sentido del formulario.
+- **No se marcan:** ubicación, información financiera, salud, mensajes (no hay chat), fotos o
+  vídeos (la cámara solo lee códigos QR en el dispositivo), audio, archivos, calendario, contactos,
+  información y rendimiento de la app (sin informes automáticos), identificadores del dispositivo
+  (los avisos están apagados).
+- No marcar «no se recogen datos»: el invitado anónimo ya es un dato de usuario.
+
+**Otras declaraciones de Play Console → Contenido de la app:**
+- Anuncios → **No contiene anuncios.**
+- ID de publicidad → **No** (el manifiesto no declara `AD_ID`; confirmarlo en el manifiesto final del AAB).
+- Acceso a la app → **Toda la funcionalidad está disponible sin restricciones** (no hace falta
+  iniciar sesión: el invitado se crea solo).
+- Política de privacidad → `https://continuumjuego.es/privacidad.html`.
+- Aplicaciones de Gobierno, finanzas, salud, noticias → **No.**
 
 ## Inventario de datos
 
@@ -199,11 +235,48 @@ producción y que la limpieza diaria (`purgeExpiredData`) funciona (publicada el
 
 ## Clasificación por edades
 
-Sin violencia, sexo, apuestas, compras ni publicidad. Hay contenido creado por usuarios (alias
-visibles) y juego online con desconocidos en las mesas públicas, sin chat. Algunas cartas tratan
-guerras o hechos históricos de forma informativa. La política pide permiso de madre, padre o
-tutor por debajo de 14 años para jugar online y aparecer en el ranking. Completar los
-cuestionarios de cada tienda con el contenido real de la versión enviada.
+El contenido de la versión actual, para responder cualquier cuestionario: sin violencia gráfica
+(las cartas de guerras son informativas; si alguna ilustración muestra combates, contarla como
+violencia realista leve e infrecuente), sin sexo ni desnudos, sin lenguaje soez (los nombres
+ofensivos se filtran), sin drogas, alcohol ni tabaco más allá de datos históricos, sin apuestas ni
+casino, sin compras, sin anuncios. Hay **contenido creado por usuarios** (alias visibles) y juego
+**online con desconocidos** en las mesas públicas, **sin chat** ni mensajes. Pregunta la edad al
+abrirse: con menos de 14 años y sin permiso de los padres, funciona solo sin conexión.
+
+**App Store Connect → la app → Clasificación por edades:**
+
+| Pregunta | Respuesta |
+| --- | --- |
+| Violencia de dibujos animados o fantasía | Ninguna |
+| Violencia realista | Ninguna (o «Infrecuente/leve» si alguna ilustración muestra combates) |
+| Violencia prolongada, gráfica o sádica | Ninguna |
+| Blasfemias o humor crudo | Ninguno |
+| Contenido sexual o desnudos | Ninguno |
+| Temas para adultos o sugerentes / de terror | Ninguno |
+| Alcohol, tabaco o drogas | Ninguno (o «Infrecuente/leve» si una carta trata su historia) |
+| Juegos de azar simulados / apuestas / concursos | No |
+| Contenido médico o de tratamiento | No |
+| Acceso web sin restricciones | No (solo abre las páginas propias del juego) |
+| Contenido generado por usuarios | **Sí** (nombres visibles; hay filtro, denuncia y bloqueo) |
+| Mensajería y chat | No |
+| Controles parentales | No |
+| Verificación de la edad | No (solo una pregunta, sin comprobación) |
+| Anuncios | No |
+
+Apple calcula la edad con esas respuestas; lo esperable es 9+ o 13+ por el contenido de usuarios.
+Si da más, revisar la respuesta de contenido generado por usuarios.
+
+**Google Play → Contenido de la app → Clasificación del contenido** (cuestionario IARC): categoría
+**Juego** (preguntas y respuestas). Violencia, miedo, sexo, lenguaje, drogas, apuestas: **no**.
+«¿Los usuarios pueden interactuar o intercambiar contenido?» → **Sí** (nombres visibles en partidas
+con desconocidos, sin chat). «¿Comparte la ubicación del usuario?» → **No.** «¿Compras digitales?» →
+**No.** Lo esperable es PEGI 3 o PEGI 7 con el aviso «Interacción de usuarios».
+
+**Google Play → Público objetivo:** marcar **13 a 15, 16 a 17 y 18 o más**. No marcar edades por
+debajo de 13: obligaría a cumplir la política de Familias (anuncios, SDK y datos especiales) y el
+juego no está pensado para niños pequeños. A «¿Puede atraer a niños?» → **No**, y que la ficha y
+las capturas no se dirijan a niños (por eso en «Público» de la ficha conviene «jóvenes y adultos,
+también en familia» en vez de solo «familias»).
 
 ## Preparación comercial
 

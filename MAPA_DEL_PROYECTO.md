@@ -82,6 +82,7 @@ Cada archivo es una lista de cartas con su título, su explicación, el valor qu
 | `progreso.js` | Estadísticas del jugador: qué ha jugado, qué acierta y qué falla. |
 | `identidad.js`, `avatares.js` | El nombre y el dibujo (avatar) del jugador. |
 | `moderacion.js` | Filtro de nombres ofensivos o reservados y botón «Denunciar» que se pone junto a los nombres ajenos. |
+| `edad.js` | Pregunta una vez si quien juega tiene 14 años o más (o el permiso de sus padres). Sin permiso, el juego funciona sin conexión y sin ranking. |
 | `enciclopedia.js` | El Atlas: el álbum de cartas descubiertas. |
 | `cartera.js` | Decide a qué mazos tiene acceso cada jugador. Hoy todos están abiertos. |
 | `recent-players.js` | Los nombres de las últimas personas con las que se jugó en el mismo móvil. |

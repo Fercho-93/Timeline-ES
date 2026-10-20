@@ -133,8 +133,8 @@ porque no se desplegó. Si algún día se quiere competición pública arbitrada
 - [ ] Declararse «no comerciante» en App Store Connect y Play Console al crear las fichas (juego gratuito, sin ingresos).
 - [ ] (Futuro, solo si compensa) Lanzar las compras (colecciones y mazos): condiciones de venta, política de privacidad sin «no hay compras» y con una sección «Compras» (cobran Apple o Google; el juego no ve datos de pago; qué se guarda para desbloquear y restaurar), restauración de compras, reglas de menores de las tiendas. Antes: ser comerciante, NIF y dirección física públicos y gestoría (ver `docs/TIENDAS.md`).
 - [ ] Revisión legal de la política de privacidad, las condiciones de uso, el aviso legal, la conservación y el borrado.
-- [ ] Cuestionarios de edad, «Privacidad de la app» y «Seguridad de los datos» (borradores en
-      [docs/TIENDAS.md](docs/TIENDAS.md)).
+- [ ] Rellenar los cuestionarios de edad, público objetivo, «Privacidad de la app» y «Seguridad de los
+      datos» con las respuestas de [docs/TIENDAS.md](docs/TIENDAS.md) al crear las fichas.
 - [ ] Capturas reales desde una compilación final.
 - [ ] Validar comprensión, repetición y disposición a pagar con testers.
 - [ ] Decidir la monetización después de la beta; si se venden mazos, compras oficiales,

@@ -42,6 +42,8 @@ export async function startHarness() {
       const body = (await fs.readFile(path.join(root, 'node_modules/firebase', name), 'utf8')).replace(/firebasejs\/[\d.]+\//g, 'firebasejs/12.15.0/');
       route.fulfill({ contentType: 'text/javascript', body });
     });
+    // La edad ya respondida (edad.js): la pregunta se prueba en tests/edad.mjs.
+    await ctx.addInitScript(() => { try { localStorage.setItem('continuum-edad-v1', 'mayor'); } catch { /* sin almacenamiento */ } });
     const page = await ctx.newPage();
     const log = [];
     page.on('pageerror', e => log.push(`pageerror ${e.message}`));

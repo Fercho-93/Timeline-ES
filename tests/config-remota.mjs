@@ -115,4 +115,27 @@ async function cargar({ version = "continuum-v100", native = false, config, fall
   assert.deepEqual(anonimo.llamadas, []);
 }
 
-console.log("Cartel remoto: actualizar, pausar el online, levantar la pausa y no hacer nada ante fallos: OK");
+// Menor sin permiso (edad.js): ni se lee el cartel ni se conecta; se retira del ranking antes de cortar.
+{
+  const menor = await cargar({ config: undefined });
+  const retiradas = [];
+  window.CONTINUUM.Edad = { permiteOnline: () => false, fijar: valor => retiradas.push(`edad ${valor}`) };
+  window.CONTINUUM.Accounts = { rankingPublico: true, setRanking: async valor => { retiradas.push(`ranking ${valor}`); } };
+  assert.equal((await menor.modulo.check()).mode, "minor");
+  assert.ok(!menor.llamadas.includes("get appConfig/current"), "a un menor sin permiso no se le abre la conexión ni para leer el cartel");
+  assert.ok(menor.llamadas.includes("disableNetwork"), "se corta la conexión con el servidor");
+  assert.deepEqual(retiradas, ["ranking false"], "si estaba en el ranking, se retira antes de cortar");
+  const aviso = menor.body.querySelector(".app-config-minor");
+  assert.match(aviso.textContent, /permiso de tu madre, padre o tutor/);
+  aviso.querySelectorAll("button")[0].click();
+  assert.deepEqual(retiradas, ["ranking false", "edad permiso"], "«Ya tengo su permiso» cambia la edad declarada");
+  aviso.querySelectorAll("button")[1].click();
+  assert.equal(menor.body.querySelector(".app-config-minor"), null, "«Entendido» quita el aviso");
+  // Con permiso, vuelve a conectar y a leer el cartel.
+  window.CONTINUUM.Edad.permiteOnline = () => true;
+  assert.equal((await menor.modulo.check()).mode, "ok");
+  assert.ok(menor.llamadas.includes("enableNetwork") && menor.llamadas.includes("get appConfig/current"));
+}
+assert.match(read("app-config.js"), /await CT\.Edad\?\.preguntar\?\.\(\);[\s\S]*await check\(\);/, "la edad se pregunta antes del primer chequeo");
+
+console.log("Cartel remoto: actualizar, pausar el online, levantar la pausa, menores sin permiso y no hacer nada ante fallos: OK");

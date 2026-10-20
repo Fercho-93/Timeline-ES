@@ -110,11 +110,20 @@ async function conEleccion(w, choice) {
   // Con la función del servidor disponible, ella borra datos y acceso: el móvil solo cierra la sesión.
   const {w,dom,calls}=setup({apple:true});await w.appleTest.startAccounts(()=>{});
   const served=[];
-  w.appleTest.setLoader(async()=>({getFunctions:app=>{assert.equal(app.id,'app');return 'functions';},httpsCallable:(functions,name)=>async()=>{served.push([functions,name]);return {data:{deleted:true}};}}));
+  w.appleTest.setLoader(async()=>({getFunctions:(app,region)=>{assert.equal(app.id,'app');return region;},httpsCallable:(region,name)=>async()=>{served.push([region,name]);if(region!=='europe-west1')throw Error('región equivocada');return {data:{deleted:true}};}}));
   await w.appleTest.removeAccount();
-  assert.deepEqual(served,[['functions','deleteMyAccount']]);
+  assert.deepEqual(served,[['europe-west1','deleteMyAccount']],'se llama a la función en Europa');
   assert.deepEqual(calls.revoke,['codigo-apple'],'Apple se revoca antes, en el móvil');
   assert.equal(calls.batch,0);assert.equal(calls.deleted,0);assert.equal(calls.logout,1);dom.window.close();
+}
+{
+  // Mientras las Functions sigan en la región anterior (sin volver a publicar), se usa esa.
+  const {w,dom,calls}=setup({apple:true});await w.appleTest.startAccounts(()=>{});
+  const served=[];
+  w.appleTest.setLoader(async()=>({getFunctions:(_,region)=>region,httpsCallable:(region)=>async()=>{served.push(region);if(region==='europe-west1')throw Object.assign(Error('internal'),{code:'functions/internal'});return {data:{deleted:true}};}}));
+  await w.appleTest.removeAccount();
+  assert.deepEqual(served,['europe-west1','us-central1']);
+  assert.equal(calls.batch,0);assert.equal(calls.deleted,0);dom.window.close();
 }
 {
   // Si la función no está disponible (sin publicar, sin red), se borra desde el móvil como siempre.

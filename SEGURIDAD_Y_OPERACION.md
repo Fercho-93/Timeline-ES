@@ -50,6 +50,12 @@ dispositivo.
   (el documento no necesita existir) detectan si las reglas publicadas admiten la final privada y
   la competición multijugador; sin ellas, el cliente avisa antes de empezar en vez de fallar a
   mitad de partida.
+- **Ranking con resultados posibles.** Un resultado nuevo del reto diario o semanal solo se acepta
+  para el día o la semana en curso según la hora del servidor, y con al menos un segundo por
+  acierto (`firestore.rules`). No lo hace infalible —sigue siendo declarado por el móvil—, pero
+  corta las puntuaciones imposibles y las de otros días.
+- **Edad.** El juego pregunta una vez si se tienen 14 años o más (`edad.js`); sin permiso de los
+  padres no se conecta al servidor (`app-config.js`) ni deja activar el ranking.
 - **Borrado y limpieza.** Borrado completo de la cuenta desde el juego (lo hace el servidor con
   `deleteMyAccount`, y el móvil si el servidor no responde), borrado manual por el titular (workflow
   «Borrar cuenta de un jugador») y limpieza diaria de lo caducado (`purgeExpiredData`).

@@ -513,12 +513,33 @@ service cloud.firestore {
       let d = request.resource.data;
       return !('ms' in d) || (d.ms is int && d.ms >= 0 && d.ms <= maxMs);
     }
+    // Contra resultados imposibles (el ranking lo declara cada móvil): un resultado nuevo solo vale para
+    // el día o la semana en curso, según la hora del servidor (con margen para cualquier huso horario), y
+    // con al menos un segundo por acierto. Renombrar o cambiar de avatar reescribe filas de días pasados
+    // con el mismo resultado: eso sigue valiendo.
+    function sameResult() {
+      return resource != null && request.resource.data.hits == resource.data.hits
+        && request.resource.data.get('ms', -1) == resource.data.get('ms', -1);
+    }
+    function humanMs() {
+      let d = request.resource.data;
+      return !('ms' in d) || d.ms >= d.hits * 1000;
+    }
+    function startOf(key) {
+      return timestamp.date(int(key[0:4]), int(key[5:7]), int(key[8:10]));
+    }
+    function current(key, days) {
+      return key.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && request.time > startOf(key) - duration.value(14, 'h')
+        && request.time < startOf(key) + duration.value(days * 24 + 12, 'h');
+    }
     match /dailyScores/{day}/players/{uid} {
       allow get: if registered();
       allow list: if registered() && request.query.limit != null && request.query.limit <= 200;
       allow create, update: if owner(uid) && scoreRow(uid, 10) && validMs(86400000)
         && request.resource.data.keys().hasOnly(['alias','avatar','hits','ms','finishedAt','updatedAt'])
         && request.resource.data.finishedAt is string && request.resource.data.finishedAt.size() <= 40
+        && (sameResult() || (current(day, 1) && humanMs()))
         && getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data.day == day
         && getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data.dayHits == request.resource.data.hits;
       allow delete: if owner(uid);
@@ -527,6 +548,7 @@ service cloud.firestore {
       allow get: if registered();
       allow list: if registered() && request.query.limit != null && request.query.limit <= 200;
       allow create, update: if owner(uid) && scoreRow(uid, 70) && validMs(604800000)
+        && (sameResult() || (current(week, 7) && humanMs()))
         && request.resource.data.keys().hasOnly(['alias','avatar','hits','ms','updatedAt'])
         && getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data.week == week
         && getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data.weekHits == request.resource.data.hits;

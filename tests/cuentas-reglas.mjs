@@ -38,12 +38,16 @@ try {
  await assertFails(setDoc(doc(db,'playerProfiles','account-a'),{...data,alias:'Fulanito',aliasKey:'fulanito',avatar:'inventado'}));
  await assertFails(setDoc(doc(db,'dailyRanking','account-a'),{...rank,alias:'Fulanito',avatar:'panda',updatedAt:serverTimestamp()})); // no coincide con el perfil
  // Tablas del ranking: hoy y esta semana. La fila tiene que cuadrar con el progreso, el nombre y el avatar.
- const day='2026-09-30', week='2026-09-28', who={alias:'Fulanito',avatar:'tigre'};
+ // Las filas nuevas solo valen para el día y la semana en curso (según la hora del servidor), como las del juego.
+ const key=d=>d.toLocaleDateString('sv-SE'), shift=(d,n)=>{const c=new Date(d);c.setDate(c.getDate()+n);return c;};
+ const now=new Date();now.setHours(12,0,0,0);
+ const day=key(now), week=key(shift(now,-((now.getDay()+6)%7))), yesterday=key(shift(now,-1)), old=key(shift(now,-20)), future=key(shift(now,3));
+ const who={alias:'Fulanito',avatar:'tigre'};
  batch=writeBatch(db);batch.set(doc(db,'playerProgress','account-a'),{...progress,revision:2,day,dayHits:7,week,weekHits:19});
- batch.set(doc(db,'dailyScores',day,'players','account-a'),{...who,hits:7,finishedAt:'2026-09-30T08:00:00.000Z',updatedAt:serverTimestamp()});
+ batch.set(doc(db,'dailyScores',day,'players','account-a'),{...who,hits:7,finishedAt:`${day}T08:00:00.000Z`,updatedAt:serverTimestamp()});
  batch.set(doc(db,'weeklyScores',week,'players','account-a'),{...who,hits:19,updatedAt:serverTimestamp()});await assertSucceeds(batch.commit());
  await assertFails(setDoc(doc(db,'dailyScores',day,'players','account-a'),{...who,hits:9,finishedAt:'',updatedAt:serverTimestamp()})); // no cuadra con el progreso
- await assertFails(setDoc(doc(db,'dailyScores','2026-09-29','players','account-a'),{...who,hits:7,finishedAt:'',updatedAt:serverTimestamp()})); // otro día
+ await assertFails(setDoc(doc(db,'dailyScores',yesterday,'players','account-a'),{...who,hits:7,finishedAt:'',updatedAt:serverTimestamp()})); // otro día
  await assertFails(setDoc(doc(db,'dailyScores',day,'players','account-a'),{...who,alias:'Otro',hits:7,finishedAt:'',updatedAt:serverTimestamp()}));
  await assertFails(setDoc(doc(other,'dailyScores',day,'players','account-a'),{...who,hits:7,finishedAt:'',updatedAt:serverTimestamp()}));
  await assertFails(setDoc(doc(db,'playerProgress','account-a'),{...progress,revision:3,day,dayHits:11,week,weekHits:19})); // un reto vale como mucho 10
@@ -58,6 +62,22 @@ try {
  await assertFails(setDoc(doc(db,'dailyScores',day,'players','account-a'),{...who,hits:7,ms:-5,finishedAt:'',updatedAt:serverTimestamp()}));
  await assertFails(setDoc(doc(db,'dailyScores',day,'players','account-a'),{...who,hits:7,ms:'rápido',finishedAt:'',updatedAt:serverTimestamp()}));
  await assertSucceeds(setDoc(doc(db,'weeklyScores',week,'players','account-a'),{...who,hits:19,ms:400000,updatedAt:serverTimestamp()}));
+ // Resultados imposibles: menos de un segundo por acierto, o un día que no es el de hoy aunque el progreso diga eso.
+ await assertFails(setDoc(doc(db,'dailyScores',day,'players','account-a'),{...who,hits:7,ms:3000,finishedAt:'',updatedAt:serverTimestamp()}));
+ await assertFails(setDoc(doc(db,'weeklyScores',week,'players','account-a'),{...who,hits:19,ms:5000,updatedAt:serverTimestamp()}));
+ for (const [d, wk] of [[future, future], [old, old]]) {
+  await env.withSecurityRulesDisabled(async c=>{await setDoc(doc(c.firestore(),'playerProgress','account-a'),{...progress,revision:2,day:d,dayHits:10,week:wk,weekHits:10});});
+  await assertFails(setDoc(doc(db,'dailyScores',d,'players','account-a'),{...who,hits:10,ms:60000,finishedAt:'',updatedAt:serverTimestamp()}));
+  await assertFails(setDoc(doc(db,'weeklyScores',wk,'players','account-a'),{...who,hits:10,ms:60000,updatedAt:serverTimestamp()}));
+ }
+ // Una fila de un día pasado sí se puede reescribir con el mismo resultado (al cambiar de nombre o de avatar).
+ await env.withSecurityRulesDisabled(async c=>{
+  await setDoc(doc(c.firestore(),'playerProgress','account-a'),{...progress,revision:2,day:old,dayHits:5,week:old,weekHits:5});
+  await setDoc(doc(c.firestore(),'dailyScores',old,'players','account-a'),{alias:'Fulanito',avatar:'panda',hits:5,ms:80000,finishedAt:'',updatedAt:new Date()});
+ });
+ await assertSucceeds(setDoc(doc(db,'dailyScores',old,'players','account-a'),{...who,hits:5,ms:80000,finishedAt:'',updatedAt:serverTimestamp()}));
+ await assertFails(setDoc(doc(db,'dailyScores',old,'players','account-a'),{...who,hits:5,ms:70000,finishedAt:'',updatedAt:serverTimestamp()})); // otro tiempo: resultado nuevo
+ await env.withSecurityRulesDisabled(async c=>{await setDoc(doc(c.firestore(),'playerProgress','account-a'),{...progress,revision:2,day,dayHits:7,week,weekHits:19});});
  // «Ver más»: hasta 200 filas; más, no.
  await assertSucceeds(getDocs(query(collection(other,'dailyScores',day,'players'),orderBy('hits','desc'),limit(200))));
  await assertFails(getDocs(query(collection(other,'dailyScores',day,'players'),orderBy('hits','desc'),limit(201))));

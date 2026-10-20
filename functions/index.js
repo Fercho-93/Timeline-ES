@@ -7,11 +7,15 @@ const { getMessaging } = require('firebase-admin/messaging');
 const { onDocumentUpdated, onDocumentCreated } = require('firebase-functions/v2/firestore');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const { onCall, HttpsError } = require('firebase-functions/v2/https');
+const { setGlobalOptions } = require('firebase-functions/v2');
 const { DAY, millis, lifecycle, movementMessage } = require('./duel-policy');
 const { getAuth } = require('firebase-admin/auth');
 const { ACTIVITY, cutoff, expiredRankingKey, staleAnonymous } = require('./retention');
 const { deleteAccount } = require('./account-purge');
 
+// En Europa, como la base de datos: los datos de las cuentas no salen de la UE para procesarse.
+// El juego llama a `deleteMyAccount` en esta región (accounts.js, FUNCTIONS_REGIONS).
+setGlobalOptions({ region: 'europe-west1' });
 initializeApp();
 
 const db = getFirestore();
