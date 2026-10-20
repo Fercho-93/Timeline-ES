@@ -15,7 +15,9 @@ const { deleteAccount } = require('./account-purge');
 
 // En Madrid, junto a la base de datos: los datos no salen de España para procesarse y los avisos
 // de Firestore no cruzan de región. El juego llama a `deleteMyAccount` aquí (accounts.js, FUNCTIONS_REGIONS).
+// Las tareas programadas van en Bélgica (SCHEDULED_REGION): Cloud Scheduler no existe en Madrid.
 setGlobalOptions({ region: 'europe-southwest1' });
+const SCHEDULED_REGION = 'europe-west1';
 initializeApp();
 
 const db = getFirestore();
@@ -93,7 +95,7 @@ async function maintainDuel(ref, now) {
     return { recipient: action.recipient, waiting: game.status === 'waiting' };
   });
 }
-exports.maintainTurnDuels = onSchedule({ schedule: 'every 60 minutes', timeZone: 'Europe/Madrid', timeoutSeconds: 540, maxInstances: 1 }, async () => {
+exports.maintainTurnDuels = onSchedule({ region: SCHEDULED_REGION, schedule: 'every 60 minutes', timeZone: 'Europe/Madrid', timeoutSeconds: 540, maxInstances: 1 }, async () => {
   let cursor;
   const now = Date.now();
   do {
@@ -152,7 +154,7 @@ exports.deleteMyAccount = onCall({ timeoutSeconds: 120, maxInstances: 10 }, asyn
   catch (error) { console.warn('Account deletion failed', error.code || error.message); throw new HttpsError('internal', 'No se pudo borrar la cuenta.'); }
   return { deleted: true };
 });
-exports.purgeExpiredData = onSchedule({ schedule: 'every day 04:17', timeZone: 'Europe/Madrid', timeoutSeconds: 540, maxInstances: 1 }, async () => {
+exports.purgeExpiredData = onSchedule({ region: SCHEDULED_REGION, schedule: 'every day 04:17', timeZone: 'Europe/Madrid', timeoutSeconds: 540, maxInstances: 1 }, async () => {
   const now = Date.now(), summary = {};
   for (const name of Object.keys(ACTIVITY)) {
     try { summary[name] = await purgeCollection(name, now); } catch (error) { console.warn('Purge failed', name, error.code || error.message); }

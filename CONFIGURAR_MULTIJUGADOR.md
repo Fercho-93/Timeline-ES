@@ -61,8 +61,10 @@ Las Functions (`functions/index.js`) son seis:
 | `deleteMyAccount` | Al pulsar «Eliminar» en el Atlas (llamada del juego) | Borra todo lo que el servidor guarda de la cuenta de quien llama —datos, filas de ranking de todos los días y semanas, nombre— y su acceso (`functions/account-purge.js`) |
 | `purgeExpiredData` | Cada día a las 04:17 (Europe/Madrid) | Limpieza según `functions/retention.js` |
 
-Todas corren en **`europe-southwest1`** (Madrid), junto a la base de datos, para que los datos no salgan de
+Corren en **`europe-southwest1`** (Madrid), junto a la base de datos, para que los datos no salgan de
 España al procesarse y los avisos de Firestore no crucen de región (`setGlobalOptions` en `functions/index.js`).
+Las dos programadas (`maintainTurnDuels` y `purgeExpiredData`) van en **`europe-west1`** (Bélgica, también en la
+UE): Cloud Scheduler no está disponible en Madrid y publicarlas allí falla (`SCHEDULED_REGION`).
 Historia: hasta octubre de 2026 la mayoría estaba en `us-central1` y los avisos de duelos en Madrid; el 20 de
 octubre pasaron todas a `europe-west1` (Bélgica) y después a Madrid. Cada publicación crea las nuevas en su región
 y borra las de las demás (por el `--force` del workflow). El juego llama a `deleteMyAccount` primero en Madrid y,
