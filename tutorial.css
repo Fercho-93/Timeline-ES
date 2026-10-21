@@ -125,6 +125,25 @@
 :is(#app, #app-splash) .tv-logo { position: relative; padding-bottom: 10px; color: var(--tv-glow); font: 500 1.8rem/1.1 var(--font-display); letter-spacing: -.02em; text-align: center; }
 :is(#app, #app-splash) .tv-logo::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 44px; height: 1px; transform: translateX(-50%); background: linear-gradient(90deg, transparent, var(--tv-glow), transparent); }
 
+/* Entradilla de Jugar solo: la misma ilustración que su puerta en el juego. */
+:is(#app, #app-splash) .tv-chapter-intro {
+  width: min(100%, 370px); overflow: hidden; border: 1px solid #cbb896; border-radius: 15px;
+  background: linear-gradient(155deg, #f7f1e6, #e9dfcc); color: var(--tv-ink);
+  box-shadow: inset 0 1px #fff9, 0 12px 26px -8px #0009;
+}
+:is(#app, #app-splash) .tv-intro-hero { position: relative; isolation: isolate; min-height: 170px; }
+:is(#app, #app-splash) .tv-chapter-intro .tv-intro-hero > .tv-menu-art {
+  position: absolute; z-index: -1; inset: 0 0 0 auto; width: 60%; height: 100%; object-fit: cover; object-position: right center;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 45%);
+  mask-image: linear-gradient(90deg, transparent, #000 45%);
+}
+:is(#app, #app-splash) .tv-intro-copy { position: relative; width: 75%; padding: 22px 18px; text-align: left; }
+:is(#app, #app-splash) .tv-intro-copy p { margin: 0 0 9px; color: #755528; font: 600 .58rem/1.4 var(--ui-font); letter-spacing: .18em; text-transform: uppercase; }
+:is(#app, #app-splash) .tv-intro-copy h3 { margin: 0 0 10px; color: var(--tv-ink); font: 500 clamp(1.7rem, 7vw, 2.35rem)/1.1 var(--font-display); letter-spacing: -.025em; }
+:is(#app, #app-splash) .tv-intro-copy > span { display: block; color: var(--tv-ink-soft); font: 500 .8rem/1.45 var(--ui-font); }
+:is(#app, #app-splash) .tv-chapter-intro > .tv-path { margin: 0; padding: 12px 10px; border-top: 1px solid #cbb89688; color: #755528; }
+:is(#app, #app-splash) .tv-chapter-intro .tv-path span { border-color: #ab8d5955; background: #fff8; }
+
 /* Cada carta, un dato: una de fechas y otra de cifras, juntas. */
 :is(#app, #app-splash) .tv-pair { display: flex; justify-content: center; gap: 22px; }
 :is(#app, #app-splash) .tv-kind { display: grid; justify-items: center; gap: 8px; margin: 0; opacity: 0; transform: translateY(14px); transition: opacity .5s, transform .6s var(--tv-ease-out); }

@@ -158,6 +158,14 @@
         ] },
 
       // 2 · Jugar solo
+      { chapter: 1, title: "Jugar solo · Elegir colección", duration: 6800,
+        html: `<div class="tv-chapter-intro">
+          <div class="tv-intro-hero">${menuArt("Jugar solo")}<div class="tv-intro-copy"><p>A tu ritmo</p><h3>Jugar solo</h3><span>Elige una colección<br>y un mazo</span></div></div>
+          ${path(["Jugar", "Jugar solo", "Grandes colecciones"])}</div>`,
+        steps: [
+          [0, c => c.say("Ahora pasamos a «Jugar solo», para jugar a tu ritmo.")],
+          [2800, c => c.say("En «Grandes colecciones», elige una colección y después un mazo.")]
+        ] },
       { chapter: 1, title: "Rondas", duration: 10400,
         html: `<div class="tv-board">${path(["Jugar solo", "Grandes colecciones"])}<div class="tv-round"><div class="tv-round-head"><b>Ronda</b>${hearts()}</div>${dots("✓✓✓✗✓✓✓✓✓✓")}<div class="tv-stars">★★<i>★</i></div></div>
           <div class="tv-tiles">${tile("∞", "Maratón", "Todo el mazo · 3 vidas")}${tile("◈", "Competición", "Varios temas · 3 vidas en cada uno")}</div></div>`,

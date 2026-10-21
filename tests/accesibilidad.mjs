@@ -133,9 +133,14 @@ console.log("\nLas reglas se adaptan al mazo");
   click(w, '.tv-play');
   ok("se puede pausar como un vídeo", !video.tutorial.state().playing && el(w, '.tv-play').getAttribute('aria-label') === 'Reproducir');
   click(w, '[data-tv-chapter="1"]');
-  ok("cada capítulo se abre desde su barra", el(w, '.tv-scene-title').textContent === 'Rondas' && el(w, '[data-tv-chapter="1"]').classList.contains('is-current'));
+  ok("Jugar solo se abre con su entradilla desde la barra", el(w, '.tv-scene-title').textContent === 'Jugar solo · Elegir colección' && el(w, '[data-tv-chapter="1"]').classList.contains('is-current'));
+  ok("la entradilla ubica la elección de colección y mazo", /Elige una colección\s*y un mazo/.test(el(w, '.tv-intro-copy').textContent) && el(w, '.tv-stage .tv-path').textContent.includes('Grandes colecciones'));
   click(w, '[data-tv="prev"]');
   ok("y se rebobina escena a escena", el(w, '.tv-scene-title').textContent === 'Dónde se juega');
+  click(w, '[data-tv="next"]');
+  ok("tras Dónde se juega aparece la entradilla", el(w, '.tv-stage h3').textContent === 'Jugar solo');
+  click(w, '[data-tv="next"]');
+  ok("después continúa la explicación de Rondas", el(w, '.tv-scene-title').textContent === 'Rondas' && el(w, '.tv-round').textContent.includes('Ronda'));
   video.tutorial.go(2);
   ok("la carta por colocar dice qué dato esconde", /Peso oculto/i.test(el(w, '.tv-hand').textContent));
   // Ninguna escena espera a quien mira: en la mesa no hay huecos ni botones que pulsar.
