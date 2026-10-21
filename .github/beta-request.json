@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 762,
+  "cache": 781,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Láminas de cartas más ligeras (448×672, assets de unos 176 a 103,5 MiB), moderación de nombres y botón «Denunciar», borrado de cuenta, textos legales y política de privacidad, identificación solo con nombre y correo, aviso remoto de actualización, sin cofre ni música ambiente, y mejoras de menús, guía y Retos rápidos"
+  "reason": "Denunciar y bloquear en cada nombre ajeno, diseño adaptable a iPad, enlaces legales que abren en Safari, permiso de Fotos, botón de Apple con logotipo, SDK de Firebase dentro de la app, aviso previo de la cámara en salas Wi-Fi, sonido que respeta el modo silencio, copias y comentarios por la hoja de compartir, «Jugar sin conexión» si falla la cuenta y sin menciones a Android ni herramientas de prueba en iPhone"
 }
