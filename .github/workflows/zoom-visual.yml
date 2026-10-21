@@ -34,6 +34,7 @@ jobs:
       - run: node tests/navegacion-volver-browser.mjs
       - run: node tests/quick-challenges-browser.mjs
       - run: node tests/quick-formats-browser.mjs
+      - run: node tests/tablet-browser.mjs
       - uses: actions/upload-artifact@v5
         if: always()
         with:

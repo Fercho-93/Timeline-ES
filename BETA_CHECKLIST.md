@@ -58,6 +58,7 @@ automáticas no sustituyen estas pruebas.
 - [ ] Modo avión en partida local y sala Wi-Fi entre Android e iPhone.
 - [ ] Salas cercanas entre dos iPhone, con el código de 4 cifras.
 - [ ] Orientación vertical y horizontal; áreas seguras del iPhone.
+- [ ] iPad real (o tableta Android), en vertical y en horizontal: la partida a dos columnas en horizontal, girar la tableta en plena partida, Split View estrecho y áreas seguras (el diseño de tabletas se ha probado en navegador, no en un iPad).
 - [ ] Teclado y campos de nombre; tamaño de letra grande.
 - [ ] Lector de pantalla y movimiento reducido.
 - [ ] Gesto Atrás de Android.

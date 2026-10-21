@@ -1,0 +1,62 @@
+/* Diseño adaptable para tabletas (iPad y tabletas Android): pantallas táctiles de al menos 700 × 600.
+   mesa-escala.js pone `data-tablet` en <html> en esas pantallas y deja de escalar la mesa como un iPhone,
+   así que aquí el juego usa las medidas reales. Todo cuelga de `html[data-tablet]`: el móvil y el ordenador
+   con ratón no cambian. */
+
+/* ───────── Partida en tableta horizontal: dos columnas ─────────
+   Izquierda, la cabecera, las vidas y tu carta (flujo normal); derecha, la línea del tiempo a todo lo alto,
+   colocada en absoluto dentro de la pantalla de juego para que su alto sea el de la tableta y no dependa de
+   lo que haya a la izquierda. */
+html[data-tablet="horizontal"] #app.atlas-board:not(.mesa-escena) {
+  --tcol: clamp(300px, 34vw, 420px);
+  --tgap: 28px;
+  --tpad-l: max(26px, var(--safe-left)); --tpad-r: max(26px, var(--safe-right));
+  --tpad-t: max(10px, var(--safe-top)); --tpad-b: max(14px, var(--safe-bottom));
+  --atlas-card: clamp(220px, calc(100 * var(--dvh) - 430px), 320px);
+}
+html[data-tablet="horizontal"] #app.atlas-board:not(.mesa-escena):has(.board-focus-card) { --atlas-card: clamp(240px, calc(100 * var(--dvh) - 400px), 460px); }
+html[data-tablet="horizontal"] #app.atlas-board:not(.mesa-escena) > .shell {
+  width: 100%; max-width: none; box-sizing: border-box; position: relative; min-height: calc(100 * var(--dvh));
+  padding: var(--tpad-t) calc(100vw - var(--tpad-l) - var(--tcol)) var(--tpad-b) var(--tpad-l);
+}
+html[data-tablet="horizontal"] #app.atlas-board:not(.mesa-escena) > .shell > .board-timeline-section {
+  position: absolute; top: var(--tpad-t); bottom: var(--tpad-b); left: calc(var(--tpad-l) + var(--tcol) + var(--tgap)); right: var(--tpad-r);
+  margin: 0 !important; box-sizing: border-box; display: flex; flex-direction: column;
+}
+html[data-tablet="horizontal"] #app.atlas-board:not(.mesa-escena) .board-timeline-section .timeline-wrap {
+  flex: 1 1 auto; display: flex; align-items: center; margin-bottom: 0;
+}
+html[data-tablet="horizontal"] #app.atlas-board:not(.mesa-escena) .board-focus-card .hand-solo {
+  grid-template-columns: minmax(0, min(100%, 300px)); justify-content: center;
+}
+
+/* Cartas de la línea: las mismas cuentas que la mesa de móvil, con una carta de referencia más grande. */
+html[data-tablet="horizontal"] #app.atlas-board:not(.mesa-escena) .timeline-card { width: max(128px, calc(var(--atlas-card) * .73)); min-height: var(--atlas-card); }
+html[data-tablet="horizontal"] #app.atlas-board:not(.mesa-escena)[data-platform][data-screen] .timeline .card-visual { height: max(108px, calc(var(--atlas-card) * .66 + 12px)); }
+html[data-tablet="horizontal"] #app.atlas-board:not(.mesa-escena):has(.board-focus-card) .timeline-card { width: max(128px, calc((var(--atlas-card) - 92px) / 1.5 + 16px)); }
+html[data-tablet="horizontal"] #app.atlas-board:not(.mesa-escena):has(.board-focus-card)[data-platform][data-screen] .timeline .card-visual {
+  aspect-ratio: 2 / 3; height: auto; max-height: calc(var(--atlas-card) - 92px); flex: none;
+}
+html[data-tablet="horizontal"] #app.atlas-board:not(.mesa-escena) :is(.slot, .slot-confirm) { min-height: var(--atlas-card); }
+html[data-tablet="horizontal"] #app.atlas-board:not(.mesa-escena) .slot { width: max(46px, calc(var(--atlas-card) * .2)); }
+
+
+/* El resultado de cada carta ocupa el hueco de la columna izquierda, sin alargar la página. */
+html[data-tablet="horizontal"] #app.atlas-board:not(.mesa-escena) > .overlay.board-result-layer {
+  position: fixed; left: var(--tpad-l); bottom: var(--tpad-b); top: auto; right: auto; width: var(--tcol);
+  box-sizing: border-box; padding: 0; z-index: 6;
+}
+html[data-tablet="horizontal"] #app.atlas-board:not(.mesa-escena) > .overlay.board-result-layer .modal.board-result { max-width: none; }
+
+/* ───────── Inicio en tableta horizontal: jugar y unirse a la izquierda, reto diario a la derecha ───────── */
+html[data-tablet="horizontal"] #app .home-doors-shell .home-doors {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px 22px; align-items: start;
+}
+html[data-tablet="horizontal"] #app .home-doors > .mode-play-zone { grid-column: 1; }
+html[data-tablet="horizontal"] #app .home-doors > .mode-daily-zone { grid-column: 2; }
+html[data-tablet="horizontal"] #app .home-doors > .mode-ranking-summary { grid-column: 1 / -1; }
+html[data-tablet="horizontal"] #app .home-doors > :not(.mode-play-zone, .mode-daily-zone, .mode-ranking-summary) { grid-column: 1 / -1; }
+/* El pie del reto diario se lee sobre el mapa: va sobre un fondo de papel. */
+html[data-tablet] #app .mode-daily-family {
+  display: inline-block; padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, var(--edition-paper, #f6f1e8) 86%, transparent);
+}

@@ -135,9 +135,25 @@
     app?.style.setProperty('--mesa-desplazada', `${app.scrollTop}px`);
   }
 
+  // Tabletas (iPad, tabletas Android): pantalla táctil de al menos 700 × 600. `html[data-tablet]` vale
+  // «vertical» u «horizontal» (tablet.css cuelga de ahí). En vertical, la mesa sigue escalada como un
+  // iPhone: cabe entera a lo alto y las cartas salen grandes. En horizontal ese iPhone dejaría una columna
+  // estrecha en medio de la pantalla, así que la partida usa las medidas reales con dos columnas
+  // (tablet.css). El ordenador con ratón y los móviles siguen con la mesa a escala.
+  const consultaTablet = window.matchMedia?.('(min-width: 700px) and (min-height: 600px) and (pointer: coarse)');
+  const esTablet = () => !!consultaTablet?.matches;
+  const esTabletHorizontal = () => esTablet() && window.innerWidth > window.innerHeight;
+  const marcaTablet = () => {
+    const raiz = document.documentElement;
+    if (esTablet()) raiz.setAttribute('data-tablet', esTabletHorizontal() ? 'horizontal' : 'vertical');
+    else raiz.removeAttribute('data-tablet');
+  };
+  marcaTablet();
+
   // La pinta immersion.js en cada pantalla: dentro de la partida, la mesa; fuera, la vista normal.
   function aplica(app, mesa) {
     if (!app) return;
+    if (mesa && esTabletHorizontal()) mesa = false;
     if (mesa && !activa) {
       activa = true;
       fijaMedia();
@@ -168,7 +184,11 @@
   }
   function recoloca() {
     const app = document.getElementById('app');
-    if (activa && app) coloca(app);
+    marcaTablet();
+    if (!app) return;
+    // Girar la tableta en plena partida cambia de la mesa a escala a las dos columnas, o al revés.
+    if (app.classList.contains('atlas-board') && activa === esTabletHorizontal()) aplica(app, true);
+    else if (activa) coloca(app);
   }
   window.addEventListener('resize', recoloca, { passive: true });
   window.addEventListener('orientationchange', recoloca, { passive: true });
@@ -186,6 +206,8 @@
   CT.Mesa = {
     ANCHO, ALTO,
     aplica,
+    tablet: esTablet,
+    tabletHorizontal: esTabletHorizontal,
     activa: () => activa,
     escala: () => (activa ? escala : 1),
     ancho: () => (activa ? ANCHO : window.innerWidth),

@@ -1,6 +1,6 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v779";
+const CACHE = "continuum-v780";
 // Las láminas de animales —5,5 MB en casi cien archivos— no se precargan: quien nunca
 // abre ese bloque no debería pagar esa descarga solo por instalar la aplicación. La ruta
 // `fetch` de más abajo ya guarda en caché cualquier respuesta válida la primera vez que
@@ -27,7 +27,7 @@ const ASSETS = [
   "./", "./index.html", "./home-modes-v1.js", "./home-modes-v1.css", "./splash.css", "./splash.js", "./styles.css", "./edition.css", "./atlas-voyage.css", "./navigation-nautical.css", "./guide-journal.css", "./tutorial.css", "./tutorial.js", "./assets/guide-notebook-v1.webp", "./assets/saved-journey-v1.webp", "./service-worker-258.js", "./cards.js", "./movies.js", "./music.js", "./videogames.js",
   "./animals.js", "./lifespan.js", "./speed.js", "./inventos.js", "./mundo.js", "./astronomy.js",
   "./medicine.js", "./countries.js", "./population.js", "./idiomas.js", "./distances.js", "./modes.js", "./storage.js", "./saves.js", "./updates.js", "./session.js", "./avatares.js", "./moderacion.js", "./edad.js", "./identidad.js", "./enciclopedia.js", "./progreso.js", "./cartera.js", "./duelo.js", "./duelo-turnos.js", "./push.js", "./app-config.js", "./public-matchmaking.js", "./public-matchmaking-online.js", "./public-tables.js", "./local-transport.js", "./local-peer.js", "./local-room.js", "./local-session.js", "./local-share.js", "./qrcode-generator.js", "./qr-encode.js", "./qr-scanner.js", "./local-multiplayer.js", "./jsqr.js",
-  "./ghost.js", "./drag.js", "./swipe.js", "./a11y.js", "./mapa.js", "./settings.js", "./effects.js", "./sonidos.js", "./mesa-escala.js", "./mesa-escala.css", "./immersion.js", "./app.js", "./online.js",
+  "./ghost.js", "./drag.js", "./swipe.js", "./a11y.js", "./mapa.js", "./settings.js", "./effects.js", "./sonidos.js", "./mesa-escala.js", "./mesa-escala.css", "./tablet.css", "./immersion.js", "./app.js", "./online.js",
   "./manifest.webmanifest", "./icon.svg", "./assets/continuum-emblem-800.webp", "./assets/continuum-splash-clean-v3.webp", "./assets/continuum-splash-blue-v5.webp",
   "./assets/splash-card-marathon.webp", "./assets/splash-card-hippocrates.webp", "./assets/splash-card-vesuvius.webp",
   "./assets/home-door-jugar.webp",

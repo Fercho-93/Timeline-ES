@@ -147,6 +147,8 @@ tienda, sin nombres ni salas reales y sin simular funciones que la versión no t
 6. Sala con amigos o mesa pública.
 7. Ajustes con el texto ampliado.
 
+La app se declara para iPhone y iPad (`TARGETED_DEVICE_FAMILY = "1,2"`): App Store Connect exige además capturas de iPad de 13" (y las de iPhone de 6,9"), y Google Play pide capturas de tableta si se publica para tabletas. En iPad, la partida en horizontal usa dos columnas (`tablet.css`) y en vertical la mesa a escala; hacer capturas de las dos orientaciones desde un iPad real o el simulador, no desde el navegador.
+
 Las imágenes del navegador durante el desarrollo no valen como capturas aprobadas. El icono
 actual es el candidato, sujeto a la elección del titular.
 
