@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="941" height="1672" viewBox="0 0 941 1672">
+  <!-- Solo las nubes inferiores: el horizonte y el mapa quedan fuera de la máscara. -->
+  <defs>
+    <filter id="feather" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+  </defs>
+  <g fill="white" filter="url(#feather)">
+    <path d="M-60 1020 C35 1050 50 1130 115 1150 S155 1250 225 1280 L280 1320 Q130 1340-60 1440Z"/>
+    <path d="M1001 1000 C920 1035 900 1110 840 1150 S810 1250 745 1290 L710 1315 Q850 1340 1001 1440Z"/>
+    <path d="M-60 1450 Q30 1440 65 1515 T170 1590 Q235 1585 280 1640 L380 1710 H-60Z"/>
+    <path d="M1001 1450 Q935 1440 900 1515 T810 1590 Q765 1600 730 1650 L680 1710 H1001Z"/>
+  </g>
+</svg>

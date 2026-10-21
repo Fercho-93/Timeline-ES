@@ -206,6 +206,20 @@ html.splash-active #app-splash .splash-masthead {
 /* Copia exacta del fondo de la portada (incluida su posición) que solo existe para
    acercarse al abrir; al terminar coincide píxel a píxel con el de debajo. */
 #app-splash .splash-backdrop { z-index: -2; background: inherit; }
+/* Reutiliza la ilustración con una máscara en sus mismas coordenadas. La capa
+   acompaña el acercamiento inicial; solo las nubes derivan después, sin mover el globo. */
+@supports ((mask-image: url("assets/splash-clouds-mask.svg")) or (-webkit-mask-image: url("assets/splash-clouds-mask.svg"))) {
+  #app-splash .splash-backdrop::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: inherit;
+    -webkit-mask: url("assets/splash-clouds-mask.svg") var(--splash-cloud-position, center) / cover no-repeat;
+    mask: url("assets/splash-clouds-mask.svg") var(--splash-cloud-position, center) / cover no-repeat;
+    transform-origin: center bottom;
+  }
+}
 #app-splash .splash-curtain { z-index: 20; display: none; background: radial-gradient(ellipse at 50% 40%, #3a220f 0, #120b06 70%); }
 
 /* El emblema es una moneda: canto oscuro entre anverso y reverso. */
@@ -230,6 +244,9 @@ html.splash-active #app-splash .splash-masthead {
 @media (prefers-reduced-motion: no-preference) {
   html.splash-active #app-splash .splash-curtain { display: block; animation: splash-fade-out 1.3s .1s ease-in both; }
   html.splash-active #app-splash .splash-backdrop { animation: splash-settle 8.5s cubic-bezier(.25,.6,.25,1) both; }
+  html.splash-active #app-splash .splash-backdrop::after {
+    animation: splash-cloud-drift 22s 8.5s ease-in-out infinite both;
+  }
   html.splash-active #app-splash .splash-coin-edge { display: block; }
 
   /* Torbellino: el emblema aparece pequeño girando muy deprisa, crece mientras frena y se queda quieto. */
@@ -299,6 +316,10 @@ html.splash-active #app-splash .splash-masthead {
 #app-splash .home-wordmark span,
 #app-splash .home-tagline span:first-child { --i: 0; }
 @keyframes splash-fade-out { to { opacity: 0; } }
+@keyframes splash-cloud-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(7px, -4px, 0) scale(1.012); }
+}
 @keyframes splash-settle {
   from { transform: scale(1.16) translateY(2%); filter: brightness(.55) sepia(.4); }
   30% { filter: brightness(1) sepia(0); }
@@ -497,7 +518,7 @@ html.splash-active #app-splash .splash-masthead {
   #app-splash .splash-play { min-height: 54px; padding-block: 14px; }
 }
 @media (min-aspect-ratio: 4/3) and (max-height: 760px) {
-  html.splash-active #app-splash { background-position: center 48%; }
+  html.splash-active #app-splash { background-position: center 48%; --splash-cloud-position: center 48%; }
   html.splash-active #app-splash .splash-masthead { top: 45%; width: min(50vw, 480px); }
   #app-splash .splash-crest { width: min(36vw, 320px); }
   #app-splash .home-wordmark { font-size: clamp(2.2rem, 5vw, 3.5rem); }
