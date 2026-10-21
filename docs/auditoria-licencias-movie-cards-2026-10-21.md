@@ -4,7 +4,7 @@ Fecha: 21 de octubre de 2026
 
 ## Resultado
 
-La carpeta contiene **120 láminas WebP de 512 × 768 px**, una por película. No son fotografías descargadas: el inventario atribuye las 120 a arte generado con ChatGPT/OpenAI y confirmado por el titular (`docs/inventario-arte.json`, estado `user-confirmed-ai-generated`). La declaración general está en `PROCEDENCIA_ARTE_IA.md`.
+La carpeta contiene **120 láminas WebP de 512 × 768 px**, una por película. Antes de esta auditoría, el inventario atribuía las 120 a arte generado con ChatGPT/OpenAI. Se ha sustituido `1001-moon.webp` por un fotograma de la película de 1902 marcado como dominio público; sus datos están en `docs/procedencia-movie-cards.md`. Las otras 119 láminas siguen bajo la declaración general de `PROCEDENCIA_ARTE_IA.md`.
 
 Por tanto, no hay una licencia fotográfica de terceros que se pueda comprobar para estos archivos. El inventario tampoco conserva los prompts, las referencias visuales ni la fecha individual. En la inspección visual aparecen escenas, personajes y elementos reconocibles de películas y franquicias. La declaración de generación con IA **no acredita por sí sola** que esas representaciones sean ajenas a derechos de autor, marcas o derechos de imagen.
 
@@ -59,7 +59,7 @@ La prioridad alta corresponde a láminas cuya composición evoca un personaje, c
 | `1116-howls-moving-castle.webp` | Castillo ambulante y personajes |
 | `1117-my-neighbor-totoro.webp` | Criatura grande con paraguas |
 
-Las otras 78 láminas también requieren revisión si se quiere una garantía documental: se generaron bajo la misma declaración general y faltan sus prompts y referencias. Algunas representan escenas, encuadres, vestuario o diseños asociados a la obra aunque no imiten un personaje con tanta claridad.
+La prioridad alta incluye ahora **41 sustituciones pendientes**; `1001-moon.webp` ya usa un fotograma de dominio público. Las otras 78 láminas también requieren revisión si se quiere una garantía documental: faltan sus prompts y referencias. Algunas representan escenas, encuadres, vestuario o diseños asociados a la obra aunque no imiten un personaje con tanta claridad.
 
 ## Sustitución recomendada
 
@@ -77,4 +77,4 @@ Si no existe una foto CC0 o de dominio público que represente directamente la p
 
 ## Estado de la tarea
 
-Esta revisión identifica qué recursos priorizar y confirma que los ficheros actuales ya están en formato de juego. No se han descargado ni convertido sustitutos: hacerlo sin una selección individual de fuente y una verificación de licencia dejaría sin resolver precisamente el problema detectado. Las láminas de prioridad alta deben reemplazarse por fuentes verificadas o por ilustraciones nuevas que eviten elementos identificables antes de distribuir el juego.
+Esta revisión identifica qué recursos priorizar y confirma que los ficheros actuales ya están en formato de juego. Se verificó y convirtió un fotograma de dominio público para `1001-moon.webp`; no se reemplazaron las demás láminas porque aún no hay una selección individual de fuentes y licencias verificadas. Las restantes láminas de prioridad alta deben reemplazarse por fuentes verificadas o por ilustraciones nuevas que eviten elementos identificables antes de distribuir el juego.
