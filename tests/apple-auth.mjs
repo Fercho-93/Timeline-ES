@@ -45,7 +45,8 @@ async function conEleccion(w, choice) {
 {
   // Cualquier invitado de iPhone puede entrar con Apple: ya no hace falta estar autorizado.
   const {w,dom}=setup();await w.appleTest.startAccounts(()=>{});
-  assert.match(w.CONTINUUM.Accounts.card(),/data-account-action="apple">Continuar con Apple/);
+  assert.match(w.CONTINUUM.Accounts.card(),/data-account-action="apple">.*<span>Continuar con Apple<\/span>/s);
+  assert.match(w.CONTINUUM.Accounts.card(),/account-apple-logo/,'el botón lleva el logotipo de Apple, como piden sus pautas');
   assert.doesNotMatch(w.CONTINUUM.Accounts.card(),/prueba|beta|autorizad/i);dom.window.close();
 }
 {

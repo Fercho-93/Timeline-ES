@@ -14,6 +14,7 @@
     if (window.Capacitor?.isNativePlatform?.()) return PUBLIC_URL;
     try { return TRUSTED.find(base => location.href.startsWith(base)) || PUBLIC_URL; } catch { return PUBLIC_URL; }
   };
+  const LEGAL_PAGES = ['privacidad.html', 'terminos.html', 'aviso-legal.html', 'soporte.html', 'borrar-cuenta.html', 'licencias.html'];
   CT.Links = {
     base() { return window.Capacitor?.isNativePlatform?.() ? PUBLIC_URL : location.origin + location.pathname; },
     parse(value) {
@@ -66,6 +67,20 @@
       return url.href;
     },
     nativeUrl(target) { return 'continuum://invite?' + CT.Links.params(target).toString(); },
+    // Las páginas legales (privacidad, condiciones, soporte…) son páginas del sitio, no pantallas del
+    // juego. En la app nativa, un enlace relativo con target="_blank" se convertiría en
+    // capacitor://localhost/privacidad.html, que el sistema no sabe abrir: el toque no haría nada.
+    // Se abren por su dirección pública, en el navegador del sistema.
+    legalUrl(href, base) {
+      try {
+        const url = new URL(href, base || location.href);
+        // `origin` de una URL con esquema propio (capacitor://) es «null»: se compara esquema y servidor.
+        if (url.protocol !== location.protocol || url.host !== location.host) return null;
+        const page = url.pathname.split('/').pop();
+        if (!LEGAL_PAGES.includes(page)) return null;
+        return new URL(page + url.search + url.hash, PUBLIC_URL).href;
+      } catch { return null; }
+    },
     start(open) {
       const cap = window.Capacitor;
       if (!cap?.isNativePlatform?.()) return;
@@ -84,4 +99,13 @@
       Promise.resolve(app?.getLaunchUrl?.()).then(receive).catch(()=>{});
     }
   };
+  if (typeof document !== 'undefined') document.addEventListener('click', event => {
+    if (!window.Capacitor?.isNativePlatform?.()) return;
+    const link = event.target?.closest?.('a[href]');
+    if (!link || event.defaultPrevented) return;
+    const url = CT.Links.legalUrl(link.getAttribute('href'));
+    if (!url) return;
+    event.preventDefault();
+    window.open(url, '_blank');
+  }, true);
 })();
