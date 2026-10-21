@@ -205,18 +205,6 @@
           [3400, c => { c.say("Juega uno de los mazos del día o una partida sorpresa."); c.stagger(".tv-tile", 500); }],
           [6800, c => c.say("Un fallo no te saca del reto: cuentan los aciertos.")]
         ] },
-      blockIntro(1, "Reto del día", "Reto del día", "Desde Inicio", "El mismo desafío para todos",
-        ["Inicio", "Reto del día"], "Volvemos a Inicio para ver el «Reto del día», un desafío común para todos."),
-      { chapter: 1, title: "Reto del día", duration: 9600,
-        html: `<div class="tv-board">${path(["Inicio", "Reto del día"])}${dots("✓✓✗✓✓✓✗✓✓✗")}<div class="tv-score">7 de 10</div>
-          <div class="tv-facts"><span>Un intento al día</span><span>Días pares: Grandes colecciones</span><span>Impares: Retos rápidos</span></div></div>`,
-        steps: [
-          [0, c => c.say("Cada día, un reto de 10 cartas, las mismas para todos.")],
-          [500, c => c.stagger(".tv-dots span", 260)],
-          [3300, c => c.add(".tv-score", "is-in")],
-          [4400, c => c.say("Sin vidas ni reloj. Puntúa en el ranking diario y semanal.")],
-          [5600, c => c.stagger(".tv-facts span", 350)]
-        ] },
 
       // 3 · En grupo
       blockIntro(2, "En grupo", "Jugar con amigos", "Con otras personas", "Las reglas de una mesa compartida",
@@ -277,7 +265,21 @@
           [1400, c => c.fill(".tv-table-seats .is-free", 800)],
           [3600, c => { c.say("Siéntate en una mesa, crea la tuya o pide partida rápida."); c.stagger(".tv-tile", 450); }]
         ] },
-      { chapter: 2, title: "A jugar", duration: 4500, last: true,
+
+      // 4 · Reto del día
+      blockIntro(3, "Reto del día", "Reto del día", "Desde Inicio", "El mismo desafío para todos",
+        ["Inicio", "Reto del día"], "Volvemos a Inicio para ver el «Reto del día», un desafío común para todos."),
+      { chapter: 3, title: "Reto del día", duration: 9600,
+        html: `<div class="tv-board">${path(["Inicio", "Reto del día"])}${dots("✓✓✗✓✓✓✗✓✓✗")}<div class="tv-score">7 de 10</div>
+          <div class="tv-facts"><span>Un intento al día</span><span>Días pares: Grandes colecciones</span><span>Impares: Retos rápidos</span></div></div>`,
+        steps: [
+          [0, c => c.say("Cada día, un reto de 10 cartas, las mismas para todos.")],
+          [500, c => c.stagger(".tv-dots span", 260)],
+          [3300, c => c.add(".tv-score", "is-in")],
+          [4400, c => c.say("Sin vidas ni reloj. Puntúa en el ranking diario y semanal.")],
+          [5600, c => c.stagger(".tv-facts span", 350)]
+        ] },
+      { chapter: 3, title: "A jugar", duration: 4500, last: true,
         html: `<div class="tv-center tv-end"><div class="tv-logo">A jugar</div><p>Para tu primera partida: «Jugar solo», un mazo de Grandes colecciones, en Fácil.</p><div class="tv-end-actions"><button type="button" class="btn btn-secondary" data-tv="replay">Ver otra vez</button>${portada ? "" : '<button type="button" class="btn btn-ghost" data-tv="manual">Ver el manual</button>'}</div></div>`,
         steps: [
           [0, c => { c.say(portada ? "Pulsa «Jugar» para empezar." : "Debajo tienes el manual, con todos los detalles."); c.add(".tv-end", "is-in"); }]
@@ -285,7 +287,7 @@
     ];
   }
 
-  const CHAPTERS = ["Lo básico", "Jugar solo", "En grupo"];
+  const CHAPTERS = ["Lo básico", "Jugar solo", "En grupo", "Reto del día"];
 
   const ICON = {
     play: '<svg class="tv-ico-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.6v14.8c0 .9 1 1.4 1.7.9l11-7.4c.7-.4.7-1.4 0-1.8l-11-7.4C8 3.2 7 3.7 7 4.6Z"/></svg>',

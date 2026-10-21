@@ -116,7 +116,7 @@ console.log("\nLas reglas se adaptan al mazo");
   const conPulso = w.CONTINUUM.guideMarkup("history", "local", { pulse: true });
   ok("el Pulso se explica fuera de solitario", /Pulso/.test(conPulso) && /Los dos colocáis/.test(conPulso));
   ok("y la guía dice si está en juego o no", /en juego/.test(conPulso) && /opcional/.test(w.CONTINUUM.guideMarkup("history", "local", { pulse: false })));
-  ok("la guía empieza por el vídeo, con sus tres capítulos", /data-tutorial=/.test(conPulso) && ["Lo básico", "Jugar solo", "En grupo"].every(nombre => conPulso.includes(nombre)));
+  ok("la guía empieza por el vídeo, con cuatro capítulos y Reto del día aparte", /data-tutorial=/.test(conPulso) && (conPulso.match(/class="tv-chapter"/g) || []).length === 4 && ["Lo básico", "Jugar solo", "En grupo", "Reto del día"].every(nombre => conPulso.includes(nombre)));
   ok("el reto diario se explica en solitario", /reto diario/i.test(w.CONTINUUM.guideMarkup("history", "solo")));
   ok("la competición explica sus rondas", /cinco cartas/i.test(w.CONTINUUM.guideMarkup("history", "competition")));
   ok("la guía online explica quién prepara la sala", /quien crea la partida/i.test(w.CONTINUUM.guideMarkup("history", "online")));
@@ -143,9 +143,9 @@ console.log("\nLas reglas se adaptan al mazo");
   ok("después continúa la explicación de Rondas", el(w, '.tv-scene-title').textContent === 'Rondas' && el(w, '.tv-round').textContent.includes('Ronda'));
   for (const [anterior, entrada, siguiente, capitulo] of [
     ['Dificultad', 'Retos rápidos', 'Retos rápidos', 1],
-    ['Retos rápidos', 'Reto del día', 'Reto del día', 1],
-    ['Reto del día', 'En grupo', 'Tu mano', 2],
-    ['Poderes', 'Jugar online', 'Online', 2]
+    ['Retos rápidos', 'En grupo', 'Tu mano', 2],
+    ['Poderes', 'Jugar online', 'Online', 2],
+    ['Online', 'Reto del día', 'Reto del día', 3]
   ]) {
     click(w, `.tv-seg[aria-label="${anterior}"]`);
     click(w, '[data-tv="next"]');
@@ -157,6 +157,15 @@ console.log("\nLas reglas se adaptan al mazo");
   }
   click(w, '[data-tv-chapter="2"]');
   ok("el capítulo En grupo abre desde su entradilla", el(w, '.tv-stage h3').textContent === 'En grupo');
+  click(w, '[data-tv-chapter="3"]');
+  ok("Reto del día abre como capítulo independiente", el(w, '.tv-stage h3').textContent === 'Reto del día' && el(w, '[data-tv-chapter="3"]').classList.contains('is-current'));
+  click(w, '[data-tv="prev"]');
+  ok("el capítulo diario viene después de Online", el(w, '.tv-scene-title').textContent === 'Online');
+  click(w, '[data-tv-chapter="3"]');
+  click(w, '[data-tv="next"]');
+  ok("la explicación diaria sigue dentro de su propio capítulo", el(w, '.tv-score').textContent === '7 de 10' && el(w, '[data-tv-chapter="3"]').classList.contains('is-current'));
+  click(w, '[data-tv="next"]');
+  ok("el cierre del vídeo sigue después del reto diario", el(w, '.tv-scene-title').textContent === 'A jugar');
   video.tutorial.go(2);
   ok("la carta por colocar dice qué dato esconde", /Peso oculto/i.test(el(w, '.tv-hand').textContent));
   // Ninguna escena espera a quien mira: en la mesa no hay huecos ni botones que pulsar.

@@ -338,8 +338,8 @@
 :is(#app, #app-splash) .tv-play svg { display: none; width: 22px; height: 22px; }
 :is(#app, #app-splash) .tv-play[data-state="playing"] .tv-ico-pause, :is(#app, #app-splash) .tv-play[data-state="paused"] .tv-ico-play, :is(#app, #app-splash) .tv-play[data-state="ended"] .tv-ico-replay { display: block; }
 :is(#app, #app-splash) .tv-play[data-state="paused"] svg { margin-left: 3px; }
-:is(#app, #app-splash) .tv-chapters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; width: 100%; }
-:is(#app, #app-splash) .tv-chapter { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 7px; min-width: 0; padding: 8px 6px 10px; border: 0; background: none; color: var(--edition-muted); text-align: left; cursor: pointer; }
+:is(#app, #app-splash) .tv-chapters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; width: 100%; }
+:is(#app, #app-splash) .tv-chapter { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-items: center; gap: 5px; min-width: 0; padding: 8px 6px 10px; border: 0; background: none; color: var(--edition-muted); text-align: center; cursor: pointer; }
 :is(#app, #app-splash) .tv-chapter b { display: grid; place-items: center; width: 20px; height: 20px; border: 1px solid currentColor; border-radius: 50%; font: 700 .58rem/1 var(--ui-font); transition: background .3s, color .3s; }
 :is(#app, #app-splash) .tv-chapter small { overflow: hidden; font: 600 .64rem/1.2 var(--ui-font); white-space: nowrap; text-overflow: ellipsis; }
 :is(#app, #app-splash) .tv-chapter::after { content: ""; position: absolute; left: 6px; right: 6px; bottom: 2px; height: 2px; border-radius: 2px; background: var(--edition-line); transition: background .3s; }
@@ -380,8 +380,6 @@
   :is(#app, #app-splash) .tv-pair { gap: 14px; }
   :is(#app, #app-splash) .tv-tiles.tv-three .tv-tile small { display: none; }
   :is(#app, #app-splash) .tv-level-row { grid-template-columns: 62px repeat(var(--tv-levels, 4), minmax(0, 1fr)); }
-  :is(#app, #app-splash) .tv-chapter small { display: none; }
-  :is(#app, #app-splash) .tv-chapter { justify-items: center; grid-template-columns: auto; }
 }
 
 /* Las miniaturas del manual comparten papel, tinta, láminas y reverso con el juego.
