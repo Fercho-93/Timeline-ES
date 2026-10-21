@@ -3,7 +3,7 @@
 // sentado. Solo la escribe el móvil que lleva la mesa; el resto la lista para elegir
 // dónde entrar. La sala sigue siendo la fuente de verdad: la ficha solo sirve para verla.
 import { db } from './firebase-client.js';
-import { collection, deleteDoc, doc, getDoc, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+import { collection, deleteDoc, doc, getDoc, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc } from './vendor/firebase/firebase-firestore.js';
 
 // Quien lleva la mesa renueva la ficha cada 45 s; sin renovar en dos minutos, la mesa
 // está abandonada y deja de enseñarse (las reglas permiten entonces borrarla a cualquiera).

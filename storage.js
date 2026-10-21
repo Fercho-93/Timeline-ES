@@ -11,7 +11,7 @@
     if (!host) { host = document.createElement("div"); host.id = "system-notices"; document.body.append(host); }
     return host;
   }
-  function notice(text, actions = [["Reintentar guardado", flush], ["Descargar copia", backup]]) {
+  function notice(text, actions = [["Reintentar guardado", flush], [saveLabel(), backup]]) {
     message = text;
     let box = document.getElementById("storage-notice");
     if (!box) {
@@ -37,7 +37,7 @@
     protectedKeys.delete(key);
     if (!pending.size && !protectedKeys.size) document.getElementById("storage-notice")?.remove();
   }
-  function failed() { notice("No se ha podido guardar. El progreso sigue en esta pantalla: mantén la app abierta y reintenta o descarga una copia."); }
+  function failed() { notice("No se ha podido guardar. El progreso sigue en esta pantalla: mantén la app abierta y reintenta o guarda una copia."); }
   function getItem(key) {
     if (pending.has(key)) return pending.get(key);
     try { return window.localStorage.getItem(key); }
@@ -72,11 +72,30 @@
       }
     } catch { /* La copia incluye al menos todos los cambios pendientes. */ }
     for (const [key, value] of pending) if (!CT.AccountStorage || CT.AccountStorage.ownsKey(key)) entries[key] = value;
-    const url = URL.createObjectURL(new Blob([JSON.stringify({ format: "continuum-backup", version: 1, entries }, null, 2)], { type: "application/json" }));
-    const a = document.createElement("a");
-    a.href = url; a.download = "continuum-recuperacion.json"; a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    void saveFile("continuum-recuperacion.json", JSON.stringify({ format: "continuum-backup", version: 1, entries }, null, 2), "application/json")
+      .then(result => { if (result === "copied") confirmed("Copia copiada al portapapeles: pégala en un mensaje o una nota para guardarla."); })
+      .catch(() => notice("No se ha podido guardar la copia en este dispositivo."));
   }
+  // En el navegador se descarga un archivo; en la app (iPhone y Android) las descargas de enlaces `blob:` no
+  // funcionan, así que se ofrece la hoja de compartir del sistema y, si no hay, se copia al portapapeles.
+  // Devuelve «downloaded», «shared», «copied» o «cancelled».
+  async function saveFile(name, text, type = "text/plain;charset=utf-8") {
+    if (window.Capacitor?.isNativePlatform?.()) {
+      if (typeof navigator !== "undefined" && navigator.share) {
+        try { await navigator.share({ title: name, text }); return "shared"; }
+        catch (error) { if (error?.name === "AbortError") return "cancelled"; }
+      }
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) { await navigator.clipboard.writeText(text); return "copied"; }
+      throw Error("SAVE_UNAVAILABLE");
+    }
+    const url = URL.createObjectURL(new Blob([text], { type }));
+    const a = document.createElement("a");
+    a.href = url; a.download = name; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    return "downloaded";
+  }
+  const saveLabel = () => window.Capacitor?.isNativePlatform?.() ? "Compartir copia" : "Descargar copia";
+  function confirmed(text) { notice(text, [["Entendido", () => document.getElementById("storage-notice")?.remove()]]); }
   function restore(text) {
     if (CT.isSessionActive?.()) throw Error("Sal de la partida antes de recuperar una copia.");
     const data = JSON.parse(text);
@@ -89,12 +108,12 @@
   }
   CT.Storage = {
     getItem, setItem: (key, value) => write(key, String(value)), removeItem: key => write(key, null),
-    flush, backup, restore, hasPending: () => pending.size > 0,
+    flush, backup, saveFile, saveLabel, restore, hasPending: () => pending.size > 0,
     protect(key) {
       const isNew = !protectedKeys.has(key);
       protectedKeys.add(key);
       if (isNew) notice("No podemos abrir una partida guardada con este formato. Su original se conserva para recuperarlo; no se ha borrado.", [
-        ["Descargar copia", backup],
+        [saveLabel(), backup],
         ["Descartar aviso", () => dismiss(key)]
       ]);
     },

@@ -384,4 +384,25 @@ assert.doesNotMatch(read('online.js'),/signInAnonymously/);
  assert.match(w.document.querySelector('.ranking-medallion-1').innerHTML,/data-report-uid="c"/,'el podio de cartas también tiene «Denunciar o bloquear»');
  dom.window.close();
 }
+{
+ // Un fallo de cuenta que no es de red (cuenta no disponible, permisos) no deja la pantalla en «Reintentar»:
+ // se puede jugar sin conexión (partidas en un móvil y en solitario), como si no hubiera cuenta.
+ const {w,dom}=setup();w.signInAnonymously=async()=>{throw Object.assign(Error('no permitido'),{code:'auth/operation-not-allowed'});};
+ let started=0;await w.testAccounts.startAccounts(()=>started++);
+ assert.equal(started,0,'no entra solo');
+ assert.ok(w.document.querySelector('#account-load'),'sigue ofreciendo reintentar');
+ assert.match(w.document.querySelector('#account-offline').textContent,/Jugar sin conexión/);
+ w.document.querySelector('#account-offline').click();await new Promise(r=>setTimeout(r,0));
+ assert.equal(started,1,'«Jugar sin conexión» abre el juego');
+ assert.equal(w.CONTINUUM.Accounts,undefined,'sin cuenta, como cuando no hay red');
+ assert.doesNotMatch(w.document.body.textContent,/Firebase/,'el mensaje no habla de la consola de Firebase');
+ dom.window.close();
+}
+{
+ // Con el perfil de otra temporada no hay «Jugar sin conexión»: no es falta de red.
+ const {w,dom}=setup(user('a'),{'playerProfiles/a':{...profile,season:'otra-temporada'}});
+ await w.testAccounts.startAccounts(()=>{});
+ assert.equal(w.document.querySelector('#account-offline'),null);
+ dom.window.close();
+}
 console.log('Invitados: alta automática, reentrada, error de conexión, cambio de nombre, ranking, aislamiento y conflictos correctos.');

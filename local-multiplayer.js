@@ -52,6 +52,12 @@
   let qrScanTitle = "", qrScanHint = "", qrScanOnResult = null, qrScanOnBack = null;
   let cameraHandle = null;
 
+  // El nombre que se escribe al crear o unirse a una sala lo ven los demás: mismo filtro que el perfil.
+  function rejectName(name) {
+    const reason = CT.Moderacion?.problema(name);
+    if (reason) showToast(reason);
+    return !!reason;
+  }
   function showToast(message) {
     const toastEl = document.getElementById("toast");
     if (!toastEl) return;
@@ -94,8 +100,42 @@
     return `<header class="topbar"><button class="icon-btn" data-local-action="${backAction}" aria-label="Volver">${BACK_ICON}</button><div class="brand">Continuum</div><div class="topbar-actions">${actionsHtml}</div></header>`;
   }
 
+  // En la app de iPhone no se habla de Android (guía 2.3.10 de App Review).
+  const enIPhone = () => !!window.Capacitor?.isNativePlatform?.() && window.Capacitor.getPlatform?.() === "ios";
+  // Antes de que el iPhone abra la cámara para que la señal lleve la IP real (ver `withCapture` en
+  // local-transport.js), se explica para qué y se deja elegir. Solo en la app de iPhone (en otros sitios el
+  // navegador ya pide su permiso). «Permitir» se recuerda; «Ahora no» solo hasta cerrar la app, y entonces la
+  // conexión sigue sin la ayuda (entre iPhones no hace falta; con Android puede costar más conectar).
+  let cameraAnswer = null;
+  CT.cameraConsent = () => {
+    if (!enIPhone()) return Promise.resolve(true);
+    if (cameraAnswer !== null) return Promise.resolve(cameraAnswer);
+    const saved = CT.Storage?.getItem("continuum-camara-wifi-v1");
+    if (saved === "si") return Promise.resolve((cameraAnswer = true));
+    const app = document.getElementById("app");
+    if (!app || !CT.openDialog) return Promise.resolve(true);
+    return new Promise(resolve => {
+      let answer = false, chosen = false;
+      const layer = document.createElement("div");
+      layer.className = "overlay";
+      layer.innerHTML = '<div class="modal" role="alertdialog" aria-modal="true"><h2>¿Abrir la cámara unos segundos?</h2><p>Al crear o unirte a una sala por Wi-Fi, Continuum abre la cámara un momento para que los móviles se encuentren en tu red. No graba ni envía imágenes. Si todos jugáis con iPhone no hace falta.</p><div class="actions exit-actions"><button type="button" class="btn btn-primary btn-block" data-camera="si">Permitir</button><button type="button" class="btn btn-secondary btn-block" data-camera="no">Ahora no</button></div></div>';
+      layer.addEventListener("click", event => {
+        const button = event.target.closest("[data-camera]");
+        if (!button) return;
+        answer = button.dataset.camera === "si"; chosen = true;
+        CT.closeDialog();
+      });
+      app.append(layer);
+      CT.openDialog(layer, true, () => {
+        cameraAnswer = answer;
+        if (chosen && answer) CT.Storage?.setItem("continuum-camara-wifi-v1", "si");
+        resolve(answer);
+      });
+    });
+  };
+
   function wifiNote() {
-    return `<div class="wifi-note">${WIFI_ICON}<p><strong>Antes de empezar:</strong> uno de los móviles activa su punto de acceso Wi-Fi (mejor si es Android) y el resto se une a esa red — no hace falta que tenga internet.</p></div>`;
+    return `<div class="wifi-note">${WIFI_ICON}<p><strong>Antes de empezar:</strong> uno de los móviles activa su punto de acceso Wi-Fi${enIPhone() ? "" : " (mejor si es Android)"} y el resto se une a esa red — no hace falta que tenga internet.</p></div>`;
   }
 
   // El permiso de la cámara hay que pedirlo aquí, al entrar, no cuando ya haga falta
@@ -354,7 +394,7 @@
         ${nearbyAvailable() ? `<button type="button" class="btn btn-primary btn-block" data-local-action="nearby-search">${WIFI_ICON} Buscar salas cercanas</button><p class="hint">Entre iPhones: sin escanear nada ni compartir Wi-Fi. Con Bluetooth y Wi-Fi activados basta.</p>` : ""}
         <button type="button" class="btn ${nearbyAvailable() ? "btn-secondary" : "btn-primary"} btn-block" data-local-action="scan-offer">${CAMERA_ICON} Escanear el código del anfitrión</button>
         <details class="qr-fallback"><summary>¿No puedes usar la cámara?</summary>
-          <div class="field"><label for="local-guest-offer">Pega el código que te ha compartido el anfitrión</label><textarea id="local-guest-offer" name="offer" rows="3" placeholder="Recíbelo por Bluetooth, AirDrop o Cerca y pégalo aquí."></textarea></div>
+          <div class="field"><label for="local-guest-offer">Pega el código que te ha compartido el anfitrión</label><textarea id="local-guest-offer" name="offer" rows="3" placeholder="${enIPhone() ? "Recíbelo por AirDrop o Mensajes y pégalo aquí." : "Recíbelo por Bluetooth, AirDrop o Cerca y pégalo aquí."}"></textarea></div>
           <button class="btn btn-secondary btn-block" type="submit">Unirse con ese código</button>
         </details>
       </form>
@@ -491,7 +531,8 @@
       if (state === "connected" || state === "completed") { clearInterval(connectionWatch); connectionWatch = null; return; }
       if (state === "failed" || state === "disconnected" || seconds >= warnAfter) {
         statusEl.textContent = "No consigue conectar. Comprobad que los dos móviles están en el mismo Wi-Fi, con los datos móviles apagados, y que el punto de acceso no aísla los dispositivos. Si sigue igual, empezad la invitación de nuevo.";
-        if (diagEl) diagEl.hidden = false;
+        // La línea técnica (ICE, QR, candidatos) es para quien depura; en la app de iPhone no se enseña.
+        if (diagEl && !enIPhone()) diagEl.hidden = false;
       }
     }, 1000);
   }
@@ -1124,11 +1165,13 @@
     if (kind === "create") {
       const name = String(values.get("name") || "").trim().slice(0, 18);
       if (!name) return showToast("Escribe tu nombre");
+      if (rejectName(name)) return;
       doCreateRoom(name);
     } else if (kind === "join-offer") {
       const name = String(values.get("name") || "").trim().slice(0, 18);
       const offer = String(values.get("offer") || "").trim();
       if (!name) return showToast("Escribe tu nombre");
+      if (rejectName(name)) return;
       if (!offer) return showToast(errorMessage("EMPTY_SIGNAL"));
       void doJoinWithOffer(name, offer);
     } else if (kind === "accept-answer") {
@@ -1205,6 +1248,7 @@
     else if (action === "nearby-search") {
       const name = String(document.getElementById("local-guest-name")?.value || "").trim().slice(0, 18);
       if (!name) return showToast("Escribe tu nombre antes de buscar");
+      if (rejectName(name)) return;
       void renderNearby(name);
     }
     else if (action === "nearby-join") {
@@ -1220,6 +1264,7 @@
     else if (action === "scan-offer") {
       const name = String(document.getElementById("local-guest-name")?.value || "").trim().slice(0, 18);
       if (!name) return showToast("Escribe tu nombre antes de escanear");
+      if (rejectName(name)) return;
       openQrScan({
         title: "Escanear invitación", hint: "Apunta la cámara al código que te enseñe quien organiza la sala.",
         onResult: text => { renderUnirseForm(); void doJoinWithOffer(name, text); },

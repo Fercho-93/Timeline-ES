@@ -174,7 +174,7 @@ debe aparecer. Ninguna prueba de reglas toca Firebase de producción.
 `entrada-por-enlace.mjs` fija el comportamiento del SDK del que depende `connectToRoom()`: al
 entrar por una invitación, la primera instantánea de `onSnapshot` llega de la caché y todavía no
 incluye a quien acaba de entrar. Comprueba el SDK y la condición, no `online.js`, que no se puede
-importar desde Node porque carga Firebase desde gstatic.
+importar desde Node porque carga el SDK de Firebase como módulo de navegador (`vendor/firebase/`).
 
 `service-worker.mjs` ejecuta el archivo real con un entorno de service worker simulado: se
 responde con la copia guardada pero se pide la del servidor por detrás, así que un archivo nuevo

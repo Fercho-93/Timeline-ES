@@ -40,7 +40,8 @@ console.log("\nPantalla de fallo");
   ok("lleva la pantalla en la que estaba", /Pantalla: home/.test(detalle.value));
   ok("lleva el mazo abierto", /Mazo: history/.test(detalle.value));
   ok("lleva el mensaje del error", detalle.value.includes("algo raro pasó"));
-  ok("es un diálogo de verdad: el foco entra en el texto a copiar", w.document.activeElement === detalle);
+  ok("es un diálogo de verdad: el foco entra en «Volver al inicio»", w.document.activeElement?.dataset?.crashAction === "inicio");
+  ok("el aviso no asusta: no dice «ha fallado» y el informe va plegado", !/ha fallado/i.test(w.document.querySelector(".modal").textContent.split("Ver el informe")[0]) && !!w.document.querySelector(".modal details"));
 
   // Un segundo error no debe apilar una segunda pantalla encima.
   w.dispatchEvent(new w.ErrorEvent("error", { message: "otro fallo distinto", error: new w.Error("otro fallo distinto") }));
@@ -79,6 +80,19 @@ console.log("\n«Script error.» sin más detalle tampoco cuenta como fallo");
   w.dispatchEvent(new w.ErrorEvent("error", { message: "Script error.", error: new w.Error("Script error.") }));
   await espera();
   ok("con un error de verdad detrás, sí se enseña la pantalla de fallo", !!w.document.querySelector("#crash-detalle"));
+}
+
+console.log("\nUna petición sin conexión no cuenta como fallo");
+{
+  const w = boot();
+  for (const reason of [Object.assign(new w.Error("Firebase: Error (auth/network-request-failed)."), { code: "auth/network-request-failed" }), new w.TypeError("Load failed"), Object.assign(new w.Error("client offline"), { code: "unavailable" })]) {
+    w.dispatchEvent(Object.assign(new w.Event("unhandledrejection"), { reason }));
+  }
+  await espera();
+  ok("ninguna se enseña como fallo", !w.document.querySelector("#crash-detalle"));
+  w.dispatchEvent(Object.assign(new w.Event("unhandledrejection"), { reason: new w.Error("algo de verdad roto") }));
+  await espera();
+  ok("un rechazo que no es de red sí se enseña", !!w.document.querySelector("#crash-detalle"));
 }
 
 console.log("\nComentarios en Ajustes");

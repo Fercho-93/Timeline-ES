@@ -1,6 +1,6 @@
 // Retos rápidos por internet: salas y duelos guardados en Firestore, con cada jugada firmada por su autor.
 import {auth, db} from './firebase-client.js';
-import {collection, deleteDoc, doc, getDoc, getDocs, query, where, runTransaction, onSnapshot, serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+import {collection, deleteDoc, doc, getDoc, getDocs, query, where, runTransaction, onSnapshot, serverTimestamp} from './vendor/firebase/firebase-firestore.js';
 const CT=window.CONTINUUM, R=CT.QuickRoom;
 export const PUBLIC_VERSION=1;
 function publicKey(capacity){return 'quick:'+capacity+':v'+PUBLIC_VERSION+':'+CT.QuickNetwork.fingerprint();}

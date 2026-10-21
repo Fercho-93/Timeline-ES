@@ -15,7 +15,7 @@ assert.match(read("service-worker-258.js"), /"\.\/app-config\.js"/, "el service 
 
 const fuente = read("app-config.js")
   .replace(/^import \{ auth, db \} from '\.\/firebase-client\.js';$/m, "const { auth, db } = globalThis.__fake;")
-  .replace(/^import \{[^}]*\} from 'https:\/\/www\.gstatic\.com[^']*';$/m, "const { doc, getDocFromServer, disableNetwork, enableNetwork } = globalThis.__fake;");
+  .replace(/^import \{[^}]*\} from '\.\/vendor\/firebase\/[^']*';$/m, "const { doc, getDocFromServer, disableNetwork, enableNetwork } = globalThis.__fake;");
 assert.ok(!/^import /m.test(fuente), "el test debe poder sustituir todos los import de app-config.js");
 
 let n = 0;

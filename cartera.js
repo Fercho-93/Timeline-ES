@@ -214,6 +214,8 @@
   // se cierra otra vez. Es a propósito —una maqueta que se pudiera dejar desbloqueada
   // para siempre dejaría de servir para mirarla.
   function compraSimulada(clave) {
+    // Sin simulación encendida (la versión de tienda) no hay compra falsa posible: el juego no regala mazos.
+    if (!SIMULACION.length) return false;
     const suyo = paquetes().find(uno => uno.clave === clave);
     if (!suyo) return false;
     concede({ origen: "compra-simulada", mazos: [...new Set([...abiertos(), ...suyo.mazos])] });

@@ -6,7 +6,7 @@
 // opcional, hasta 200 caracteres) y updateUrl (enlace https a la tienda, opcional).
 // También corta la conexión de quien declara tener menos de 14 años sin permiso (edad.js): modo «minor».
 import { auth, db } from './firebase-client.js';
-import { doc, getDocFromServer, disableNetwork, enableNetwork } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+import { doc, getDocFromServer, disableNetwork, enableNetwork } from './vendor/firebase/firebase-firestore.js';
 
 const CT = window.CONTINUUM;
 const CHECK_EVERY = 5 * 60 * 1000;

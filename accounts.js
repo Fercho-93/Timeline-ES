@@ -1,8 +1,8 @@
 // Cuentas del jugador: crea el invitado automático, permite entrar con Apple, sincroniza el progreso con
 // la nube, gestiona el ranking opcional y borra la cuenta con todos sus datos cuando se pide.
 import { auth, db, firebaseApp } from './firebase-client.js';
-import { signInAnonymously, setPersistence, browserLocalPersistence, deleteUser, onAuthStateChanged, OAuthProvider, linkWithCredential, signInWithCredential, reauthenticateWithCredential, revokeAccessToken, signOut } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
-import { doc, getDocFromServer, runTransaction, serverTimestamp, writeBatch, collection, query, orderBy, limit, getDocsFromServer } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+import { signInAnonymously, setPersistence, browserLocalPersistence, deleteUser, onAuthStateChanged, OAuthProvider, linkWithCredential, signInWithCredential, reauthenticateWithCredential, revokeAccessToken, signOut } from './vendor/firebase/firebase-auth.js';
+import { doc, getDocFromServer, runTransaction, serverTimestamp, writeBatch, collection, query, orderBy, limit, getDocsFromServer } from './vendor/firebase/firebase-firestore.js';
 
 const CT = window.CONTINUUM;
 const app = document.getElementById('app');
@@ -69,10 +69,10 @@ const PROVIDERS = {'apple.com':'Apple','google.com':'Google'};
 const linkedProvider = u => u?.providerData?.map(p => p.providerId).find(id => PROVIDERS[id]) || null;
 function message(error) {
   const texts = {
-    'auth/operation-not-allowed':'Este método de acceso aún no está activado en Firebase. Contacta con soporte.',
+    'auth/operation-not-allowed':'Este método de acceso no está disponible ahora mismo. Inténtalo más tarde o contacta con soporte.',
     'auth/network-request-failed':'No hay conexión. Reinténtalo cuando tengas internet.',
     'auth/too-many-requests':'Demasiados intentos. Espera unos minutos y vuelve a intentarlo.',
-    'permission-denied':'No se puede acceder al perfil. Comprueba tu sesión; si persiste, falta activar las reglas de cuentas.',
+    'permission-denied':'No se puede acceder al perfil. Cierra y vuelve a abrir el juego; si persiste, contacta con soporte.',
     'unavailable':'No hay conexión con tu progreso. Conservamos los cambios en este dispositivo.',
     'auth/requires-recent-login':'No se pudo eliminar el invitado. Vuelve a abrir el juego e inténtalo de nuevo.'
   };
@@ -355,11 +355,13 @@ function restoreRemote(data) {
   setMeta(false); suppress = false;
 }
 function syncNotice(text) {
-  CT.Storage.notice(text,[['Reintentar',() => flush().catch(e => syncNotice(message(e)))],['Guardar copia',downloadProgress]]);
+  CT.Storage.notice(text,[['Reintentar',() => flush().catch(e => syncNotice(message(e)))],[saveLabel(),downloadProgress]]);
 }
+const saveLabel=()=>CT.Storage.saveLabel?.()||'Descargar copia';
 function downloadProgress() {
-  const url = URL.createObjectURL(new Blob([JSON.stringify({season,uid:identity?.uid,...payload()},null,2)],{type:'application/json'}));
-  const a=document.createElement('a');a.href=url;a.download='continuum-progreso.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  CT.Storage.saveFile('continuum-progreso.json',JSON.stringify({season,uid:identity?.uid,...payload()},null,2),'application/json')
+    .then(result=>{if(result==='copied')syncNotice('Copia copiada al portapapeles: pégala en un mensaje o una nota para guardarla.');})
+    .catch(()=>syncNotice('No se ha podido guardar la copia en este dispositivo.'));
 }
 // Pregunta con el mismo aspecto que el resto de diálogos del juego. Esta pantalla sale antes de que
 // cargue el resto de la interfaz, así que no puede depender de `CT.UI`: pinta su propia capa.
@@ -377,7 +379,7 @@ function conflictScreen() {
   failedConflict = true;
   // No se fusionan totales ni se pisa el otro dispositivo: el usuario elige expresamente.
   ready = false; app.inert = false;
-  shell('<h2>Tu progreso cambió en otro dispositivo</h2><p>Hay dos versiones. Puedes descargar una copia de la de este móvil antes de cargar la guardada en tu cuenta. Para evitar duplicados, juega desde un dispositivo cada vez.</p><button class="btn btn-secondary" id="account-copy">Descargar copia de este móvil</button><button class="btn btn-primary" id="account-cloud">Usar el progreso de mi cuenta</button>');
+  shell('<h2>Tu progreso cambió en otro dispositivo</h2><p>Hay dos versiones. Puedes guardar una copia de la de este móvil antes de cargar la guardada en tu cuenta. Para evitar duplicados, juega desde un dispositivo cada vez.</p><button class="btn btn-secondary" id="account-copy">'+saveLabel()+' de este móvil</button><button class="btn btn-primary" id="account-cloud">Usar el progreso de mi cuenta</button>');
   button('account-copy',downloadProgress);
   button('account-cloud',() => {
     askConfirm('Se sustituirán los cambios pendientes de este móvil por el progreso de tu cuenta.','¿Cargar el progreso de tu cuenta?','Cargar el de mi cuenta',async () => {
@@ -538,8 +540,8 @@ async function enter() {
     try { u=(await signInAnonymously(auth)).user; }
     catch(error) {
       if (isNetworkError(error)) { offlineFallback(); return; }
-      shell('<p>No hemos podido crear tu invitado. Conéctate a internet y vuelve a intentarlo.</p><button class="btn btn-primary" id="account-load">Reintentar</button>');
-      feedback(message(error));button('account-load',enter);return;
+      shell('<p>No hemos podido crear tu invitado. Conéctate a internet y vuelve a intentarlo.</p><button class="btn btn-primary" id="account-load">Reintentar</button><button class="btn btn-secondary" id="account-offline">Jugar sin conexión</button>');
+      feedback(message(error));button('account-load',enter);button('account-offline',offlineFallback);return;
     }
   }
   if (!await acquireTab(u.uid)) {
@@ -578,8 +580,11 @@ async function enter() {
   } catch (error) {
     if (failedConflict) return;
     if (isNetworkError(error)) { offlineFallback(); return; }
-    shell('<h2>No hemos podido abrir tu progreso</h2><p>Necesitas conexión para abrir tu invitado. Tus datos no se han sustituido.</p><button class="btn btn-primary" id="account-load">Reintentar</button>');
-    feedback(message(error));button('account-load',enter);
+    // Una temporada distinta no es falta de conexión: ahí no se entra sin cuenta (el progreso de este móvil
+    // pertenece a otra). Cualquier otro fallo deja jugar sin conexión: partidas en un móvil y en solitario.
+    const sinCuenta=error?.code==='account/wrong-season'?'':'<button class="btn btn-secondary" id="account-offline">Jugar sin conexión</button>';
+    shell('<h2>No hemos podido abrir tu progreso</h2><p>Necesitas conexión para abrir tu invitado. Tus datos no se han sustituido.</p><button class="btn btn-primary" id="account-load">Reintentar</button>'+sinCuenta);
+    feedback(message(error));button('account-load',enter);if(sinCuenta)button('account-offline',offlineFallback);
   }
 }
 // Aparecer o dejar de aparecer en el ranking. Al dejarlo se borran las filas de hoy y de esta semana (y la
@@ -770,7 +775,7 @@ function deleteScreen() {
   accountDialog(`<div class="overlay"><section class="modal"><h2>${apple ? 'Eliminar cuenta y progreso' : 'Eliminar invitado y progreso'}</h2><p>Se borrarán tu perfil, progreso y entrada en el ranking. Esta acción no se puede deshacer. Al volver a entrar se creará un invitado nuevo desde cero.</p>${apple ? '<p>Apple te pedirá confirmar que eres tú y el juego dejará de tener acceso a tu cuenta de Apple.</p>' : ''}<button class="btn btn-ghost" data-account-action="delete-confirm">Eliminar definitivamente</button><button class="btn btn-primary" data-account-action="close">Cancelar</button><p id="account-delete-message" role="status"></p></section></div>`,true);
 }
 // Carga perezosa: si la librería no llega, el borrado sigue por el camino de siempre.
-let loadFunctions = () => import('https://www.gstatic.com/firebasejs/12.15.0/firebase-functions.js');
+let loadFunctions = () => import('./vendor/firebase/firebase-functions.js');
 // Pide a la función `deleteMyAccount` que borre todo lo de esta cuenta en el servidor, incluido el acceso.
 // Devuelve false si no se pudo (la función no está publicada, sin red, error del servidor).
 // Primero en Madrid (donde viven ahora); después en la región anterior, por si aún no se han vuelto a publicar.

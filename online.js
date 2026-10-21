@@ -1,7 +1,7 @@
 // Partidas por internet con amigos (salas con código): crear y unirse a una sala, turnos, jugadas y
 // final, todo guardado en Firestore.
 import { auth, db } from './firebase-client.js';
-import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, onSnapshot, runTransaction, serverTimestamp, setDoc, writeBatch } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, onSnapshot, runTransaction, serverTimestamp, setDoc, writeBatch } from "./vendor/firebase/firebase-firestore.js";
 
 const appEl = document.getElementById("app");
 const toastEl = document.getElementById("toast");
@@ -92,7 +92,7 @@ function ensurePresence() {
       const p = snap.data();
       if (p?.seenAt?.toMillis) presenceRecords.set(uid, { seenAt: p.seenAt.toMillis(), visible: p.visible });
       if (roomState?.matchmaking === "public" && roomState.status === "lobby") renderLobby(); else renderPresence();
-    }, () => { connectionMessage = "La presencia requiere las reglas actualizadas de la sala."; renderPresence(); });
+    }, () => { connectionMessage = "No se puede ver quién está conectado en este momento."; renderPresence(); });
     presenceListeners.set(uid, stop);
   }
   for (const [uid, stop] of presenceListeners) if (!roomState.playerOrder.includes(uid)) { stop(); presenceListeners.delete(uid); presenceRecords.delete(uid); }
@@ -534,7 +534,7 @@ function rememberedRoom(code) {
 // en una plataforma que aún no tenga su atestación configurada.
 async function ensureProtection() {
   const config = CT.Deployment;
-  if ((!config?.appCheckSiteKey || window.Capacitor?.isNativePlatform?.()) && config?.audience === 'public') throw Error('Falta configurar la protección de las salas para esta plataforma.');
+  if (config?.audience === 'public' && !config.salasProtegidas?.(window.Capacitor)) throw Error('Las salas online todavía no están disponibles en este dispositivo.');
 }
 async function ensureAuth() {
   await ensureProtection();
@@ -1414,7 +1414,7 @@ async function useGhost() {
     });
     selectedCardId = null; pendingIndex = null;
   } catch (error) {
-    console.error(error); showToast("No se pudo activar Fantasma. Comprueba que las reglas de sala estén actualizadas.");
+    console.error(error); showToast("No se pudo activar Fantasma. Inténtalo de nuevo.");
   } finally { busy = false; }
 }
 
@@ -2045,6 +2045,9 @@ document.addEventListener("submit", event => {
   const values = new FormData(form);
   const name = String(values.get("name") || "").trim().slice(0, 18);
   if (!name) return showToast("Escribe tu nombre");
+  // Lo que se escribe aquí lo ven los demás jugadores de la sala: pasa por el mismo filtro que el perfil.
+  const rechazado = CT.Moderacion?.problema(name);
+  if (rechazado) return showToast(rechazado);
   if (form.dataset.onlineForm === "create") createRoom(name);
   else {
     const code = cleanCode(values.get("code"));

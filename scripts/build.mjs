@@ -27,7 +27,7 @@ const FILES = [
   "a11y.js", "mapa.js", "settings.js", "effects.js", "sonidos.js", "mesa-escala.js", "mesa-escala.css", "tablet.css", "immersion.js", "duelo-turnos.js", "push.js", "app-config.js", "public-matchmaking.js", "public-matchmaking-online.js", "public-tables.js", "app.js", "online.js", "actualizar.js"
 ];
 
-const DIRS = ["assets"];
+const DIRS = ["assets", "vendor"];
 
 async function build() {
   await rm(dist, { recursive: true, force: true });

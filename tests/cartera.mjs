@@ -66,6 +66,10 @@ console.log("\nLa beta: todo el catálogo abierto");
   const C = w.CONTINUUM.Cartera;
   ok("la concesión la firma la beta", C.origen() === "beta");
   ok("no hay nada cerrado", C.SIMULACION.length === 0 && C.todoAbierto() === true);
+  // La versión de tienda no lleva compras falsas: sin simulación, ni se concede ni se enseña la maqueta de pago.
+  ok("sin simulación no hay compra simulada posible", C.compraSimulada("mazo:mixed") === false && C.compraSimulada("todo") === false);
+  ok("y no hay ningún botón de desbloquear ni texto de pago en pantalla", !existe(w, '[data-action="mazo-desbloquear"]') && !/no se cobra nada|Simular/i.test(texto(w)));
+  ok("el archivo que sale a la tienda tiene la simulación vacía", /const SIMULACION = \[\];/.test(read("cartera.js")));
   ok("el reto diario sortea entre todos los mazos mientras no haya gratuitos decididos", C.diarios().length === Object.keys(w.CONTINUUM.MODES).length);
 }
 

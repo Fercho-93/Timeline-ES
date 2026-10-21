@@ -10,11 +10,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // La música ambiente es audio web: por defecto iOS la calla con el interruptor de silencio del
-        // iPhone. Con la categoría «playback» suena igual que en cualquier juego, y `mixWithOthers` deja
-        // seguir lo que el usuario ya estuviera escuchando (Spotify, podcasts). El volumen y el ajuste
-        // «Música ambiente» de la app siguen mandando.
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+        // Los efectos de sonido son audio web (Web Audio). Con la categoría «ambient» respetan el interruptor de
+        // silencio del iPhone (como dice Ajustes: «En iPhone respetan el modo silencio») y, con `mixWithOthers`,
+        // dejan seguir lo que la persona ya estuviera escuchando (Spotify, podcasts). El volumen y el ajuste
+        // «Efectos de sonido» de la app siguen mandando.
+        try? AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default, options: [.mixWithOthers])
         try? AVAudioSession.sharedInstance().setActive(true)
         return true
     }

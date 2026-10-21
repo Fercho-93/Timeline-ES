@@ -856,21 +856,26 @@
       const capa = document.createElement("div");
       capa.className = "overlay";
       capa.innerHTML = `<div class="modal">
-        <h2>Algo ha fallado</h2>
-        <p>No es cosa tuya. Copia este texto y compártelo con quien mantiene la aplicación.</p>
-        <div class="field"><textarea id="crash-detalle" rows="6" readonly>${escapeHtml(detalle)}</textarea></div>
-        <button type="button" class="btn btn-primary btn-block" data-crash-action="copiar">Copiar</button>
-        <button type="button" class="btn btn-secondary btn-block" style="margin-top:10px" data-crash-action="inicio">Volver al inicio</button>
+        <h2>Algo no ha ido bien</h2>
+        <p>Vuelve al inicio y sigue jugando; tu progreso guardado no se pierde. Si quieres ayudarnos a arreglarlo, envía el informe por correo.</p>
+        <button type="button" class="btn btn-primary btn-block" data-crash-action="inicio">Volver al inicio</button>
+        <button type="button" class="btn btn-secondary btn-block" style="margin-top:10px" data-crash-action="enviar">Enviar informe por correo</button>
+        <details style="margin-top:10px"><summary>Ver el informe</summary>
+          <div class="field"><textarea id="crash-detalle" rows="6" readonly>${escapeHtml(detalle)}</textarea></div>
+          <button type="button" class="btn btn-ghost btn-block" data-crash-action="copiar">Copiar</button>
+        </details>
       </div>`;
       document.body.appendChild(capa);
       CT.openDialog(capa, false);
-      // El primer control focuseable es esta misma caja: seleccionar su texto de una vez
-      // deja el copiado a mano tan a mano como el botón.
       const textarea = capa.querySelector("#crash-detalle");
-      textarea.select();
       capa.querySelector('[data-crash-action="copiar"]').addEventListener("click", async () => {
         try { await navigator.clipboard.writeText(detalle); }
-        catch { textarea.select(); document.execCommand("copy"); }
+        catch { capa.querySelector("details").open = true; textarea.select(); document.execCommand("copy"); }
+      });
+      capa.querySelector('[data-crash-action="enviar"]').addEventListener("click", () => {
+        const correo = CT.Deployment?.feedbackEmail;
+        if (!correo) { capa.querySelector("details").open = true; textarea.select(); return; }
+        location.href = `mailto:${correo}?subject=${encodeURIComponent("Continuum: informe de fallo")}&body=${encodeURIComponent(detalle)}`;
       });
       capa.querySelector('[data-crash-action="inicio"]').addEventListener("click", () => location.reload());
     } catch { /* sin documento donde pintar, no hay aviso posible */ }
@@ -887,8 +892,11 @@
     if (event.message === "Script error." && !event.error) return;
     showCrash(`${event.message || "Error sin mensaje"}\n${event.error?.stack || ""}`.trim());
   });
+  // Sin conexión, una petición que falla no es un fallo del juego: cada pantalla ya avisa a su manera.
+  const esFalloDeRed = reason => /(^|\s)(Load failed|Failed to fetch|NetworkError)|network-request-failed|\bunavailable\b|offline/i.test(`${reason?.code || ""} ${reason?.message || reason || ""}`);
   window.addEventListener("unhandledrejection", event => {
     const reason = event.reason;
+    if (esFalloDeRed(reason)) return;
     showCrash(reason instanceof Error ? `${reason.message}\n${reason.stack || ""}`.trim() : String(reason));
   });
   // El botón de comentarios de Ajustes usa el mismo informe, exista o no un fallo de por
@@ -2604,6 +2612,9 @@
   // guarda—, así que se puede entrar al mazo, mirarlo y recargar para volver a verlo
   // cerrado.
   function tiendaSimulada(clave, modeKey) {
+    // La maqueta de pago solo existe con la simulación encendida (cartera.js: `SIMULACION`). En la versión
+    // de tienda está vacía y no hay nada que enseñar ni cobrar.
+    if (!CT.Cartera.SIMULACION.length) return;
     const suyo = CT.Cartera.paquetes().find(uno => uno.clave === clave);
     if (!suyo) return;
     const cuantos = suyo.mazos.length === 1 ? "1 mazo" : `${suyo.mazos.length} mazos`;
@@ -4064,7 +4075,7 @@
       const detail = table?.code && (error?.code === "permission-denied" || /TABLE_(FULL|GONE)/.test(error?.message || ""))
         ? "Esa mesa ya está completa o ha empezado. Elige otra en la lista o crea la tuya."
         : error?.code === "permission-denied"
-        ? "Firebase ha rechazado la creación de la mesa pública."
+        ? "No se ha podido crear la mesa pública. Inténtalo de nuevo en unos segundos."
         : error?.message === "AUTH_NOT_READY"
           ? "Tu perfil todavía no está preparado."
         : error?.message === "MATCH_TIMEOUT"

@@ -10,7 +10,7 @@ assert.match(read("deployment.js"), /nativePush:\s*false/, "los avisos push debe
 // push.js importa Firebase desde internet: se sustituyen los import por piezas falsas para ejecutarlo aquí.
 const fuente = read("push.js")
   .replace(/^import \{ auth, db \} from '\.\/firebase-client\.js';$/m, "const auth = {}, db = {};")
-  .replace(/^import \{[^}]*\} from 'https:\/\/www\.gstatic\.com[^']*';$/m, "const doc = () => ({}), serverTimestamp = () => 0, setDoc = async () => {};");
+  .replace(/^import \{[^}]*\} from '\.\/vendor\/firebase\/[^']*';$/m, "const doc = () => ({}), serverTimestamp = () => 0, setDoc = async () => {};");
 assert.ok(!/^import /m.test(fuente), "el test debe poder sustituir todos los import de push.js");
 
 async function arrancar(nativePush) {

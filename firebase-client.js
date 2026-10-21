@@ -1,8 +1,8 @@
 // Conexión con Firebase (la nube de Google) y con App Check, que demuestra que quien llama es el juego
 // de verdad y no un programa ajeno.
-import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js';
-import { getAuth } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
-import { getFirestore, initializeFirestore } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+import { initializeApp, getApps, getApp } from './vendor/firebase/firebase-app.js';
+import { getAuth } from './vendor/firebase/firebase-auth.js';
+import { getFirestore, initializeFirestore } from './vendor/firebase/firebase-firestore.js';
 export const firebaseApp = getApps().length ? getApp() : initializeApp({
   apiKey: 'AIzaSyAT-ELQvHrBdMaCdxJNUJzDRwq1jOOwI44',
   authDomain: 'timeline-es.firebaseapp.com', projectId: 'timeline-es',
@@ -21,7 +21,7 @@ const attestation = native && capacitor?.getPlatform?.() === 'ios' ? capacitor?.
 const iosAppCheck = deployment?.iosAppCheck;
 if ((!native && deployment?.appCheckSiteKey) || (attestation && iosAppCheck?.appId && iosAppCheck?.apiKey)) {
   try {
-    const { initializeAppCheck, ReCaptchaEnterpriseProvider, CustomProvider } = await import('https://www.gstatic.com/firebasejs/12.15.0/firebase-app-check.js');
+    const { initializeAppCheck, ReCaptchaEnterpriseProvider, CustomProvider } = await import('./vendor/firebase/firebase-app-check.js');
     const provider = native
       ? new CustomProvider({ getToken: async () => {
           const { token, expireTimeMillis } = await attestation.getToken({ ...iosAppCheck, projectId: 'timeline-es', senderId: '572227626442' });

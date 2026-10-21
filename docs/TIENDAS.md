@@ -166,7 +166,10 @@ actual es el candidato, sujeto a la elección del titular.
 - Funciones online (salas, mesas públicas, Retos rápidos en red y duelos por turnos) usan
   Firebase (Authentication, Firestore, Cloud Functions). Firebase App Check con App Attest
   comprueba que las peticiones vienen de la app.
-- Las partidas en un solo móvil y en solitario funcionan sin conexión una vez abierto el juego.
+- Las partidas en un solo móvil y en solitario funcionan sin conexión desde el primer arranque (el SDK de Firebase va dentro de la app, no se descarga).
+- La cámara solo se usa para leer códigos QR. Al crear o unirse a una sala por Wi-Fi en iPhone, antes del aviso del sistema, el juego explica que abre la cámara unos segundos para que los móviles se encuentren (sin grabar ni enviar imágenes; entre iPhones no hace falta) y deja elegir «Permitir» o «Ahora no».
+- «Jugar online» necesita otros jugadores: con un solo dispositivo se ve «Buscando jugadores». Para revisar las mesas hacen falta dos dispositivos o el vídeo adjunto.
+- Los efectos de sonido respetan el interruptor de silencio del iPhone.
 - Al abrirse, el juego pregunta si se tienen 14 años o más. Para revisar todo, responder «Sí»: con
   menos de 14 y sin permiso de los padres, el juego funciona solo sin conexión.
 - Sin publicidad, sin compras, sin seguimiento ni analítica de terceros.

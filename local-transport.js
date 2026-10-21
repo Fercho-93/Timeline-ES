@@ -191,7 +191,9 @@
   async function withCapture(work) {
     let stream = null, late = false;
     try {
-      if (typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
+      // En la app de iPhone, antes del aviso del sistema se explica para qué y se deja elegir (local-multiplayer.js).
+      const allowed = window.CONTINUUM?.cameraConsent ? await window.CONTINUUM.cameraConsent() : true;
+      if (allowed !== false && typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
         const pending = navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         // Si el permiso tarda (aviso del sistema abierto), no se bloquea la invitación: la
         // cámara que llegue tarde se cierra en cuanto aparezca.

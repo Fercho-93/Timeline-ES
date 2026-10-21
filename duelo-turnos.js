@@ -1,7 +1,7 @@
 // Duelo por turnos entre dos móviles. El documento de la partida es la autoridad:
 // el cliente solo puede escribir la jugada del turno que le corresponde.
 import { auth, db } from './firebase-client.js';
-import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, runTransaction, serverTimestamp, setDoc, Timestamp, where } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, runTransaction, serverTimestamp, setDoc, Timestamp, where } from './vendor/firebase/firebase-firestore.js';
 
 const CT = window.CONTINUUM;
 const TURN_SECONDS = 15; // Ya no hay reloj por turno; solo el tope que se guardaba en `ms` y que usan las partidas antiguas.
@@ -262,7 +262,7 @@ async function sendPending(move) {
     if (move.uid === uid() && pendingMove(move.gameId)?.operationId === move.operationId) savePending(move.gameId, null);
     if (current?.id === move.gameId) delivery = result === 'confirmed' ? 'Jugada confirmada' : 'La partida ya cambió o terminó. No se ha repetido la jugada.';
   } catch (error) {
-    if (current?.id === move.gameId) delivery = error.code === 'permission-denied' ? 'No se pudo confirmar el envío. Revisa los permisos o las reglas de Firebase.' : 'Esperando conexión para confirmar tu jugada.';
+    if (current?.id === move.gameId) delivery = error.code === 'permission-denied' ? 'No se pudo confirmar el envío. Inténtalo de nuevo en unos segundos.' : 'Esperando conexión para confirmar tu jugada.';
     if (error.code !== 'permission-denied') { clearTimeout(retryTimer); retryTimer = setTimeout(retryPending, 15000); }
   } finally {
     sending.delete(move.operationId);
