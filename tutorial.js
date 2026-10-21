@@ -110,7 +110,7 @@
           [300, c => c.stagger(".tv-kind", 350)],
           [2400, c => c.fingerTo(".tv-big")],
           [2900, c => { c.tap(); c.reveal(".tv-big"); c.fingerHide(); }],
-          [3300, c => c.say("Según el mazo, una fecha, un peso, una distancia…")]
+          [3300, c => c.say("Según el mazo, puede ser una fecha, un peso, una distancia…")]
         ] },
       { chapter: 0, title: "La línea", duration: 7000,
         html: `<div class="tv-center">${lineMarkup(modeKey, [A, C, E, G], { gaps: false })}<div class="tv-axis"><span>${esc(less)}</span><i></i><span>${esc(more)}</span></div></div>`,
@@ -170,7 +170,7 @@
         html: `<div class="tv-board">${path(["Jugar solo", "Grandes colecciones"])}<div class="tv-round"><div class="tv-round-head"><b>Ronda</b>${hearts()}</div>${dots("✓✓✓✗✓✓✓✓✓✓")}<div class="tv-stars">★★<i>★</i></div></div>
           <div class="tv-tiles">${tile("∞", "Maratón", "Todo el mazo · 3 vidas")}${tile("◈", "Competición", "Varios temas · 3 vidas en cada uno")}</div></div>`,
         steps: [
-          [0, c => { c.say("Elige un mazo y juega una ronda: 10 cartas, 3 vidas."); c.add(".tv-lives", "is-in"); }],
+          [0, c => { c.say("Una ronda son 10 cartas y 3 vidas."); c.add(".tv-lives", "is-in"); }],
           [500, c => c.stagger(".tv-dots span", 260)],
           [1300, c => c.lose(".tv-lives")],
           [3600, c => { c.add(".tv-stars", "is-in"); c.say("Si la acabas con vidas, cada una que te quede es una estrella."); }],
