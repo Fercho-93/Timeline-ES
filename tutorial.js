@@ -40,7 +40,7 @@
   const path = steps => `<div class="tv-path">${steps.map(step => `<span>${esc(step)}</span>`).join('<i aria-hidden="true">›</i>')}</div>`;
   // Las mismas láminas que las puertas y modalidades de Inicio, a escala de la guía.
   const MENU_ART = {
-    "Jugar": "home-door-jugar.webp", "Jugar solo": "mode-walk-solo.webp",
+    "Jugar": "home-door-jugar.webp", "Jugar solo": "mode-walk-solo.webp", "Retos rápidos": "menu-quick.webp",
     "Jugar con amigos": "mode-walk-multi.webp", "Jugar online": "menu-online.webp",
     "Unirme a una partida": "menu-private.webp", "Reto del día": "menu-daily.webp",
     "Maratón": "mode-walk-solo.webp", "Competición": "competition-engraving.webp",
@@ -75,6 +75,15 @@
     const list = CT.QuickCatalog?.challenges || [];
     const deck = list.find(item => item.id === "sports-players") || list[0];
     return deck ? `<div class="tv-deck"><img class="tv-menu-art" src="${esc(deck.cards?.find(card => card.image)?.image || "assets/menu-quick.webp")}" alt="" decoding="async"><b>${esc(deck.title)}</b><small>${esc(deck.rule)}</small></div>` : "";
+  }
+
+  // Separadores dentro del vídeo: anuncian un cambio de bloque antes de sus ejemplos.
+  function blockIntro(chapter, heading, art, kicker, description, route, caption) {
+    return { chapter, title: `${heading} · Entradilla`, duration: 4800,
+      html: `<div class="tv-chapter-intro">
+        <div class="tv-intro-hero">${menuArt(art)}<div class="tv-intro-copy"><p>${esc(kicker)}</p><h3>${esc(heading)}</h3><span>${esc(description)}</span></div></div>
+        ${path(route)}</div>`,
+      steps: [[0, c => c.say(caption)]] };
   }
 
   // ── Las escenas ────────────────────────────────────────────────────────────────────────
@@ -186,6 +195,8 @@
           [5400, c => c.focus(".tv-levels", 2)],
           [7000, c => { c.focus(".tv-levels", 3); c.say(`En Experto, la línea oculta sus ${time ? "fechas" : "cifras"}: te guías por las ilustraciones.`); }]
         ] },
+      blockIntro(1, "Retos rápidos", "Retos rápidos", "Jugar solo", "Mazos del día y partidas sorpresa",
+        ["Jugar solo", "Retos rápidos"], "Dejamos Grandes colecciones y pasamos a «Retos rápidos», dentro de «Jugar solo»."),
       { chapter: 1, title: "Retos rápidos", duration: 9800,
         html: `<div class="tv-board">${path(["Jugar solo", "Retos rápidos"])}${quickExample()}<div class="tv-tiles">
           ${tile("☀", "Mazos del día", "4 mazos, nuevos cada día")}${tile("?", "Partida sorpresa", "1, 3, 5 o más, al azar")}</div></div>`,
@@ -194,6 +205,8 @@
           [3400, c => { c.say("Juega uno de los mazos del día o una partida sorpresa."); c.stagger(".tv-tile", 500); }],
           [6800, c => c.say("Un fallo no te saca del reto: cuentan los aciertos.")]
         ] },
+      blockIntro(1, "Reto del día", "Reto del día", "Desde Inicio", "El mismo desafío para todos",
+        ["Inicio", "Reto del día"], "Volvemos a Inicio para ver el «Reto del día», un desafío común para todos."),
       { chapter: 1, title: "Reto del día", duration: 9600,
         html: `<div class="tv-board">${path(["Inicio", "Reto del día"])}${dots("✓✓✗✓✓✓✗✓✓✗")}<div class="tv-score">7 de 10</div>
           <div class="tv-facts"><span>Un intento al día</span><span>Días pares: Grandes colecciones</span><span>Impares: Retos rápidos</span></div></div>`,
@@ -206,6 +219,8 @@
         ] },
 
       // 3 · En grupo
+      blockIntro(2, "En grupo", "Jugar con amigos", "Con otras personas", "Las reglas de una mesa compartida",
+        ["Inicio", "Jugar"], "Ahora pasamos a jugar en grupo: primero veremos las reglas de una mesa compartida."),
       { chapter: 2, title: "Tu mano", duration: 11000,
         html: `<div class="tv-board"><div class="tv-path"><span>Grandes colecciones · en grupo</span></div><div class="tv-seats">${seat("Ana", 3)}${seat("Luis", 3)}${seat("Sara", 3)}</div>
           <div class="tv-piles"><span data-pile="deck">Mazo</span><span data-pile="discard">Descarte</span></div></div>`,
@@ -252,6 +267,8 @@
           [7000, c => { c.remove('[data-power="ghost"]', "is-on"); c.add('[data-power="pulse"]', "is-on"); c.say("Pulso: retas a alguien con la misma carta. Si solo aciertas tú, le pasas una."); }],
           [9200, c => c.add(".tv-note", "is-in")]
         ] },
+      blockIntro(2, "Jugar online", "Jugar online", "Con otras personas", "Encuentra una mesa pública",
+        ["Jugar", "Jugar online"], "Pasamos a «Jugar online», para encontrar otras personas en mesas públicas."),
       { chapter: 2, title: "Online", duration: 8800,
         html: `<div class="tv-board">${path(["Jugar", "Jugar online"])}<div class="tv-table-seats"><span>●</span><span>●</span><span class="is-free">○</span><span class="is-free">○</span></div><div class="tv-tiles tv-three">
           ${tile("◎", "Mesas abiertas", "Siéntate en una")}${tile("+", "Crear mesa", "Juego, plazas y tiempo")}${tile("⚡", "Partida rápida", "Te sentamos")}</div></div>`,

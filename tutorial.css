@@ -125,7 +125,7 @@
 :is(#app, #app-splash) .tv-logo { position: relative; padding-bottom: 10px; color: var(--tv-glow); font: 500 1.8rem/1.1 var(--font-display); letter-spacing: -.02em; text-align: center; }
 :is(#app, #app-splash) .tv-logo::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 44px; height: 1px; transform: translateX(-50%); background: linear-gradient(90deg, transparent, var(--tv-glow), transparent); }
 
-/* Entradilla de Jugar solo: la misma ilustración que su puerta en el juego. */
+/* Entradillas de bloque: la misma ilustración que su puerta en el juego. */
 :is(#app, #app-splash) .tv-chapter-intro {
   width: min(100%, 370px); overflow: hidden; border: 1px solid #cbb896; border-radius: 15px;
   background: linear-gradient(155deg, #f7f1e6, #e9dfcc); color: var(--tv-ink);

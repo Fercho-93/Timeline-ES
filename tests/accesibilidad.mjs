@@ -141,6 +141,22 @@ console.log("\nLas reglas se adaptan al mazo");
   ok("tras Dónde se juega aparece la entradilla", el(w, '.tv-stage h3').textContent === 'Jugar solo');
   click(w, '[data-tv="next"]');
   ok("después continúa la explicación de Rondas", el(w, '.tv-scene-title').textContent === 'Rondas' && el(w, '.tv-round').textContent.includes('Ronda'));
+  for (const [anterior, entrada, siguiente, capitulo] of [
+    ['Dificultad', 'Retos rápidos', 'Retos rápidos', 1],
+    ['Retos rápidos', 'Reto del día', 'Reto del día', 1],
+    ['Reto del día', 'En grupo', 'Tu mano', 2],
+    ['Poderes', 'Jugar online', 'Online', 2]
+  ]) {
+    click(w, `.tv-seg[aria-label="${anterior}"]`);
+    click(w, '[data-tv="next"]');
+    ok(`${anterior} da paso a la entradilla de ${entrada}`, el(w, '.tv-stage h3').textContent === entrada && el(w, `[data-tv-chapter="${capitulo}"]`).classList.contains('is-current'));
+    click(w, '[data-tv="next"]');
+    ok(`la entradilla continúa con ${siguiente}`, el(w, '.tv-scene-title').textContent === siguiente);
+    click(w, '[data-tv="prev"]');
+    ok(`se puede volver a la entradilla de ${entrada}`, el(w, '.tv-stage h3').textContent === entrada);
+  }
+  click(w, '[data-tv-chapter="2"]');
+  ok("el capítulo En grupo abre desde su entradilla", el(w, '.tv-stage h3').textContent === 'En grupo');
   video.tutorial.go(2);
   ok("la carta por colocar dice qué dato esconde", /Peso oculto/i.test(el(w, '.tv-hand').textContent));
   // Ninguna escena espera a quien mira: en la mesa no hay huecos ni botones que pulsar.
