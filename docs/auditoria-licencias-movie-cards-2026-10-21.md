@@ -59,7 +59,7 @@ La prioridad alta corresponde a láminas cuya composición evoca un personaje, c
 | `1116-howls-moving-castle.webp` | Castillo ambulante y personajes |
 | `1117-my-neighbor-totoro.webp` | Criatura grande con paraguas |
 
-La prioridad alta incluye ahora **41 sustituciones pendientes**; `1001-moon.webp` ya usa un fotograma de dominio público. Las otras 78 láminas también requieren revisión si se quiere una garantía documental: faltan sus prompts y referencias. Algunas representan escenas, encuadres, vestuario o diseños asociados a la obra aunque no imiten un personaje con tanta claridad.
+La prioridad alta incluye ahora **44 sustituciones pendientes**; `1001-moon.webp` ya usa un fotograma de dominio público. Las otras 75 láminas también requieren revisión si se quiere una garantía documental: faltan sus prompts y referencias. Algunas representan escenas, encuadres, vestuario o diseños asociados a la obra aunque no imiten un personaje con tanta claridad.
 
 ## Sustitución recomendada
 
