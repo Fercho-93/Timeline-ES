@@ -110,12 +110,12 @@
           [300, c => c.stagger(".tv-kind", 350)],
           [2400, c => c.fingerTo(".tv-big")],
           [2900, c => { c.tap(); c.reveal(".tv-big"); c.fingerHide(); }],
-          [3300, c => c.say("Según el mazo, una fecha o una cifra.")]
+          [3300, c => c.say("Según el mazo, una fecha, un peso, una distancia…")]
         ] },
       { chapter: 0, title: "La línea", duration: 7000,
         html: `<div class="tv-center">${lineMarkup(modeKey, [A, C, E, G], { gaps: false })}<div class="tv-axis"><span>${esc(less)}</span><i></i><span>${esc(more)}</span></div></div>`,
         steps: [
-          [0, c => c.say("Tu objetivo: poner cada carta en su sitio de la línea.")],
+          [0, c => c.say("Tu objetivo es poner cada carta en su sitio de la línea.")],
           [300, c => c.stagger(".tv-line .tv-card", 380)],
           [2600, c => c.add(".tv-axis", "is-in")],
           [3400, c => c.say(`La línea va ${order}.`)]
@@ -123,7 +123,7 @@
       { chapter: 0, title: "Tu turno", duration: 10000,
         html: `<div class="tv-table">${lineMarkup(modeKey, [B, E])}<div class="tv-hand">${cardMarkup(modeKey, C, { hidden: true })}</div><span class="tv-confirm" aria-hidden="true">Sí, aquí</span></div>`,
         steps: [
-          [0, c => c.say("Arrastra la carta al hueco donde crees que va, o tócalo.")],
+          [0, c => c.say("Arrastra la carta al hueco donde crees que va, o bien toca el símbolo «+» o «−» de la línea habiendo seleccionado una carta.")],
           [400, c => c.add(".tv-hand .tv-card", "is-in")],
           [1800, c => c.fingerTo(".tv-hand .tv-card")],
           [2400, c => c.press(true)],
@@ -149,12 +149,12 @@
           <div class="tv-choices">${["Jugar solo", "Jugar con amigos", "Jugar online"].map(name => `<span>${menuArt(name)}<b>${name}</b></span>`).join("")}</div>
           ${door("Unirme a una partida", "tv-door-join")}${door("Reto del día", "tv-door-daily")}</div>`,
         steps: [
-          [0, c => { c.say("En Inicio, toca «Jugar» y elige: solo, con amigos u online."); c.add(".tv-home", "is-in"); }],
+          [0, c => { c.say("En el menú de Inicio está la opción «Jugar», donde se despliegan las distintas modalidades: jugar solo, con amigos u online."); c.add(".tv-home", "is-in"); }],
           [1100, c => c.fingerTo(".tv-door-play")],
           [1700, c => { c.tap(); c.add(".tv-door-play", "is-open"); c.add(".tv-choices", "is-open"); }],
           [1900, c => c.stagger(".tv-choices > span", 300)],
           [3600, c => c.fingerHide()],
-          [4800, c => { c.say("Debajo, «Unirme a una partida» y el reto del día."); c.stagger(".tv-door-join, .tv-door-daily", 400); }]
+          [4800, c => { c.say("Además, en el propio menú de Inicio podemos encontrar «Unirme a una partida» y el «Reto del día»."); c.stagger(".tv-door-join, .tv-door-daily", 400); }]
         ] },
 
       // 2 · Jugar solo
