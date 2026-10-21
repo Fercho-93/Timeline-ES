@@ -37,6 +37,13 @@ Quedan pendientes 202 cartas de retos rápidos: 19 de `drinks` y 183 de otros 14
 | --- | --- | --- |
 | `astronomy.js` · Astronomía y espacio | 55/55, cerrado el 30-09-2026 | Contraste individual de fecha, hito, modalidad y explicación con fuentes institucionales de NASA, ESA, ESO, IAU, LIGO, CNSA y otras instituciones. Se explicitaron las fechas aproximadas antiguas; Rømer no calculó una velocidad en distancia/tiempo; la cefeida de Andrómeda se identificó en 1923, con anuncio de la conclusión en 1924; la señal de LIGO se captó en 2015, pero se anunció en 2016; Philae rebotó tras el primer contacto. Las 55 cartas enlazan su fuente específica. |
 
+> **Pasada de verificación del 20 de octubre de 2026.** Se comprobaron fechas y cifras de las 14
+> Grandes colecciones restantes y se muestrearon los Retos rápidos pendientes: 11 correcciones
+> aplicadas (Billie Jean, rueda de alfarero, París–Versalles, Turkmenistán, vietnamita, cachalote,
+> La comunidad del anillo, Teruel, Fernando VII, TikTok, Miño) y dudas abiertas que dependen de la
+> fuente (Miño/Segura, Guadiana, Intellivision, «In the End»). Detalle en
+> `revision-verificacion-2026-10-20.md`. No sustituye al cierre carta a carta de abajo.
+
 Las otras 14 grandes colecciones ya han tenido revisiones generales y algunas correcciones, pero siguen pendientes de cierre individual carta por carta en esta ronda: 1.217 cartas en total. No significa que estén sin mirar, sino que aún no se han certificado formalmente todas sus afirmaciones y fuentes. Sumadas a los 202 retos rápidos pendientes, quedan 1.419 cartas por cerrar formalmente.
 
 ## Criterio de revisión

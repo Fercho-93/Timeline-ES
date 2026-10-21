@@ -67,7 +67,7 @@ window.MUSIC_CARDS = [
   ,{ id: 6063, year: 1979, title: "Highway to Hell", detail: "AC/DC publica uno de sus grandes himnos de hard rock y el último álbum de estudio de la banda con Bon Scott como vocalista." }
   ,{ id: 6064, year: 1979, title: "Another Brick in the Wall (Part 2)", detail: "Pink Floyd convierte este fragmento de The Wall en un éxito mundial con un coro infantil y una crítica a la educación autoritaria." }
   ,{ id: 6065, year: 1981, title: "Como una ola", detail: "Rocío Jurado interpreta una de las canciones más populares de su repertorio, convertida en referencia de la canción española." }
-  ,{ id: 6066, year: 1982, title: "Billie Jean", detail: "Michael Jackson publica el sencillo cuyo bajo, producción y coreografía asociada se convierten en hitos del pop de los años ochenta." }
+  ,{ id: 6066, year: 1983, title: "Billie Jean", detail: "Michael Jackson publica como sencillo, en enero de 1983, la canción cuyo bajo, producción y coreografía asociada se convierten en hitos del pop de los años ochenta; el álbum Thriller, que la incluye, es de 1982." }
   ,{ id: 6067, year: 1983, title: "Every Breath You Take", detail: "The Police publican una canción de apariencia romántica y letra inquietante que se convierte en su mayor éxito internacional." }
   ,{ id: 6068, year: 1983, title: "Let’s Dance", detail: "David Bowie entra en una nueva etapa pop con una producción de Nile Rodgers y una canción que alcanza un enorme éxito comercial." }
   ,{ id: 6069, year: 1984, title: "Dancing in the Dark", detail: "Bruce Springsteen publica el sencillo que abre Born in the U.S.A. y amplía su presencia en la radio y en MTV." }

@@ -9,8 +9,8 @@
 // fecha es aproximada o discutida, lo dicen el título y la explicación.
 window.INVENTION_CARDS = [
   { id: 4001, year: -3300, title: "La escritura cuneiforme (fecha aproximada)", detail: "En Sumeria se empiezan a marcar cuentas sobre arcilla blanda; es el primer sistema de escritura conocido." },
-  { id: 4002, year: -3000, title: "La rueda de alfarero (fecha aproximada)", detail: "El torno de alfarero es el primer uso documentado de la rueda, antes que el transporte." },
-  { id: 4003, year: -2600, title: "El papiro egipcio (fecha aproximada)", detail: "Egipto convierte una planta del Nilo en la primera superficie ligera para escribir." },
+  { id: 4002, year: -3500, title: "La rueda de alfarero (fecha aproximada)", detail: "Hacia el 3500 a. C. Mesopotamia ya usa el torno de alfarero, el uso más antiguo documentado de la rueda, anterior o contemporáneo a las ruedas de transporte; los tornos lentos son aún más antiguos." },
+  { id: 4003, year: -2600, title: "El papiro egipcio (fecha aproximada)", detail: "Egipto convierte una planta del Nilo en una superficie ligera para escribir. Los papiros con texto más antiguos que se conservan, el Diario de Merer, son de hacia 2600 a. C.; el uso del papiro es anterior." },
   { id: 4004, year: -1750, title: "El código de Hammurabi", detail: "Babilonia graba en piedra uno de los primeros conjuntos de leyes escritas que se conservan." },
   { id: 4005, year: -630, title: "Las primeras monedas acuñadas (fecha aproximada)", detail: "El reino de Lidia sella trozos de electro con un peso garantizado por el Estado." },
   { id: 4008, year: -46, title: "Julio César decreta la reforma del calendario", detail: "La reforma se decreta en 46 a. C.; el calendario juliano entra en vigor el 1 de enero de 45 a. C. La carta usa el año del decreto, no el de su aplicación." },

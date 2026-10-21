@@ -28,7 +28,7 @@ window.COUNTRY_CARDS = [
   { id: 2017, value: 603550, title: "Ucrania", detail: "El país más extenso situado por completo en Europa." },
   { id: 2018, value: 551695, title: "Francia metropolitana", detail: "Se cuenta solo la Francia metropolitana, incluida Córcega; quedan fuera los territorios de ultramar." },
   { id: 2019, value: 505944, title: "España", detail: "El segundo país más extenso de la Unión Europea, por detrás de Francia." },
-  { id: 2065, value: 488100, title: "Turkmenistán", detail: "Más de cuatro quintas partes del país están cubiertas por el desierto del Karakum.", source: "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/rankorder/2147rank.html" },
+  { id: 2065, value: 488100, title: "Turkmenistán", detail: "Cerca del 70 % del país está cubierto por el desierto del Karakum.", source: "https://start.csail.mit.edu/mirror/cia.gov/library/publications/the-world-factbook/rankorder/2147rank.html" },
   { id: 2020, value: 446550, title: "Marruecos (sin Sáhara Occidental)", detail: "Sin contar el Sáhara Occidental, cuyo estatus sigue sin resolverse." },
   { id: 2021, value: 377975, title: "Japón", detail: "Un archipiélago alargado que se extiende más de 3.000 kilómetros." },
   { id: 2022, value: 338455, title: "Finlandia", detail: "El país con más lagos del mundo: unos 188.000." },

@@ -63,7 +63,7 @@ window.MOVIE_CARDS = [
   { id: 1061, year: 1998, title: "Salvar al soldado Ryan", detail: "Spielberg abre con veinte minutos de desembarco en Omaha Beach." },
   { id: 1062, year: 1999, title: "Matrix", detail: "Las hermanas Wachowski popularizan el «bullet time» y la pastilla roja." },
   { id: 1063, year: 2000, title: "Gladiator", detail: "Ridley Scott devuelve el cine de romanos con Russell Crowe en el Coliseo." },
-  { id: 1064, year: 2001, title: "El señor de los anillos: La comunidad del anillo", detail: "Peter Jackson estrena en Nueva Zelanda la primera parte de la trilogía." },
+  { id: 1064, year: 2001, title: "El señor de los anillos: La comunidad del anillo", detail: "Peter Jackson, que la rodó en Nueva Zelanda, estrena la primera parte de la trilogía; el estreno mundial fue en Londres." },
   { id: 1065, year: 2002, title: "Spider-Man", detail: "Sam Raimi inaugura la era moderna del superhéroe en taquilla." },
   { id: 1066, year: 2003, title: "Buscando a Nemo", detail: "Pixar cruza el océano detrás de un pez payaso y una amiga sin memoria." },
   { id: 1067, year: 2004, title: "Mar adentro", detail: "Alejandro Amenábar cuenta la historia de Ramón Sampedro y gana el Óscar a la mejor película extranjera." },

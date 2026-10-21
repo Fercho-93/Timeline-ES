@@ -33,7 +33,7 @@ window.LANGUAGE_CARDS = [
   { id: 14008, value: 125300000, title: "Japonés", detail: "Casi todos sus hablantes viven en un solo país, algo poco habitual entre las lenguas de este tamaño." },
   { id: 14009, value: 92700000, title: "Lahnda", detail: "No es una lengua sino el conjunto de variedades panyabíes del oeste de Pakistán, el seraiki y el hindko entre ellas, que la fuente cuenta aparte del panyabí." },
   { id: 14010, value: 85200000, title: "Chino yue (cantonés)", detail: "El chino de Cantón, Hong Kong y Macao. Hablado no se entiende con el mandarín, aunque la escritura estándar es común." },
-  { id: 14011, value: 84600000, title: "Vietnamita", detail: "La única lengua grande del sudeste asiático que se escribe con alfabeto latino, adaptado por misioneros europeos en el siglo XVII." },
+  { id: 14011, value: 84600000, title: "Vietnamita", detail: "Se escribe con alfabeto latino, el chữ quốc ngữ, que misioneros europeos adaptaron en el siglo XVII; los diacríticos marcan sus seis tonos." },
   { id: 14012, value: 83100000, title: "Maratí", detail: "La lengua del estado indio de Maharashtra, cuya capital es Bombay." },
   { id: 14013, value: 82200000, title: "Turco", detail: "En 1928 cambió el alfabeto árabe por el latino en una reforma que se aplicó en cuestión de meses." },
   { id: 14014, value: 82000000, title: "Télugu", detail: "La lengua drávida con más hablantes, en los estados indios de Andhra Pradesh y Telangana." },

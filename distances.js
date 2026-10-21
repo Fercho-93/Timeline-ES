@@ -2,7 +2,7 @@
 // (círculo máximo) entre coordenadas fijas de los centros urbanos, con radio terrestre
 // medio de 6.371 km. No son distancias por carretera, tren ni avión.
 window.CITY_DISTANCE_CARDS = [
-  { id: 11001, value: 17, title: "París — Versalles", detail: "17 km entre centros urbanos, calculados como distancia de círculo máximo sobre la Tierra." },
+  { id: 11001, value: 18, title: "París — Versalles", detail: "18 km entre centros urbanos, calculados como distancia de círculo máximo sobre la Tierra." },
   { id: 11002, value: 27, title: "Berlín — Potsdam", detail: "27 km en línea recta entre los centros urbanos." },
   { id: 11003, value: 30, title: "Madrid — Alcalá de Henares", detail: "30 km en línea recta entre los centros urbanos." },
   { id: 11004, value: 34, title: "Ámsterdam — Utrecht", detail: "34 km en línea recta entre los centros urbanos." },
