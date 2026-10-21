@@ -133,6 +133,60 @@ function accountDialog(html) {
   app.insertAdjacentHTML('beforeend',html);
   CT.openDialog(app.lastElementChild,true);
 }
+// Personas bloqueadas: la misma lista de `duelPreferences/{uid}/blocked` que ya usan los duelos por turnos
+// (y que sus reglas hacen valer en los dos sentidos). Quien bloquea deja de ver las mesas de esa persona y su
+// nombre en el ranking, no entra en mesas públicas donde ya esté sentada y no puede retarla ni ser retado
+// por ella. No se avisa a la otra persona.
+let blocked = new Map();
+const blockedRef = target => doc(db, 'duelPreferences', identity.uid, 'blocked', String(target));
+async function loadBlocked() {
+  if (!identity) return;
+  try {
+    const snap = await getDocsFromServer(collection(db, 'duelPreferences', identity.uid, 'blocked'));
+    blocked = new Map(snap.docs.map(d => [d.id, d.data().alias || 'Jugador']));
+  } catch { /* sin conexión: se conservan los que ya se conocían */ }
+  document.dispatchEvent(new CustomEvent('continuum:bloqueos'));
+}
+async function setBlocked(target, alias, block) {
+  target = String(target);
+  const batch = writeBatch(db);
+  if (block) batch.set(blockedRef(target), { alias: String(alias || 'Jugador').slice(0, 24), updatedAt: serverTimestamp() });
+  else batch.delete(blockedRef(target));
+  await batch.commit();
+  if (block) blocked.set(target, String(alias || 'Jugador').slice(0, 24)); else blocked.delete(target);
+  document.dispatchEvent(new CustomEvent('continuum:bloqueos'));
+}
+const notBlocked = list => list.filter(v => !blocked.has(v.id));
+function blockedListMarkup() {
+  return blocked.size
+    ? [...blocked].map(([target, name]) => `<p class="blocked-row" data-blocked-row="${esc(target)}"><span>${esc(name)}</span> <button type="button" class="btn btn-ghost" data-unblock-uid="${esc(target)}" aria-label="Desbloquear a ${esc(name)}">Desbloquear</button></p>`).join('')
+    : '<p class="hint">No has bloqueado a nadie.</p>';
+}
+// El menú que abre el botón junto a cada nombre ajeno: denunciar o bloquear (o desbloquear).
+function personDialog({ uid, alias, context }) {
+  if (!identity || !uid || uid === identity.uid) return;
+  const target = String(uid), name = String(alias || 'esta persona').slice(0, 24);
+  const already = () => blocked.has(target);
+  accountDialog(`<div class="overlay" data-overlay="person"><section class="modal report-modal" role="dialog" aria-modal="true" aria-labelledby="person-title">
+    <h2 id="person-title" tabindex="-1" data-dialog-focus>${esc(name)}</h2>
+    <p id="person-text">${already() ? 'Has bloqueado a esta persona.' : 'Si su nombre es ofensivo o se hace pasar por otra persona, denúnciala. Si no quieres coincidir con ella, bloquéala: es privado y ella no lo sabrá.'}</p>
+    <p id="person-message" class="hint" role="status"></p>
+    <div class="actions" style="display:grid"><button type="button" class="btn btn-secondary" id="person-report">Denunciar</button><button type="button" class="btn btn-secondary" id="person-block">${already() ? 'Desbloquear' : 'Bloquear'}</button><button type="button" class="btn btn-ghost" id="person-cancel" data-account-action="close">Cancelar</button></div>
+  </section></div>`);
+  document.getElementById('person-report').onclick = () => { CT.closeDialog(true); reportDialog({ uid: target, alias: name, context }); };
+  document.getElementById('person-block').onclick = async event => {
+    const button = event.currentTarget, message = document.getElementById('person-message'), wasBlocked = already();
+    button.disabled = true; message.textContent = wasBlocked ? 'Desbloqueando…' : 'Bloqueando…';
+    try {
+      await setBlocked(target, name, !wasBlocked);
+      message.textContent = wasBlocked ? 'Desbloqueada.' : 'Bloqueada. No verás sus mesas ni su nombre en el ranking, no entrarás en mesas donde ya esté y no podréis retaros. Puedes desbloquearla en Atlas → Tu cuenta y tus datos.';
+      document.getElementById('person-report').hidden = true; button.hidden = true; document.getElementById('person-cancel').textContent = 'Cerrar';
+      if (context === 'ranking') refreshRanking();
+    } catch {
+      message.textContent = 'No se ha podido guardar. Comprueba tu conexión e inténtalo de nuevo.'; button.disabled = false;
+    }
+  };
+}
 // «Denunciar»: junto a cualquier nombre ajeno hay un botón (moderacion.js). Escribe una denuncia en
 // `reports` —una por pareja denunciante-denunciado—, que nadie puede leer desde el juego: la lee quien
 // gestiona el proyecto en la consola de Firebase (ver CONFIGURAR_MULTIJUGADOR.md).
@@ -148,6 +202,22 @@ function reportDialog({ uid, alias, context }) {
     <p id="report-message" class="hint" role="status"></p>
     <div class="actions"><button type="button" class="btn btn-primary" id="report-send">Enviar denuncia</button><button type="button" class="btn btn-secondary" id="report-cancel" data-account-action="close">Cancelar</button></div>
   </section></div>`);
+  // Tras denunciar se ofrece bloquear, como hacen otros juegos: quien denuncia suele querer no volver a verla.
+  const offerBlock = () => {
+    if (blocked.has(target)) return;
+    const actions = document.querySelector('[data-overlay="report"] .actions');
+    actions.insertAdjacentHTML('afterbegin', '<button type="button" class="btn btn-secondary" id="report-block">Bloquear también</button>');
+    document.getElementById('report-block').onclick = async event => {
+      const button = event.currentTarget, message = document.getElementById('report-message');
+      button.disabled = true;
+      try {
+        await setBlocked(target, name, true);
+        message.textContent = 'Denunciada y bloqueada. Puedes desbloquearla en Atlas → Tu cuenta y tus datos.';
+        button.hidden = true;
+        if (context === 'ranking') refreshRanking();
+      } catch { message.textContent = 'La denuncia está enviada, pero no se ha podido bloquear. Inténtalo de nuevo.'; button.disabled = false; }
+    };
+  };
   document.getElementById('report-send').onclick = async event => {
     const send = event.currentTarget, message = document.getElementById('report-message');
     const reason = document.querySelector('input[name="report-reason"]:checked')?.value || 'otro';
@@ -158,9 +228,10 @@ function reportDialog({ uid, alias, context }) {
       await batch.commit();
       message.textContent = 'Gracias. Hemos recibido tu denuncia y la revisaremos.';
       send.hidden = true; document.getElementById('report-cancel').textContent = 'Cerrar';
+      offerBlock();
     } catch (error) {
       // Las reglas solo dejan una denuncia por pareja: «sin permiso» aquí es «ya la enviaste».
-      if (error?.code === 'permission-denied') { message.textContent = 'Ya habías denunciado a esta persona. Gracias.'; send.hidden = true; document.getElementById('report-cancel').textContent = 'Cerrar'; }
+      if (error?.code === 'permission-denied') { message.textContent = 'Ya habías denunciado a esta persona. Gracias.'; send.hidden = true; document.getElementById('report-cancel').textContent = 'Cerrar'; offerBlock(); }
       else { message.textContent = 'No se ha podido enviar la denuncia. Comprueba tu conexión e inténtalo de nuevo.'; send.disabled = false; }
     }
   };
@@ -499,6 +570,7 @@ async function enter() {
     // Un UID compartido con Firebase y un alias guardado para los modos que piden nombre.
     CT.Storage.setItem('hilo-jugador-v1',u.uid);CT.Storage.setItem('hilo-nombre-v1',profile.alias);
     await syncAvatar();
+    await loadBlocked();
     ready=true;stopStorage?.();stopStorage=CT.AccountStorage.subscribe(schedule);
     // Quien dijo que no y no tenía conexión al decirlo: se terminan de retirar sus filas.
     if (rankingPublico() === false) void removeRankingRows().catch(() => {});
@@ -605,11 +677,14 @@ function accountCard() {
     ${appleControls()}
     <div class="account-actions"><button class="btn btn-secondary" data-account-action="sync"><span aria-hidden="true">↻</span> Guardar ahora</button></div>
     ${rankingControls()}
+    <details class="account-details"><summary>Personas bloqueadas<span data-blocked-count>${blocked.size ? ` (${blocked.size})` : ''}</span></summary><div data-blocked-list>${blockedListMarkup()}</div><p class="hint">Bloquear es privado. Se bloquea con el botón «Denunciar o bloquear» junto a cada nombre.</p></details>
     <details class="account-details"><summary>Tu cuenta y tus datos</summary><p>${esc(accountText())}</p><a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a><button class="btn btn-ghost account-delete" data-account-action="delete">${appleUser(identity) ? 'Eliminar cuenta y progreso' : 'Eliminar invitado y progreso'}</button></details>
   </div>`;
 }
 // Qué tabla se está mirando: hoy o esta semana, o un día o una semana anteriores (flechas ‹ ›).
 let rankingView = { tab: 'day', key: '', all: false };
+// Vuelve a pintar la tabla que se está mirando (tras bloquear a alguien, que deja de verse).
+const refreshRanking = () => (rankingView.tab === 'found' ? discoveryRanking(rankingView.section, rankingView.all) : ranking(rankingView.tab, rankingView.key, rankingView.all)).catch(() => {});
 const RANKING_PAGE = 50, RANKING_ALL = 200, RANKING_BACK_WEEKS = 8;
 function duration(ms) {
   const total = Math.round((Number(ms) || 0) / 1000), h = Math.floor(total / 3600), m = Math.floor(total % 3600 / 60), sec = total % 60;
@@ -624,7 +699,7 @@ async function ranking(tab = 'day', key = '', all = false) {
   rankingView = { tab: semana ? 'week' : 'day', key, all };
   const snap=await getDocsFromServer(query(collection(db, semana ? 'weeklyScores' : 'dailyScores', key, 'players'),orderBy('hits','desc'),limit(all ? RANKING_ALL : RANKING_PAGE)));
   const hits = v => Number(v.hits) || 0, ms = v => Number.isFinite(Number(v.ms)) ? Number(v.ms) : Infinity;
-  const entries=snap.docs.map(d=>({id:d.id,...d.data()}));
+  const entries=notBlocked(snap.docs.map(d=>({id:d.id,...d.data()})));
   // Más aciertos primero; a igualdad, quien tardó menos. Solo comparten puesto aciertos y tiempo idénticos.
   entries.sort((a,b) => hits(b) - hits(a) || ms(a) - ms(b));
   const position = i => 1 + entries.filter(v => hits(v) > hits(entries[i]) || (hits(v) === hits(entries[i]) && ms(v) < ms(entries[i]))).length;
@@ -664,7 +739,7 @@ async function discoveryRanking(section = 'all', all = false) {
   rankingView = { tab: 'found', section, key: '', all };
   const snap = await getDocsFromServer(query(collection(db, 'discoveryScores'), orderBy(field, 'desc'), limit(all ? RANKING_ALL : RANKING_PAGE)));
   const value = v => Number(v[field]) || 0;
-  const entries = snap.docs.map(d => ({id: d.id, ...d.data()})).filter(v => value(v) > 0);
+  const entries = notBlocked(snap.docs.map(d => ({id: d.id, ...d.data()})).filter(v => value(v) > 0));
   entries.sort((a, b) => value(b) - value(a) || String(a.alias).localeCompare(String(b.alias), 'es'));
   const position = i => 1 + entries.filter(v => value(v) > value(entries[i])).length;
   const mine = entries.findIndex(v => v.id === uid);
@@ -675,7 +750,7 @@ async function discoveryRanking(section = 'all', all = false) {
   const rankAvatar = (v, size) => CT.Avatares.markup(v.alias, { size, seed: 'uid:' + v.id, id: v.id === uid ? CT.Avatares.ownId() : v.avatar });
   const you = v => v.id === uid ? '<small class="ranking-you">Tú</small>' : '';
   const player = (v, i) => `<tr class="${v.id === uid ? 'is-you' : ''}"><td><span class="ranking-place">${position(i)}</span></td><td><span aria-hidden="true">${rankAvatar(v, 32)}</span> <span class="ranking-name">${esc(v.alias)}</span>${you(v)}${v.id===uid?'':CT.Moderacion?.botonDenuncia(v.id,v.alias,'ranking',true)||''}</td><td><b>${value(v)}</b></td></tr>`;
-  const podium = entries.slice(0, 3).map((v, i) => `<article class="ranking-medallion ranking-medallion-${i + 1}${v.id === uid ? ' is-you' : ''}"><span class="ranking-medal" aria-label="Puesto ${position(i)}">${['Ⅰ','Ⅱ','Ⅲ'][i]}</span><span class="ranking-avatar" aria-hidden="true">${rankAvatar(v, 46)}</span><b>${esc(v.alias)}</b>${you(v)}<strong>${value(v)}</strong><span>cartas</span></article>`).join('');
+  const podium = entries.slice(0, 3).map((v, i) => `<article class="ranking-medallion ranking-medallion-${i + 1}${v.id === uid ? ' is-you' : ''}"><span class="ranking-medal" aria-label="Puesto ${position(i)}">${['Ⅰ','Ⅱ','Ⅲ'][i]}</span><span class="ranking-avatar" aria-hidden="true">${rankAvatar(v, 46)}</span><b>${esc(v.alias)}</b>${you(v)}${v.id===uid?'':CT.Moderacion?.botonDenuncia(v.id,v.alias,'ranking',true)||''}<strong>${value(v)}</strong><span>cartas</span></article>`).join('');
   const tabs = `<div class="ranking-tabs" role="group" aria-label="Tabla"><button type="button" class="btn btn-secondary" data-account-action="ranking-day" aria-pressed="false">Por días</button><button type="button" class="btn btn-secondary" data-account-action="ranking-week" aria-pressed="false">Por semanas</button><button type="button" class="btn btn-primary" data-account-action="ranking-discoveries" aria-pressed="true">Cartas</button></div>`;
   const sections = `<div class="ranking-tabs ranking-sections" role="group" aria-label="Sección">${Object.entries(FOUND_SECTIONS).map(([key, [, name]]) => `<button type="button" class="btn ${key === section ? 'btn-primary' : 'btn-secondary'}" data-account-action="ranking-found-${key}" aria-pressed="${key === section}">${esc(name)}</button>`).join('')}</div>`;
   const personal = mine >= 0 ? `<span>Tu puesto <b>#${position(mine)}</b></span><span><b>${value(own)}</b> cartas</span>`
@@ -734,6 +809,7 @@ async function removeAccount() {
 }
 export async function startAccounts(callback) {
   startGame=callback;
+  CT.Bloqueos={has:uid=>blocked.has(String(uid)),list:()=>[...blocked],reload:loadBlocked};
   CT.Accounts={get ready(){return ready;},get user(){return identity;},get profile(){return profile;},card:accountCard,flush,rankingDe:(tab)=>ranking(tab),renombra:alias=>rename(alias),sincronizaAvatar:syncAvatar,cargaAvatares:loadAvatars,get rankingPublico(){return rankingPublico();},setRanking};
   await auth.authStateReady();
   await setPersistence(auth,browserLocalPersistence);
@@ -758,8 +834,17 @@ export async function startAccounts(callback) {
   document.addEventListener('click',event=>{
     const button=event.target.closest?.('[data-report-uid]');if(!button)return;
     event.preventDefault();event.stopPropagation();
-    reportDialog({uid:button.dataset.reportUid,alias:button.dataset.reportAlias,context:button.dataset.reportContext});
+    personDialog({uid:button.dataset.reportUid,alias:button.dataset.reportAlias,context:button.dataset.reportContext});
   },true);
+  // «Desbloquear» en la lista de Tu cuenta y tus datos.
+  document.addEventListener('click',event=>{
+    const button=event.target.closest?.('[data-unblock-uid]');if(!button)return;
+    event.preventDefault();button.disabled=true;
+    setBlocked(button.dataset.unblockUid,'',false).then(()=>{
+      document.querySelectorAll('[data-blocked-list]').forEach(box=>{box.innerHTML=blockedListMarkup();});
+      document.querySelectorAll('[data-blocked-count]').forEach(el=>{el.textContent=blocked.size?` (${blocked.size})`:'';});
+    }).catch(()=>{button.disabled=false;});
+  });
   document.addEventListener('click',event=>{
     const target=event.target.closest('[data-account-action]');if(!target)return;
     const action=target.dataset.accountAction;

@@ -135,15 +135,20 @@
     stopBoard?.(); stopBoard = null;
     Promise.all([import('./public-tables.js'), boardVersions()]).then(([tables, versions]) => {
       if (!app.querySelector('[data-public-board]')) return;
-      const stop = tables.watchTables(list => {
+      let lastList = [];
+      const draw = () => {
         const box = app.querySelector('[data-public-board]');
-        if (!box) { stop(); if (stopBoard === stop) stopBoard = null; return; }
-        renderBoard(box, list.filter(t => usableTable(t, tables, versions)));
-      }, () => {
+        if (!box) { stopAll(); if (stopBoard === stopAll) stopBoard = null; return; }
+        // Las mesas de quien has bloqueado no se enseñan.
+        renderBoard(box, lastList.filter(t => usableTable(t, tables, versions) && !(t.hostUid && window.CONTINUUM.Bloqueos?.has(t.hostUid))));
+      };
+      const stopAll = () => { document.removeEventListener('continuum:bloqueos', draw); stop(); };
+      const stop = tables.watchTables(list => { lastList = list; draw(); }, () => {
         const box = app.querySelector('[data-public-board]');
         if (box) box.innerHTML = '<li class="public-board-empty">No se pudo cargar la lista de mesas. Puedes crear una o usar la partida rápida.</li>';
       });
-      stopBoard = stop;
+      document.addEventListener('continuum:bloqueos', draw);
+      stopBoard = stopAll;
     }).catch(() => {
       const box = app.querySelector('[data-public-board]');
       if (box) box.innerHTML = '<li class="public-board-empty">No se pudo cargar la lista de mesas. Puedes crear una o usar la partida rápida.</li>';

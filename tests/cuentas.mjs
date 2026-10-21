@@ -11,7 +11,7 @@ function setup(user=null,seed={}){
  w.eval(read('avatares.js'));
  const auth={currentUser:user,authStateReady:async()=>{}};w.auth=auth;w.db={};
  const snap=key=>({exists:()=>data.has(key),data:()=>data.get(key)});
- Object.assign(w,{collection:(_,...parts)=>parts.join('/'),query:(...args)=>args,orderBy:()=>null,limit:()=>null,getDocsFromServer:async q=>{const base=(typeof q[0]==='string'?q[0]:'dailyRanking');return {docs:[...data].filter(([k])=>k.startsWith(base+'/')&&k.split('/').length===base.split('/').length+1).map(([k,v])=>({id:k.split('/').pop(),data:()=>v}))};},browserLocalPersistence:{},setPersistence:async()=>{},signInAnonymously:async()=>{auth.currentUser={uid:'guest',isAnonymous:true,getIdToken:async()=>''};return {user:auth.currentUser};},doc:(_,...parts)=>parts.join('/'),getDocFromServer:async key=>snap(key),serverTimestamp:()=>123,onAuthStateChanged:()=>{},runTransaction:async(_,fn)=>{
+ Object.assign(w,{collection:(_,...parts)=>parts.join('/'),query:(...args)=>args,orderBy:()=>null,limit:()=>null,getDocsFromServer:async q=>{const base=typeof q==='string'?q:(typeof q[0]==='string'?q[0]:'dailyRanking');return {docs:[...data].filter(([k])=>k.startsWith(base+'/')&&k.split('/').length===base.split('/').length+1).map(([k,v])=>({id:k.split('/').pop(),data:()=>v}))};},browserLocalPersistence:{},setPersistence:async()=>{},signInAnonymously:async()=>{auth.currentUser={uid:'guest',isAnonymous:true,getIdToken:async()=>''};return {user:auth.currentUser};},doc:(_,...parts)=>parts.join('/'),getDocFromServer:async key=>snap(key),serverTimestamp:()=>123,onAuthStateChanged:()=>{},runTransaction:async(_,fn)=>{
   const pending=[];const result=await fn({delete:key=>pending.push([key,null]),get:async key=>snap(key),set:(key,value)=>pending.push([key,value])});for(const [k,v]of pending)v===null?data.delete(k):data.set(k,v);return result;
  }});
  let source=read('accounts.js').replace(/^import .*;\n/gm,'').replace('export async function startAccounts','async function startAccounts');
@@ -289,13 +289,19 @@ assert.doesNotMatch(read('online.js'),/signInAnonymously/);
  }
  assert.equal(data.get('playerProfiles/a').alias,'Fer','un nombre rechazado no cambia el perfil');
  const escrituras=[];let fallo=null;
- w.writeBatch=()=>({set:(key,value)=>escrituras.push([key,value]),delete(){},commit:async()=>{if(fallo)throw fallo;}});
+ w.writeBatch=()=>({set:(key,value)=>escrituras.push([key,value]),delete:key=>escrituras.push([key,null]),commit:async()=>{if(fallo)throw fallo;}});
  const app=w.document.getElementById('app');
  app.insertAdjacentHTML('beforeend','<div id="lista">'+w.CONTINUUM.Moderacion.botonDenuncia('b','Bea','ranking',true)+'</div>');
  const boton=()=>w.document.querySelector('#lista [data-report-uid]');
- assert.equal(boton().getAttribute('aria-label'),'Denunciar a Bea');
+ const abre=()=>{boton().click();w.document.getElementById('person-report').click();};
+ assert.equal(boton().getAttribute('aria-label'),'Denunciar o bloquear a Bea');
  boton().click();
- assert.ok(w.document.querySelector('[data-overlay="report"]'),'el botón abre el diálogo de denuncia');
+ assert.ok(w.document.querySelector('[data-overlay="person"]'),'el botón abre un menú con denunciar y bloquear');
+ assert.equal(w.document.querySelector('#person-title').textContent,'Bea');
+ assert.equal(escrituras.length,0,'abrir el menú no escribe nada');
+ w.document.getElementById('person-report').click();
+ assert.equal(w.document.querySelector('[data-overlay="person"]'),null,'el menú se cierra al pasar a denunciar');
+ assert.ok(w.document.querySelector('[data-overlay="report"]'),'«Denunciar» abre el diálogo de denuncia');
  assert.match(w.document.querySelector('#report-title').textContent,/Denunciar a Bea/);
  assert.equal(w.document.querySelectorAll('input[name="report-reason"]').length,3);
  w.document.querySelector('input[name="report-reason"][value="suplantacion"]').click();
@@ -310,12 +316,12 @@ assert.doesNotMatch(read('online.js'),/signInAnonymously/);
  w.CONTINUUM.closeDialog?.();
  // Ya denunciada: las reglas la rechazan y el juego lo explica sin alarmar.
  fallo=Object.assign(Error('denegado'),{code:'permission-denied'});
- boton().click();w.document.getElementById('report-send').click();await new Promise(r=>setTimeout(r,0));
+ abre();w.document.getElementById('report-send').click();await new Promise(r=>setTimeout(r,0));
  assert.match(w.document.getElementById('report-message').textContent,/Ya habías denunciado/);
  w.CONTINUUM.closeDialog?.();
  // Sin red: se puede reintentar.
  fallo=Object.assign(Error('sin red'),{code:'unavailable'});
- boton().click();w.document.getElementById('report-send').click();await new Promise(r=>setTimeout(r,0));
+ abre();w.document.getElementById('report-send').click();await new Promise(r=>setTimeout(r,0));
  assert.match(w.document.getElementById('report-message').textContent,/No se ha podido enviar/);
  assert.equal(w.document.getElementById('report-send').disabled,false,'tras un fallo de red se puede volver a intentar');
  w.CONTINUUM.closeDialog?.();
@@ -324,6 +330,58 @@ assert.doesNotMatch(read('online.js'),/signInAnonymously/);
  app.insertAdjacentHTML('beforeend','<div id="yo">'+w.CONTINUUM.Moderacion.botonDenuncia('a','Fer','ranking')+'</div>');
  w.document.querySelector('#yo [data-report-uid]').click();
  assert.equal(w.document.querySelectorAll('[data-overlay="report"]').length,antes,'no se puede denunciar a uno mismo');
+ w.document.getElementById('yo').remove();
+ // Bloquear: escribe en la lista de bloqueados que ya usan los duelos, sin avisar a la otra persona.
+ fallo=null;escrituras.length=0;
+ const espera=()=>new Promise(r=>setTimeout(r,0));
+ const cierra=()=>w.document.querySelectorAll('[data-overlay]').forEach(e=>e.remove());
+ assert.equal(w.CONTINUUM.Bloqueos.has('b'),false);
+ boton().click();w.document.getElementById('person-block').click();await espera();
+ assert.deepEqual(escrituras.map(([k,v])=>[k,v&&{...v,updatedAt:undefined}]),[['duelPreferences/a/blocked/b',{alias:'Bea',updatedAt:undefined}]],'se guarda en duelPreferences/{yo}/blocked/{ella}');
+ assert.equal(w.CONTINUUM.Bloqueos.has('b'),true);
+ assert.match(w.document.getElementById('person-message').textContent,/Bloqueada/);
+ cierra();
+ // Con la tarjeta de la cuenta se ve y se deshace.
+ app.insertAdjacentHTML('beforeend','<div id="tarjeta">'+w.CONTINUUM.Accounts.card()+'</div>');
+ assert.match(w.document.querySelector('#tarjeta [data-blocked-count]').textContent,/\(1\)/);
+ assert.match(w.document.querySelector('#tarjeta [data-blocked-list]').textContent,/Bea/);
+ escrituras.length=0;
+ w.document.querySelector('#tarjeta [data-unblock-uid="b"]').click();await espera();await espera();
+ assert.deepEqual(escrituras,[['duelPreferences/a/blocked/b',null]],'desbloquear borra el documento');
+ assert.equal(w.CONTINUUM.Bloqueos.has('b'),false);
+ assert.match(w.document.querySelector('#tarjeta [data-blocked-list]').textContent,/No has bloqueado a nadie/);
+ w.document.getElementById('tarjeta').remove();
+ // Tras denunciar se ofrece bloquear.
+ escrituras.length=0;abre();w.document.getElementById('report-send').click();await espera();
+ assert.ok(w.document.getElementById('report-block'),'tras denunciar se ofrece «Bloquear también»');
+ w.document.getElementById('report-block').click();await espera();
+ assert.equal(w.CONTINUUM.Bloqueos.has('b'),true);
+ assert.deepEqual(escrituras.map(([k])=>k),['reports/a_b','duelPreferences/a/blocked/b']);
+ cierra();
+ // Bloqueada, el menú ofrece desbloquear y no repite el texto de bloquear.
+ boton().click();
+ assert.equal(w.document.getElementById('person-block').textContent,'Desbloquear');
+ cierra();
+ // Sin red, no se da por bloqueada.
+ fallo=Object.assign(Error('sin red'),{code:'unavailable'});
+ await w.CONTINUUM.Bloqueos.reload();
+ w.document.getElementById('person-block')?.click();
+ dom.window.close();
+}
+{
+ // Quien está bloqueado desaparece de las tablas del ranking de quien bloqueó.
+ const {w,dom}=setup(user('a'),{'playerProfiles/a':profile,'duelPreferences/a/blocked/b':{alias:'Luna'},'discoveryScores/b':{alias:'Luna',avatar:'star',cards:40,collections:10,quick:30},'discoveryScores/c':{alias:'Atlas',avatar:'globe',cards:25,collections:25,quick:0},'discoveryScores/a':{alias:'Fer',avatar:'compass',cards:12,collections:9,quick:3}});
+ w.eval(read('moderacion.js'));
+ await w.testAccounts.startAccounts(()=>{});
+ assert.equal(w.CONTINUUM.Bloqueos.has('b'),true,'al entrar se cargan los bloqueados');
+ w.document.getElementById('app').innerHTML=w.CONTINUUM.Accounts.card();
+ const click=async action=>{w.document.querySelector(`[data-account-action="${action}"]`).click();for(let i=0;i<4;i++)await new Promise(r=>setTimeout(r,0));};
+ await click('ranking');await click('ranking-discoveries');
+ const tabla=[...w.document.querySelectorAll('.ranking-medallion, .account-ranking')].map(e=>e.textContent).join(' ');
+ assert.ok(tabla.includes('Atlas'));
+ assert.doesNotMatch(tabla,/Luna/,'la persona bloqueada no sale en el ranking');
+ assert.match(w.document.querySelector('.ranking-medallion-1').textContent,/Atlas/);
+ assert.match(w.document.querySelector('.ranking-medallion-1').innerHTML,/data-report-uid="c"/,'el podio de cartas también tiene «Denunciar o bloquear»');
  dom.window.close();
 }
 console.log('Invitados: alta automática, reentrada, error de conexión, cambio de nombre, ranking, aislamiento y conflictos correctos.');

@@ -173,16 +173,21 @@ actual es el candidato, sujeto a la elección del titular.
 - La política de privacidad y el soporte están en las URL de arriba.
 
 **Moderación (guía 1.2 de Apple):** el único contenido creado por usuarios son los alias, y la
-app ya tiene las tres piezas que pide la guía: un filtro de nombres ofensivos y reservados
-(`moderacion.js`, también al cambiar de nombre), un botón «Denunciar» junto a los nombres ajenos
-(ranking, tablón y plazas de las mesas, rivales de los duelos) y el bloqueo de retos en los duelos.
-Las denuncias llegan a la colección `reports` y las revisa el responsable en la consola de Firebase
-(ver «Denuncias de nombres» en [CONFIGURAR_MULTIJUGADOR.md](../CONFIGURAR_MULTIJUGADOR.md)). Apple
-también espera un contacto publicado (el correo de soporte) y responder a las denuncias con rapidez:
-comprométete a revisarlas en un plazo razonable antes de enviar la app. Lo que no existe: bloqueo en
-las mesas públicas (solo en los duelos) y chat (no lo hay, así que no hace falta moderarlo).
-Notas para App Review: «Los nombres se filtran, se pueden denunciar desde cualquier lista y se
-bloquean los retos de quien abusa; las denuncias las revisa el equipo.»
+app tiene las piezas que pide la guía: un filtro de nombres ofensivos y reservados (`moderacion.js`,
+también al cambiar de nombre), un botón «Denunciar o bloquear» junto a los nombres ajenos (ranking,
+tablón y plazas de las mesas, menú de la sala durante la partida y al terminar, rivales de los duelos)
+y el bloqueo. Bloquear es privado y se guarda en `duelPreferences/{uid}/blocked`, la misma lista que
+usan los duelos (y que sus reglas hacen valer en los dos sentidos): quien bloquea deja de ver las mesas de
+esa persona y su nombre en el ranking, no entra en mesas públicas donde ya esté sentada y no puede retarla
+ni ser retado. Se deshace en Atlas → «Tu cuenta y tus datos» → «Personas bloqueadas». Tras denunciar se
+ofrece «Bloquear también». Las denuncias llegan a la colección `reports` y las revisa el responsable en la
+consola de Firebase (ver «Denuncias de nombres» en [CONFIGURAR_MULTIJUGADOR.md](../CONFIGURAR_MULTIJUGADOR.md)).
+Apple también espera un contacto publicado (el correo de soporte) y responder a las denuncias con rapidez:
+comprométete a revisarlas en un plazo razonable (los rechazos que se ven en los foros piden actuar en 24 horas)
+antes de enviar la app. Límites conocidos: el bloqueo no impide que la persona bloqueada entre después en una
+mesa en la que ya estás; en las partidas por Wi-Fi o en el mismo móvil no hay nombres de desconocidos; no hay
+chat, así que no hace falta moderarlo. Notas para App Review: «Los nombres se filtran, se pueden denunciar y
+bloquear desde cualquier lista; las denuncias las revisa el equipo.»
 
 ## App Store: «Privacidad de la app»
 

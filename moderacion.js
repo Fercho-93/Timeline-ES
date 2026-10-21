@@ -1,4 +1,4 @@
-// Moderación de nombres: qué nombre no se admite y el botón «Denunciar» que acompaña a cualquier
+// Moderación de nombres: qué nombre no se admite y el botón «Denunciar o bloquear» que acompaña a cualquier
 // nombre ajeno. Ningún filtro de palabras es perfecto (por eso existe la denuncia, que lee una
 // persona en la consola de Firebase); este se limita a lo claramente ofensivo y a los nombres que
 // harían pasar a alguien por el juego o por quien lo gestiona. El servidor solo exige estos últimos
@@ -50,12 +50,13 @@
   }
 
   const escapa = texto => String(texto ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  // El botón que se pone junto al nombre de otra persona. Lo atiende accounts.js (que es quien tiene la
-  // conexión con el servidor): `contexto` es dónde se ve el nombre (ranking, mesa, duelo o sala).
+  // El botón que se pone junto al nombre de otra persona: abre un menú con «Denunciar» y «Bloquear». Lo
+  // atiende accounts.js (que es quien tiene la conexión con el servidor): `contexto` es dónde se ve el
+  // nombre (ranking, mesa, duelo o sala).
   function botonDenuncia(uid, alias, contexto, compacto = false) {
     if (!uid || !["ranking", "mesa", "duelo", "sala"].includes(contexto)) return "";
     const nombre = String(alias || "esta persona").slice(0, 24);
-    return `<button type="button" class="report-btn${compacto ? " report-compact" : ""}" data-report-uid="${escapa(uid)}" data-report-alias="${escapa(nombre)}" data-report-context="${contexto}" aria-label="Denunciar a ${escapa(nombre)}" title="Denunciar">${compacto ? "⚑" : "Denunciar"}</button>`;
+    return `<button type="button" class="report-btn${compacto ? " report-compact" : ""}" data-report-uid="${escapa(uid)}" data-report-alias="${escapa(nombre)}" data-report-context="${contexto}" aria-haspopup="dialog" aria-label="Denunciar o bloquear a ${escapa(nombre)}" title="Denunciar o bloquear">${compacto ? "⋯" : "Denunciar o bloquear"}</button>`;
   }
 
   CT.Moderacion = { problema, ofensivo, reservado, botonDenuncia };

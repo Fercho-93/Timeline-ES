@@ -70,7 +70,8 @@ async function publicConnect(options) {
     const snap=current?await tx.get(current):null;
     const room=snap?.exists()?snap.data():null;
     if(room && room.catalog===CT.QuickNetwork.fingerprint() && room.matchmaking==='public'
-        && room.capacity===chosen.cap && room.phase==='lobby' && room.members.length<chosen.cap){
+        && room.capacity===chosen.cap && room.phase==='lobby' && room.members.length<chosen.cap
+        && !room.members.some(other=>CT.Bloqueos?.has(other))){
       if(!room.members.includes(uid)){
         const next=R.reduce(room,uid,{type:'join',name});
         tx.update(current,{...next,updatedAt:serverTimestamp()});

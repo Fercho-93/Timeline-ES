@@ -112,7 +112,9 @@
 .report-btn { min-height: 28px; padding: 2px 8px; border: 0; background: none; color: var(--muted, #7a6a58); font: inherit; font-size: .72rem; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; opacity: .8; }
 .report-btn:hover, .report-btn:focus-visible { opacity: 1; }
 .report-btn:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; border-radius: 4px; }
-.report-btn.report-compact { min-width: 28px; padding: 2px 4px; font-size: .9rem; text-decoration: none; }
+.report-btn.report-compact { min-width: 36px; min-height: 36px; padding: 2px 6px; font-size: 1.1rem; font-weight: 700; line-height: 1; text-decoration: none; }
+.blocked-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 4px 0; }
+.manage-player .report-btn { margin-left: auto; }
 .report-modal { max-width: 26rem; text-align: left; }
 .report-modal h2 { margin-top: 0; }
 .report-reasons { margin: 12px 0; padding: 0; border: 0; }

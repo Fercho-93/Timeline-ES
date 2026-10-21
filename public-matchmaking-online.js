@@ -65,7 +65,8 @@ async function findOrCreate(mode, capacityInput, { allowStale = false } = {}) {
     const oldRoom=roomSnap?.exists()?roomSnap.data():null;
     if(oldRoom?.playerOrder?.includes(user.uid)) return oldRoom.roomCode;
     if(freshQueue.exists() && freshQueue.data().status==='waiting' && (allowStale || queueFresh(freshQueue.data()))
-        && isJoinablePublicRoom(oldRoom,{mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint})){
+        && isJoinablePublicRoom(oldRoom,{mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint})
+        && !oldRoom.playerOrder.some(other=>CT.Bloqueos?.has(other))){
       const order=[...oldRoom.playerOrder,user.uid];
       tx.update(oldRef,{
         players:{...oldRoom.players,[user.uid]:{name:alias(),avatarId:avatarId(),hand:[],joinedAt:Date.now(),clientVersion:CLIENT_VERSION}},

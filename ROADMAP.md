@@ -93,7 +93,7 @@ externa o una decisión del titular. Las listas de comprobación de la beta est�
 - [ ] App Check en Android: Play Integrity exige que la app esté en Google Play.
 - [ ] Aplicar el *enforcement* de App Check.
 - [ ] Límites, alertas y procedimiento de cierre ante abuso o costes anómalos.
-- [x] Moderación de alias: filtro de nombres ofensivos y reservados, botón «Denunciar» y colección `reports` (ver [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#denuncias-de-nombres)). Falta, si se quiere, bloqueo en las mesas públicas.
+- [x] Moderación de alias: filtro de nombres ofensivos y reservados, botón «Denunciar» y colección `reports` (ver [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#denuncias-de-nombres)). El botón «Denunciar o bloquear» sirve también para bloquear (ranking, mesas, tablón, sala y duelos).
 - [ ] Mantener fuera la competición pública arbitrada: exigiría un servidor autoritativo.
 
 ## 5. Cuentas

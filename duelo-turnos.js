@@ -411,6 +411,8 @@ async function archive(gameId, restore = false) {
 async function block(player, name, unblock = false) {
   const ref = doc(db, 'duelPreferences', uid(), 'blocked', player);
   if (unblock) await deleteDoc(ref); else await setDoc(ref, { alias: String(name || 'Jugador').slice(0, 24), updatedAt: serverTimestamp() });
+  // La misma lista que usa «Denunciar o bloquear» en el resto del juego.
+  void CT.Bloqueos?.reload?.();
 }
 function headToHead(player, games = cachedGames) {
   const totals = { orden: { wins: 0, losses: 0, draws: 0 }, cifras: { wins: 0, losses: 0, draws: 0 } };

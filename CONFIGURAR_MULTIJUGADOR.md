@@ -118,7 +118,7 @@ salida de emergencia para cuando algo se rompe de todos modos. Lo prueban `tests
 ## Denuncias de nombres
 
 Junto al nombre de otra persona (ranking, tablón y plazas de las mesas, rivales de los duelos) hay un
-botón «Denunciar». Escribe un documento en la colección `reports`, que **ningún jugador puede leer**:
+botón «Denunciar o bloquear». Escribe un documento en la colección `reports`, que **ningún jugador puede leer**:
 se mira en la consola de Firebase → Firestore Database → Datos → `reports` (ordena por `createdAt`).
 Cada documento se llama `{denunciante}_{denunciado}` y lleva:
 
