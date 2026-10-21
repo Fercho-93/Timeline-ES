@@ -86,7 +86,7 @@ window.MUSIC_CARDS = [
   ,{ id: 6082, year: 1998, title: "…Baby One More Time", detail: "Britney Spears debuta con un sencillo pop que se convierte en uno de los grandes éxitos juveniles de finales de los noventa." }
   ,{ id: 6083, year: 1999, title: "La raja de tu falda", detail: "Estopa irrumpe con una mezcla de rumba, rock y lenguaje cotidiano que se convierte en uno de los grandes éxitos españoles de la década." }
   ,{ id: 6084, year: 2000, title: "Yellow", detail: "Coldplay publica una canción de guitarras envolventes que presenta a la banda ante el gran público internacional." }
-  ,{ id: 6085, year: 2000, title: "In the End", detail: "Linkin Park combina rock, rap y electrónica en una canción que define el nu metal de comienzos del siglo XXI." }
+  ,{ id: 6085, year: 2001, title: "In the End", detail: "Linkin Park publica como sencillo, en octubre de 2001, una canción que combina rock, rap y electrónica y define el nu metal de comienzos del siglo XXI; el álbum Hybrid Theory, que la incluye, es de 2000." }
   ,{ id: 6086, year: 2002, title: "Sin ti no soy nada", detail: "Amaral publica una canción de pop rock melódico que se convierte en una de las piezas más reconocibles del dúo zaragozano." }
   ,{ id: 6087, year: 2002, title: "Lose Yourself", detail: "Eminem publica para la película 8 Mile una canción de rap sobre la presión y la oportunidad que gana el Óscar a mejor canción original." }
   ,{ id: 6088, year: 2003, title: "Crazy in Love", detail: "Beyoncé inicia su carrera solista con una producción de pop y R&B impulsada por un sample de soul y la colaboración de Jay-Z." }

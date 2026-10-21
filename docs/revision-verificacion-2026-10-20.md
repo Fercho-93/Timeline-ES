@@ -28,13 +28,27 @@ Pasada de comprobación sobre las 1.272 cartas de las Grandes colecciones (más 
 
 `docs/catalogo-fuentes.json` se regeneró con `node scripts/audit-content.mjs --write`. La prueba `tests/auditoria-correcciones.mjs` impide que estos datos vuelvan atrás.
 
-## Dudas que quedan abiertas (dependen de la fuente, no son errores claros)
+## Segunda pasada (21 de octubre de 2026): dudas cerradas con fuentes oficiales
 
-- **Miño 315 km** (Wikipedia en español) frente a 340 km de otras fuentes: según cuál se use, cambia su posición respecto al Segura (325 km). Ya aclarado en el texto de la carta; conviene decidir una única fuente y reordenar si hace falta.
-- **Guadiana 744 km**: otras fuentes dan 818–829 km (incluye el tramo fronterizo y el alto Guadiana). Mismo criterio.
-- **Intellivision 1979 / 1980**: lanzamiento de prueba en 1979 y comercialización general en 1980.
-- **«In the End» de Linkin Park**: sencillo de 2001, álbum *Hybrid Theory* de 2000.
-- Cartas con nombre ambiguo (apellidos comunes, coronaciones frente a proclamaciones): sin cambios, ya acotadas por el texto de cada carta.
+Criterio fijado: cuando una cifra admite varias versiones, se usa la de una institución pública (INE, confederaciones hidrográficas, IGN, ministerios) y se cita en la carta.
+
+| Carta | Antes | Ahora | Fuente |
+| --- | --- | --- | --- |
+| Guadiana | 744 km | 818 km | INE, *España en cifras 2008* (y Anuario 2004). Ninguna institución respalda 744 km. |
+| Duero | 897 km | 895 km | INE, *España en cifras 2008*. |
+| Ebro | 930 km | 910 km | INE, *España en cifras 2008*. |
+| Miño | 315 km | 315 km | Confederación Hidrográfica del Miño-Sil (315 km). Se quita la nota sobre 307–340 km. |
+| Tajo, Guadalquivir | 1.007 / 657 km | igual | Fuente pasa a ser el INE (*España en cifras 2008*). |
+| Júcar, Segura | 498 / 325 km | igual | Fuente pasa a ser el INE (*España en cifras 2000*). |
+| «In the End» | 2000 | 2001 | Sencillo publicado en octubre de 2001; el álbum *Hybrid Theory* es de 2000. Mismo criterio que Billie Jean. |
+| Intellivision | 1980 | 1980 | Se aclara en la carta que hubo pruebas en Fresno a finales de 1979 y que el reto usa el lanzamiento nacional. |
+
+El orden de los ríos no cambia: Miño < Segura < Júcar < Guadalquivir < Guadiana < Duero < Ebro < Tajo.
+
+Matices que quedan, y por qué no cambian el juego:
+- Las instituciones no coinciden entre sí en todo: el Atlas Nacional de España (IGN, tabla del CEDEX) da otras cifras (Ebro 938, Tajo 847, Duero 729, Guadiana 700...) y mide otra cosa, y el plan del Guadiana de su confederación habla de 860 km. Se mantiene la tabla del INE porque es la única que cubre los ocho ríos con el criterio que dice la regla del reto (curso completo hasta la desembocadura, incluido el tramo portugués).
+- El INE no es idéntico entre ediciones (Miño 310 en 2000, 275 en el Anuario 2004). Para el Miño se prefiere la confederación de su cuenca.
+- No se han podido abrir directamente las webs del INE, el IGN ni las confederaciones desde este entorno: las cifras se leyeron en los resultados del buscador sobre esos documentos. Conviene abrir `espcif08.pdf` del INE y la ficha del Miño-Sil para confirmarlas a mano.
 
 ## Qué falta
 

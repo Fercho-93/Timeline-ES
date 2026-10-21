@@ -24,4 +24,11 @@ const teruel = decks.find(d => d.id === 'civil-war').cards.find(c => c.title ===
 assert.equal(teruel.value, 19371215); assert.equal(teruel.label, '15 diciembre 1937');
 const fernando = decks.find(d => d.id === 'kings').cards.find(c => c.title === 'Fernando VII');
 assert.match(fernando.detail, /1808/, 'Fernando VII: se aclara que reinó unas semanas en 1808');
+
+// Segunda pasada (21 de octubre): ríos según el INE y la Confederación del Miño-Sil, y «In the End» como sencillo.
+assert.equal(card('music.js', 6085).year, 2001, '«In the End» salió como sencillo en octubre de 2001 (el álbum Hybrid Theory es de 2000)');
+const rios = Object.fromEntries(decks.find(d => d.id === 'rivers-spain').cards.map(c => [c.title, c]));
+assert.deepEqual(['Miño', 'Segura', 'Júcar', 'Guadalquivir', 'Guadiana', 'Duero', 'Ebro', 'Tajo'].map(n => rios[n].value), [315, 325, 498, 657, 818, 895, 910, 1007]);
+for (const n of ['Guadalquivir', 'Guadiana', 'Duero', 'Ebro', 'Tajo']) assert.match(rios[n].source, /ine\.es/, `${n}: fuente del INE`);
+assert.match(rios['Miño'].source, /chminosil\.es/, 'Miño: fuente de la Confederación del Miño-Sil');
 console.log('Auditoría: las correcciones del 20 de octubre de 2026 siguen aplicadas: OK');
