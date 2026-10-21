@@ -117,7 +117,7 @@ console.log("\nLas reglas se adaptan al mazo");
   ok("el Pulso se explica fuera de solitario", /Pulso/.test(conPulso) && /Los dos colocáis/.test(conPulso));
   ok("y la guía dice si está en juego o no", /en juego/.test(conPulso) && /opcional/.test(w.CONTINUUM.guideMarkup("history", "local", { pulse: false })));
   ok("la guía empieza por el vídeo, con cuatro capítulos y Reto del día aparte", /data-tutorial=/.test(conPulso) && (conPulso.match(/class="tv-chapter"/g) || []).length === 4 && ["Lo básico", "Jugar solo", "En grupo", "Reto del día"].every(nombre => conPulso.includes(nombre)));
-  ok("el reto diario se explica en solitario", /reto diario/i.test(w.CONTINUUM.guideMarkup("history", "solo")));
+  ok("el reto diario tiene su propio capítulo en el manual", /data-guide-chapter="03"[^]*?<b>Reto del día<\/b>/.test(w.CONTINUUM.guideMarkup("history", "solo")));
   ok("la competición explica sus rondas", /cinco cartas/i.test(w.CONTINUUM.guideMarkup("history", "competition")));
   ok("la guía online explica quién prepara la sala", /quien crea la partida/i.test(w.CONTINUUM.guideMarkup("history", "online")));
   ok("fuera del iPhone la guía no ofrece entrar con Apple", !/Apple/.test(w.CONTINUUM.guideMarkup("history", "solo")));
@@ -180,7 +180,10 @@ console.log("\nLas reglas se adaptan al mazo");
   ok("ver el vídeo no modifica partidas ni progreso", JSON.stringify({...w.localStorage}) === saved);
   video.tutorial.stop();
   const chapters = [...w.document.querySelectorAll('[data-guide-chapter]')];
-  ok("siete capítulos cubren todas las reglas sin desplegarlas de golpe", chapters.length === 7 && chapters.every(chapter => !chapter.open));
+  ok("ocho capítulos cubren todas las reglas sin desplegarlas de golpe", chapters.length === 8 && chapters.every(chapter => !chapter.open));
+  const formatos = el(w, '[data-guide-chapter="02"]'), diario = el(w, '[data-guide-chapter="03"]');
+  ok("el reto diario queda fuera de las opciones de Jugar solo", !/Reto del día|reto diario/i.test(formatos.textContent) && diario.querySelector('summary b').textContent === 'Reto del día');
+  ok("su bloque explica dónde abrirlo y sus reglas", /Inicio/.test(diario.textContent) && /10 cartas/.test(diario.textContent) && /sin límite de tiempo|ni límite de tiempo/.test(diario.textContent));
   chapters[0].open = true;
   await respira();
   chapters[1].open = true;
@@ -188,10 +191,10 @@ console.log("\nLas reglas se adaptan al mazo");
   ok("abrir otro capítulo recoge el anterior", !chapters[0].open && chapters[1].open);
   ok("las salas explican el reloj configurable, con las opciones reales", /sin tiempo, 15, 20 o 30 segundos/.test(chapters[1].textContent) && !/45/.test(chapters[1].textContent));
   ok("el duelo «Mismas cartas» se juega sin vidas", /Mismas cartas/.test(chapters[1].textContent) && /Sin vidas · 15 cartas/.test(chapters[1].textContent));
-  ok("Pulso explica sus cuatro resultados", chapters[2].querySelectorAll('tbody tr').length === 4);
+  ok("Pulso explica sus cuatro resultados", el(w, '[data-guide-chapter="04"]').querySelectorAll('tbody tr').length === 4);
   for (const [key, info] of Object.entries(w.CONTINUUM.MODES)) {
     const markup = w.CONTINUUM.guideMarkup(key, 'solo');
-    ok(key + ": guía completa y eje correcto", markup.includes('data-guide-chapter="06"') && markup.includes(info.axis === 'time' ? 'de antes a después' : 'de menor a mayor'));
+    ok(key + ": guía completa y eje correcto", markup.includes('data-guide-chapter="08"') && markup.includes(info.axis === 'time' ? 'de antes a después' : 'de menor a mayor'));
   }
 }
 {

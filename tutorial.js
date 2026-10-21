@@ -132,9 +132,9 @@
       { chapter: 0, title: "Tu turno", duration: 10000,
         html: `<div class="tv-table">${lineMarkup(modeKey, [B, E])}<div class="tv-hand">${cardMarkup(modeKey, C, { hidden: true })}</div><span class="tv-confirm" aria-hidden="true">Sí, aquí</span></div>`,
         steps: [
-          [0, c => c.say("Arrastra la carta al hueco donde crees que va, o bien toca el símbolo «+» o «−» de la línea habiendo seleccionado una carta.")],
+          [0, c => c.say("Arrastra la carta al hueco donde crees que va.")],
           [400, c => c.add(".tv-hand .tv-card", "is-in")],
-          [1800, c => c.fingerTo(".tv-hand .tv-card")],
+          [1800, c => { c.fingerTo(".tv-hand .tv-card"); c.say("También puedes seleccionarla y tocar «+» o «−»."); }],
           [2400, c => c.press(true)],
           [2900, c => c.dragTo(".tv-hand .tv-card", '.tv-gap[data-gap="1"]')],
           [4100, c => { c.press(false); c.drop('.tv-gap[data-gap="1"]'); }],
@@ -158,12 +158,12 @@
           <div class="tv-choices">${["Jugar solo", "Jugar con amigos", "Jugar online"].map(name => `<span>${menuArt(name)}<b>${name}</b></span>`).join("")}</div>
           ${door("Unirme a una partida", "tv-door-join")}${door("Reto del día", "tv-door-daily")}</div>`,
         steps: [
-          [0, c => { c.say("En el menú de Inicio está la opción «Jugar», donde se despliegan las distintas modalidades: jugar solo, con amigos u online."); c.add(".tv-home", "is-in"); }],
+          [0, c => { c.say("En Inicio, toca «Jugar» para elegir si juegas solo, con amigos u online."); c.add(".tv-home", "is-in"); }],
           [1100, c => c.fingerTo(".tv-door-play")],
           [1700, c => { c.tap(); c.add(".tv-door-play", "is-open"); c.add(".tv-choices", "is-open"); }],
           [1900, c => c.stagger(".tv-choices > span", 300)],
           [3600, c => c.fingerHide()],
-          [4800, c => { c.say("Además, en el propio menú de Inicio podemos encontrar «Unirme a una partida» y el «Reto del día»."); c.stagger(".tv-door-join, .tv-door-daily", 400); }]
+          [4800, c => { c.say("En Inicio también están «Unirme a una partida» y «Reto del día»."); c.stagger(".tv-door-join, .tv-door-daily", 400); }]
         ] },
 
       // 2 · Jugar solo
@@ -172,18 +172,18 @@
           <div class="tv-intro-hero">${menuArt("Jugar solo")}<div class="tv-intro-copy"><p>A tu ritmo</p><h3>Jugar solo</h3><span>Elige una colección<br>y un mazo</span></div></div>
           ${path(["Jugar", "Jugar solo", "Grandes colecciones"])}</div>`,
         steps: [
-          [0, c => c.say("Ahora pasamos a «Jugar solo», para jugar a tu ritmo.")],
+          [0, c => c.say("En «Jugar solo» juegas a tu ritmo.")],
           [2800, c => c.say("En «Grandes colecciones», elige una colección y después un mazo.")]
         ] },
       { chapter: 1, title: "Rondas", duration: 10400,
         html: `<div class="tv-board">${path(["Jugar solo", "Grandes colecciones"])}<div class="tv-round"><div class="tv-round-head"><b>Ronda</b>${hearts()}</div>${dots("✓✓✓✗✓✓✓✓✓✓")}<div class="tv-stars">★★<i>★</i></div></div>
           <div class="tv-tiles">${tile("∞", "Maratón", "Todo el mazo · 3 vidas")}${tile("◈", "Competición", "Varios temas · 3 vidas en cada uno")}</div></div>`,
         steps: [
-          [0, c => { c.say("Una ronda son 10 cartas y 3 vidas."); c.add(".tv-lives", "is-in"); }],
+          [0, c => { c.say("En cada ronda juegas 10 cartas y tienes 3 vidas."); c.add(".tv-lives", "is-in"); }],
           [500, c => c.stagger(".tv-dots span", 260)],
           [1300, c => c.lose(".tv-lives")],
-          [3600, c => { c.add(".tv-stars", "is-in"); c.say("Si la acabas con vidas, cada una que te quede es una estrella."); }],
-          [6800, c => { c.say("También hay maratón, con el mazo entero, y competición."); c.stagger(".tv-tile", 500); }]
+          [3600, c => { c.add(".tv-stars", "is-in"); c.say("Al terminar, ganas una estrella por cada vida que te quede."); }],
+          [6800, c => { c.say("También puedes jugar una maratón o una competición."); c.stagger(".tv-tile", 500); }]
         ] },
       { chapter: 1, title: "Dificultad", duration: 10200,
         html: `<div class="tv-board">${path(["Jugar solo", "Grandes colecciones", "Dificultad"])}${levelsTable(time)}</div>`,
@@ -193,27 +193,27 @@
           [1600, c => c.focus(".tv-levels", 0)],
           [3600, c => { c.focus(".tv-levels", 1); c.say("Desde Normal hay reloj, y cada acierto añade cartas a la línea."); }],
           [5400, c => c.focus(".tv-levels", 2)],
-          [7000, c => { c.focus(".tv-levels", 3); c.say(`En Experto, la línea oculta sus ${time ? "fechas" : "cifras"}: te guías por las ilustraciones.`); }]
+          [7000, c => { c.focus(".tv-levels", 3); c.say(`En Experto se ocultan las ${time ? "fechas" : "cifras"} de la línea. Te guías por las ilustraciones.`); }]
         ] },
       blockIntro(1, "Retos rápidos", "Retos rápidos", "Jugar solo", "Mazos del día y partidas sorpresa",
-        ["Jugar solo", "Retos rápidos"], "Dejamos Grandes colecciones y pasamos a «Retos rápidos», dentro de «Jugar solo»."),
+        ["Jugar solo", "Retos rápidos"], "En «Jugar solo» también tienes «Retos rápidos»."),
       { chapter: 1, title: "Retos rápidos", duration: 9800,
         html: `<div class="tv-board">${path(["Jugar solo", "Retos rápidos"])}${quickExample()}<div class="tv-tiles">
           ${tile("☀", "Mazos del día", "4 mazos, nuevos cada día")}${tile("?", "Partida sorpresa", "1, 3, 5 o más, al azar")}</div></div>`,
         steps: [
           [0, c => { c.say("Mazos cortos, cada uno con su propia regla de orden."); c.add(".tv-deck", "is-in"); }],
           [3400, c => { c.say("Juega uno de los mazos del día o una partida sorpresa."); c.stagger(".tv-tile", 500); }],
-          [6800, c => c.say("Un fallo no te saca del reto: cuentan los aciertos.")]
+          [6800, c => c.say("Un fallo no te elimina: al final cuentan tus aciertos.")]
         ] },
 
       // 3 · En grupo
       blockIntro(2, "En grupo", "Jugar con amigos", "Con otras personas", "Las reglas de una mesa compartida",
-        ["Inicio", "Jugar"], "Ahora pasamos a jugar en grupo: primero veremos las reglas de una mesa compartida."),
+        ["Inicio", "Jugar"], "Veamos cómo se juega con otras personas."),
       { chapter: 2, title: "Tu mano", duration: 11000,
         html: `<div class="tv-board"><div class="tv-path"><span>Grandes colecciones · en grupo</span></div><div class="tv-seats">${seat("Ana", 3)}${seat("Luis", 3)}${seat("Sara", 3)}</div>
           <div class="tv-piles"><span data-pile="deck">Mazo</span><span data-pile="discard">Descarte</span></div></div>`,
         steps: [
-          [0, c => { c.say("En grupo, cada uno juega con su mano de cartas."); c.stagger(".tv-seat", 300); }],
+          [0, c => { c.say("Cada persona tiene su propia mano de cartas."); c.stagger(".tv-seat", 300); }],
           [1200, c => c.add(".tv-piles", "is-in")],
           [2600, c => { c.turn(0); c.say("Si aciertas, te queda una carta menos."); }],
           [3300, c => c.play(0, true)],
@@ -228,7 +228,7 @@
       { chapter: 2, title: "Quién empieza", duration: 10600,
         html: `<div class="tv-center">${cardMarkup(modeKey, D, { hidden: true, extra: "tv-big tv-guess-card" })}<div class="tv-guesses">${guesses.map(([name, card], i) => `<span data-guess="${i}"><b>${name}</b>${esc(CT.shortValue(modeKey, card))}</span>`).join("")}</div></div>`,
         steps: [
-          [0, c => { c.say("Para ver quién empieza, todos escriben el dato de una carta."); c.add(".tv-big", "is-in"); }],
+          [0, c => { c.say("Para decidir quién empieza, cada persona intenta adivinar el dato de una carta."); c.add(".tv-big", "is-in"); }],
           [1000, c => c.stagger(".tv-guesses span", 450)],
           [3800, c => { c.reveal(".tv-big"); c.say("Empieza quien más se acerque."); }],
           [4300, c => c.add(`[data-guess="${closest}"]`, "is-on")],
@@ -239,10 +239,10 @@
           <div class="tv-way tv-way-one"><img class="tv-menu-art" src="assets/menu-local.webp" alt=""><b>Un solo móvil</b><span class="tv-pass"><span class="tv-phone" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10.5 18.5h3"/></svg></span><span class="tv-people"><b>Ana</b><b>Luis</b><b>Sara</b></span></span><small>De 2 a 9 personas</small></div>
           <div class="tv-way tv-way-many"><img class="tv-menu-art" src="assets/menu-private.webp" alt=""><b>Cada uno en su móvil</b><span class="tv-rhythms"><span><b>En directo</b>Todos a la vez</span><span><b>Por turnos</b>Un duelo a dos, sin prisa</span><span><b>Mismas cartas</b>Juegas y retas con un enlace</span></span></div></div></div>`,
         steps: [
-          [0, c => { c.say("En un solo móvil, de 2 a 9: os pasáis el teléfono en cada turno."); c.add(".tv-way-one", "is-in"); }],
+          [0, c => { c.say("Si compartís móvil, pasadlo a quien le toque jugar."); c.add(".tv-way-one", "is-in"); }],
           [500, c => c.cycle(".tv-people b", 800, 2)],
           [4400, c => { c.add(".tv-way-many", "is-in"); c.stagger(".tv-rhythms > span", 450); c.say("O cada uno en el suyo: en directo, por turnos o con las mismas cartas."); }],
-          [8200, c => c.say("Te unes a la de otro en «Unirme a una partida».")]
+          [8200, c => c.say("Para entrar en una partida, toca «Unirme a una partida».")]
         ] },
       { chapter: 2, title: "Poderes", duration: 11400,
         html: `<div class="tv-board"><div class="tv-path"><span>Opcionales · se activan al preparar la partida</span></div><div class="tv-powers">
@@ -250,37 +250,37 @@
           <div class="tv-power" data-power="pulse"><i aria-hidden="true">ϟ</i><b>Pulso</b><span class="tv-duel" aria-hidden="true"><em>Tú</em><i>ϟ</i><em>Luis</em></span></div></div>
           <p class="tv-note">No hay poderes en duelos, competición, mesas públicas ni Retos rápidos.</p></div>`,
         steps: [
-          [0, c => { c.say("Si se activan, algunas cartas traen un poder. Cada uno se usa una vez."); c.stagger(".tv-power", 400); }],
+          [0, c => { c.say("Algunas cartas dan poderes de un solo uso."); c.stagger(".tv-power", 400); }],
           [3200, c => { c.add('[data-power="ghost"]', "is-on"); c.say("Fantasma: durante una vuelta, las cartas ocultan su dato y su ilustración."); }],
-          [7000, c => { c.remove('[data-power="ghost"]', "is-on"); c.add('[data-power="pulse"]', "is-on"); c.say("Pulso: retas a alguien con la misma carta. Si solo aciertas tú, le pasas una."); }],
+          [7000, c => { c.remove('[data-power="ghost"]', "is-on"); c.add('[data-power="pulse"]', "is-on"); c.say("Pulso: jugáis la misma carta. Si solo tú aciertas, le pasas una de tu mano."); }],
           [9200, c => c.add(".tv-note", "is-in")]
         ] },
       blockIntro(2, "Jugar online", "Jugar online", "Con otras personas", "Encuentra una mesa pública",
-        ["Jugar", "Jugar online"], "Pasamos a «Jugar online», para encontrar otras personas en mesas públicas."),
+        ["Jugar", "Jugar online"], "En «Jugar online» puedes unirte a una mesa pública o crear la tuya."),
       { chapter: 2, title: "Online", duration: 8800,
         html: `<div class="tv-board">${path(["Jugar", "Jugar online"])}<div class="tv-table-seats"><span>●</span><span>●</span><span class="is-free">○</span><span class="is-free">○</span></div><div class="tv-tiles tv-three">
           ${tile("◎", "Mesas abiertas", "Siéntate en una")}${tile("+", "Crear mesa", "Juego, plazas y tiempo")}${tile("⚡", "Partida rápida", "Te sentamos")}</div></div>`,
         steps: [
-          [0, c => { c.say("Online juegas con otras personas, en mesas de 2 a 4."); c.add(".tv-table-seats", "is-in"); }],
+          [0, c => { c.say("En las mesas públicas podéis jugar de 2 a 4 personas."); c.add(".tv-table-seats", "is-in"); }],
           [1400, c => c.fill(".tv-table-seats .is-free", 800)],
-          [3600, c => { c.say("Siéntate en una mesa, crea la tuya o pide partida rápida."); c.stagger(".tv-tile", 450); }]
+          [3600, c => { c.say("Elige una mesa, crea la tuya o busca una partida rápida."); c.stagger(".tv-tile", 450); }]
         ] },
 
       // 4 · Reto del día
       blockIntro(3, "Reto del día", "Reto del día", "Desde Inicio", "El mismo desafío para todos",
-        ["Inicio", "Reto del día"], "Volvemos a Inicio para ver el «Reto del día», un desafío común para todos."),
+        ["Inicio", "Reto del día"], "En Inicio tienes el «Reto del día», con las mismas cartas para todos."),
       { chapter: 3, title: "Reto del día", duration: 9600,
         html: `<div class="tv-board">${path(["Inicio", "Reto del día"])}${dots("✓✓✗✓✓✓✗✓✓✗")}<div class="tv-score">7 de 10</div>
           <div class="tv-facts"><span>Un intento al día</span><span>Días pares: Grandes colecciones</span><span>Impares: Retos rápidos</span></div></div>`,
         steps: [
-          [0, c => c.say("Cada día, un reto de 10 cartas, las mismas para todos.")],
+          [0, c => c.say("Cada día tienes un reto nuevo de 10 cartas.")],
           [500, c => c.stagger(".tv-dots span", 260)],
           [3300, c => c.add(".tv-score", "is-in")],
-          [4400, c => c.say("Sin vidas ni reloj. Puntúa en el ranking diario y semanal.")],
+          [4400, c => c.say("No hay vidas ni límite de tiempo. Tus aciertos cuentan en el ranking diario y semanal.")],
           [5600, c => c.stagger(".tv-facts span", 350)]
         ] },
       { chapter: 3, title: "A jugar", duration: 4500, last: true,
-        html: `<div class="tv-center tv-end"><div class="tv-logo">A jugar</div><p>Para tu primera partida: «Jugar solo», un mazo de Grandes colecciones, en Fácil.</p><div class="tv-end-actions"><button type="button" class="btn btn-secondary" data-tv="replay">Ver otra vez</button>${portada ? "" : '<button type="button" class="btn btn-ghost" data-tv="manual">Ver el manual</button>'}</div></div>`,
+        html: `<div class="tv-center tv-end"><div class="tv-logo">A jugar</div><p>Para empezar, elige un mazo de Grandes colecciones en «Jugar solo» y juega en Fácil.</p><div class="tv-end-actions"><button type="button" class="btn btn-secondary" data-tv="replay">Ver otra vez</button>${portada ? "" : '<button type="button" class="btn btn-ghost" data-tv="manual">Ver el manual</button>'}</div></div>`,
         steps: [
           [0, c => { c.say(portada ? "Pulsa «Jugar» para empezar." : "Debajo tienes el manual, con todos los detalles."); c.add(".tv-end", "is-in"); }]
         ] }

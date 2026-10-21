@@ -264,8 +264,8 @@ try {
       await page.screenshot({path:`test-results/zoom/${engine}-guia-video.png`,fullPage:true});
       await page.locator('[data-guide-chapter="02"] > summary').click();
       assert.equal(await page.locator('[data-guide-chapter][open]').count(),1);
-      await page.locator('[data-guide-chapter="03"] > summary').click();
-      await page.waitForFunction(()=>document.querySelectorAll('[data-guide-chapter][open]').length===1 && document.querySelector('[data-guide-chapter="03"]').open);
+      await page.locator('[data-guide-chapter="04"] > summary').click();
+      await page.waitForFunction(()=>document.querySelectorAll('[data-guide-chapter][open]').length===1 && document.querySelector('[data-guide-chapter="04"]').open);
       assert.equal(await page.locator('.guide-pulse-table tbody tr').count(),4);
       assert.ok(await page.locator('.guide-handbook').evaluate(el=>el.scrollWidth<=el.clientWidth+1),'la guía cabe en el móvil');
       await page.screenshot({path:`test-results/zoom/${engine}-guia-poderes.png`,fullPage:true});
