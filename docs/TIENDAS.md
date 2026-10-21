@@ -26,31 +26,53 @@ se revisa aquí antes de enviarla.
   existe): `https://continuumjuego.es/borrar-cuenta.html`.
 - Condiciones de uso: `https://continuumjuego.es/terminos.html`. Aviso legal (identificación del titular,
   LSSI art. 10): `https://continuumjuego.es/aviso-legal.html`.
-- Responsable: Fernando Sirvent Merino, a título individual. **El juego se publica gratis, sin publicidad,
-  compras ni ingresos**, así que en App Store Connect (Negocio → Estado de comerciante) y en Play Console hay
-  que declararse **«no comerciante»**: las fichas no muestran dirección ni teléfono, y en la web solo constan el
-  nombre y el correo (sin NIF ni domicilio). Decisión del titular (octubre de 2026): no vender por ahora, porque
-  vender obliga a publicar NIF y una dirección física y, con los ingresos esperados (unos cientos de euros), no
-  compensa el alta, las cuotas ni la exposición.
+- Responsable: Fernando Sirvent Merino, a título individual.
 
-### Si algún día se vende algo dentro del juego
+### Decisión del titular (21 de octubre de 2026): habrá ventas dentro del juego
 
-Vender (también anuncios o donaciones) convierte al titular en comerciante, y entonces hace falta **antes de
-la primera venta**: declararse comerciante en las dos tiendas (muestran dirección, teléfono y correo en la UE),
-completar el aviso legal (art. 10 de la LSSI) y pasar por una gestoría (alta, IVA, cuotas, depósito legal). Los
-estudios españoles con juegos de pago lo publican así (ejemplo revisado: Toro Games, SL, en torogames.es):
+Se venderán colecciones y mazos, así que el titular se declarará **comerciante** en App Store Connect
+(Negocio → Estado de comerciante) y en Play Console. No se usará la declaración «no comerciante» para vender:
+Apple considera comerciante a quien gana dinero con la app y la declaración recae en quien la hace (hay apps de
+pago que figuran como «no comerciante», pero eso no las hace correctas).
+
+Qué se publica y dónde:
+
+| Dato | Dónde se ve | Quién lo ve |
+| --- | --- | --- |
+| Nombre, dirección, teléfono y correo | Ficha de la App Store y de Google Play (UE) | Cualquiera que abra la ficha |
+| DNI/NIF, datos fiscales y bancarios | Solo se entregan a Apple, Google y Hacienda | Nadie más |
+| Nombre y `feedbackcontinuum@gmail.com` | `aviso-legal.html`, política de privacidad y resto de páginas legales | Cualquiera |
+
+- Los datos de la ficha se introducen directamente en App Store Connect y Play Console. **No se escriben en
+  el repositorio** (se publica en GitHub Pages).
+- Dirección de la ficha: la que el titular decida dar (otros estudios españoles independientes muestran solo
+  calle y número). Apple y Google pueden pedir justificar nombre y dirección.
+- En las páginas legales se mantiene solo el nombre y el correo de contacto de Continuum, sin NIF ni domicilio,
+  como hacen los estudios independientes que ha mirado el titular. **Riesgo asumido y sin confirmar:** el art. 10
+  de la LSSI puede exigir NIF y domicilio en el aviso legal (infracción leve, multa de hasta 30.000 €). Pendiente
+  de consultar en un Punto de Atención al Emprendedor o con un asesor.
+- Obligaciones fiscales pendientes de confirmar con un asesor: alta en Hacienda por la actividad, IVA e IRPF
+  y si corresponde cuota de autónomo con ingresos bajos (según recuerdo, no hay obligación de cotizar al RETA
+  por debajo del salario mínimo anual; no verificado).
+
+**Todavía no se ha cambiado ningún texto publicado:** `aviso-legal.html`, `terminos.html`, `privacidad.html` y
+`PRIVACIDAD.md` dicen «gratuito, sin compras, sin ingresos» y son ciertos mientras no haya ventas. Al activar
+la primera compra hay que, en la misma versión, quitar «gratuito / sin compras», añadir una sección «Compras»
+(precio, desistimiento, restauración de compras, pagos a cargo de Apple/Google), cambiar la ficha a «comerciante»
+y actualizar el cuestionario de privacidad de las tiendas. Se usarán las compras oficiales de cada tienda.
+
+### Referencia: cómo lo publican otros estudios españoles
+
+Estudios con juegos de pago publican datos de identificación completos (ejemplo revisado: Toro Games, SL, en
+torogames.es). El titular ha elegido un criterio más mínimo, descrito arriba.
 
 | Dato | Como autónomo | Como sociedad (SL) |
 | --- | --- | --- |
 | Titular | Fernando Sirvent Merino | Denominación social |
 | Identificación fiscal | NIF | CIF |
-| Domicilio | Dirección física para notificaciones (sin domiciliación contratada, sería la de casa) | Domicilio social |
+| Domicilio | Dirección física para notificaciones | Domicilio social |
 | Registro | — | Registro Mercantil (tomo, folio, hoja) |
 | Contacto | Correo y, como hacen la mayoría, teléfono | Igual |
-
-Además: condiciones de venta (precio, desistimiento, restauración de compras), una sección «Compras» en la
-política y quitar «gratuito / sin compras» de `terminos.html`, la política y la ficha. Vender sin publicar
-estos datos incumple la LSSI (infracción leve, multa de hasta 30.000 €).
 
 ## Textos de la ficha
 
