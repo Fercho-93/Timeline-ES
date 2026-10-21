@@ -10685,18 +10685,16 @@
     },
     {
       "path": "assets/movie-cards/1001-moon.webp",
-      "sha256": "1cadab6d7d9c396ebd0c55762bdb0c13e3b36568540e4f8d78cfa64bca02a330",
+      "sha256": "8311d14ea216215cbcd20428e5f3b7a79244f6186b2574ec900a02c8e303aca0",
       "rightsEvidence": {
-        "status": "public-domain-source",
-        "sourcePage": "https://commons.wikimedia.org/wiki/File:A_Trip_to_the_Moon_(Le_Voyage_dans_la_Lune)_(cropped).jpg",
-        "creator": "Georges Méliès (film creator; died 1938)",
-        "sourceAuthor": "Breve Storia del Cinema",
-        "license": "Public Domain Mark 1.0",
-        "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
-        "sourceFile": "docs/sources/movie-cards/1001-trip-to-the-moon-frame.jpg",
-        "sourceSha256": "b53844ebf82377ffecf276b2ba960d5ed6a7b9ab7e7e35804dde40123c9a16a7",
-        "retrievedAt": "2026-10-21",
-        "modification": "Cropped to a 2:3 portrait frame, resized to 512x768, converted to grayscale, colorized in the game sepia palette, lightly adjusted, exported as WebP quality 88; no new pictured elements."
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
       }
     },
     {

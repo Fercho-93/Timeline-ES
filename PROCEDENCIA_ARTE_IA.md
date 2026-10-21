@@ -2,11 +2,11 @@
 
 ## Declaración del titular
 
-El titular del proyecto declara que los recursos visuales de Continuum —antes Timeline— se han generado con ChatGPT/OpenAI, salvo las excepciones cuya fuente y licencia están documentadas expresamente. La declaración incluye las ilustraciones de las cartas, las portadas de las familias, el icono, el logo, el splash y los demás elementos gráficos incorporados al repositorio.
+El titular del proyecto declara que todos los recursos visuales incorporados a Continuum —antes Timeline— fueron generados con ChatGPT/OpenAI. La declaración incluye las ilustraciones de las cartas, las portadas de las familias, el icono, el logo, el splash y los demás elementos gráficos incorporados al repositorio.
 
-Esta declaración se basa en la confirmación expresa del titular y en el historial disponible de conversaciones del proyecto. El inventario `docs/inventario-arte.json` enlaza los archivos generados con esta declaración y conserva la huella SHA-256; las excepciones se documentan con su fuente y licencia en el propio inventario.
+Esta declaración se basa en la confirmación expresa del titular y en el historial disponible de conversaciones del proyecto. El inventario `docs/inventario-arte.json` enlaza cada archivo con esta declaración y conserva su huella SHA-256.
 
-La regla general para imágenes nuevas es generarlas con IA. Las excepciones deben conservar su ficha de fuente y licencia en el inventario y en el documento de procedencia correspondiente. `node scripts/audit-content.mjs --write` conserva la evidencia de los recursos que no han cambiado; las modificaciones futuras del script deben mantener registradas estas excepciones.
+La declaración es general y también vale para el futuro: todas las imágenes del juego se generan con IA, y de ninguna otra manera. `node scripts/audit-content.mjs --write` asigna esta declaración a cada imagen nueva o modificada.
 
 ## Lenguaje visual
 

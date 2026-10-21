@@ -17,13 +17,12 @@ if(process.argv.includes('--write')) {
   let previous=[];
   try{previous=JSON.parse(await fs.readFile('docs/inventario-arte.json','utf8')).assets;}catch(error){if(error.code!=='ENOENT')throw error;}
   const byPath=new Map(previous.map(asset=>[asset.path,asset]));
-  // Evidencia por defecto para recursos nuevos o modificados que se generaron con IA.
-  // Los recursos de otras procedencias deben llevar una ficha específica en el inventario.
   const DECLARED={status:'user-confirmed-ai-generated',generator:'ChatGPT / OpenAI',declaredBy:'Fercho-93',evidenceRef:'PROCEDENCIA_ARTE_IA.md',exactPrompt:null,generatedAt:null,referenceImage:null,commercialTermsRef:'terms-to-preserve'};
   async function walk(dir) {const result=[];for(const e of await fs.readdir(dir,{withFileTypes:true})){const file=dir+'/'+e.name;if(e.isDirectory())result.push(...await walk(file));else if(/\.(png|webp|jpg|svg)$/i.test(file)){
     const sha256=createHash('sha256').update(await fs.readFile(file)).digest('hex'),old=byPath.get(file);
-    // Una imagen sin evidencia propia, nueva o cambiada, recibe la declaración IA por defecto;
-    // la que no ha cambiado conserva su ficha específica, sea generada o de otra procedencia.
+    // Todo el arte del juego se genera con IA (declaración general del titular en
+    // PROCEDENCIA_ARTE_IA.md). Una imagen sin evidencia propia, nueva o cambiada, recibe esa
+    // declaración; la que no ha cambiado conserva la suya, que puede ser más detallada.
     result.push(old?.sha256===sha256&&old.rightsEvidence?old:{path:file,sha256,rightsEvidence:DECLARED});
   }}return result;}
   await fs.writeFile('docs/inventario-arte.json',JSON.stringify({note:'Completar derechos y procedencia con evidencia del titular. No se presupone que una imagen pública pueda reutilizarse.',assets:await walk('assets')},null,2)+'\n');
