@@ -35,11 +35,20 @@ comerciante) y en Play Console se declara **«no comerciante»**: es verdad mien
 no muestran dirección ni teléfono y las páginas legales actuales siguen siendo ciertas. No hay que cambiar nada.
 No se prometerá «gratis para siempre» en ninguna ficha ni texto (hoy no figura en ninguno).
 
+**Estado a 21 de octubre de 2026 (Apple):** declaración de comerciante completada como «no comerciante»,
+contrato del Apple Developer Program aceptado y tarjeta de la membresía anual actualizada (si caduca, Apple
+puede retirar las apps). Pendiente: la ficha de Google Play con «no comerciante».
+
 **Fase 2, cuando el juego tenga tráfico: ventas de colecciones y mazos dentro del juego.** Antes de la primera
 venta, en este orden:
 1. Consulta con un Punto de Atención al Emprendedor o un asesor: alta en Hacienda, IVA e IRPF, si corresponde
    cuota de autónomo con ingresos bajos, y si el aviso legal debe llevar NIF y domicilio (ver abajo).
-2. Declararse **comerciante** en las dos tiendas. No se venderá con la declaración «no comerciante»: Apple
+2. Declararse **comerciante** en las dos tiendas, **con semanas de antelación**: Apple verifica los datos y hay
+   desarrolladores que cuentan apps bloqueadas en toda la UE mientras el cambio estaba «en revisión» (relatos
+   sueltos, no cifras oficiales). En Apple: App Store Connect → Negocio → Acuerdos → Cumplimiento →
+   Reglamento de Servicios Digitales (se puede indicar app por app). En Google Play: **procedimiento sin
+   confirmar**; buscar «estado de comerciante» o «Ley de Servicios Digitales» en la ayuda de Play Console al
+   llegar. No se venderá con la declaración «no comerciante»: Apple
    considera comerciante a quien gana dinero con la app y la declaración recae en quien la hace (hay apps de
    pago que figuran como «no comerciante», pero eso no las hace correctas).
 3. Contratos y datos de cobro: «Apps de pago» y formularios fiscales y bancarios en App Store Connect, y perfil
