@@ -28,14 +28,30 @@ se revisa aquí antes de enviarla.
   LSSI art. 10): `https://continuumjuego.es/aviso-legal.html`.
 - Responsable: Fernando Sirvent Merino, a título individual.
 
-### Decisión del titular (21 de octubre de 2026): habrá ventas dentro del juego
+### Decisión del titular (21 de octubre de 2026): gratis al lanzar, ventas más adelante
 
-Se venderán colecciones y mazos, así que el titular se declarará **comerciante** en App Store Connect
-(Negocio → Estado de comerciante) y en Play Console. No se usará la declaración «no comerciante» para vender:
-Apple considera comerciante a quien gana dinero con la app y la declaración recae en quien la hace (hay apps de
-pago que figuran como «no comerciante», pero eso no las hace correctas).
+**Fase 1, lanzamiento: gratis, sin publicidad, compras ni ingresos.** En App Store Connect (Negocio → Estado de
+comerciante) y en Play Console se declara **«no comerciante»**: es verdad mientras no haya ingresos. Las fichas
+no muestran dirección ni teléfono y las páginas legales actuales siguen siendo ciertas. No hay que cambiar nada.
+No se prometerá «gratis para siempre» en ninguna ficha ni texto (hoy no figura en ninguno).
 
-Qué se publica y dónde:
+**Fase 2, cuando el juego tenga tráfico: ventas de colecciones y mazos dentro del juego.** Antes de la primera
+venta, en este orden:
+1. Consulta con un Punto de Atención al Emprendedor o un asesor: alta en Hacienda, IVA e IRPF, si corresponde
+   cuota de autónomo con ingresos bajos, y si el aviso legal debe llevar NIF y domicilio (ver abajo).
+2. Declararse **comerciante** en las dos tiendas. No se venderá con la declaración «no comerciante»: Apple
+   considera comerciante a quien gana dinero con la app y la declaración recae en quien la hace (hay apps de
+   pago que figuran como «no comerciante», pero eso no las hace correctas).
+3. Contratos y datos de cobro: «Apps de pago» y formularios fiscales y bancarios en App Store Connect, y perfil
+   de pagos en Play Console.
+4. Desarrollar las compras con las **compras oficiales de cada tienda** (en iOS, obligatorias para contenido
+   digital). La versión web no puede usarlas: o no vende, o necesita otra pasarela de pago. Incluye restaurar
+   compras, validación en servidor, reembolsos y qué hacen las cuentas de menores de 14 años.
+5. Mantener gratis lo que ya es gratis; lo de pago serán colecciones nuevas.
+6. En la misma versión que active la primera compra: textos legales y de privacidad, ficha, cuestionarios de
+   privacidad de las tiendas y declaración de comerciante (ver «Todavía no se ha cambiado ningún texto»).
+
+Datos de comerciante en la Fase 2 (decisión del titular): qué se publica y dónde.
 
 | Dato | Dónde se ve | Quién lo ve |
 | --- | --- | --- |
