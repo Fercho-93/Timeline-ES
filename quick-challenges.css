@@ -102,8 +102,7 @@ html #app[data-screen] .quick-free-setup .quick-mode-card {
 html #app[data-screen] .quick-free-setup .quick-mode-surprise { --choice-tone: #3c656b; --choice-wash: #87aeaa; }
 html #app[data-screen] .quick-free-setup .quick-mode-visual {
   position: relative; display: block; width: 100%; height: clamp(96px, 27vw, 150px);
-  margin: 0 0 16px; border-bottom: 1px solid color-mix(in srgb, var(--choice-tone) 30%, var(--edition-line));
-  background: var(--choice-wash);
+  margin: 0 0 16px;
 }
 html #app[data-screen] .quick-free-setup .quick-mode-visual > img {
   display: block; width: 100%; height: 100%; object-fit: cover; object-position: 78% 52%;
@@ -130,7 +129,7 @@ html #app[data-screen] .quick-free-setup .quick-mode-card.is-selected::after {
 }
 html #app[data-screen] .quick-free-setup .quick-day-head {
   padding: 18px 16px; border: 1px solid var(--edition-line); border-left: 3px solid #8b733e;
-  border-radius: 12px; background: linear-gradient(110deg, #b8995622, #8caa9a12), var(--edition-surface);
+  border-radius: 12px;
 }
 html #app[data-screen] .quick-free-setup .quick-day-deck { background: linear-gradient(115deg, #b8995614, #8caa9a0d), var(--edition-surface); }
 html[data-theme="dark"] #app[data-screen] .quick-free-setup .quick-mode-card { --choice-tone: #e0bd7d; --choice-wash: #8f6f36; }
@@ -152,15 +151,13 @@ html #app[data-screen] .quick-free-setup .quick-day-panel {
     0 14px 30px -15px #3e2a1659;
 }
 html #app[data-screen] .quick-free-setup .quick-mode-head {
-  position: relative; min-height: 88px; padding: 9px 82px 14px 0; margin: 0 0 20px;
+  position: relative;
   border-bottom: 1px solid color-mix(in srgb, var(--edition-brass) 35%, transparent);
 }
 html #app[data-screen] .quick-free-setup .quick-mode-head::after {
-  content: ""; position: absolute; right: -5px; top: -7px; width: 100px; height: 98px;
+  content: ""; position: absolute;
   background: url("assets/hero-quick-400.webp") center 43% / cover;
-  border-radius: 16px; opacity: .8; pointer-events: none;
-  -webkit-mask-image: radial-gradient(ellipse, #000 15%, transparent 73%);
-  mask-image: radial-gradient(ellipse, #000 15%, transparent 73%);
+  pointer-events: none;
 }
 html #app[data-screen] .quick-free-setup .quick-mode-head h3 { margin: 5px 0 0; text-wrap: balance; }
 html #app[data-screen] .quick-free-setup .quick-mode-head .quick-setup-kicker { font-size: .6rem; letter-spacing: .17em; }

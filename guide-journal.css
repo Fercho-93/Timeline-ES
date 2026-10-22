@@ -12,7 +12,7 @@
 #app .guide-handbook .guide-index-hint { font-size: .78rem; }
 #app .guide-handbook .guide-chapter { margin: 12px 0; border: 1px solid var(--journal-line); border-radius: 12px; background: var(--edition-surface); box-shadow: 0 4px 10px #26323a0a; }
 #app .guide-handbook .guide-chapter > summary { grid-template-columns: 42px minmax(0,1fr) 26px; gap: 12px; min-height: 94px; padding: 17px 16px; background: linear-gradient(110deg, var(--journal-wash), transparent 75%); }
-#app .guide-handbook .guide-chapter-number { display: grid; place-items: center; width: 40px; height: 48px; color: var(--edition-brass); border: 1px solid var(--edition-line); border-radius: 4px 4px 12px 4px; background: var(--edition-surface); box-shadow: -3px 0 var(--journal-ink); font: 500 1.15rem/1 var(--font-display); }
+#app .guide-handbook .guide-chapter-number { display: grid; place-items: center; width: 40px; height: 48px; border: 1px solid var(--edition-line); border-radius: 4px 4px 12px 4px; background: var(--edition-surface); font: 500 1.15rem/1 var(--font-display); }
 #app .guide-handbook .guide-chapter summary b { color: var(--journal-ink); font-size: 1.08rem; line-height: 1.25; }
 #app .guide-handbook .guide-chapter summary small { font-size: .74rem; line-height: 1.5; }
 #app .guide-handbook .guide-chapter summary i { display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid var(--journal-line); border-radius: 50%; color: var(--journal-ink); font-size: 1.1rem; }

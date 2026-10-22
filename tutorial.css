@@ -8,7 +8,6 @@
 
 :is(#app, #app-splash) .tv-player {
   --tv-screen: #1f150e; --tv-screen-2: #4a3321; --tv-glow: #e9cb8f; --tv-glow-soft: #e9cb8f66;
-  --tv-paper: #fbf3e2; --tv-paper-2: #efdfc0; --tv-ink: #3b2816; --tv-ink-soft: #6b553a;
   --tv-ok: #4f9166; --tv-bad: #b4532f; --tv-text: #fff7e8; --tv-soft: #f3e6cc;
   --tv-ease: cubic-bezier(.4, 0, .2, 1); --tv-ease-out: cubic-bezier(.2, .7, .2, 1);
   max-width: 560px; margin: 4px auto 26px;
@@ -89,8 +88,8 @@
 /* ── Cartas ──────────────────────────────────────────────────────────────────────────── */
 :is(#app, #app-splash) .tv-card {
   position: relative; display: grid; grid-template-rows: auto auto auto; justify-items: center; align-content: start;
-  width: 66px; min-width: 0; padding: 4px 4px 6px; border-radius: 9px;
-  background: linear-gradient(170deg, #fffaf0, var(--tv-paper) 40%, var(--tv-paper-2)); color: var(--tv-ink);
+  width: 66px; min-width: 0; padding: 4px 4px 6px;
+  color: var(--tv-ink);
   box-shadow: inset 0 0 0 1px #c9ab7a66, 0 1px 0 #fff8, 0 10px 22px -6px #000c;
   transition: transform .9s var(--tv-ease), box-shadow .3s, opacity .4s, background .3s;
 }
@@ -194,30 +193,30 @@
 :is(#app, #app-splash) .tv-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; width: 100%; }
 :is(#app, #app-splash) .tv-tiles.tv-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 :is(#app, #app-splash) .tv-tile {
-  display: grid; grid-template-columns: 30px minmax(0, 1fr); column-gap: 9px; align-items: center; padding: 10px;
-  border: 1px solid #e9cb8f33; border-radius: 12px; background: linear-gradient(160deg, #ffffff14, #ffffff08); text-align: left; box-shadow: inset 0 1px 0 #ffffff14;
+  display: grid; align-items: center; padding: 10px;
+  border: 1px solid #e9cb8f33; border-radius: 12px;
   opacity: 0; transform: translateY(12px) scale(.96); transition: opacity .45s, transform .5s var(--tv-ease-out), background .3s;
 }
 :is(#app, #app-splash) .tv-tile.is-in { opacity: 1; transform: none; }
 :is(#app, #app-splash) .tv-tile i { grid-row: span 2; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(180deg, #f3dba6, var(--tv-glow)); color: var(--tv-ink); font-style: normal; font-size: .86rem; box-shadow: 0 3px 8px #0006; }
-:is(#app, #app-splash) .tv-tile b { font: 600 .84rem/1.2 var(--ui-font); color: #fff; }
-:is(#app, #app-splash) .tv-tile small { font: .7rem/1.3 var(--ui-font); color: #e9dcc2; }
+:is(#app, #app-splash) .tv-tile b { font: 600 .84rem/1.2 var(--ui-font); }
+:is(#app, #app-splash) .tv-tile small { font: .7rem/1.3 var(--ui-font); }
 :is(#app, #app-splash) .tv-three .tv-tile { grid-template-columns: 1fr; justify-items: center; text-align: center; gap: 4px; padding: 10px 6px; }
 :is(#app, #app-splash) .tv-three .tv-tile i { grid-row: auto; }
 :is(#app, #app-splash) .tv-note { margin: 0; max-width: 300px; color: var(--tv-soft); font: .72rem/1.45 var(--ui-font); text-align: center; opacity: 0; transition: opacity .5s; }
 :is(#app, #app-splash) .tv-note.is-in { opacity: 1; }
 
 /* Inicio: la tarjeta «Jugar» se abre en sus tres caminos; debajo, Unirme y el reto del día. */
-:is(#app, #app-splash) .tv-home { display: grid; gap: 8px; width: min(100%, 300px); opacity: 0; transition: opacity .4s; }
+:is(#app, #app-splash) .tv-home { display: grid; width: min(100%, 300px); opacity: 0; transition: opacity .4s; }
 :is(#app, #app-splash) .tv-home.is-in { opacity: 1; }
-:is(#app, #app-splash) .tv-door { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border: 1px solid #e9cb8f40; border-radius: 14px; background: linear-gradient(160deg, #ffffff17, #ffffff08); color: #fff; font: 600 .82rem/1.2 var(--ui-font); transition: opacity .45s, transform .5s var(--tv-ease-out), border-color .3s; }
+:is(#app, #app-splash) .tv-door { display: flex; align-items: center; justify-content: space-between; font: 600 .82rem/1.2 var(--ui-font); transition: opacity .45s, transform .5s var(--tv-ease-out), border-color .3s; }
 :is(#app, #app-splash) .tv-door-play { background: linear-gradient(180deg, #f3dba6, var(--tv-glow)); color: var(--tv-ink); border-color: transparent; font-size: .98rem; box-shadow: 0 8px 18px -6px #000a; }
 :is(#app, #app-splash) .tv-door-play b { font: 500 1.15rem/1 var(--font-display); }
 :is(#app, #app-splash) .tv-door-play span { transition: transform .3s; }
 :is(#app, #app-splash) .tv-door-play.is-open span { transform: rotate(180deg); }
 :is(#app, #app-splash) .tv-door-join, :is(#app, #app-splash) .tv-door-daily { opacity: .3; }
 :is(#app, #app-splash) .tv-door-join.is-in, :is(#app, #app-splash) .tv-door-daily.is-in { opacity: 1; border-color: var(--tv-glow); }
-:is(#app, #app-splash) .tv-choices { display: grid; gap: 6px; max-height: 0; overflow: hidden; transition: max-height .45s var(--tv-ease-out); }
+:is(#app, #app-splash) .tv-choices { display: grid; max-height: 0; overflow: hidden; transition: max-height .45s var(--tv-ease-out); }
 :is(#app, #app-splash) .tv-choices span { padding: 9px 14px; border-radius: 12px; background: #ffffff12; color: var(--tv-soft); font: 600 .8rem/1.2 var(--ui-font); opacity: 0; transform: translateY(-6px); transition: opacity .35s, transform .4s var(--tv-ease-out); }
 :is(#app, #app-splash) .tv-choices span.is-in { opacity: 1; transform: none; }
 
@@ -237,7 +236,7 @@
 :is(#app, #app-splash) .tv-facts { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
 :is(#app, #app-splash) .tv-facts span { padding: 4px 10px; border: 1px solid #e9cb8f26; border-radius: 999px; background: #ffffff12; color: var(--tv-soft); font: 600 .66rem/1.5 var(--ui-font); opacity: 0; transition: opacity .3s; }
 :is(#app, #app-splash) .tv-facts span.is-in { opacity: 1; }
-:is(#app, #app-splash) .tv-deck { display: grid; gap: 3px; width: min(100%, 290px); padding: 12px 14px; border-left: 3px solid var(--tv-glow); border-radius: 4px 12px 12px 4px; background: #fbf3e2f0; color: var(--tv-ink); box-shadow: 0 10px 22px -8px #000c; opacity: 0; transform: rotate(-1.5deg) translateY(10px); transition: opacity .45s, transform .55s var(--tv-ease-out); }
+:is(#app, #app-splash) .tv-deck { display: grid; gap: 3px; width: min(100%, 290px); padding: 12px 14px; border-left: 3px solid var(--tv-glow); border-radius: 4px 12px 12px 4px; color: var(--tv-ink); box-shadow: 0 10px 22px -8px #000c; opacity: 0; transform: rotate(-1.5deg) translateY(10px); transition: opacity .45s, transform .55s var(--tv-ease-out); }
 :is(#app, #app-splash) .tv-deck.is-in { opacity: 1; transform: rotate(-1.5deg); }
 :is(#app, #app-splash) .tv-deck b { font: 500 1rem/1.2 var(--font-display); }
 :is(#app, #app-splash) .tv-deck small { color: #8a3d1d; font: 700 .7rem/1.3 var(--ui-font); letter-spacing: .02em; }
@@ -264,7 +263,7 @@
 :is(#app, #app-splash) .tv-seat em[data-mark="bad"] { color: #e88a65; }
 :is(#app, #app-splash) .tv-seat em[data-mark="win"] { padding: 3px 8px; border-radius: 999px; background: var(--tv-ok); color: #fff; font-size: .7rem; }
 :is(#app, #app-splash) .tv-minihand { display: flex; min-height: 30px; }
-:is(#app, #app-splash) .tv-minihand i { flex: 0 0 auto; width: 22px; height: 30px; margin-right: -6px; border: 1px solid #c9ab7a; border-radius: 4px; background: linear-gradient(160deg, #fff7e4, #ecdcbb); box-shadow: 0 3px 6px #0007; transition: opacity .45s, transform .5s var(--tv-ease-out), width .45s, margin .45s, border-width .45s; }
+:is(#app, #app-splash) .tv-minihand i { flex: 0 0 auto; width: 22px; height: 30px; margin-right: -6px; border: 1px solid #c9ab7a; border-radius: 4px; box-shadow: 0 3px 6px #0007; transition: opacity .45s, transform .5s var(--tv-ease-out), width .45s, margin .45s, border-width .45s; }
 :is(#app, #app-splash) .tv-minihand i.is-out { width: 0; margin-right: 0; border-width: 0; opacity: 0; transform: translateY(-14px); }
 :is(#app, #app-splash) .tv-minihand i.is-bad { background: var(--tv-bad); transform: translateX(40px); }
 :is(#app, #app-splash) .tv-minihand i.is-new { animation: tv-draw .5s var(--tv-ease-out); }
@@ -283,10 +282,10 @@
 
 /* Con amigos: un móvil que se pasa, o cada uno con el suyo y su ritmo. */
 :is(#app, #app-splash) .tv-ways { display: grid; gap: 10px; width: min(100%, 330px); }
-:is(#app, #app-splash) .tv-way { display: grid; justify-items: center; gap: 6px; padding: 10px; border: 1px solid #e9cb8f33; border-radius: 14px; background: #ffffff0c; opacity: 0; transform: translateY(10px); transition: opacity .45s, transform .5s var(--tv-ease-out); }
+:is(#app, #app-splash) .tv-way { display: grid; justify-items: center; gap: 6px; padding: 10px; border: 1px solid #e9cb8f33; border-radius: 14px; opacity: 0; transform: translateY(10px); transition: opacity .45s, transform .5s var(--tv-ease-out); }
 :is(#app, #app-splash) .tv-way.is-in { opacity: 1; transform: none; }
-:is(#app, #app-splash) .tv-way > b { color: #fff; font: 500 .98rem/1.1 var(--font-display); }
-:is(#app, #app-splash) .tv-way > small { color: var(--tv-soft); font: .7rem/1.3 var(--ui-font); }
+:is(#app, #app-splash) .tv-way > b { font: 500 .98rem/1.1 var(--font-display); }
+:is(#app, #app-splash) .tv-way > small { font: .7rem/1.3 var(--ui-font); }
 :is(#app, #app-splash) .tv-pass { display: flex; align-items: center; gap: 12px; }
 :is(#app, #app-splash) .tv-phone { display: grid; width: 32px; height: 32px; color: var(--tv-glow); filter: drop-shadow(0 0 8px #e9cb8f55); animation: tv-wiggle 1.8s ease-in-out infinite; }
 :is(#app, #app-splash) .tv-phone svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }

@@ -34,7 +34,7 @@ html { background: var(--edition-paper); }
 /* Las circunferencias evocan un instrumento de medida. Son estáticas: no distraen
    mientras se comparan valores ni mantienen un bucle de animación en el móvil. */
 html body::before {
-  inset: 0; opacity: .45; box-shadow: none;
+  inset: 0;
   background: radial-gradient(circle at 96% 10%, transparent 0 179px, var(--edition-line) 180px, transparent 181px 215px, var(--edition-line) 216px, transparent 217px 320px, var(--edition-line) 321px, transparent 322px);
 }
 :root[data-theme="dark"] body { background: radial-gradient(ellipse at 80% 0%, color-mix(in srgb, var(--scene-wash) 12%, transparent), transparent 55%), var(--edition-paper); }
@@ -74,7 +74,7 @@ html body::before {
 .btn-secondary { border-color: var(--edition-line); background: var(--edition-surface); }
 .btn:focus-visible, .icon-btn:focus-visible, .home-nav button:focus-visible { outline-color: var(--edition-brass); }
 .home-shell .gallery { grid-template-columns: minmax(0, 1fr); gap: 18px; }
-.home-shell .gallery-panel { height: 250px; border-radius: 8px; border: 1px solid #78634366; box-shadow: var(--edition-shade); }
+.home-shell .gallery-panel { height: 250px; border: 1px solid #78634366; }
 .home-shell .gallery-panel::after { background: linear-gradient(180deg, #17150f40, transparent 30%, #17150f30 45%, #17150feb); }
 .home-shell .gallery-panel::before { content: ""; position: absolute; z-index: 3; inset: 9px; border: 1px solid #eee0bd55; border-radius: 3px; pointer-events: none; }
 .home-shell .gallery-panel .panel-label,
@@ -90,8 +90,8 @@ html body::before {
 .collection-decks h2 { font-weight: 400; }
 .collection-decks .lead { color: var(--edition-muted); }
 .collection-decks .games { border: 0; background: transparent; gap: 8px; margin-bottom: 0; }
-.collection-decks .game-row { position: relative; padding: 16px 42px 16px 18px; border: 1px solid var(--edition-line); border-left: 3px solid transparent; border-radius: 4px; background: var(--edition-paper); color: var(--edition-ink); }
-.collection-decks .game-row::after { content: "→"; position: absolute; right: 17px; top: 18px; color: var(--edition-brass); }
+.collection-decks .game-row { position: relative; border: 1px solid var(--edition-line); background: var(--edition-paper); color: var(--edition-ink); }
+.collection-decks .game-row::after { color: var(--edition-brass); }
 .collection-decks .game-row.active { border-left-color: var(--edition-brass); }
 .collection-decks .game-name { font-size: 1.1rem; }
 .collection-decks .game-meta { color: var(--edition-muted); font: .875rem/1.5 var(--ui-font); }
@@ -324,7 +324,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 /* Tercera columna: fila propia con el sonido y, si la pantalla lo pide, el menú de la
    partida (⋮). Crece con su contenido —una o dos monedas de 44 px— en vez de forzar un
    ancho fijo que solo cabría una. */
-#app .atlas-topbar-actions { grid-column: 3; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
+#app .atlas-topbar-actions { grid-column: 3; justify-content: flex-end; }
 #app.atlas-has-nav > .shell { padding-bottom: calc(96px + var(--safe-bottom)); }
 #app .atlas-nav { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); width: 100%; max-width: none; left: 0; transform: none; background: var(--edition-surface); min-height: 64px; z-index: 30; }
 #app .atlas-nav button { min-height: 50px; min-width: 0; }
@@ -357,9 +357,9 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .gallery-panel img { transform: translate(var(--depth-x,0px),var(--depth-y,0px)) scale(1.035); transition: transform 500ms ease-out; }
 #app.atlas-board .shell { max-width: 940px; padding: max(4px,var(--safe-top)) 12px max(12px,var(--safe-bottom)); }
 #app.atlas-board .atlas-topbar { margin-bottom: 4px; }
-#app.atlas-board .game-head { margin: 0 0 6px; padding-bottom: 6px; gap: 8px; align-items: center; }
-#app.atlas-board .turn-name { font-size: 1.18rem; line-height: 1.15; }
-#app.atlas-board .turn-label { font-size: .66rem; line-height: 1.2; letter-spacing: .02em; }
+#app.atlas-board .game-head { margin: 0 0 6px; gap: 8px; }
+#app.atlas-board .turn-name { line-height: 1.15; }
+#app.atlas-board .turn-label { line-height: 1.2; }
 #app.atlas-board :is(.turn-timer,.deck-count) { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 46px; min-width: 46px; height: 46px; aspect-ratio: 1; padding: 2px; border-radius: 50%; }
 #app.atlas-board :is(.turn-timer,.deck-count) strong { font-size: 1rem; line-height: 1.05; }
 #app.atlas-board :is(.turn-timer,.deck-count) span { font-size: .55rem; }
@@ -368,7 +368,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app.atlas-board .score i { width: 24px; height: 24px; font-size: .64rem; }
 #app.atlas-board .score em { width: 22px; height: 22px; }
 #app.atlas-board .hand-title { margin: 3px 0 5px; gap: 8px; }
-#app.atlas-board .hand-title h3 { font-size: 1rem; line-height: 1.3; }
+#app.atlas-board .hand-title h3 { line-height: 1.3; }
 #app.atlas-board .hand-title small { font-size: .72rem; }
 #app.atlas-board .timeline-wrap { margin: 0 -4px; padding: 3px 4px 8px; }
 #app.atlas-board .timeline-card { width: 124px; min-height: 164px; border-radius: 7px; }
@@ -390,7 +390,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app.atlas-board .slot-confirm-card span { font: .55rem var(--ui-font); color: var(--edition-muted); }
 #app.atlas-board .slot-confirm .btn { padding: 7px 4px; font-size: .7rem; }
 #app.atlas-board .provisional-hand-note { padding: 10px; border: 1px dashed var(--edition-brass); border-radius: 7px; background: #f3eee4; color: var(--edition-muted); }
-#app .timeline-zoom { display: flex; justify-content: center; gap: 10px; margin: 0 0 6px; }
+#app .timeline-zoom { display: flex; justify-content: center; }
 #app .timeline-zoom button { display: grid; place-items: center; width: 44px; min-width: 44px; height: 44px; padding: 0; border-radius: 50%; border-color: var(--edition-brass); background: transparent; color: var(--edition-ink); font-size: 1.25rem; }
 .timeline-zoom input[type="range"] { width: 130px; min-height: 44px; margin: 0; accent-color: var(--edition-brass); cursor: pointer; }
 #app.atlas-board .hand { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; padding: 6px 2px 2px; }
@@ -400,15 +400,15 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app.atlas-board .hand .carta-reverso { height: 26px; min-height: 26px; padding: 0; flex: 1; }
 #app.atlas-board .hand .reverso-emblema { width: 35px; height: 35px; }
 #app.atlas-board .hand .card-arrow { display: none; }
-#app.atlas-board .hand .hand-card.selected { border: 2px solid var(--atlas-selection); box-shadow: 0 5px 12px #3d221b33, inset 0 0 0 2px var(--edition-surface); transform: translateY(-4px); }
+#app.atlas-board .hand .hand-card.selected { border: 2px solid var(--atlas-selection); }
 #app.atlas-board .hand .hand-card.selected::after { content: '✓'; position: absolute; right: 5px; top: 5px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--atlas-selection); color: var(--edition-surface); font: bold 15px var(--ui-font); }
 #app.atlas-board .hand-solo { grid-template-columns: minmax(0,280px); }
 #app.atlas-board .hand-solo .hand-card { min-height: 156px !important; }
 #app.atlas-board .hand-solo .carta-reverso { height: 62px; }
 #app.atlas-board .hand-solo .reverso-emblema { width: 62px; height: 62px; }
-#app.atlas-board .atlas-hand-many { max-height: 260px; overflow-y: auto; padding: 7px 5px; }
+#app.atlas-board .atlas-hand-many { overflow-y: auto; }
 #app.atlas-board .atlas-hand-section > .hint { font: .72rem/1.3 var(--ui-font); margin: 5px 0; }
-#app.atlas-board .placement-dock { position: sticky; bottom: 0; z-index: 5; background: var(--edition-paper); padding: 7px 0 max(6px,var(--safe-bottom)); display: grid; gap: 7px; }
+#app.atlas-board .placement-dock { position: sticky; bottom: 0; z-index: 5; background: var(--edition-paper); padding: 7px 0 max(6px,var(--safe-bottom)); display: grid; }
 #app.atlas-board .placement-dock-status { display: flex; align-items: center; gap: 6px; color: var(--edition-ink); font: 700 .68rem/1.1 var(--ui-font); letter-spacing: .025em; }
 #app.atlas-board .placement-dock-status span { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--atlas-selection); color: var(--edition-surface); font: 800 .76rem/1 var(--ui-font); box-shadow: inset 0 0 0 1px #fff8e744; }
 #app.atlas-board .placement-dock-actions { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 7px; }
@@ -493,7 +493,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
    muerta bajo el botón de confirmar. El hueco que sobra se lo queda la línea temporal
    —con sus cartas centradas— en lugar de acumularse al final de la pantalla. */
 @media (max-width: 699px) {
-  #app.atlas-board > .shell { display: flex; flex-direction: column; min-height: calc(100 * var(--dvh)); }
+  #app.atlas-board > .shell { display: flex; flex-direction: column; }
   #app.atlas-board > .shell > section:has(.timeline-wrap) { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
   #app.atlas-board > .shell > section:has(.timeline-wrap) .timeline-wrap { flex: 0 0 auto; display: flex; align-items: flex-start; }
 }
@@ -548,7 +548,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 @media (max-width: 699px) {
   #app .atlas-specimens { max-width: 245px; gap: 8px; }
   #app .atlas-specimens img { aspect-ratio: 1.45; }
-  #app .atlas-specimens figcaption { font-size: .65rem; line-height: 1.15; padding: 4px 1px; }
+  #app .atlas-specimens figcaption { font-size: .65rem; line-height: 1.15; }
   /* El resto de la cabecera se retira para dejar sitio a la colección, pero el
      interruptor de sonido se queda: es la única manera de llegar a él en esta
      pantalla sin pasar por Ajustes. Y la flecha de volver, que toda pantalla
@@ -686,8 +686,8 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 @keyframes daily-sun { to { transform: rotate(1turn); } }
 @keyframes cal-in { from { opacity: 0; transform: scale(.55); } }
 @keyframes cal-today { 50% { box-shadow: 0 0 0 2px var(--edition-surface), 0 0 0 6px color-mix(in srgb, var(--edition-brass) 35%, transparent); } }
-#app.atlas-board .deck-count { width: auto; min-width: 72px; height: 46px; padding: 4px 10px; border-radius: 12px; }
-#app.atlas-board .deck-count span { font-size: .52rem; white-space: nowrap; letter-spacing: .03em; }
+#app.atlas-board .deck-count { width: auto; height: 46px; border-radius: 12px; }
+#app.atlas-board .deck-count span { white-space: nowrap; letter-spacing: .03em; }
 #app.atlas-board .placement-dock .btn-primary:disabled { background: color-mix(in srgb,var(--atlas-selection) 12%,var(--edition-paper)); color: var(--edition-muted); border: 1px solid var(--edition-line); box-shadow: none; }
 @media (max-width: 699px) {
   #app .home-gallery-shell .collection-decks { padding: 14px; }
@@ -760,16 +760,16 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 /* Reverso neutro: sin ilustración ni pistas visuales sobre la respuesta. */
 #app .hand-card { isolation: isolate; background: #f3eee4; color: #302d27; }
 #app.atlas-board[data-screen] .hand .hand-card .carta-reverso {
-  position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0;
-  padding: 0; margin: 0; opacity: 1; z-index: -1; overflow: hidden; background: #f3eee4;
+  min-height: 0;
+  z-index: -1; overflow: hidden;
 }
 #app .carta-reverso::after { content: none; }
 
 /* La carta levantada conserva proporción 2:3 aunque la mano sea horizontal. */
 .drag-card-preview { display: flex; flex-direction: column; align-items: stretch; isolation: isolate; padding: 12px; border: 2px solid var(--atlas-selection); border-radius: 10px; background: #f3eee4; color: #302d27; }
-.drag-card-preview .carta-reverso { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; z-index: -1; overflow: hidden; }
-.drag-card-preview > .hidden-date { position: relative; color: #4a3014; font-size: .65rem; }
-#app.atlas-board .slot.drop-target { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); border-radius: 12px; }
+.drag-card-preview .carta-reverso { z-index: -1; overflow: hidden; }
+.drag-card-preview > .hidden-date { position: relative; font-size: .65rem; }
+#app.atlas-board .slot.drop-target { border-radius: 12px; }
 
 /* Competición: una lámina de atlas al final de las colecciones. */
 @media (max-width: 699px) {
@@ -781,8 +781,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 /* Colecciones: pigmentos originales y relieve ligero sobre el papel. */
 #app .home-gallery-shell .gallery-panel {
   border-color: #a58b60;
-  box-shadow: 0 3px 0 #aa916b, 0 5px 0 #d3c1a0, 0 10px 18px #49361f22;
-  background: #756044;
 }
 /* hover-neutro: el estado con puntero encima recibe exactamente lo mismo que el estado
    normal, que es justo el modo de anular el filtro que aplica la hoja base. No hay nada
@@ -875,7 +873,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 }
 
 /* Mesa de explorador: relieve físico, cronología continua y controles contenidos. */
-#app.atlas-board { --board-brass: #ac843f; background: radial-gradient(ellipse at 50% 35%, #fff9e84d, #7954310c 90%); }
+#app.atlas-board { --board-brass: #ac843f; }
 #app.atlas-board .topbar { min-height: 44px; margin-bottom: 4px; }
 #app.atlas-board .game-head { padding: 6px 0 9px; margin-bottom: 8px; align-items: center; }
 #app.atlas-board .turn-label { font-size: .68rem; letter-spacing: .07em; }
@@ -886,7 +884,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app.atlas-board .solo-lives { margin: 7px 0; font-size: 1rem; }
 #app.atlas-board .hand-title { margin-bottom: 10px; }
 #app.atlas-board .hand-title h3 { font-size: 1.1rem; }
-#app.atlas-board .timeline { background: linear-gradient(#b8996555,#b8996555) center / 100% 1px no-repeat; padding-block: 9px 14px; }
+#app.atlas-board .timeline { padding-block: 9px 14px; }
 #app.atlas-board .timeline-card { background-color: #f2e7ce; box-shadow: 0 2px 0 #b89b6e, 0 4px 0 #ddcba8, 0 8px 14px #4a341a25, inset 0 1px 0 #fff8df; transition: translate 180ms ease-out; }
 #app.atlas-board .slot { border-color: #b7985b77; background: #fff9e51a; }
 #app.atlas-board .slot.drop-target { background: #d8b86d24; border: 2px dashed #b58a3d; box-shadow: inset 0 0 0 3px #fff6d780, 0 0 16px #dfbb6233; }
@@ -911,7 +909,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app.atlas-board .slot { position: relative; }
 #app.atlas-board:has(.board-result-layer) > .shell { min-height: 0; }
 #app.atlas-board .game-head > div:first-child { flex: 1; }
-#app.atlas-board .game-head .solo-lives { flex: none; margin: 0 8px; white-space: nowrap; font-size: .9rem; }
+#app.atlas-board .game-head .solo-lives { flex: none; margin: 0 8px; white-space: nowrap; }
 #app.atlas-board .atlas-hand-section { margin-top: 4px; }
 #app.atlas-board[data-platform][data-screen] .hand-solo .hand-card > strong {
   font-size: clamp(.66rem,calc(2.65 * var(--vw)),.78rem); padding-right: 0; line-height: 1.12;
@@ -1149,7 +1147,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 .enc-topic-divider > span { grid-row: 1 / 3; color: var(--edition-brass); font: 700 .56rem/1.4 var(--ui-font); letter-spacing: .12em; text-transform: uppercase; writing-mode: vertical-rl; transform: rotate(180deg); }
 #app .enc-topic-divider h2 { grid-column: 2; margin: 0; font-size: 1.45rem; }
 .enc-topic-divider h2 i { font-style: normal; margin-right: 5px; }
-#app .enc-deck { overflow: hidden; border-color: color-mix(in srgb,var(--edition-brass) 32%,var(--edition-line)); box-shadow: 0 3px 10px #48321a0d; }
+#app .enc-deck { overflow: hidden; border-color: color-mix(in srgb,var(--edition-brass) 32%,var(--edition-line)); }
 #app .enc-deck summary { display: grid; grid-template-columns: 78px minmax(0,1fr) 26px; align-items: center; gap: 12px; min-height: 86px; padding: 0 13px 0 0; }
 .enc-deck-cover { position: relative; align-self: stretch; min-height: 86px; overflow: hidden; background: var(--edition-paper); }
 .enc-deck-cover img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: var(--cover-position) center; filter: sepia(.18) saturate(.9); }
@@ -1158,7 +1156,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .enc-deck summary .enc-deck-copy { display: block; min-width: 0; }
 .enc-deck-copy b, .enc-deck-copy small { display: block; }
 .enc-deck-copy b { font: 600 .98rem/1.2 var(--font-display); }
-#app .enc-deck-copy small { margin: 5px 0 0; white-space: normal; font-size: .68rem; line-height: 1.35; }
+#app .enc-deck-copy small { margin: 5px 0 0; white-space: normal; }
 .enc-deck-chevron { color: var(--edition-brass); font-size: 1.25rem; font-style: normal; transition: transform 180ms ease; }
 .enc-deck[open] .enc-deck-chevron { transform: rotate(180deg); }
 #app .enc-deck-cards:not(:empty) { padding: 10px; background: color-mix(in srgb,var(--edition-brass) 5%,var(--edition-paper)); }
@@ -1478,25 +1476,9 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 /* La navegación no vive dentro de una caja: una base baja y arqueada une los cinco
    botones, dejando que la silueta superior acompañe sus curvas. */
 html #app .home-nav.atlas-nav {
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  max-width: none;
-  min-height: calc(68px + var(--safe-bottom));
-  padding: 4px 12px calc(4px + var(--safe-bottom));
-  border: 0;
-  border-radius: 0;
   color: #3e3028;
-  background: transparent;
-  box-shadow: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  transform: none;
-  overflow: visible;
-  isolation: isolate;
 }
 html #app .home-nav.atlas-nav::after {
-  content: "";
   position: absolute;
   z-index: 0;
   inset: 7px 5px 0;
@@ -1517,43 +1499,15 @@ html #app .home-nav.atlas-nav::after {
   pointer-events: none;
 }
 html #app .home-nav.atlas-nav::before {
-  content: "";
-  position: absolute;
   z-index: 1;
-  top: 23px;
-  right: 9%;
-  left: 9%;
   height: 1px;
-  border: 0;
-  border-radius: 0;
-  background: linear-gradient(90deg, transparent, #a9957b 9% 91%, transparent);
-  box-shadow: 0 1px #fff8;
-  pointer-events: none;
 }
 #app .home-nav.atlas-nav button {
-  position: relative;
   z-index: 2;
-  min-height: 59px;
-  padding: 1px 2px 0;
-  border-radius: 0;
-  color: #49372d;
-  background: transparent;
-  box-shadow: none;
 }
 #app .home-nav.atlas-nav button span {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border: 1px solid #aa9985c9;
-  border-radius: 12px;
-  color: #514035;
-  background:
-    radial-gradient(circle at 28% 18%, #fff 0 7%, transparent 31%),
-    linear-gradient(145deg, #fffdf6d9, #ddd3c4bd);
   -webkit-backdrop-filter: blur(5px) saturate(1.12);
   backdrop-filter: blur(5px) saturate(1.12);
-  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #aa9985a1, 0 3px 6px #46372a33, 0 0 0 2px #f8eddb9c;
   filter: none;
 }
 #app .home-nav.atlas-nav button:nth-child(2) span { box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #a8b5a6, 0 3px 6px #41544238, 0 0 0 2px #e9eee5c4; }
@@ -1600,7 +1554,7 @@ html #app .home-nav.atlas-nav::before {
   background: var(--edition-paper);
   box-shadow: none;
 }
-#app[data-screen="perfil"] > .shell { width: 100%; max-width: none; }
+#app[data-screen="perfil"] > .shell { width: 100%; }
 #app :is(.enc-modal, .settings-modal, .rules) .home-nav.atlas-nav { display: grid; }
 #app .home-nav.atlas-nav button[aria-current] small {
   color: #8a3f2f;
@@ -1788,15 +1742,15 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 
 /* La portada: tres puertas —el reto del día, jugar y el atlas— con la misma lámina en
    sepia que la competición. El aviso de duelos solo aparece cuando hay algo pendiente. */
-#app .home-doors { display: grid; gap: 12px; max-width: 720px; margin: 0 auto; }
-#app .home-door { display: grid; grid-template-columns: 76px 1fr; align-items: center; gap: 14px; width: 100%; padding: 12px 14px; text-align: left; color: var(--edition-ink); border: 1px solid var(--edition-line); border-radius: 8px; background: var(--edition-surface); box-shadow: 0 4px 14px #352a170d; cursor: pointer; }
+#app .home-doors { display: grid; max-width: 720px; margin: 0 auto; }
+#app .home-door { grid-template-columns: 76px 1fr; align-items: center; gap: 14px; width: 100%; color: var(--edition-ink); border: 1px solid var(--edition-line); cursor: pointer; }
 #app article.home-door { cursor: default; }
-#app .home-door-art { width: 76px; height: 76px; overflow: hidden; border-radius: 6px; border: 1px solid var(--edition-line); }
-#app .home-door-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
-#app .home-door-copy b { font-family: var(--font-display); font-size: 1.3rem; font-weight: 400; line-height: 1.1; }
-#app .home-door-copy small { font: .78rem/1.45 var(--ui-font); color: var(--edition-muted); }
-#app .home-door-cta { display: inline-flex; margin-top: 4px; color: var(--edition-brass); font: 600 .75rem/1.3 var(--ui-font); }
-#app .home-door-daily { grid-template-columns: 92px 1fr; border-color: color-mix(in srgb, var(--edition-brass) 55%, var(--edition-line)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--edition-brass) 30%, transparent), 0 6px 18px #352a1714; }
+#app .home-door-art { overflow: hidden; }
+#app .home-door-copy { flex-direction: column; align-items: flex-start; min-width: 0; }
+#app .home-door-copy b { font-family: var(--font-display); font-weight: 400; }
+#app .home-door-copy small { font: .78rem/1.45 var(--ui-font); }
+#app .home-door-cta { display: inline-flex; color: var(--edition-brass); font: 600 .75rem/1.3 var(--ui-font); }
+#app .home-door-daily { grid-template-columns: 92px 1fr; }
 #app .home-daily-streak { display: inline-flex; align-items: center; gap: 6px; font: 600 .75rem/1.3 var(--ui-font); color: var(--edition-brass); }
 #app .home-daily-streak .solo-glyph { width: 18px; height: 18px; }
 #app .home-daily-share { margin-top: 10px; min-height: 44px; }
@@ -1836,7 +1790,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 }
 #app .home-doors-shell .atlas-topbar > :not(.atlas-topbar-actions) { display: none; }
 #app .home-doors-shell .atlas-topbar-actions { pointer-events: auto; padding-right: max(4px, var(--safe-right)); }
-#app[data-screen="home"] .home-doors-shell .home-masthead { margin: calc(var(--safe-top) + 10px) auto clamp(12px, calc(2.4 * var(--svh)), 22px); padding: 0; }
+#app[data-screen="home"] .home-doors-shell .home-masthead { padding: 0; }
 #app[data-screen="home"] .home-doors-shell .home-ornament { margin-top: clamp(6px, calc(1.4 * var(--svh)), 12px); }
 #app .home-doors-shell .home-door { padding-block: clamp(8px, calc(1.4 * var(--svh)), 12px); }
 @media (max-height: 700px) {
@@ -1851,8 +1805,8 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .daily-splash-art { display: grid; place-items: center; background: color-mix(in srgb, var(--edition-brass) 12%, var(--edition-paper)); }
 #app .daily-splash-art::after { background: linear-gradient(transparent 70%, var(--edition-surface)); }
 #app .daily-splash-art .cal-day { fill: var(--edition-ink); font: 400 32px/1 var(--font-display); }
-#app .daily-reel { display: block; min-height: 1.1em; color: var(--edition-muted); transition: color .3s; }
-#app .daily-splash-rule { margin: -12px 0 22px; color: var(--edition-muted); font: .85rem/1.5 var(--ui-font); }
+#app .daily-reel { color: var(--edition-muted); }
+#app .daily-splash-rule { font: .85rem/1.5 var(--ui-font); }
 #app .daily-splash .comp-splash-start { background: var(--edition-ink); color: var(--edition-surface); }
 
 /* Identidad: bienvenida, selector de avatares, Atlas y avatares en la mesa. */
@@ -1878,7 +1832,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .atlas-identidad-avatar { flex: none; display: grid; }
 #app .atlas-identidad .hint { margin: 8px 0 0; color: var(--edition-muted); font: .78rem/1.4 var(--ui-font); }
 #app .identidad-avatar-vivo { display: grid; place-items: center; margin: 4px 0 10px; }
-#app .table-seat > span.seat-avatar, #app .manage-player > span.seat-avatar { padding: 0; overflow: visible; border: 0; background: transparent; box-shadow: none; color: inherit; }
+#app .table-seat > span.seat-avatar, #app .manage-player > span.seat-avatar { padding: 0; color: inherit; }
 #app .seat-avatar svg { width: 100%; height: 100%; }
 
 /* Portada Continuum: cada acceso es una lámina completa con el foco de lectura a la izquierda. */
@@ -1998,7 +1952,6 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
       color-mix(in srgb, var(--edition-paper) 84%, #d7bc87) 100%);
 }
 #app[data-screen="home"]::before {
-  content: "";
   position: absolute;
   z-index: 0;
   inset: 0;
@@ -2020,7 +1973,6 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
     linear-gradient(104deg, transparent 0 21%, color-mix(in srgb, #fff 24%, transparent) 34%, transparent 46%);
 }
 #app[data-screen="home"]::after {
-  content: "";
   position: absolute;
   z-index: 0;
   inset: 0;
@@ -2508,22 +2460,22 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app.atlas-board .board-question p { margin: 4px 0 0; color: var(--edition-muted); font: .7rem/1.25 var(--ui-font); }
 
 #app.atlas-board .board-focus-card { margin-top: 0; }
-#app.atlas-board .board-focus-card > .hand-title { justify-content: center; margin-bottom: 3px; }
+#app.atlas-board .board-focus-card > .hand-title { margin-bottom: 3px; }
 #app.atlas-board .board-focus-card > .hand-title h3 { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; }
 #app.atlas-board .board-focus-card .hand-solo { grid-template-columns: minmax(0, min(calc(54 * var(--vw)), 220px)); justify-content: center; padding: 2px; }
 #app.atlas-board[data-platform][data-device][data-screen] .board-focus-card .hand-solo .hand-card { width: 100%; height: auto !important; min-height: 0 !important; aspect-ratio: 2 / 3; padding: 11px; border-radius: 10px; }
 #app.atlas-board .board-focus-card .hand-solo .carta-reverso { min-height: 0; height: auto; flex: 1 1 auto; }
 #app.atlas-board[data-platform][data-screen] .board-focus-card .hand-solo .hand-card > strong,
 #app.atlas-board[data-platform][data-screen] .atlas-hand-section .hand-card > strong { display: block; max-height: none; overflow: visible; white-space: normal; overflow-wrap: break-word; hyphens: auto; text-overflow: clip; }
-#app.atlas-board[data-platform][data-screen] .board-focus-card .hand-solo .hand-card > strong { margin-top: 8px; font-size: clamp(.84rem, calc(3.6 * var(--vw)), 1rem); line-height: 1.15; }
+#app.atlas-board[data-platform][data-screen] .board-focus-card .hand-solo .hand-card > strong { font-size: clamp(.84rem, calc(3.6 * var(--vw)), 1rem); }
 
 /* En manos de varias cartas, la elegida adquiere la misma jerarquía sin ocultar las demás. */
 #app.atlas-board .atlas-hand-section .hand:not(.hand-solo) .hand-card.selected .carta-reverso { min-height: 112px; }
 
 /* El selector de escala tiene una fila propia, centrada antes del título de la línea. */
-#app.atlas-board .board-timeline-section > .timeline-zoom { margin: 4px auto 5px; padding: 2px; justify-content: center; }
-#app.atlas-board .board-timeline-section > .timeline-zoom [data-zoom-level] { width: auto; min-width: 52px; height: 36px; min-height: 36px; font-size: .72rem; }
-#app.atlas-board .board-timeline-section > .timeline-toolbar { display: flex; flex-direction: row; align-items: baseline; justify-content: space-between; width: 100%; margin: 0 0 3px; }
+#app.atlas-board .board-timeline-section > .timeline-zoom { padding: 2px; justify-content: center; }
+#app.atlas-board .board-timeline-section > .timeline-zoom [data-zoom-level] { width: auto; }
+#app.atlas-board .board-timeline-section > .timeline-toolbar { flex-direction: row; width: 100%; margin: 0 0 3px; }
 
 /* La incisión de la línea es tenue; los huecos pasan a ser nodos circulares. */
 #app.atlas-board .board-timeline-section { padding-top: 4px; }
@@ -2533,24 +2485,24 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app.atlas-board .board-timeline-section .timeline-card { box-shadow: 0 2px 0 #b89b6e, 0 6px 12px #4a341a1b; }
 
 /* Marcador multijugador: avatar actual, nombre, avance y cartas restantes. */
-#app.atlas-board .scoreboard-panel { margin: 0 0 5px; padding: 7px 8px 8px; border: 1px solid color-mix(in srgb, var(--edition-brass) 26%, transparent); border-radius: 12px; background: color-mix(in srgb, var(--edition-surface) 43%, transparent); box-shadow: inset 0 1px 0 #fff8; }
+#app.atlas-board .scoreboard-panel { border-radius: 12px; }
 #app.atlas-board .scoreboard-title { margin: 0 0 4px 3px; color: var(--edition-muted); font: 700 .56rem/1 var(--ui-font); letter-spacing: .2em; text-transform: uppercase; }
-#app.atlas-board .scoreboard-panel .scoreboard { display: grid; gap: 4px; max-height: 108px; margin: 0; padding: 0; overflow-x: hidden; overflow-y: auto; scroll-snap-type: y proximity; }
-#app.atlas-board .scoreboard-panel .score { width: 100%; min-width: 0; display: grid; grid-template-columns: 42px minmax(0, 1fr) 42px; gap: 8px; align-items: center; padding: 4px 7px; border-radius: 10px; color: var(--edition-ink); background: color-mix(in srgb, var(--edition-surface) 64%, transparent); border: 1px solid color-mix(in srgb, var(--edition-line) 72%, transparent); box-shadow: none; }
-#app.atlas-board .scoreboard-panel .score.active { color: var(--edition-ink); background: color-mix(in srgb, var(--atlas-selection) 6%, var(--edition-surface)); border-color: color-mix(in srgb, var(--atlas-selection) 44%, var(--edition-line)); box-shadow: inset 3px 0 0 var(--atlas-selection); }
-#app.atlas-board .scoreboard-panel .score > .score-avatar { width: 40px; height: 40px; overflow: visible; border-radius: 50%; background: transparent; }
+#app.atlas-board .scoreboard-panel .scoreboard { scroll-snap-type: y proximity; }
+#app.atlas-board .scoreboard-panel .score { min-width: 0; }
+#app.atlas-board .scoreboard-panel .score.active { box-shadow: inset 3px 0 0 var(--atlas-selection); }
+#app.atlas-board .scoreboard-panel .score > .score-avatar { overflow: visible; border-radius: 50%; background: transparent; }
 #app.atlas-board .score-copy { min-width: 0; display: grid; gap: 4px; }
 #app.atlas-board .score-copy > b { max-width: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .78rem; }
 #app.atlas-board .score-progress { display: block; width: 100%; height: 5px; overflow: hidden; border-radius: 999px; background: color-mix(in srgb, var(--edition-line) 72%, transparent); }
 #app.atlas-board .score-progress > i { display: block; width: var(--player-progress); height: 100%; border-radius: inherit; background: color-mix(in srgb, var(--atlas-selection) 74%, var(--edition-brass)); }
-#app.atlas-board .scoreboard-panel .score > em { width: auto; height: auto; display: grid; gap: 0; place-items: center; border-radius: 0; color: var(--edition-ink); background: transparent; }
+#app.atlas-board .scoreboard-panel .score > em { gap: 0; place-items: center; }
 #app.atlas-board .scoreboard-panel .score > em small { color: var(--edition-muted); font: .48rem/1 var(--ui-font); text-transform: uppercase; }
 
 #app.atlas-board .placement-dock { gap: 4px; padding-top: 5px; }
 #app.atlas-board .placement-dock > .btn-primary { min-height: 42px; border-radius: 12px; }
 
 @media (max-width: 699px) {
-  #app.atlas-board .game-head { margin-bottom: 3px; padding-block: 2px 4px; }
+  #app.atlas-board .game-head { padding-block: 2px 4px; }
   #app.atlas-board .board-question { margin-block: 1px 4px; }
   #app.atlas-board .atlas-hand-section { margin-top: 0; }
   #app.atlas-board .atlas-hand-section > .hint { margin: 2px 0; }
@@ -2585,9 +2537,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
     padding: 8px;
   }
   #app.atlas-board[data-platform][data-screen] .board-focus-card .hand-solo .hand-card > strong {
-    margin-top: auto;
     font-size: clamp(.72rem, calc(3 * var(--vw)), .86rem);
-    line-height: 1.12;
   }
   #app.atlas-board .board-focus-card > .hint {
     max-width: 32rem;
@@ -2607,8 +2557,6 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   #app.atlas-board[data-platform][data-screen] .board-timeline-section .timeline .card-visual,
   #app.atlas-board:has(.hand-solo)[data-platform][data-screen] .board-timeline-section .timeline .card-visual {
     width: auto;
-    height: 114px;
-    max-height: 114px;
     aspect-ratio: auto;
   }
   #app.atlas-board .board-timeline-section .animal-timeline-card .animal-card-art {
@@ -2713,9 +2661,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
     box-shadow: inset 0 1px 0 #fff8;
   }
   #app.atlas-board > .shell > .board-timeline-section .timeline-wrap {
-    flex: 1 0 auto;
     padding-block: 8px 6px;
-    align-items: center;
   }
   #app.atlas-board .board-timeline-section .timeline-card {
     width: 138px;
@@ -2728,11 +2674,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
     margin: 5px 5px 0;
   }
   #app.atlas-board .board-timeline-section .timeline .animal-card-art {
-    object-fit: contain;
     object-position: center;
-    filter: sepia(.25) saturate(.88) contrast(1.04);
-    -webkit-mask-image: none;
-    mask-image: none;
   }
   #app.atlas-board .board-timeline-section .timeline-card .card-content {
     padding: 7px 8px;
@@ -2758,15 +2700,14 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app[data-screen="home"] .home-door[data-action="jugar"] { --door-paper: #f1eadc; --door-ink: #3e382d; --door-edge: #8e8060; }
 #app[data-screen="home"] .home-door[data-action="perfil"] { --door-paper: #eee8da; --door-ink: #3e372e; --door-edge: #97856b; }
 #app[data-screen="home"] .home-doors-shell .home-door {
-  background: var(--door-paper); border: 1px solid color-mix(in srgb, var(--door-edge) 67%, #fff8e8);
-  border-radius: 12px; box-shadow: 0 3px 0 color-mix(in srgb, var(--door-edge) 25%, #ddd0b6), 0 10px 21px #4939201d, inset 0 1px 0 #fff9ec;
+  background: var(--door-paper);
 }
 #app[data-screen="home"] .home-doors-shell .home-door::before {
-  content: ""; position: absolute; z-index: 3; inset: 5px; border: 1px solid #fff9e7a8; border-radius: 7px; box-shadow: inset 0 0 0 1px #6d563016; pointer-events: none;
+  content: ""; position: absolute; z-index: 3; border: 1px solid #fff9e7a8; pointer-events: none;
 }
-#app[data-screen="home"] .home-doors-shell .home-door-art img { filter: sepia(.32) saturate(.91) contrast(1.13); opacity: 1; }
+#app[data-screen="home"] .home-doors-shell .home-door-art img { opacity: 1; }
 #app[data-screen="home"] .home-doors-shell .home-door-cta {
-  margin-top: 5px; padding: 0 0 2px; border-radius: 0; border-bottom: 1px solid var(--door-edge); background: transparent; color: #745a35; font-weight: 700; box-shadow: none;
+  padding: 0 0 2px; border-radius: 0; background: transparent; box-shadow: none;
 }
 #app[data-screen="home"] .home-doors-shell .home-crest,
 #app[data-screen="home"] .home-doors-shell .home-crest img { filter: sepia(.12) saturate(.9) drop-shadow(0 5px 8px #6d563024); }
@@ -2809,8 +2750,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   background: var(--cardback-fill); opacity: 1; pointer-events: none;
 }
 #app .hand-card > strong, .drag-card-preview > strong {
-  color: #253f39; background: #f9f3e7ed; padding: 7px 5px 4px;
-  border-top: 1px solid #9aab9370; border-radius: 4px; text-shadow: none;
+  text-shadow: none;
 }
 
 /* Portada ilustrada: la lámina de referencia del juego. El papel se enmarca con una
@@ -2861,11 +2801,8 @@ html body::before { content: none; }
 
 #app[data-screen="home"] .home-doors-shell .home-masthead::before { display: none; }
 #app[data-screen="home"] .home-doors-shell .home-wordmark {
-  color: #2a1a10;
-  font-size: clamp(2.2rem, calc(10.6 * var(--vw)), 3.6rem);
   font-weight: 600;
   letter-spacing: .005em;
-  text-shadow: 0 1px 0 #fff8e8, 0 4px 10px #4a2c1624;
 }
 #app[data-screen="home"] .home-doors-shell .home-ornament { display: none; }
 
@@ -2873,7 +2810,6 @@ html body::before { content: none; }
    funde en el papel, y todo el texto va en la misma serif que el título. */
 #app[data-screen="home"] .home-doors-shell .home-door {
   --door-paper: #f8f0df; --door-ink: #2a1c12; --door-edge: #c4a46c;
-  min-height: 150px;
   border: 1.5px solid #d2b683;
   border-radius: 14px;
   box-shadow: 0 2px 0 #e2cfa6, 0 12px 26px #4a321a26, inset 0 1px 0 #fffaf0;
@@ -2890,37 +2826,37 @@ html body::before { content: none; }
   background: linear-gradient(90deg, var(--door-paper) 0 30%, color-mix(in srgb, var(--door-paper) 72%, transparent) 46%, transparent 72%);
 }
 #app[data-screen="home"] .home-doors-shell .home-door[data-action="jugar"] .home-door-art img { object-position: 70% 50%; }
-#app[data-screen="home"] .home-doors-shell .home-door-copy { min-height: 150px; width: 70%; padding: 18px 22px; gap: 7px; }
-#app[data-screen="home"] .home-doors-shell .home-door-copy b { color: var(--door-ink); font-family: var(--font-display); font-weight: 500; font-size: clamp(1.6rem, calc(6.6 * var(--vw)), 2.05rem); letter-spacing: -.01em; }
+#app[data-screen="home"] .home-doors-shell .home-door-copy { width: 70%; }
+#app[data-screen="home"] .home-doors-shell .home-door-copy b { color: var(--door-ink); font-family: var(--font-display); font-weight: 500; letter-spacing: -.01em; }
 #app[data-screen="home"] .home-doors-shell .home-door-copy small { max-width: 26ch; color: #4a3d31; font: 1rem/1.35 var(--font-display); }
 #app[data-screen="home"] .home-doors-shell .home-door-cta {
-  margin-top: 8px; padding-bottom: 4px; border-bottom: 1.5px solid #9c7641; color: #6e4a1f;
+  border-bottom: 1.5px solid #9c7641; color: #6e4a1f;
   font: 700 1.05rem/1.3 var(--font-display);
 }
 #app[data-screen="home"] .home-doors-shell .home-daily-streak { font-family: var(--font-display); }
 
 /* Aviso de duelos: tarjeta de papel con sello circular, como las láminas. */
 #app[data-screen="home"] .home-duels-banner {
-  min-height: 70px; padding: 12px 18px; gap: 16px;
+  gap: 16px;
   border: 1.5px solid #d2b683; border-radius: 14px;
   background: linear-gradient(180deg, #fbf5e8, #f4ead5);
   box-shadow: 0 2px 0 #e2cfa6, 0 10px 22px #4a321a1f, inset 0 0 0 4px #fffaf0, inset 0 0 0 5px #c4a46c40;
 }
 #app[data-screen="home"] .home-duels-banner b { color: #2a1c12; font: 700 1.12rem/1.25 var(--font-display); }
 #app[data-screen="home"] .home-duels-banner small { color: #5f5142; font: .95rem/1.35 var(--font-display); }
-#app[data-screen="home"] .home-duels-mark { width: 44px; height: 44px; border: 1px solid #c9ad7a; background: radial-gradient(circle, #fffaf0, #efe2c6); color: #3d3024; font-size: 1.25rem; box-shadow: inset 0 0 0 3px #fffaf0; }
+#app[data-screen="home"] .home-duels-mark { border: 1px solid #c9ad7a; background: radial-gradient(circle, #fffaf0, #efe2c6); color: #3d3024; box-shadow: inset 0 0 0 3px #fffaf0; }
 #app[data-screen="home"] .home-duels-banner i { color: #6e4a1f; font-size: 1.4rem; }
 
 :root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-door { --door-paper: #332a20; --door-ink: #f1e1bf; border-color: #8c6f45; box-shadow: 0 12px 26px #0006; }
 :root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-door-copy small { color: #e9dcc3; }
 :root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-door-cta { color: #e6c58e; border-color: #c8a26a; }
-:root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-wordmark { color: #f5dfc0; text-shadow: 0 4px 12px #0008; }
+:root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-wordmark { color: #f5dfc0; }
 :root[data-theme="dark"] #app[data-screen="home"] .home-duels-banner { background: #3a2d1f; border-color: #8c6f45; box-shadow: 0 10px 22px #0006; }
 :root[data-theme="dark"] #app[data-screen="home"] .home-duels-banner b { color: #f1e1bf; }
 :root[data-theme="dark"] #app[data-screen="home"] .home-duels-banner small { color: #d9c9aa; }
 :root[data-theme="dark"] #app[data-screen="home"] .home-duels-mark { background: #2a2118; color: #e6c58e; box-shadow: none; }
 @media (max-width: 380px) {
-  #app[data-screen="home"] .home-doors-shell .home-door-copy { width: 76%; padding-inline: 16px; }
+  #app[data-screen="home"] .home-doors-shell .home-door-copy { width: 76%; }
 }
 #app[data-screen="home"] .home-doors-shell { padding-bottom: calc(150px + var(--safe-bottom)); }
 :root #app[data-screen="daily-intro"] { background: radial-gradient(ellipse at 50% 22%, color-mix(in srgb, var(--scene-wash) 18%, transparent), transparent 43%); }
@@ -2936,7 +2872,7 @@ html body::before { content: none; }
 /* Portada compacta: caben al menos dos láminas enteras en un móvil con la barra del
    navegador visible. */
 #app[data-screen="home"] .home-doors-shell .home-masthead { margin: calc(var(--safe-top) + clamp(4px, calc(1.6 * var(--svh)), 18px)) auto clamp(10px, calc(1.8 * var(--svh)), 18px); }
-#app[data-screen="home"] .home-doors-shell .home-crest { width: clamp(70px, calc(17 * var(--vw)), 110px); margin-bottom: -2px; }
+#app[data-screen="home"] .home-doors-shell .home-crest { margin-bottom: -2px; }
 #app[data-screen="home"] .home-doors-shell .home-wordmark { font-size: clamp(2rem, calc(9.4 * var(--vw)), 3.2rem); }
 #app[data-screen="home"] .home-doors-shell .home-doors { gap: 10px; }
 #app[data-screen="home"] .home-doors-shell .home-door,
@@ -3179,7 +3115,6 @@ html:not(:has(#app[data-screen="home"]))::before {
 /* El reverso común lleva el emblema real de Continuum. La mano se lee por encima
    de la línea: una carta activa grande, las demás en un abanico limpio y compacto. */
 #app .hand-card, .drag-card-preview {
-  --cardback-fill: radial-gradient(ellipse at 50% 38%, #fff8e9, #f5ead4 58%, #e7d3b1 100%);
   border-color: #bd9670;
   box-shadow: inset 0 0 0 1px #fff8e7, 0 5px 13px #51351d26;
 }
@@ -3193,7 +3128,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 }
 #app .hand-card > .hidden-date, .drag-card-preview > .hidden-date { color: #5b3d22; }
 #app .hand-card > strong, .drag-card-preview > strong {
-  color: #30271e; background: #fbf4e9e8; border-top-color: #b994686b;
+  color: #30271e; background: #fbf4e9e8;
 }
 #app.atlas-board .atlas-hand-section .hand:not(.hand-solo) {
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -3253,15 +3188,14 @@ html:not(:has(#app[data-screen="home"]))::before {
   --fan-step: min(calc(14.7 * var(--vw)), 54.6px);
   display: grid; grid-template-columns: 1fr; grid-template-rows: 1fr;
   justify-items: center; align-items: center;
-  width: 100%; max-width: 460px; height: clamp(160px, calc(45 * var(--vw)), 176px);
-  min-height: 0; max-height: none; margin: 0 auto; padding: 8px 0 18px;
-  overflow: clip; isolation: isolate; touch-action: pan-y;
+  width: 100%; max-width: 460px;
+  min-height: 0; max-height: none; margin: 0 auto;
+  isolation: isolate; touch-action: pan-y;
 }
 #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card {
   grid-area: 1 / 1; order: 0; position: relative;
-  width: min(calc(26.6 * var(--vw)), 105px); min-height: 0 !important; height: auto !important;
-  aspect-ratio: 3 / 4 !important; margin: 0; padding: 6px;
-  transform: translateX(calc(var(--fan-offset) * var(--fan-step))) translateY(calc(var(--fan-depth) * 11.2px)) rotate(calc(var(--fan-offset) * 6deg)) scale(calc(1 - var(--fan-depth) * .14));
+  min-height: 0 !important; height: auto !important;
+  margin: 0; padding: 6px;
   transform-origin: center 85%; touch-action: pan-y;
   border: 1px solid #b99570; outline: 0;
   box-shadow: 0 7px 12px #51351d33;
@@ -3389,7 +3323,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 
 /* Tamaño compacto sin reducir los controles táctiles ni el texto accesible. */
 #app.atlas-board[data-platform][data-device][data-screen] .hand.hand-fan .hand-card > strong {
-  font-size: .72rem; line-height: 1.12; padding: 4px 3px;
+  padding: 4px 3px;
 }
 #app.atlas-board[data-platform][data-device][data-screen] .hand.hand-fan .hand-card > .hidden-date {
   font-size: .42rem; letter-spacing: .03em;
@@ -3397,7 +3331,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 :root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board[data-platform][data-device][data-screen] .hand.hand-fan .hand-card > strong { font-size: 1rem; }
 
 /* Atlas personal: carta de navegación, estaciones y cuadernos del recorrido. */
-#app[data-screen="perfil"] .perfil-section { max-width: 900px; margin-inline: auto; }
+#app[data-screen="perfil"] .perfil-section { margin-inline: auto; }
 #app[data-screen="perfil"] .atlas-page-heading { margin-bottom: 8px; text-align: center; }
 #app[data-screen="perfil"] .atlas-page-heading h1 { font-size: clamp(2.8rem, calc(11 * var(--vw)), 4.8rem); letter-spacing: -.035em; }
 #app[data-screen="perfil"] .atlas-page-heading p { max-width: 42ch; margin-inline: auto; }
@@ -3459,7 +3393,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 #app[data-screen="perfil"] .atlas-chart-seal { position: absolute; right: 24px; bottom: 18px; display: grid; place-content: center; width: 64px; height: 64px; border: 3px double #965444; border-radius: 50%; text-align: center; color: #965444; font: 2rem/.75 var(--font-display); opacity: .68; transform: rotate(-13deg); }
 #app[data-screen="perfil"] .atlas-chart-seal small { padding-top: 8px; font: 600 .33rem var(--ui-font); letter-spacing: .1em; }
 
-#app[data-screen="perfil"] .atlas-territories { position: relative; display: grid; gap: 18px; padding-left: 30px; }
+#app[data-screen="perfil"] .atlas-territories { position: relative; display: grid; padding-left: 30px; }
 #app[data-screen="perfil"] .atlas-territories::before { content: ''; position: absolute; left: 13px; top: 20px; bottom: 70px; width: 2px; background: repeating-linear-gradient(to bottom, #a76e50 0 5px, transparent 5px 13px); opacity: .6; }
 #app[data-screen="perfil"] .atlas-territory { position: relative; min-width: 0; scroll-margin-top: 18px; padding: 19px clamp(15px, calc(4 * var(--vw)), 28px) 24px; border: 1px solid color-mix(in srgb, var(--edition-brass) 26%, var(--edition-line)); border-radius: 16px; background: radial-gradient(ellipse at 94% 8%, color-mix(in srgb, var(--edition-brass) 10%, transparent), transparent 40%), var(--edition-surface); box-shadow: 0 8px 20px #50371d12, inset 0 1px #fff5; }
 #app[data-screen="perfil"] .atlas-territory::before { content: ''; position: absolute; left: -27px; top: 30px; width: 18px; height: 18px; border: 4px solid var(--edition-paper); border-radius: 50%; background: var(--atlas-selection); box-shadow: 0 0 0 1px var(--edition-brass); }
@@ -3525,7 +3459,7 @@ html:not(:has(#app[data-screen="home"]))::before {
     --fit-score-height: 52px; --fit-section-pad: 4px;
   }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell {
-    padding-top: max(2px, var(--safe-top)); padding-bottom: max(3px, var(--safe-bottom));
+    padding-bottom: max(3px, var(--safe-bottom));
   }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .atlas-topbar {
     min-height: 40px; height: 40px; margin-bottom: 0; padding-block: 0;
@@ -3820,48 +3754,17 @@ html:not(:has(#app[data-screen="home"]))::before {
 #app.atlas-board .quick-shell .timeline .timeline-card:has(.animal-card-art) .card-content .year { font: 700 .92rem/1.15 var(--font-display); color: #8a3f2f; }
 
 /* Retos rápidos: título del mazo pegado a la línea divisoria y extremos de la línea de cartas. */
-#app.atlas-board .quick-shell .game-head { align-items: end; margin-top: 6px; padding-bottom: 6px; }
+#app.atlas-board .quick-shell .game-head { align-items: end; }
 #app.atlas-board .quick-shell .game-head .turn-label { margin: 0; }
 #app.atlas-board .quick-shell .timeline-ends { display: flex; justify-content: space-between; gap: 8px; margin: 0 2px 2px; color: #8a3f2f; font: 700 .68rem/1.2 var(--font-display); letter-spacing: .06em; text-transform: uppercase; }
 
 /* Navegación como cuatro fichas de atlas: pergamino mate, inclinación leve y una
    elevación contenida para indicar el destino actual sin añadir otra caja brillante. */
 html #app .home-nav.atlas-nav {
-  left: 50%;
-  bottom: 0;
-  width: min(calc(100% - 24px), 460px);
-  max-width: 460px;
-  min-height: calc(88px + var(--safe-bottom));
-  padding: 5px 5px calc(7px + var(--safe-bottom));
-  grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: end;
-  gap: 7px;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  transform: translateX(-50%);
-  overflow: visible;
 }
 html #app .home-nav.atlas-nav button {
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  gap: 3px;
-  width: 100%;
-  min-width: 0;
-  min-height: 70px;
-  padding: 5px 2px 4px;
-  border: 1px solid #b9a98e;
-  border-radius: 9px 9px 7px 7px;
-  color: #5b4936;
-  background: linear-gradient(155deg, rgba(250,246,235,.97), rgba(232,221,201,.96));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 2px 4px rgba(54,41,26,.12);
-  transform: rotate(var(--atlas-card-tilt, 0deg));
   transform-origin: 50% 100%;
-  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
 }
 html #app .home-nav.atlas-nav button:nth-child(1) { --atlas-card-tilt: -2deg; }
 html #app .home-nav.atlas-nav button:nth-child(2) { --atlas-card-tilt: -.7deg; }
@@ -3869,15 +3772,8 @@ html #app .home-nav.atlas-nav button:nth-child(3) { --atlas-card-tilt: .7deg; }
 html #app .home-nav.atlas-nav button:nth-child(4) { --atlas-card-tilt: 2deg; }
 html #app .home-nav.atlas-nav button[aria-current="page"] {
   z-index: 3;
-  min-height: 76px;
-  border-color: #aa7157;
-  color: #704a37;
-  background: linear-gradient(155deg, #f8efdf, #eadbc4);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 5px 9px rgba(61,43,29,.17);
-  transform: translateY(-5px) rotate(0deg);
 }
 html #app .home-nav.atlas-nav button[aria-current="page"] small {
-  color: #854b37;
   text-decoration: none;
 }
 
@@ -3890,10 +3786,8 @@ html #app .home-nav.atlas-nav button[aria-current="page"] small {
     transform: none;
     width: 100%;
     max-width: none;
-    min-height: 0;
     margin-top: 24px;
     padding: 0;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -3910,48 +3804,42 @@ html #app .home-nav.atlas-nav button[aria-current="page"] small {
    tarjeta cuya ilustración forma parte del propio fondo (se difumina hacia el texto). */
 #app #deck-collection .collection-decks { padding: 4px 0 12px; background: transparent; border: 0; box-shadow: none; }
 #app #deck-collection .collection-decks .lead { margin: 2px 0 10px; text-align: center; font: 600 .7rem/1.3 var(--ui-font); letter-spacing: .14em; text-transform: uppercase; color: #8a3f2f; }
-#app #deck-collection .collection-decks .games { position: relative; display: grid; gap: 14px; padding: 4px 0 4px 34px; }
-#app #deck-collection .collection-decks .games::before { content: ""; position: absolute; left: 13px; top: 18px; bottom: 18px; width: 3px; border-radius: 2px; background: repeating-linear-gradient(180deg, #b08a52 0 7px, transparent 7px 13px); opacity: .8; }
-#app #deck-collection .collection-decks .game-row { position: relative; display: block; overflow: visible; margin: 0; min-height: 92px; padding: 15px 44% 15px 16px; border: 1px solid #c9b48f; border-left: 1px solid #c9b48f; border-radius: 14px; background: linear-gradient(120deg, #fbf3e2, #f3e6cc); box-shadow: 0 3px 10px #5a3f1f22; text-align: left; }
-#app #deck-collection .collection-decks .game-row::before { content: ""; position: absolute; inset: 50% auto auto -27px; width: 15px; height: 15px; margin-top: -8px; border-radius: 50%; background: #f7ecd6; border: 3px solid #b08a52; box-shadow: 0 0 0 3px #f7ecd6; }
+#app #deck-collection .collection-decks .games { position: relative; display: grid; }
+#app #deck-collection .collection-decks .games::before { content: ""; position: absolute; }
+#app #deck-collection .collection-decks .game-row { position: relative; display: block; margin: 0; text-align: left; }
+#app #deck-collection .collection-decks .game-row::before { position: absolute; border-radius: 50%; }
 #app #deck-collection .collection-decks .game-row::after { content: none; }
-#app #deck-collection .collection-decks .game-row .deck-preview { position: absolute; inset: 0 0 0 auto; z-index: 0; float: none; width: 46%; height: auto; margin: 0; border-radius: 0 14px 14px 0; overflow: hidden; filter: sepia(.25) saturate(.9); mix-blend-mode: normal; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 70%); mask-image: linear-gradient(90deg, transparent 0, #000 70%); pointer-events: none; }
+#app #deck-collection .collection-decks .game-row .deck-preview { position: absolute; z-index: 0; float: none; margin: 0; overflow: hidden; mix-blend-mode: normal; pointer-events: none; }
 #app #deck-collection .collection-decks .game-row .deck-preview img,
 #app #deck-collection .collection-decks .game-row .deck-preview svg { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
 #app #deck-collection .collection-decks .game-row > :not(.deck-preview) { position: relative; z-index: 1; grid-column: auto; }
-#app #deck-collection .collection-decks .game-row .deck-chapter { margin: 0 0 4px; justify-content: flex-start; font-size: .58rem; letter-spacing: .16em; color: #8a3f2f; }
+#app #deck-collection .collection-decks .game-row .deck-chapter { margin: 0 0 4px; justify-content: flex-start; font-size: .58rem; letter-spacing: .16em; }
 #app #deck-collection .collection-decks .game-row .deck-chapter i { display: none; }
 #app #deck-collection .collection-decks .game-row .game-name { padding: 0; border: 0; font-size: 1.12rem; line-height: 1.15; }
 #app #deck-collection .collection-decks .game-row .game-meta { margin-top: 5px; font: .72rem/1.35 var(--ui-font); }
 
 /* El camino de los mazos, como el mapa de niveles de un videojuego: una senda de tierra
    que serpentea, un medallón numerado por mazo, bandera de salida y estrella de meta. */
-#app #deck-collection .collection-decks .games { counter-reset: nivel; padding: 34px 0 44px 52px; gap: 16px; }
+#app #deck-collection .collection-decks .games { counter-reset: nivel; }
 #app #deck-collection .collection-decks .games::before {
-  left: 3px; top: 14px; bottom: 16px; width: 44px; border-radius: 0; opacity: 1;
-  background: url("assets/camino-senda.svg") center top / 44px 120px repeat-y;
+  border-radius: 0; opacity: 1;
 }
 #app #deck-collection .collection-decks .games::after {
-  content: "★"; position: absolute; left: 6px; bottom: 0; width: 38px; height: 38px;
-  display: grid; place-items: center; border-radius: 50%; color: #fff4d6; font-size: 1.15rem;
-  background: radial-gradient(circle at 35% 30%, #f3d48a, #b8862f 60%, #7c5418);
-  border: 2px solid #fff3d2; box-shadow: 0 0 0 2px #8a6326, 0 4px 10px #5a3a1466, 0 0 14px #e6b85a88;
+  position: absolute;
+  display: grid; place-items: center; border-radius: 50%;
 }
 #app #deck-collection .collection-decks .game-row { counter-increment: nivel; }
 #app #deck-collection .collection-decks .game-row::before {
-  content: counter(nivel); inset: 50% auto auto -47px; width: 34px; height: 34px; margin-top: -17px;
-  display: grid; place-items: center; color: #fff6e0; font: 800 .95rem/1 var(--font-display);
-  text-shadow: 0 1px 0 #5a2a1c;
-  background: radial-gradient(circle at 35% 28%, #d98a68, #9b4430 58%, #6c2a1d);
-  border: 2px solid #fff1d6; box-shadow: 0 0 0 2px #7a3526, 0 5px 0 #4f1e14, 0 7px 10px #3a1a0f55;
+  content: counter(nivel);
+  display: grid; place-items: center;
 }
 #app #deck-collection .collection-decks .lead { position: relative; }
 #app #deck-collection .collection-decks .lead + .games > .game-row:first-child::after {
-  content: "⚑ SALIDA"; position: absolute; left: -58px; top: -30px; z-index: 2; padding: 2px 6px;
-  border-radius: 4px; background: #8a3f2f; color: #fff4e0; font: 700 .52rem/1.4 var(--ui-font); letter-spacing: .1em;
+  position: absolute; z-index: 2; padding: 2px 6px;
+  color: #fff4e0; font: 700 .52rem/1.4 var(--ui-font); letter-spacing: .1em;
   box-shadow: 0 2px 4px #0003; white-space: nowrap;
 }
-#app #deck-collection .collection-decks .game-row .deck-preview { top: 0; bottom: 0; height: 100% !important; max-height: 100%; }
+#app #deck-collection .collection-decks .game-row .deck-preview { max-height: 100%; }
 #app #deck-collection .collection-decks .game-row .deck-preview > :is(img, svg) { position: absolute; inset: 0; height: 100%; }
 #app #deck-collection .collection-decks .lead + .games > .game-row:first-child::after { right: auto; bottom: auto; width: auto; height: auto; left: -50px; top: -28px; background: #8a3f2f; border-radius: 4px; }
 #app #deck-collection .collection-decks .games { overflow: visible; }
@@ -3982,7 +3870,7 @@ html #app .home-nav.atlas-nav button[aria-current="page"] small {
 
 /* Mesa de juego: la lupa del zoom bajo el contador de pendientes, a la derecha del todo;
    «Tu carta» pegada a la izquierda; y los extremos de la línea según el mazo. */
-#app.atlas-board .game-head-side { position: relative; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex: none; margin-left: auto; }
+#app.atlas-board .game-head-side { position: relative; display: flex; flex: none; margin-left: auto; }
 #app.atlas-board .game-head-side > .timeline-zoom { position: relative; display: block; margin: 0; padding: 0; border: 0; background: none; box-shadow: none; }
 #app.atlas-board .timeline-zoom .zoom-toggle { display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 4px 10px; border: 1px solid var(--edition-line, #cdb994); border-radius: 999px; background: #fbf4e4; color: #5a4330; font: 600 .74rem/1 var(--ui-font); cursor: pointer; box-shadow: 0 1px 3px #5a3f1f22; }
 #app.atlas-board .timeline-zoom .zoom-toggle[aria-expanded="true"] { background: #8a3f2f; border-color: #8a3f2f; color: #fff6e8; }
@@ -4114,12 +4002,12 @@ html #app .home-nav.atlas-nav button[aria-current="page"] small {
    una pastilla que tapa el «valor oculto» y el reverso: queda como un pequeño sello con su icono
    en la esquina superior derecha (el nombre sigue disponible para lectores de pantalla). */
 #app.atlas-board .hand-card { position: relative; }
-#app.atlas-board .hand-card > .card-category { position: absolute; z-index: 3; top: 5px; right: 5px; left: auto; width: 20px; height: 20px; min-height: 0; margin: 0; padding: 0; justify-content: center; gap: 0; overflow: hidden; border-radius: 50%; font-size: 0; line-height: 0; color: transparent; background: #f3e6c8; border: 1px solid #c9b48f; box-shadow: 0 1px 2px #5a3f1f33; }
-#app.atlas-board .hand-card > .card-category > span[aria-hidden="true"] { font-size: .7rem; line-height: 1; color: initial; }
+#app.atlas-board .hand-card > .card-category { position: absolute; z-index: 3; top: 5px; right: 5px; left: auto; width: 20px; height: 20px; min-height: 0; margin: 0; padding: 0; justify-content: center; gap: 0; overflow: hidden; border-radius: 50%; line-height: 0; background: #f3e6c8; border: 1px solid #c9b48f; box-shadow: 0 1px 2px #5a3f1f33; }
+#app.atlas-board .hand-card > .card-category > span[aria-hidden="true"] { line-height: 1; color: initial; }
 /* La carta de la línea usa el mismo sello de temática en la esquina, así no crece en Gran mezcla. */
 #app.atlas-board .timeline .timeline-card { position: relative; }
-#app.atlas-board .timeline .timeline-card .card-category { position: absolute; z-index: 3; top: 6px; right: 6px; left: auto; width: 22px; height: 22px; min-height: 0; margin: 0 !important; padding: 0; justify-content: center; gap: 0; overflow: hidden; border-radius: 50%; font-size: 0; line-height: 0; color: transparent; background: #f3e6c8; border: 1px solid #c9b48f; box-shadow: 0 1px 2px #5a3f1f33; }
-#app.atlas-board .timeline .timeline-card .card-category > span[aria-hidden="true"] { font-size: .75rem; line-height: 1; color: initial; }
+#app.atlas-board .timeline .timeline-card .card-category { position: absolute; z-index: 3; top: 6px; right: 6px; left: auto; width: 22px; height: 22px; min-height: 0; margin: 0 !important; padding: 0; justify-content: center; gap: 0; overflow: hidden; border-radius: 50%; background: #f3e6c8; border: 1px solid #c9b48f; box-shadow: 0 1px 2px #5a3f1f33; }
+#app.atlas-board .timeline .timeline-card .card-category > span[aria-hidden="true"] { color: initial; }
 #app.atlas-board .timeline .timeline-card:has(.animal-card-art) > .card-content { position: static !important; }
 #app.atlas-board .timeline .timeline-card .card-category { font-size: 0 !important; line-height: 0 !important; color: transparent !important; letter-spacing: 0 !important; text-transform: none !important; max-width: none; }
 #app.atlas-board .timeline .timeline-card .card-category > span[aria-hidden="true"] { font-size: .75rem !important; line-height: 1 !important; }
@@ -4131,7 +4019,7 @@ html #app .home-nav.atlas-nav button[aria-current="page"] small {
 #app.atlas-board .game-head.game-head-slim > div:first-child { flex: 0 1 auto; }
 #app.atlas-board .game-head.game-head-slim .turn-name { font: 700 1rem/1.1 var(--font-display); }
 #app.atlas-board .game-head.game-head-slim .solo-lives { margin: 0 auto 0 4px; }
-#app.atlas-board .game-head.game-head-slim .deck-count { flex-direction: row; align-items: baseline; gap: 5px; width: auto; min-width: 0; height: auto; padding: 0; border: 0; background: none; box-shadow: none; }
+#app.atlas-board .game-head.game-head-slim .deck-count { flex-direction: row; align-items: baseline; gap: 5px; width: auto; min-width: 0; padding: 0; border: 0; background: none; box-shadow: none; }
 #app.atlas-board .game-head.game-head-slim .deck-count strong { font: 700 1rem/1 var(--font-display); }
 #app.atlas-board .game-head.game-head-slim .deck-count span { font: .72rem/1.2 var(--ui-font); letter-spacing: .02em; text-transform: none; }
 #app.atlas-board .game-head.game-head-slim:has(> div:first-child > .solo-lectores + .solo-lectores) > div:first-child { display: none; }
@@ -4870,8 +4758,8 @@ html:has(#app.atlas-board) .motas { display: none; }
    estilo de los demás campos de la pantalla. Cuatro pastillas de papel en una fila; la de
    «Sin tiempo», algo más ancha, parte el texto en dos líneas si no cabe: nunca se sale. */
 html #app .tiempo-field .tiempo-segmented {
-  display: grid; grid-template-columns: minmax(0, 1.3fr) repeat(3, minmax(0, 1fr)); gap: 8px;
-  padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none;
+  gap: 8px;
+  border-radius: 0;
 }
 html #app .tiempo-field .tiempo-segmented .segmented-option {
   position: relative; display: grid; place-items: center; place-content: center; gap: 0; min-width: 0; min-height: 50px; margin: 0; padding: 6px 6px;
@@ -4939,8 +4827,8 @@ html #app .tiempo-segmented .segmented-option::after { content: none !important;
 @media (prefers-reduced-motion: reduce) { #app .solo-lives .vida-rota { animation: none; } }
 
 /* Aviso de vidas antes de empezar: tres corazones grandes y la regla en una línea. */
-#app .vidas-aviso { display: flex; align-items: center; gap: 12px; margin: 14px 0 4px; padding: 10px 14px; border: 1px solid var(--edition-line); border-radius: 14px; background: var(--edition-surface); box-shadow: 0 2px 6px #5a341a12; }
-#app .vidas-aviso-corazones { flex: none; color: #b03a2e; font-size: 1.9rem; line-height: 1; letter-spacing: .08em; }
+#app .vidas-aviso { display: flex; align-items: center; }
+#app .vidas-aviso-corazones { flex: none; color: #b03a2e; line-height: 1; }
 #app .vidas-aviso p { margin: 0; color: var(--edition-muted); font: .88rem/1.4 var(--ui-font); }
 #app .vidas-aviso b { display: block; color: var(--edition-ink); font: 600 1.05rem/1.25 var(--font-display); }
 
@@ -5041,15 +4929,15 @@ html #app .tiempo-segmented .segmented-option::after { content: none !important;
 
 /* Continuum v677: avisos y preparación con el mismo papel y filetes del menú. */
 #app .solo-shortcut-resume {
-  position: relative; grid-template-columns: minmax(0, 1fr) 42px; gap: 16px;
-  padding: 19px 22px; border: 1px solid var(--edition-brass); border-radius: 18px;
+  grid-template-columns: minmax(0, 1fr) 42px; gap: 16px;
+  border: 1px solid var(--edition-brass); border-radius: 18px;
   background: radial-gradient(ellipse at 0 0, #fffaf280, transparent 65%), var(--edition-paper);
   box-shadow: inset 0 0 0 5px #fff7e740, inset 0 0 0 6px #b8976033, 0 5px 12px #6343231c;
 }
-#app .solo-shortcut-resume .solo-shortcut-copy { grid-row: auto; color: inherit; min-width: 0; }
+#app .solo-shortcut-resume .solo-shortcut-copy { grid-row: auto; color: inherit; }
 #app .solo-shortcut-copy em { display: block; margin-bottom: 5px; color: var(--edition-brass); font: 600 .62rem/1.2 var(--ui-font); letter-spacing: .13em; text-transform: uppercase; }
 #app .solo-shortcut-copy b { font: 600 1.12rem/1.2 var(--font-display); }
-#app .solo-shortcut-resume .solo-shortcut-arrow { grid-column: 2; grid-row: 1; display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid #b8976066; border-radius: 50%; background: #b8976012; color: var(--edition-brass); }
+#app .solo-shortcut-resume .solo-shortcut-arrow { grid-column: 2; grid-row: 1; background: #b8976012; }
 #app .solo-shortcut-resume:focus-visible { outline: 2px solid var(--edition-brass); outline-offset: 4px; }
 #app .vidas-aviso {
   gap: 14px; padding: 15px 18px; margin: 16px 0 12px;
@@ -5062,16 +4950,16 @@ html #app .tiempo-segmented .segmented-option::after { content: none !important;
 #app .vidas-aviso b { margin-bottom: 3px; }
 #app .quick-free-setup .solo-panel { position: relative; border: 1px solid var(--edition-brass); box-shadow: inset 0 0 0 5px #fff7e733, inset 0 0 0 6px #b8976029, 0 10px 25px #6343231c; background: radial-gradient(ellipse at 15% 0, #fffaf280, transparent 65%), var(--edition-paper); }
 #app .quick-setup-kicker { display: block; margin-bottom: 8px; color: var(--edition-brass); font: 600 .64rem/1.2 var(--ui-font); letter-spacing: .14em; text-transform: uppercase; }
-#app .quick-free-setup .quick-length-chip { position: relative; min-height: 110px; padding: 17px 6px 12px; border-radius: 14px; overflow-wrap: normal; background: var(--edition-surface); color: var(--edition-ink); border-color: var(--edition-line); box-shadow: inset 0 0 0 4px #b8976012, 0 3px 8px #63432314; }
-#app .quick-free-setup .quick-length-chip small { font-size: .65rem; line-height: 1.3; color: var(--edition-muted); }
-#app .quick-free-setup .quick-length-chip.is-selected { border-color: var(--edition-brass); color: var(--edition-ink); background: linear-gradient(145deg, #b8976024, #b8976010), var(--edition-surface); box-shadow: inset 0 0 0 2px var(--edition-brass), 0 5px 12px #63432324; }
-#app .quick-free-setup .quick-length-chip.is-selected::after { content: "✓"; position: absolute; right: 7px; top: 6px; font: 700 .7rem/1 var(--ui-font); color: var(--edition-brass); }
-#app .quick-free-setup .quick-length-more { min-height: 44px; border: 1px solid var(--edition-line); border-radius: 12px; font-size: .82rem; background: #b897600a; }
+#app .quick-free-setup .quick-length-chip { position: relative; overflow-wrap: normal; color: var(--edition-ink); border-color: var(--edition-line); }
+#app .quick-free-setup .quick-length-chip small { color: var(--edition-muted); }
+#app .quick-free-setup .quick-length-chip.is-selected { color: var(--edition-ink); }
+#app .quick-free-setup .quick-length-chip.is-selected::after { content: "✓"; position: absolute; font: 700 .7rem/1 var(--ui-font); }
+#app .quick-free-setup .quick-length-more { min-height: 44px; border: 1px solid var(--edition-line); border-radius: 12px; font-size: .82rem; }
 #app .quick-free-setup .tiempo-segmented { gap: 8px; }
-#app .quick-free-setup .tiempo-segmented .segmented-option { border-radius: 12px; background: var(--edition-surface); box-shadow: inset 0 0 0 3px #b8976012; }
-#app .quick-free-setup .tiempo-segmented .segmented-option.is-on { border-color: var(--edition-brass); box-shadow: inset 0 0 0 1px var(--edition-brass); background: linear-gradient(145deg, #b8976024, #b8976010), var(--edition-surface); }
+#app .quick-free-setup .tiempo-segmented .segmented-option { border-radius: 12px; background: var(--edition-surface); }
+#app .quick-free-setup .tiempo-segmented .segmented-option.is-on { background: linear-gradient(145deg, #b8976024, #b8976010), var(--edition-surface); }
 #app .quick-free-setup .tiempo-segmented b { font-size: .92rem; line-height: 1.15; }
-#app .quick-free-setup [data-quick="start-free"] { border-radius: 12px; color: #fff6e7; border-color: #75432c; background: linear-gradient(160deg, #986045, #77402d); box-shadow: inset 0 1px 0 #ffffff30, 0 4px 10px #63432325; }
+#app .quick-free-setup [data-quick="start-free"] { color: #fff6e7; border-color: #75432c; }
 
 /* El reverso conserva el tamaño exterior. Rótulo, emblema y título tienen
    zonas independientes; el ajuste de texto de immersion.js mantiene palabras enteras. */
@@ -5216,7 +5104,7 @@ html #app[data-screen] .setup-art-panel .btn-secondary.btn-block { border-radius
 html #app[data-screen] .setup-art-panel .duel-brief { border-radius: 12px; border: 1px dashed var(--edition-line); background: #b897600a; }
 html #app[data-screen] .setup-art-panel .setup-block-head { padding-bottom: 9px; border-bottom: 1px solid var(--edition-line); }
 html #app[data-screen] .setup-art-panel.solo-fold > summary { position: relative; isolation: isolate; min-height: 110px; padding: 20px; overflow: hidden; }
-html #app[data-screen] .setup-art-panel.solo-fold > summary::before { content: ""; position: absolute; z-index: -1; inset: 0 0 0 auto; width: 46%; background: var(--setup-illustration) 75% center/cover; opacity: .55; -webkit-mask-image: linear-gradient(90deg, transparent, #000); mask-image: linear-gradient(90deg, transparent, #000); }
+html #app[data-screen] .setup-art-panel.solo-fold > summary::before { content: ""; position: absolute; z-index: -1; inset: 0 0 0 auto; background: var(--setup-illustration) 75% center/cover; opacity: .55; }
 html #app[data-screen] .setup-art-panel .quick-length { gap: 10px; }
 html #app[data-screen] .setup-art-panel .quick-length-chip { --quick-card-paper: #f3e7cf; min-height: 158px; padding: 12px 5px 11px; border-radius: 15px; gap: 2px; color: var(--edition-ink); background: linear-gradient(155deg, #fffaf065, #b8976014), var(--edition-surface); box-shadow: inset 0 0 0 4px #b897600e, inset 0 0 0 5px #b8976024, 0 5px 10px #6343231c; }
 html #app[data-screen] .setup-art-panel .quick-duration-art { width: min(100%, 92px); height: 68px; color: #917043; filter: drop-shadow(0 3px 2px #63432330); }
