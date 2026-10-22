@@ -239,15 +239,16 @@
     } catch { return null; }
   }
 
-  // Flecha para retroceder; la casa del menú inferior vuelve al inicio.
-  function header(extra = "") {
-    const playing = CT.UI.isPlaying(screen);
-    if (playing) {
+  // Flecha para retroceder; la casa del menú inferior vuelve al inicio. Dentro de una
+  // partida la cabecera lleva además el menú de opciones (Guía, Ajustes, salir). `volver`
+  // es la acción de la flecha fuera de la partida: `back-menu` en las pantallas que
+  // vuelven siempre al menú que las contiene; por defecto, `ui-back`, que sigue el rastro.
+  function header(volver = "ui-back") {
+    if (CT.UI.isPlaying(screen)) {
       const menu = screen === 'solo' || screen === 'comp-intro' ? 'solo-options' : 'game-menu';
       return CT.UI.header('data-action="ui-back"', `data-action="${menu}"`, true);
     }
-    const backAction = extra.match(/data-action="(collection-back|back-menu|home)"/)?.[1] || 'ui-back';
-    return CT.UI.header(screen === 'home' ? '' : `data-action="${backAction}"`);
+    return CT.UI.header(screen === 'home' ? '' : `data-action="${volver}"`);
   }
 
   // Las carátulas van a la caché de la aplicación y se bajan en la primera visita, así
@@ -355,7 +356,7 @@
     if (audience === 'local') { prepareMultiCompetition(); return; }
     if (audience === 'online' || audience === 'friends') { competitionFriends(); return; }
     screen = 'competition-menu';
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
+    paint(`<div class="shell">${header("back-menu")}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Competición</div><h2 class="solo-title" data-focus tabindex="-1">Competición en solitario</h2>
         <p class="lead">Temas al azar de las Grandes colecciones, uno detrás de otro, sin repetir.</p>${vidasAviso("por tema")}<p class="solo-intro-rule">Al final cuentan todos tus aciertos.</p></div>
         ${loadCompetition() ? '<button class="btn btn-secondary btn-block" data-action="resume-competition">Continuar competición en solitario <span>→</span></button>' : ''}
@@ -391,7 +392,7 @@
       <span class="field-label" id="${id}">${etiqueta}</span>
       <div class="segmented" role="radiogroup" aria-labelledby="${id}">${opciones.map(o => opcion(name, ...o, actual)).join("")}</div>
     </div>`;
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
+    paint(`<div class="shell">${header("back-menu")}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Competición</div><h2 class="solo-title" data-focus tabindex="-1">Competición con amigos</h2>
         <p class="lead">Cada uno desde su móvil. Se juega por rondas, todos a la vez y con puntos. Temas al azar de las Grandes colecciones y gana quien más sume al final.</p></div>
         <div class="panel solo-panel">
@@ -476,7 +477,7 @@
   function renderTournamentIntro() {
     screen = "tournament-intro";
     const mode = currentMode();
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}<section class="pass-screen"><div class="panel pass-card comp-splash">
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel pass-card comp-splash">
       <div class="chapter-art" aria-hidden="true">${blockArt(CT.blockOf(game.mode).art, true)}</div>
       ${CT.Tournament.journey(game.tournament)}
       <div class="chapter-number">Tema ${game.tournament.index + 1} de ${game.tournament.queue.length}</div>
@@ -743,7 +744,7 @@
     CT.TurnDuel?.leave?.();
     CT.Quick?.leave?.();
     screen = "duelos";
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
+    paint(`<div class="shell">${header("back-menu")}
       <section class="setup-section perfil-section">
         <header class="atlas-page-heading"><div class="eyebrow">Retos entre amigos</div><h1 data-focus tabindex="-1">Tus partidas</h1><p>Tus duelos por turnos: en qué punto está cada uno y a quién le toca.</p></header>
         <section class="panel turn-duel-profile" id="turn-duels-list"><p role="status">Cargando tus duelos…</p></section>
@@ -898,7 +899,7 @@
   function setup() {
     screen = "setup";
     starterDraw = null;
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
+    paint(`<div class="shell">${header("back-menu")}
       <section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2 data-focus tabindex="-1">Un solo móvil</h2><p class="lead">Añade hasta 9 personas y decidid quién empieza adivinando la cifra de una carta.</p>
         ${game && !game.winners && !pendingTournament && sessionStorage.getItem('continuum-entry-route') === 'local' ? '<button class="btn btn-secondary btn-block" data-action="continue">Continuar partida guardada <span>→</span></button>' : ''}
         <div class="panel">
@@ -1112,7 +1113,7 @@
     const regalo = game.pulseGift && game.pulseGift.to === player.id
       ? `<p class="pulse-gift">⚡ <b>${escapeHtml(game.pulseGift.from)}</b> te ha pasado <b>${escapeHtml(cardsById.get(game.pulseGift.cardId).title)}</b> con su Pulso.</p>`
       : "";
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
+    paint(`<div class="shell">${header()}
       <section class="pass-screen"><div class="panel pass-card"><div class="player-medallion player-medallion-avatar">${jugadorAvatar(player, 76)}</div><div class="eyebrow">${game.tournament ? `Competición · ronda ${game.tournament.index + 1} de ${game.tournament.queue.length}` : `Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}</div><h2 data-focus tabindex="-1">El turno es de<br>${escapeHtml(player.name)}</h2><p>Pásale el móvil. Las fechas siguen ocultas hasta colocar una carta.</p>${regalo}<button class="btn btn-primary btn-block" data-action="ready">Empezar mi turno <span>→</span></button></div></section>
     </div>`);
   }
@@ -1159,7 +1160,7 @@
     const manoHtml = pulseCard
       ? `<section><div class="hand-title"><h3>Carta del duelo</h3><small>${defending ? `te reta ${escapeHtml(currentPlayer().name)}` : `contra ${escapeHtml(pulseTarget.name)}`}</small></div>${pendingIndex === null ? `<div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}">${categoryBadge(pulseCard)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(pulseCard.title)}</strong></div></div>` : `<p class="hint provisional-hand-note">La carta está en la línea como vista previa.</p>`}<p class="hint">${pistaPulso()}</p></section>`
       : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${handCards.length} en mano</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${pendingIndex === null && selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${pendingIndex === null && selectedCardId === card.id}">${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco"}</p>${!game.pulsePower && pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
+    paint(`<div class="shell">${header()}
       <h1 class="solo-lectores" data-focus tabindex="-1">${defending ? `Defiendes el Pulso de ${escapeHtml(currentPlayer().name)}, ${escapeHtml(player.name)}` : `Turno de ${escapeHtml(player.name)}, ronda ${game.round}`}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${defending ? "⚡ Defensa del Pulso" : `${game.tournament ? `Competición · ronda ${game.tournament.index + 1} de ${game.tournament.queue.length}` : `Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}`}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
       <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores${game.players.length > 2 ? " · desliza →" : ""}</div><div class="scoreboard"${game.players.length > 2 ? ' aria-label="Jugadores; desliza para ver los demás"' : ""}>${game.players.map((p, i) => `<span class="score ${i === game.current ? "active" : ""}"${i === game.current ? ' aria-current="true"' : ""}><i class="score-avatar">${jugadorAvatar(p, 40)}</i><span class="score-copy"><b>${escapeHtml(p.name)}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(p.hand.length, game.players)}%"></i></span></span><em><strong>${p.hand.length}</strong><small>cartas</small></em></span>`).join("")}</div></section>
@@ -1448,7 +1449,7 @@
   function renderPulsePass() {
     screen = "pulse-pass";
     const target = game.players.find(item => item.id === game.pulseTurn.targetId);
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
+    paint(`<div class="shell">${header()}
       <section class="pass-screen"><div class="panel pass-card">
         <div class="player-medallion player-medallion-avatar">${jugadorAvatar(target, 76)}</div>
         <div class="eyebrow">⚡ Pulso · Te retan</div>
@@ -2007,7 +2008,7 @@
       .filter(key => key !== "mixed" && (!CT.Cartera || CT.Cartera.tiene(key)))
       .reduce((sum, key) => sum + (CT.Enciclopedia?.seenProgress(key)?.seen || 0), 0);
     const estrenado = resumen.cards > 0 || resumen.games > 0;
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
+    paint(`<div class="shell">${header("back-menu")}
       <section class="setup-section perfil-section">
         <header class="atlas-page-heading"><div class="eyebrow">Cuaderno de navegación · Continuum</div><h1 data-focus tabindex="-1">Tu Atlas</h1><p>Tus descubrimientos, tus travesías y los horizontes que aún te esperan.</p></header>
         ${atlasIdentidad()}
@@ -2278,7 +2279,7 @@
     screen = "daily-intro";
     const dia = today(), modeKey = dailyModeKey(dia), mode = CT.mode(modeKey);
     const fecha = new Date(`${dia}T12:00:00`).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" });
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}<section class="pass-screen"><div class="panel pass-card comp-splash daily-splash">
+    paint(`<div class="shell">${header("back-menu")}<section class="pass-screen"><div class="panel pass-card comp-splash daily-splash">
       <div class="chapter-art daily-splash-art" aria-hidden="true">${dailyMysteryArt()}</div>
       <div class="chapter-number">Reto diario · ${escapeHtml(fecha)}</div>
       <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Hoy toca</span><span class="daily-reel-stage" aria-hidden="true"><span class="daily-reel-kicker">Seleccionando mazo</span><span class="daily-reel-window"><span class="daily-reel">·&nbsp;·&nbsp;·</span></span></span><span class="solo-lectores" id="daily-reveal" aria-live="polite"></span></h2>
@@ -2465,7 +2466,7 @@
     const mode = currentMode();
     const pendiente = solo && (solo.kind === "free" || solo.kind === "marathon");
     const progreso = dominadas(selectedModeKey);
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
+    paint(`<div class="shell">${header("back-menu")}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${mode.name}</div><h2 class="solo-title" data-focus tabindex="-1">Jugar en solitario</h2>
         <p class="lead">Ordena, descubre y supera tu marca.</p><p class="hint solo-dominadas" data-solo-dominadas>Dominadas ${progreso.hechas} de ${progreso.total} ${mode.cardLabel}.</p></div>${vidasAviso("por ronda")}
         ${pendiente ? `<button class="btn btn-primary btn-block" data-action="resume-solo">Continuar ${solo.kind === "marathon" ? "la maratón" : "la ronda"} · ${CT.Ghost.level(solo.difficulty).name} <span>→</span></button>` : ""}
@@ -2511,7 +2512,7 @@
     screen = "duel-home";
     solo = loadSolo();
     pendingIndex = null;
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
+    paint(`<div class="shell">${header("back-menu")}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2 class="solo-title" data-focus tabindex="-1">Partida con amigos</h2>
         <p class="lead">Cada uno desde su móvil. Elige cómo jugáis: todos a la vez, por turnos o con las mismas cartas.</p></div>
         ${duelPanel()}
@@ -2551,7 +2552,7 @@
     screen = "mazo-cerrado";
     const juego = CT.mode(modeKey);
     const vias = razon.opciones || [];
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
+    paint(`<div class="shell">${header("back-menu")}
       <section class="pass-screen"><div class="panel">
         <div class="big-icon">🔒</div>
         <div class="eyebrow">Todavía no es tuyo</div>
@@ -2699,7 +2700,7 @@
     const camara = CT.QrScanner?.isSupported?.();
     const cercanas = CT.LocalPeer?.available?.();
     const sinRed = navigator.onLine === false;
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
+    paint(`<div class="shell">${header("back-menu")}
       <section class="setup-section solo-home friends-join"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Cada uno en su móvil</div><h2 class="solo-title" data-focus tabindex="-1">Unirme a una partida</h2>
         <p class="lead">Escanea el código QR que te enseñan, o pega el enlace o el código que te han pasado. Vale para todo: salas, duelos y Retos rápidos, por internet o por Wi‑Fi.</p></div>
         <form class="panel solo-panel" data-friends-join-form novalidate>
@@ -2905,7 +2906,7 @@
     // ponga el tablero): cuántas pondrá el tablero depende de tus aciertos.
     const restantes = solo.total ? solo.total - solo.played : (solo.pendingResult ? 0 : 1) + solo.deck.length;
     const etiqueta = soloLabel();
-    paint(`<div class="shell">${header(`<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="${solo.kind === "comp" ? "abandon-comp" : "solo-menu"}">Salir</button>`)}
+    paint(`<div class="shell">${header()}
       <h1 class="solo-lectores" data-focus tabindex="-1">${etiqueta}: ${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}${sinVidas() ? "" : `, ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}`}</h1>
       ${solo.kind === "comp" ? `<div class="comp-topic">${escapeHtml(CT.mode(solo.mode).name)}</div>` : ""}
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${etiqueta}</div><div class="turn-name" aria-hidden="true">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
@@ -3403,7 +3404,7 @@
     const aciertos = Cifras.aciertos(cifras.mode, cifras.seed, cifras.total, cifras.jugadas);
     const restante = cerrada ? 0 : Math.max(0, plazoCifras() - (Date.now() - cifras.empezadaEn));
     const marcaRival = cifras.rival ? `<span><b>${cifras.rival.aciertos}</b><small>aciertos de ${escapeHtml(cifras.rival.nombre || "quien te reta")}</small></span>` : "";
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="cifras-exit">Salir</button>')}
+    paint(`<div class="shell">${header()}
       <h1 class="solo-lectores" data-focus tabindex="-1">Carta ${indice + 1} de ${cifras.total}. ${escapeHtml(regla.pregunta)} ${escapeHtml(card.title)}.${cifrasConReloj() ? ` Tienes ${Math.round(plazoCifras() / 1000)} segundos.` : ""}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">Duelo de cifras</div><div class="turn-name" aria-hidden="true">${aciertos} ${aciertos === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${cifras.total - indice}</strong><span>por responder</span></div></div>
       ${marcaRival ? `<div class="solo-stats cifra-rival">${marcaRival}</div>` : ""}
@@ -3550,7 +3551,7 @@
       : [`${CT.Duelo.CARTAS} cartas de ${escapeHtml(currentMode().name)}, una detrás de otra.`,
          `Colocas cada una en el hueco que le toque de la línea.`,
          enTurnos ? `Cada uno juega desde su propio móvil: recibirás un aviso cuando el rival juegue.` : `Gana quien más acierte. No se gastan vidas: se juegan todas.`];
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
+    paint(`<div class="shell">${header("back-menu")}
       <section class="pass-screen"><div class="panel duelo-listo">
         <div class="eyebrow">Duelo por enlace</div>
         <h1 data-focus tabindex="-1" class="duelo-listo-titulo">${cifrasEsta ? "Escribir la cifra" : "Ordenar las cartas"}</h1>
@@ -3616,7 +3617,7 @@
     const conReloj = pendingDuel.ms > 0;
     const juego = CT.mode(mode);
     const quien = rival.nombre || "Alguien";
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
+    paint(`<div class="shell">${header("back-menu")}
       <section class="pass-screen"><div class="panel">
         <div class="big-icon">${esCifras ? "⏱️" : "⚔️"}</div>
         <div class="eyebrow">${esCifras ? "Duelo de cifras" : "Duelo"}</div>
@@ -3793,7 +3794,7 @@
     const introMode = resuming ? solo.mode : comp.queue[0];
     selectedModeKey = introMode;
     saveCompetition();
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="abandon-comp">Salir</button>')}<section class="pass-screen"><div class="panel pass-card comp-splash">
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel pass-card comp-splash">
       <div class="chapter-art" aria-hidden="true">${blockArt(CT.blockOf(introMode).art, true)}</div>
       <div class="chapter-number">Tema ${comp.roundsSummary.length + 1} de ${comp.totalThemes}</div>
       <h2 data-focus tabindex="-1"><span class="comp-splash-lead">${resuming ? "Vas a continuar" : "Vas a jugar a"}</span>${escapeHtml(CT.mode(introMode).name)}</h2>
@@ -4051,7 +4052,7 @@
         : error?.message === "MATCH_TIMEOUT"
           ? "La conexión con el servidor tarda demasiado. Comprueba tu internet e inténtalo de nuevo."
           : "No se pudo crear ni encontrar una mesa pública.";
-      paint(`<div class="shell">${header('<button class="icon-btn" data-action="public-match-back">Volver</button>')}<section class="pass-screen"><div class="panel"><div class="big-icon">☁</div><h2 data-focus tabindex="-1">No se pudo preparar la partida</h2><p class="lead" style="margin-inline:auto">${detail}</p>${table ? '<button class="btn btn-primary btn-block" data-action="online-hub">Ver mesas abiertas</button>' : '<button class="btn btn-primary btn-block" data-action="public-match">Buscar otra vez</button>'}<button class="btn btn-ghost btn-block" data-action="public-match-back">Volver</button></div></section></div>`);
+      paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">☁</div><h2 data-focus tabindex="-1">No se pudo preparar la partida</h2><p class="lead" style="margin-inline:auto">${detail}</p>${table ? '<button class="btn btn-primary btn-block" data-action="online-hub">Ver mesas abiertas</button>' : '<button class="btn btn-primary btn-block" data-action="public-match">Buscar otra vez</button>'}<button class="btn btn-ghost btn-block" data-action="public-match-back">Volver</button></div></section></div>`);
     }
   }
 
