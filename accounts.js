@@ -391,6 +391,7 @@ async function flush() {
   if (saving) { await saving; if (metadata().dirty) return flush(); return; }
   if (!identity || !profile || !metadata().dirty || failedConflict) return;
   const uid=identity.uid, expected=revision, generation=change, data=payload(), r=refs(uid);
+  urgent = false;
   saving = runTransaction(db,async tx => {
     const snap=await tx.get(r.progress), remote=snap.exists()?snap.data():null;
     if ((remote?.revision || 0) !== expected) { const e=Error('Conflicto de progreso');e.code='account/conflict';throw e; }
@@ -409,14 +410,22 @@ async function flush() {
   }).catch(error => { if (error.code === 'account/conflict') conflictScreen(); throw error; }).finally(() => { saving=null; });
   await saving;
 }
+// Cuánto se espera sin cambios antes de subir el progreso. Cada subida es una transacción (una lectura y hasta
+// cuatro escrituras), así que mientras se juega, con una carta cada pocos segundos, el aplazamiento largo agrupa
+// muchas cartas en una sola subida. Un resultado del reto diario (R) sí se sube enseguida: es lo que mira el
+// ranking. Lo pendiente queda marcado en el móvil y se sube al ocultar la app, al abrir el ranking, al recuperar
+// la red o en el siguiente arranque, así que esperar más no pierde nada.
+const SYNC_URGENT_MS = 2000, SYNC_IDLE_MS = 20000;
+let urgent = false;
 function schedule(key) {
   if (suppress || ![P,R].includes(key)) return;
+  if (key === R) urgent = true;
   change++;setMeta(true);clearTimeout(timer);
   // Recién terminado un reto diario y sin haber decidido todavía: se pregunta sobre su resultado.
   if (key === R && ready && !rankingPreguntado && rankingPublico() === null && periods(readRecords()).day) {
     rankingPreguntado = true; setTimeout(askRanking, 1800);
   }
-  timer=setTimeout(() => flush().catch(e => { if (!failedConflict) syncNotice(message(e)); }),2000);
+  timer=setTimeout(() => flush().catch(e => { if (!failedConflict) syncNotice(message(e)); }),urgent ? SYNC_URGENT_MS : SYNC_IDLE_MS);
 }
 // Adivinar todos los códigos con los que Firebase puede anunciar "sin red" no
 // funciona: en un Wi-Fi conectado pero sin salida a internet (justo el caso de un

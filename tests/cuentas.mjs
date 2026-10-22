@@ -85,6 +85,21 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  assert.equal(started,0);assert.equal(auth.currentUser,null);assert.ok(w.document.querySelector('#account-load'));dom.window.close();
 }
 {
+ // Subir el progreso es una transacción: jugando, varias cartas se agrupan en una sola subida (20 s sin cambios),
+ // pero un resultado del reto diario se sube enseguida (2 s), que es lo que mira el ranking.
+ const {w,dom,data}=setup(user('a'),{'playerProfiles/a':profile});
+ await w.testAccounts.startAccounts(()=>{});
+ const revision=()=>data.get('playerProgress/a')?.revision ?? 0, before=revision();
+ w.CONTINUUM.Storage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:3}}));
+ await new Promise(r=>setTimeout(r,2400));
+ assert.equal(revision(),before,'un cambio de progreso no se sube a los 2 s: se agrupa con las siguientes cartas');
+ assert.equal(JSON.parse(w.CONTINUUM.Storage.getItem('continuum-cloud-v1')).dirty,true,'queda marcado como pendiente para subirlo luego');
+ w.CONTINUUM.Storage.setItem('hilo-retos-v1',JSON.stringify({retoDiario:{days:{[hoy]:{hits:7,total:10,finishedAt:'2026-01-01T10:00:00.000Z',ms:123000}}}}));
+ await new Promise(r=>setTimeout(r,2400));
+ assert.equal(revision(),before+1,'el resultado del reto diario se sube a los 2 s, con el progreso pendiente');
+ dom.window.close();
+}
+{
  const {w,dom,data}=setup(user('a'),{'playerProfiles/a':profile});let started=0;
  w.localStorage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:999}}));
  await w.testAccounts.startAccounts(()=>started++);assert.equal(started,1);assert.equal(w.CONTINUUM.Storage.getItem('hilo-perfil-v1'),'{}');
