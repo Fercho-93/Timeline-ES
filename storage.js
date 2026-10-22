@@ -43,13 +43,29 @@
     try { return window.localStorage.getItem(key); }
     catch { protectedKeys.add(key); failed(); return null; }
   }
+  // Las copias de recuperación de una clave se acumulaban sin límite: se conservan las más recientes.
+  const KEEP_RECOVERY = 3;
+  function pruneRecovery(key) {
+    try {
+      const prefix = `${key}-recovery-`, copies = [];
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const name = window.localStorage.key(i);
+        if (name && name.startsWith(prefix)) copies.push(name);
+      }
+      copies.sort((a, b) => Number(b.slice(prefix.length)) - Number(a.slice(prefix.length)));
+      for (const name of copies.slice(KEEP_RECOVERY)) window.localStorage.removeItem(name);
+    } catch { /* Limpiar es opcional: la copia nueva ya está guardada. */ }
+  }
   function write(key, value) {
     pending.set(key, value);
     try {
       // Conservar una partida ilegible antes de reemplazarla por una nueva.
       if (protectedKeys.has(key)) {
         const old = window.localStorage.getItem(key);
-        if (old !== null) window.localStorage.setItem(`${key}-recovery-${Date.now()}`, old);
+        if (old !== null) {
+          window.localStorage.setItem(`${key}-recovery-${Date.now()}`, old);
+          pruneRecovery(key);
+        }
         protectedKeys.delete(key);
       }
       if (value === null) window.localStorage.removeItem(key);

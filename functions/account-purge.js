@@ -12,15 +12,17 @@ const RANKING_COLLECTIONS = ['dailyScores', 'weeklyScores'];
 async function purgeAccountData(db, uid) {
   if (typeof uid !== 'string' || !uid || uid.includes('/')) throw new Error('uid no válido');
   const aliasKey = (await db.doc(`playerProfiles/${uid}`).get()).data()?.aliasKey;
-  // Primero las filas del ranking de todos los días y semanas que aún se conservan.
-  for (const name of RANKING_COLLECTIONS) {
-    for (const period of await db.collection(name).listDocuments()) await period.collection('players').doc(uid).delete();
-  }
-  for (const collection of ACCOUNT_DOCS) await db.recursiveDelete(db.doc(`${collection}/${uid}`));
+  // El nombre se libera antes que el perfil, que es donde se guarda `aliasKey`: si el borrado se corta entre los dos
+  // pasos, al repetirlo el perfil sigue ahí y el nombre no se queda reservado para siempre sin dueño.
   if (aliasKey) {
     const name = db.doc(`playerNames/${aliasKey}`);
     if ((await name.get()).data()?.uid === uid) await name.delete();
   }
+  // Las filas del ranking de todos los días y semanas que aún se conservan.
+  for (const name of RANKING_COLLECTIONS) {
+    for (const period of await db.collection(name).listDocuments()) await period.collection('players').doc(uid).delete();
+  }
+  for (const collection of ACCOUNT_DOCS) await db.recursiveDelete(db.doc(`${collection}/${uid}`));
 }
 
 // Borra los datos y, al final, el usuario de acceso. Si el usuario ya no existe, no es un error:

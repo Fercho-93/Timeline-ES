@@ -24,7 +24,6 @@ jobs:
     environment: android-beta
     runs-on: ubuntu-latest
     env:
-      ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/continuum.jks
       ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
       ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
@@ -44,7 +43,10 @@ jobs:
           KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
           test -n "$KEYSTORE" && test -n "$ANDROID_STORE_PASSWORD" && test -n "$ANDROID_KEY_ALIAS" && test -n "$ANDROID_KEY_PASSWORD"
-          printf '%s' "$KEYSTORE" | base64 --decode > "$ANDROID_KEYSTORE_PATH"
+          # Fuera del espacio de trabajo para que la clave de firma no acabe en un artefacto por descuido.
+          keystore_path="$RUNNER_TEMP/continuum.jks"
+          printf '%s' "$KEYSTORE" | base64 --decode > "$keystore_path"
+          echo "ANDROID_KEYSTORE_PATH=$keystore_path" >> "$GITHUB_ENV"
       - run: npm ci
       - run: npm run build
       - run: npx cap sync android

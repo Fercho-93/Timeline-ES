@@ -50,6 +50,18 @@ const robbed = fakeDb({ 'playerProfiles/ana': { aliasKey: 'x' }, 'playerNames/x'
 await purgeAccountData(robbed, 'ana');
 assert.ok(robbed.store.has('playerNames/x'), 'el nombre de otra persona no se borra');
 
+// Si el borrado se corta a medias, el nombre ya está libre y el perfil sigue ahí para repetirlo: antes, con el perfil
+// borrado y el nombre en pie, nadie podía liberar ese nombre nunca más.
+const cut = fakeDb(seed('ana'));
+const realRecursive = cut.recursiveDelete;
+cut.recursiveDelete = async target => { if (target.path.startsWith('playerProfiles/')) throw new Error('corte'); return realRecursive(target); };
+await assert.rejects(() => purgeAccountData(cut, 'ana'), /corte/);
+assert.ok(!cut.store.has('playerNames/alias-ana'), 'el nombre ya se ha liberado');
+assert.ok(cut.store.has('playerProfiles/ana'), 'el perfil sigue para poder repetir el borrado');
+cut.recursiveDelete = realRecursive;
+await purgeAccountData(cut, 'ana');
+assert.equal([...cut.store.keys()].filter(key => key.includes('ana')).length, 0, 'repetir el borrado lo termina');
+
 // Sin perfil ni datos no falla, y un uid raro se rechaza.
 await purgeAccountData(fakeDb({}), 'nadie');
 for (const bad of ['', 'a/b', undefined, 5]) await assert.rejects(() => purgeAccountData(fakeDb({}), bad), /uid/);

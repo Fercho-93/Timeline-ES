@@ -55,7 +55,7 @@ externa o una decisión del titular. Las listas de comprobación de la beta est�
 - Accesibilidad, movimiento reducido, teclado, lector de pantalla y navegación móvil.
 - Capacitor con proyectos `android/` e `ios/`, iconos y splash generables.
 - Inventario de fuentes y de arte, y procedencia del arte documentada.
-- Pruebas automáticas: unas 80 órdenes en `npm test` y 14 suites de reglas en
+- Pruebas automáticas: una orden por suite en `npm test` y las suites de reglas en
   `npm run test:reglas` (ver [tests/README.md](tests/README.md)).
 
 ## 2. Prioridad inmediata: beta privada

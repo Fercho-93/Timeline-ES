@@ -110,6 +110,14 @@ try {
   assert.equal(CT.Storage.getItem("hilo-test"), '{"saveVersion":999}');
   CT.Storage.setItem("hilo-test", JSON.stringify(legacy));
   assert.ok(Object.keys(w.localStorage).some(k => k.startsWith("hilo-test-recovery-")));
+  // Las copias de recuperación no se acumulan sin fin: quedan las tres más recientes.
+  for (let i = 1; i <= 5; i++) w.localStorage.setItem(`hilo-test-recovery-${i}`, "viejo");
+  CT.Storage.setItem("hilo-test", '{"saveVersion":999}');
+  assert.equal(CT.Saves.read("hilo-test", "history"), null);
+  CT.Storage.setItem("hilo-test", JSON.stringify(legacy));
+  const copies = Object.keys(w.localStorage).filter(k => k.startsWith("hilo-test-recovery-"));
+  assert.equal(copies.length, 3, "solo se conservan las tres copias más recientes");
+  assert.ok(![1, 2, 3].some(i => copies.includes(`hilo-test-recovery-${i}`)), "se van las más antiguas");
   console.log("  ok migración, conservación de valores originales y formatos futuros protegidos");
 
   w = open({}, win => {

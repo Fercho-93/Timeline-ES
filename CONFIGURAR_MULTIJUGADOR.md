@@ -35,7 +35,7 @@ si un cambio ha llegado.
 ### Reglas de Firestore
 
 No hay que copiar ni pegar nada en la consola. Al subir a `main` un cambio en `firestore.rules`,
-el workflow «Publicar reglas de Firestore» ejecuta las 14 suites de `npm run test:reglas` en el
+el workflow «Publicar reglas de Firestore» ejecuta las suites de `npm run test:reglas` en el
 emulador y, solo si pasan, ejecuta `firebase deploy --only firestore:rules --project timeline-es`
 con el secreto `FIREBASE_SERVICE_ACCOUNT`. Si faltara el secreto, el workflow explica cómo
 crearlo. También se puede lanzar a mano: Actions → «Publicar reglas de Firestore» → «Run

@@ -679,11 +679,11 @@ no hay que volver a publicarlas al añadir un mazo nuevo.
 
 ## Comprobaciones
 
-`tests/` contiene las pruebas automáticas. `npm test` encadena unas 80 órdenes que corren en
+`tests/` contiene las pruebas automáticas. `npm test` encadena una orden por suite (la lista exacta está en `package.json`), todas ellas en
 cualquier ordenador —sintaxis de todos los archivos, partidas completas sobre un DOM simulado,
 partidas al azar, calidad de los mazos, solitario, Pulso, Fantasma, cuentas, ranking, Retos
 rápidos, salas Wi-Fi, duelos, service worker, accesibilidad, build móvil,
-plazos de conservación y presupuesto de recursos— y `npm run test:reglas` lanza 14 suites contra
+plazos de conservación y presupuesto de recursos— y `npm run test:reglas` lanza las suites de reglas contra
 el emulador oficial de Firestore. Se instalan con `npm ci` y se ejecutan solas en cada propuesta
 de cambio y cada subida a `main`. Qué comprueba cada archivo está en
 [tests/README.md](tests/README.md).
