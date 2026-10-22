@@ -6,9 +6,8 @@ siempre las mismas. `node_modules` no se guarda en el repositorio.
 ```sh
 npm ci
 
-# Juego, guardado, mazos, cuentas, service worker, accesibilidad, y build:
-# Una orden por suite, más la comprobación de recursos y la auditoría de contenido
-# (la lista exacta está en package.json). En serie: se para en el primer fallo.
+# Juego, guardado, mazos, cuentas, service worker, accesibilidad y build, más la comprobación
+# de recursos y la auditoría de contenido. En serie: se para en el primer fallo.
 npm test
 
 # Lo mismo en paralelo, contando todos los fallos de una vez; admite filtros por texto:
@@ -21,11 +20,17 @@ npm run test:reglas
 # Las dos cosas.
 npm run test:todo
 
+# Pruebas con navegador de verdad (Playwright).
+npm run test:navegador
+
 # «Jugar online» de extremo a extremo, en Chromium contra los emuladores de Auth y Firestore.
 npm run test:online-e2e
 ```
 
-Las cuentas son de octubre de 2026; la lista exacta está en `package.json`.
+La lista de suites está en un solo sitio, [`suites.mjs`](suites.mjs), repartida en grupos
+(`juego`, `reglas`, `navegador`, `e2e` y `functions`); todas las órdenes de arriba y los
+workflows la recorren con `scripts/run-tests.mjs`. Una suite nueva se añade a su grupo y a la
+tabla de abajo: `readme-pruebas.mjs` falla si falta en cualquiera de los dos.
 
 Dónde se ejecutan solas:
 
@@ -33,10 +38,11 @@ Dónde se ejecutan solas:
   clon limpio: `npm test`, `npm run test:reglas`, el build móvil con `npx cap sync` y la
   compilación de Android y de iPhone sin firma.
 - `.github/workflows/reglas-firestore.yml`: `npm run test:reglas` antes de publicar las reglas.
-- `.github/workflows/zoom-visual.yml`: las pruebas de navegador con Playwright (Chromium y
-  WebKit) cuando cambian los archivos de interfaz.
-- `.github/workflows/functions.yml`: `retencion.mjs` y `duelo-policy.cjs` antes de publicar las
-  Cloud Functions.
+- `.github/workflows/zoom-visual.yml`: el grupo `navegador` (Chromium y WebKit) cuando cambian
+  los archivos de interfaz, y `test:online-e2e`.
+- `.github/workflows/functions.yml`: el grupo `functions` (plazos de conservación, limpieza,
+  borrado de cuenta y recordatorios de duelo) y la sintaxis de `functions/*.js` antes de
+  publicar las Cloud Functions.
 
 Cada suite se puede lanzar por separado con `node tests/<archivo>`. Las de navegador necesitan
 Playwright y aceptan `PLAYWRIGHT_MODULE`, `CHROME_PATH` y `ENGINES=chromium` (para no exigir
@@ -45,7 +51,7 @@ WebKit).
 ## Qué comprueba cada archivo
 
 Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (emulador);
-**navegador** = Playwright, en `zoom-visual.yml` o a mano.
+**navegador** = Playwright, en `zoom-visual.yml` o con `npm run test:navegador`.
 
 | Archivo | Dónde | Qué comprueba |
 | --- | --- | --- |

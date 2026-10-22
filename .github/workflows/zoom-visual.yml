@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['*.js', '*.css', '*.html', 'tests/**', '.github/workflows/zoom-visual.yml']
+    paths: ['*.js', '*.css', '*.html', 'js/**', 'css/**', 'mazos/**', 'vendor/**', 'assets/**', 'firestore.rules', 'firebase-e2e.json', 'package-lock.json', 'tests/**', '.github/workflows/zoom-visual.yml']
   pull_request:
-    paths: ['*.js', '*.css', '*.html', 'tests/**', '.github/workflows/zoom-visual.yml']
+    paths: ['*.js', '*.css', '*.html', 'js/**', 'css/**', 'mazos/**', 'vendor/**', 'assets/**', 'firestore.rules', 'firebase-e2e.json', 'package-lock.json', 'tests/**', '.github/workflows/zoom-visual.yml']
 permissions:
   contents: read
 jobs:
@@ -24,17 +24,8 @@ jobs:
           npm install --prefix "$RUNNER_TEMP/zoom-browser" --ignore-scripts playwright@1.62.1
           ln -s "$RUNNER_TEMP/zoom-browser/node_modules" node_modules
       - run: npx playwright install --with-deps webkit chromium
-      - run: node tests/board-fit-browser.mjs
-      - run: node tests/entry-board-browser.mjs
-      - run: node tests/turn-duel-layout-browser.mjs
-      - run: node tests/zoom-browser.mjs
-      - run: node tests/transitions-browser.mjs
-      - run: node tests/duelo-layout.mjs
-      - run: node tests/duelos-amigos-browser.mjs
-      - run: node tests/navegacion-volver-browser.mjs
-      - run: node tests/quick-challenges-browser.mjs
-      - run: node tests/quick-formats-browser.mjs
-      - run: node tests/tablet-browser.mjs
+      # El grupo `navegador` de tests/suites.mjs, en serie y parando en el primer fallo.
+      - run: npm run test:navegador
       - uses: actions/upload-artifact@v5
         if: always()
         with:
