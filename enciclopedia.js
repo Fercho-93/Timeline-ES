@@ -101,10 +101,9 @@
   // las demás no esconden nada, y meterlas en el recuento haría creer que faltan cartas
   // por descubrir en un mazo que ya está entero a la vista.
   function seenProgress(modeKey, descubiertas = seen()) {
-    // Un mazo sin ilustraciones se descarta de una vez, y los demás se cuentan con
-    // `cardArt`, que devuelve el nombre de la lámina: `animalArt` montaría el `<img>`
-    // entero de cada carta solo para contarla, y el catálogo son casi mil.
-    if (!CT.usesAnimalArt(modeKey)) return { total: 0, seen: 0 };
+    // Se cuentan con `cardArt`, que devuelve el nombre de la lámina: `animalArt` montaría
+    // el `<img>` entero de cada carta solo para contarla, y el catálogo son casi mil.
+    if (!CT.has(modeKey)) return { total: 0, seen: 0 };
     const conLamina = CT.cards(modeKey).filter(card => CT.cardArt(modeKey, card));
     return { total: conLamina.length, seen: conLamina.filter(card => descubiertas.has(card.id)).length };
   }

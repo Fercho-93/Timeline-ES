@@ -32,8 +32,6 @@
       const ok = base.removeItem(physical(key));
       for (const fn of listeners) fn(key);
       return ok;
-    },
-    // Las copias antiguas no pueden importar puntuaciones en la nueva temporada.
-    restore() { throw Error('La nueva cuenta empieza de cero. Las copias de la beta no se importan.'); }
+    }
   };
 })();

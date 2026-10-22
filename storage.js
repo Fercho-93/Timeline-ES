@@ -112,19 +112,9 @@
   }
   const saveLabel = () => window.Capacitor?.isNativePlatform?.() ? "Compartir copia" : "Descargar copia";
   function confirmed(text) { notice(text, [["Entendido", () => document.getElementById("storage-notice")?.remove()]]); }
-  function restore(text) {
-    if (CT.isSessionActive?.()) throw Error("Sal de la partida antes de recuperar una copia.");
-    const data = JSON.parse(text);
-    if (data?.format !== "continuum-backup" || data.version !== 1 || !data.entries || typeof data.entries !== "object" || Array.isArray(data.entries)) throw Error("Copia no reconocida.");
-    const list = Object.entries(data.entries);
-    if (list.some(([key, value]) => !/^(hilo-|continuum-)/.test(key) || (value !== null && typeof value !== "string"))) throw Error("La copia contiene datos no válidos.");
-    // Todas las claves se validan antes de escribir. Los originales quedan archivados.
-    for (const [key, value] of list) { protectedKeys.add(key); write(key, value); }
-    return !pending.size;
-  }
   CT.Storage = {
     getItem, setItem: (key, value) => write(key, String(value)), removeItem: key => write(key, null),
-    flush, backup, saveFile, saveLabel, restore, hasPending: () => pending.size > 0,
+    flush, backup, saveFile, saveLabel, hasPending: () => pending.size > 0,
     protect(key) {
       const isNew = !protectedKeys.has(key);
       protectedKeys.add(key);

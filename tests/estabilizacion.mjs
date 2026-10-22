@@ -135,12 +135,6 @@ try {
   assert.equal(w.CONTINUUM.Storage.hasPending(), false);
   assert.equal(saved(w).queue.length, temas);
   assert.equal(w.document.querySelector("#storage-notice"), null);
-  assert.throws(() => w.CONTINUUM.Storage.restore(JSON.stringify({ format: "continuum-backup", version: 1, entries: {} })), /Sal de la partida/);
-  click(w, "ui-back"); w.document.querySelector("[data-exit-confirm]").click(); click(w, "home-top");
-  const copy = JSON.stringify({ format: "continuum-backup", version: 1, entries: { "hilo-ejemplo": "recuperado" } });
-  assert.equal(w.CONTINUUM.Storage.restore(copy), true);
-  assert.equal(w.localStorage.getItem("hilo-ejemplo"), "recuperado");
-  assert.throws(() => w.CONTINUUM.Storage.restore('{"format":"otra-app"}'));
   console.log("  ok almacenamiento lleno: progreso en memoria, aviso y recuperación al reintentar");
 
   const handlers = {}, messages = [];

@@ -443,9 +443,9 @@
     // otra puerta (por ejemplo Retos rápidos) y se volvió, la ruta guardada ya no es esta.
     const drawerDeck = event.target.closest('#mode-inline-drawer [data-action="set-mode"]');
     if (drawerDeck) { const drawerRoute = drawerDeck.closest('#mode-inline-drawer').dataset.route; const stale = sessionStorage.getItem('continuum-entry-route'); if (drawerRoute && stale && /(^|-)quick$/.test(stale)) sessionStorage.setItem('continuum-entry-route', drawerRoute); }
-    const routed=event.target.closest('[data-solo-route],[data-friend-route]');
+    const routed=event.target.closest('[data-solo-route]');
     if(routed){
-      const route=routed.dataset.soloRoute||routed.dataset.friendRoute;
+      const route=routed.dataset.soloRoute;
       sessionStorage.setItem('continuum-entry-route',route);
       if(route==='mixed') try{localStorage.setItem('hilo-selected-mode-v1','mixed');}catch{}
     }

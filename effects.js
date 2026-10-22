@@ -64,7 +64,6 @@
     testHaptics() { return vibration("confirm"); },
     feedback(correct) { void vibration(correct ? "success" : "failure"); CT.Sonidos?.result(correct); },
     tap() { void vibration("confirm"); },
-    page(back) { CT.Sonidos?.cue(back ? 'back' : 'page'); },
     transition(kind, info) {
       CT.Sonidos?.cue(kind, info);
       // Los momentos que se tienen que notar también en la mano: levantar una carta, que sea tu

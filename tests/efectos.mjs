@@ -57,7 +57,7 @@ for (const savedSound of [false, true]) {
     // Ni siquiera otro módulo con preferencias antiguas puede hacerlos sonar.
     w.CONTINUUM.effectPrefs=()=>({sound:true,haptics:false});
     const effects=w.CONTINUUM.Effects;
-    effects.feedback(true);effects.feedback(false);effects.tap();effects.stamp();effects.page();effects.page(true);
+    effects.feedback(true);effects.feedback(false);effects.tap();effects.stamp();
     for(const kind of ['page','back','unroll','expand','open','close','select','place','return','hover','flip','deal','turn','end','zoom','notice']) effects.transition(kind);
     await new Promise(resolve=>w.setTimeout(resolve,20));
     assert.equal(contexts,0,'todas las acciones y transiciones son silenciosas');

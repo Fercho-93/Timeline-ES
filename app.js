@@ -15,7 +15,7 @@
   const turnDuelReady = import('./duelo-turnos.js').catch(() => null);
   const pushReady = import('./push.js').catch(() => null);
   const appConfigReady = import('./app-config.js').catch(() => null);
-  const { escapeHtml, initials, shuffle, announce, seedFrom, seededRandom, shuffleWith } = CT;
+  const { escapeHtml, shuffle, announce, seedFrom, seededRandom, shuffleWith } = CT;
   pushReady.then(module => module?.start?.());
   appConfigReady.then(module => module?.start?.());
   window.addEventListener('continuum:duels-list', () => duelsView());
@@ -213,10 +213,9 @@
 
   function eraForCard(card) { return CT.eraForCard(selectedModeKey, card); }
 
-  // Cada carta de peso, longevidad y velocidad tiene una lámina propia. Se enlazan por ID para que un
-  // retoque del título o del valor no pueda cambiar por accidente la ilustración.
-  // La tabla de láminas vive en modes.js, compartida con online.js.
-  function usesAnimalArt() { return CT.usesAnimalArt(selectedModeKey); }
+  // Cada carta tiene su lámina, enlazada por ID para que un retoque del título o del valor
+  // no pueda cambiar por accidente la ilustración. La tabla de láminas vive en modes.js,
+  // compartida con online.js.
   function animalArt(card) { return CT.animalArt(selectedModeKey, card); }
   // En la mano nunca va la lámina, sino el reverso del mazo: por qué, en `modes.js`.
   function cardBack() { return CT.cardBack(selectedModeKey); }
@@ -583,19 +582,13 @@
   }
 
   // El nombre se guarda también en la cuenta, si la hay: es el del ranking y los duelos.
-  // El nombre es público en el ranking y no puede repetirse: si otra cuenta ya lo usa, se vuelve
-  // a pedir otro. Con `NOMBRES_UNICOS` a `false` (solo para pruebas) el nombre se guardaría en
-  // este móvil y la cuenta conservaría el suyo, con lo que el ranking mostraría «Jugador ####».
-  const NOMBRES_UNICOS = true;
+  // El nombre es público en el ranking y no puede repetirse: si otra cuenta ya lo usa, el
+  // error llega hasta la bienvenida o el Atlas, que vuelven a pedir otro.
   async function guardaNombre(nombre) {
     const problema = CT.Identidad.problema(nombre);
     if (problema) throw Error(problema);
     if (!CT.Accounts?.ready || !CT.Accounts.renombra) return;
-    try {
-      await CT.Accounts.renombra(CT.Identidad.limpia(nombre));
-    } catch (error) {
-      if (NOMBRES_UNICOS || !/ya está en uso/.test(error?.message || "")) throw error;
-    }
+    await CT.Accounts.renombra(CT.Identidad.limpia(nombre));
   }
 
   // Quien puso su nombre sin conexión (o antes de que hubiera cuenta) lo tiene en el móvil pero no en el
@@ -645,9 +638,7 @@
         ${dailyDoor()}
       </section>
       ${homeNav()}
-      <p class="app-version" id="app-version"></p>
     </div>`);
-    showCacheVersion();
     refreshDuelBanner();
   }
 
@@ -804,26 +795,12 @@
     soloHome();
   }
 
-  // Compartida con el diagnóstico de más abajo: es la misma búsqueda, una sola vez.
-  async function cacheVersion() {
-    return CT.APP_VERSION;
-  }
-
-  async function showCacheVersion() {
-    const key = await cacheVersion();
-    // Nada llama a esto con `await`: si la pantalla ya cambió (o, en pruebas, si la
-    // ventana ya se cerró) para cuando `cacheVersion()` resuelve, tocar el DOM puede
-    // fallar. No es un fallo que nadie necesite ver ni reportar.
-    // La versión ya no se enseña al pie del inicio (queda en Ajustes → Versión y conexión).
-    void key;
-  }
-
   // Lo que hace falta para depurar un fallo a distancia: qué versión hay instalada,
   // en qué pantalla estaba la persona y a qué hora. Se usa tanto en la pantalla de
   // «algo ha fallado» de más abajo como en el botón de comentarios de Ajustes, para no
   // mantener dos formatos distintos del mismo informe.
-  async function buildDiagnostics(extra = "") {
-    const version = (await cacheVersion()) || "sin instalar";
+  function buildDiagnostics(extra = "") {
+    const version = CT.APP_VERSION || "sin instalar";
     const lineas = [
       `Continuum ${version}`,
       `Pantalla: ${screen}`,
@@ -843,7 +820,7 @@
   // maquinaria que acaba de fallar. Sí reutiliza `CT.openDialog`, que no toca nada del
   // estado del juego, solo el elemento que se le pasa.
   let crashShown = false;
-  async function showCrash(mensaje) {
+  function showCrash(mensaje) {
     if (crashShown) return;
     crashShown = true;
     // Nada espera a esto (ni podría: lo dispara un evento de error). Un manejador de
@@ -852,7 +829,7 @@
     // —la página se está yendo, o en una prueba, la ventana ya se cerró—, se abandona en
     // silencio en vez de sumar un segundo fallo al primero.
     try {
-      const detalle = await buildDiagnostics(mensaje);
+      const detalle = buildDiagnostics(mensaje);
       const capa = document.createElement("div");
       capa.className = "overlay";
       capa.innerHTML = `<div class="modal">
@@ -1256,16 +1233,13 @@
     const era = eraForCard(card);
     // El identificador no se ve ni se lee: es el ancla que usa `a11y.js` para no perder
     // el sitio en la línea cuando se repinta la pantalla.
-    const animal = usesAnimalArt();
     const textoOculto = "Valor y explicación ocultos durante esta jugada.";
     const valor = oculta ? `<div class="year ghost-value" aria-label="Valor oculto">— —</div>` : `<div class="year">${formatValue(card)}</div>`;
     // La lámina se ve entera; la temática, el título y el valor van en su placa inferior.
-    const body = animal
-      ? `<div class="card-visual era-${era.key}">${animalArt(card)}</div><div class="card-content">${categoryBadge(card)}<h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(oculta ? textoOculto : card.detail)}</p>${valor}</div>`
-      : `<div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content">${categoryBadge(card)}${valor}<h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(oculta ? textoOculto : card.detail)}</p></div>`;
+    const body = `<div class="card-visual era-${era.key}">${animalArt(card)}</div><div class="card-content">${categoryBadge(card)}<h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(oculta ? textoOculto : card.detail)}</p>${valor}</div>`;
     // Con el valor oculto la carta no se abre: la explicación desvelaría justo lo que se esconde.
-    if (oculta) return `<article class="timeline-card ghost-card ghost-art ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}" aria-label="${escapeHtml(card.title)}. Valor oculto.">${body}</article>`;
-    return `<article class="timeline-card card-flippable ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}" role="button" tabindex="0" aria-label="${escapeHtml(card.title)}. Toca para ver ${animal ? "la lámina y los datos" : "la explicación"}.">${body}</article>`;
+    if (oculta) return `<article class="timeline-card ghost-card ghost-art animal-timeline-card" data-id="${card.id}" aria-label="${escapeHtml(card.title)}. Valor oculto.">${body}</article>`;
+    return `<article class="timeline-card card-flippable animal-timeline-card" data-id="${card.id}" role="button" tabindex="0" aria-label="${escapeHtml(card.title)}. Toca para ver la lámina y los datos.">${body}</article>`;
   }
 
   // El hueco «+» normal, o el mismo hueco resaltado como el sitio donde iba de verdad la
@@ -1803,19 +1777,6 @@
       <h2 id="enc-card-title">${escapeHtml(card.title)}</h2>
       <div class="enc-card-large">${CT.Enciclopedia.cardMarkup(modeKey, card, { descubiertas, interactive: false })}</div>
       <button type="button" class="btn btn-secondary btn-block" data-action="enc-card-close">Volver a la enciclopedia</button>
-    </div></div>`, true);
-  }
-
-  function openEnciclopediaImage(modeKey, id) {
-    if (!CT.has(modeKey)) return;
-    const card = CT.cards(modeKey).find(item => item.id === Number(id));
-    if (!card || !CT.cardArt(modeKey, card) || !(CT.Progreso?.seenCards?.() || new Set()).has(card.id)) return;
-    overlay(`<div class="overlay enc-image-overlay" data-overlay="encyclopedia-image"><div class="modal enc-image-modal" role="dialog" aria-modal="true" aria-labelledby="enc-image-title">
-      <button type="button" class="enc-card-close" data-action="enc-card-close" data-dialog-focus aria-label="Cerrar ilustración">×</button>
-      <div class="eyebrow">${escapeHtml(CT.mode(modeKey).name)}</div>
-      <h2 id="enc-image-title">${escapeHtml(card.title)}</h2>
-      <div class="enc-image-full">${CT.animalArt(modeKey, card)}</div>
-      <button type="button" class="btn btn-secondary btn-block" data-action="enc-card-close">Volver a la carta</button>
     </div></div>`, true);
   }
 
@@ -4229,7 +4190,6 @@
     else if (action === 'ui-back') uiBack();
     else if (action === 'solo-options') soloOptions();
     else if (action === "retry-online") launchOnline();
-    else if (action === "resume-room") launchOnline(CT.Storage.getItem("continuum-last-room"));
     else if (action === "home") { sessionStorage.removeItem('continuum-entry-route'); home(); }
     else if (action === "back-menu") backMenu();
     else if (action === "home-top") { homeDestination = "home"; home(); window.scrollTo({ top: 0, behavior: "instant" }); }
@@ -4307,15 +4267,12 @@
       if (game?.mode && game.mode !== selectedModeKey && !setMode(game.mode)) return;
       setup(); beginStarterDraw();
     }
-    else if (action === "competition-local") prepareMultiCompetition();
-    else if (action === "competition-online") launchOnline('',competitionOptions(),{ createOnly: true });
     else if (action === "competition-next") nextTournamentRound();
     else if (action === "competition-resume") resumeMultiCompetition();
     else if (action === "competition-round-start") { game.tournamentIntro = false; saveGame(); renderPass(); }
     else if (action === "online") launchOnline();
     else if (action === "public-match") launchPublicMatch();
     else if (action === "public-match-back") backMenu();
-    else if (action === "local-multiplayer") launchLocalMultiplayer();
     // Una partida guardada a mitad de un duelo vuelve a su pantalla de paso, no a la de
     // un turno normal: si volviera a esa, quien reta colocaría su carta por segunda vez.
     else if (action === "continue") { cardsById = new Map(game.savedDeck.map(card => [card.id, card])); game.winners ? renderWinner(game.players.filter(p => game.winners.includes(p.id))) : pulseStage() === PULSE_PASE ? renderPulsePass() : renderPass(); }
@@ -4454,15 +4411,12 @@
     else if (action === "start-competition") startCompetition();
     else if (action === "comp-next-round") beginCompRound();
     else if (action === "comp-confirm-resume") resumeCompetition(true);
-    else if (action === "abandon-comp") requestPlayExit();
     else if (action === "enc-view") openEnciclopedia(target.dataset.mode, { highlight: Number(target.dataset.id), returnTo: ["review", "timeline-review"].includes(screen) ? "review" : "perfil" });
     else if (action === "enc-card") openEnciclopediaCard(target.dataset.mode, target.dataset.id);
-    else if (action === "enc-image") openEnciclopediaImage(target.dataset.mode, target.dataset.id);
     else if (action === "enc-card-close") CT.closeDialog();
     else if (action === "enc-band-view") openEnciclopedia(target.dataset.mode, { band: target.dataset.band, returnTo: "perfil" });
     else if (action === "enc-band") { encBand = target.dataset.band; enciclopediaView(); }
     else if (action === "enc-lock") { encLock = ["all", "seen", "locked"].includes(target.dataset.lock) ? target.dataset.lock : "all"; enciclopediaView(); }
-    else if (action === "enc-close") CT.closeDialog();
     else if (action === "enc-back") CT.closeDialog();
     else if (action === "perfil") perfilView();
     else if (action === "perfil-export") perfilExport();

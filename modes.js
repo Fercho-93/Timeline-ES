@@ -783,9 +783,6 @@
     7083: "playstation-2", 7084: "playstation-3", 7085: "playstation-4", 7086: "playstation-5",
     7087: "xbox", 7088: "xbox-360", 7089: "xbox-one", 7090: "xbox-series-x-s"
   };
-  // La vista ilustrada se activa solo cuando el lote está completo; así las cartas
-  // pendientes conservan su vista tipográfica y nunca generan referencias rotas.
-  const VIDEOGAME_ART_READY = true;
   const COUNTRY_ART_IDS = new Set([2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040, 2041, 2042, 2043, 2044, 2045, 2046, 2047, 2048, 2049, 2050, 2051, 2052, 2053, 2054, 2055, 2056, 2057, 2058, 2059, 2060, 2061, 2062, 2063, 2064, 2065, 2066, 2067, 2068, 2069, 2070, 2071, 2072]);
   const POPULATION_ART_BY_ID = Object.fromEntries((window.POPULATION_CARDS || []).map(card => [card.id, String(card.id)]));
   const LANGUAGE_ART_BY_ID = Object.fromEntries((window.LANGUAGE_CARDS || []).map(card => [card.id, String(card.id)]));
@@ -929,9 +926,10 @@
     5117: "5117-ukraine-invasion"
   };
 
-  // Historia se activa cuando su lote esté completo; mientras tanto no se ocultan
-  // accidentalmente las bandas de las cartas que aún no tienen lámina.
-  function usesAnimalArt(modeKey) { return ANIMAL_ART_MODES.includes(modeKey) || modeKey === "astronomy" || modeKey === "medicine" || modeKey === "countries" || modeKey === "population" || modeKey === "languages" || modeKey === "distances" || modeKey === "history" || modeKey === "movies" || modeKey === "music" || modeKey === "inventions" || modeKey === "world" || (modeKey === "videogames" && VIDEOGAME_ART_READY) || modeKey === "mixed"; }
+  // Todos los mazos se ven ya con lámina (el nombre viene de cuando solo la tenían los de
+  // animales). Una carta sin la suya deja el hueco de la ilustración vacío: `animalArt`
+  // devuelve una cadena vacía, sin referencias rotas.
+  function usesAnimalArt(modeKey) { return has(modeKey); }
 
   function cardArt(modeKey, card) { const sourceMode = modeKey === "mixed" && card.sourceMode ? card.sourceMode : modeKey;
     if (sourceMode === "astronomy") return ASTRONOMY_ART_BY_ID[card.id] || null;
@@ -1159,10 +1157,6 @@
     return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
   }
 
-  function initials(name) {
-    return name.trim().split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase();
-  }
-
   // Un mazo sin valores repetidos: de cada grupo de cartas con el mismo valor (dos hechos del
   // mismo año, dos animales con el mismo peso) se deja UNA, elegida al azar. Colocar una
   // carta antes o después de otra igual es correcto, pero en una partida es más limpio no
@@ -1230,6 +1224,6 @@
     hasBlock, block, blockOf, blockGames,
     formatValue, shortValue, sortValue, hiddenLabel, starterNoun, timelineTitle, timelineEnds, uniqueValueIds, question, eraForCard,
     correctIndex, placementHint, guideMarkup,
-    escapeHtml, initials, shuffle, seedFrom, seededRandom, shuffleWith
+    escapeHtml, shuffle, seedFrom, seededRandom, shuffleWith
   };
 })();
