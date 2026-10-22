@@ -203,14 +203,15 @@ No se edita a mano.
 | Carpeta | Qué hay |
 | --- | --- |
 | `assets/` | Imágenes. Una carpeta por mazo (`*-cards/`) con la ilustración de cada carta; `avatars/` (los 36 retratos), `quick-cards/` (Retos rápidos), `texturas/`, y sueltas las portadas de cada sección (`hero-*`, `menu-*`, `mode-*`). |
-| `docs/` | Documentación de trabajo: tiendas, modelo de datos, auditorías de mazos y, en `.json`, las fuentes y la procedencia del arte de cada carta. `docs/promo/` guarda el vídeo promocional y la página de la que se graba. |
+| `docs/` | La documentación (ver [Documentación](#documentación) abajo) y, en `.json`, las fuentes y la procedencia del arte de cada carta, que leen las pruebas y los scripts por su ruta. `docs/revisiones/` guarda las revisiones fechadas de mazos e ilustraciones y `docs/promo/`, el vídeo promocional y la página de la que se graba. |
 | `tests/` | Las pruebas automáticas. La lista de cuáles se ejecutan y dónde está en `tests/suites.mjs`; [tests/README.md](tests/README.md) dice qué comprueba cada una. |
 | `scripts/` | Pequeños programas de mantenimiento (ver abajo). |
 | `functions/` | Las tareas automáticas en la nube (Cloud Functions). Ver abajo. |
 | `ios/`, `android/` | Los envoltorios de la app de iPhone (Xcode) y de Android (Android Studio). Ver abajo. |
 | `resources/` | Las imágenes originales del icono y de la pantalla de carga, a partir de las que se generan todos los tamaños (`npm run icons`). |
 | `.github/` | Los robots de GitHub (`workflows/`), las plantillas para abrir incidencias y `beta-request.json`. |
-| `.claude/skills/` | Instrucciones para Claude Code: las reglas «antislop» de diseño y textos. Sus auditorías se guardan en `anti-slop/`. |
+| `.claude/skills/` | Instrucciones para Claude Code: las reglas «antislop» de diseño y textos. |
+| `anti-slop/` | Las auditorías hechas con esas reglas (`audit-NNN-fecha.md`): la skill las guarda ahí. |
 | `.agents/skills/` | Instrucciones para asistentes de IA que generan ilustraciones de cartas. |
 | `dist/`, `node_modules/`, `test-results/` | No se guardan en git: los crea el ordenador al compilar la app (`dist/`), al instalar herramientas (`node_modules/`) y al pasar las pruebas de navegador (`test-results/`). |
 
@@ -278,4 +279,31 @@ que en iPhone) y `res/` (iconos, pantallas de carga y textos).
 
 ## Documentación
 
-La lista de documentos y de qué trata cada uno está en el [README](README.md#dónde-vive-cada-cosa).
+De qué trata cada documento, con más detalle, en el [README](README.md#dónde-vive-cada-cosa).
+
+| Documento | Qué es |
+| --- | --- |
+| [README.md](README.md) | Presentación, índice de documentos, cómo probar, instalar y comprobar el juego. |
+| [CLAUDE.md](CLAUDE.md) | Normas de trabajo: versión de caché, cambios en paralelo, pruebas, reglas y Functions. |
+| [MAPA_DEL_PROYECTO.md](MAPA_DEL_PROYECTO.md) | Este mapa. |
+| [PRIVACIDAD.md](PRIVACIDAD.md) | La política de privacidad, igual que `privacidad.html`. |
+| [PROCEDENCIA_ARTE_IA.md](PROCEDENCIA_ARTE_IA.md) | De dónde sale cada ilustración. |
+| [docs/REGLAS_Y_MODOS.md](docs/REGLAS_Y_MODOS.md) | Las reglas y el diseño de cada modo de juego. |
+| [docs/SONIDOS_TRANSICIONES.md](docs/SONIDOS_TRANSICIONES.md) | Qué suena con cada acción. |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Estado y lista única de pendientes. |
+| [docs/BETA_CHECKLIST.md](docs/BETA_CHECKLIST.md) | Pruebas a mano, testers e incidencias. |
+| [docs/TIENDAS.md](docs/TIENDAS.md) | Fichas de las tiendas, declaraciones y criterio de publicación. |
+| [docs/DISTRIBUCION_MOVIL.md](docs/DISTRIBUCION_MOVIL.md) | Compilaciones firmadas, TestFlight y enlaces universales. |
+| [docs/CONFIGURAR_MULTIJUGADOR.md](docs/CONFIGURAR_MULTIJUGADOR.md) | Firebase, despliegue, cartel remoto, denuncias, borrado y conservación. |
+| [docs/MODELO_DE_DATOS.md](docs/MODELO_DE_DATOS.md) | Cada colección de Firestore. |
+| [docs/SEGURIDAD_Y_OPERACION.md](docs/SEGURIDAD_Y_OPERACION.md) | Modelo de confianza, antitrampas y App Check. |
+| [docs/CUENTAS_Y_RANKING.md](docs/CUENTAS_Y_RANKING.md) | Invitado, Apple, borrado de cuenta y ranking. |
+| [docs/DUELOS-ASINCRONOS.md](docs/DUELOS-ASINCRONOS.md) | Duelos por turnos. |
+| [docs/MATCHMAKING_PUBLICO.md](docs/MATCHMAKING_PUBLICO.md) | Mesas públicas y partida rápida. |
+| [docs/CONTENIDO_Y_DERECHOS.md](docs/CONTENIDO_Y_DERECHOS.md) | Fuentes de las cartas e inventarios. |
+| [docs/AUDITORIA_MAZOS.md](docs/AUDITORIA_MAZOS.md) | Revisión carta por carta: qué está cerrado y qué falta. |
+| [docs/dependencias-seguridad.md](docs/dependencias-seguridad.md) | Correcciones fijadas en las dependencias. |
+| [docs/procedencia-idiomas.md](docs/procedencia-idiomas.md), [docs/procedencia-recuperaciones.md](docs/procedencia-recuperaciones.md), [docs/retos-portada.md](docs/retos-portada.md), [docs/intro-color.md](docs/intro-color.md) | Fichas de procedencia de algunas ilustraciones (las cita `PROCEDENCIA_ARTE_IA.md`). |
+| [docs/revisiones/](docs/revisiones/) | Revisiones fechadas: [facturación de empresas](docs/revisiones/revision-facturacion-empresas-2025.md), [ilustraciones de Retos rápidos](docs/revisiones/revision-ilustraciones-retos-2026-10-04.md), [metros](docs/revisiones/revision-metros-ampliacion-2026-10-04.md), [programas españoles](docs/revisiones/revision-programas-estrenos-2026-10-04.md), [salarios mínimos](docs/revisiones/revision-salarios-minimos-2026-10-04.md), [seis retos](docs/revisiones/revision-seis-retos-ampliacion-2026-10-05.md), [siete retos](docs/revisiones/revision-siete-retos-ampliacion-2026-10-05.md) y [verificación de las Grandes colecciones](docs/revisiones/revision-verificacion-2026-10-20.md). |
+| [tests/README.md](tests/README.md) | Qué comprueba cada prueba y dónde se ejecuta. |
+| [anti-slop/audit-001-2026-10-22.md](anti-slop/audit-001-2026-10-22.md) | Auditoría de diseño y textos de la pantalla de inicio (22 de octubre de 2026). |
