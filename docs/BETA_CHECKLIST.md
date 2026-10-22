@@ -2,7 +2,7 @@
 
 Lista de comprobación de la beta y guía para trabajar con testers. El estado general vive en
 [ROADMAP.md](ROADMAP.md); la ficha y las declaraciones de las tiendas, en
-[docs/TIENDAS.md](docs/TIENDAS.md); cómo se publica cada pieza, en la sección «Despliegue» de
+[docs/TIENDAS.md](TIENDAS.md); cómo se publica cada pieza, en la sección «Despliegue» de
 [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#despliegue).
 
 ## Público y propuesta
@@ -150,7 +150,7 @@ Mientras no se cumplan, mantener una beta pequeña.
 
 ## F. Requisitos previos a las tiendas
 
-Detalle en [docs/TIENDAS.md](docs/TIENDAS.md).
+Detalle en [docs/TIENDAS.md](TIENDAS.md).
 
 - [ ] Nombre Continuum revisado (OEPM/EUIPO y tiendas).
 - [x] Procedencia del arte documentada.

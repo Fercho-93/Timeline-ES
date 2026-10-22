@@ -5,9 +5,9 @@ Todas las colecciones del proyecto `timeline-es`, según `firestore.rules`, el c
 Apple). Las colecciones sin regla (`duelNotificationEvents`, `duelReminderBudgets`) solo las toca
 el servidor. Los plazos de conservación salen de `functions/retention.js` y los aplica cada día
 `purgeExpiredData` (ver
-[CONFIGURAR_MULTIJUGADOR.md](../CONFIGURAR_MULTIJUGADOR.md#conservación-y-limpieza-de-datos)).
+[CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#conservación-y-limpieza-de-datos)).
 Lo que borra la eliminación de una cuenta está en
-[CUENTAS_Y_RANKING.md](../CUENTAS_Y_RANKING.md#eliminar-la-cuenta).
+[CUENTAS_Y_RANKING.md](CUENTAS_Y_RANKING.md#eliminar-la-cuenta).
 
 ## Cuenta, progreso y ranking
 

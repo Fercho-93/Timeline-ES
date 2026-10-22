@@ -189,7 +189,7 @@ function personDialog({ uid, alias, context }) {
 }
 // «Denunciar»: junto a cualquier nombre ajeno hay un botón (moderacion.js). Escribe una denuncia en
 // `reports` —una por pareja denunciante-denunciado—, que nadie puede leer desde el juego: la lee quien
-// gestiona el proyecto en la consola de Firebase (ver CONFIGURAR_MULTIJUGADOR.md).
+// gestiona el proyecto en la consola de Firebase (ver docs/CONFIGURAR_MULTIJUGADOR.md).
 const REPORT_REASONS = [['nombre-ofensivo', 'Nombre ofensivo'], ['suplantacion', 'Se hace pasar por otra persona o por Continuum'], ['otro', 'Otro motivo']];
 const REPORT_CONTEXTS = ['ranking', 'mesa', 'duelo', 'sala'];
 function reportDialog({ uid, alias, context }) {

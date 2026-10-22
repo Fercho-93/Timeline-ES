@@ -15,12 +15,12 @@ deben presentarse como récords exactos ni compararse como si fueran medidas hom
 cartas de Retos rápidos llevan fuente y curiosidad en `mazos/quick-challenges-data.js`, y sus revisiones
 y fuentes ampliadas están en `docs/revision-*.md` y `docs/fuentes-*.json`.
 
-El estado de la revisión carta por carta está en [docs/AUDITORIA_MAZOS.md](docs/AUDITORIA_MAZOS.md):
+El estado de la revisión carta por carta está en [docs/AUDITORIA_MAZOS.md](AUDITORIA_MAZOS.md):
 que una carta tenga URL no la convierte en verificada. Antes de un lanzamiento educativo o
 comercial, cada cifra debería documentar población, sexo o condición, unidad, criterio (media,
 rango o máximo), referencia y fecha de revisión.
 
-Para el arte, consultar [PROCEDENCIA_ARTE_IA.md](PROCEDENCIA_ARTE_IA.md) y
+Para el arte, consultar [PROCEDENCIA_ARTE_IA.md](../PROCEDENCIA_ARTE_IA.md) y
 `docs/inventario-arte.json`. El titular declara que todos los recursos visuales incorporados se
 generaron con ChatGPT/OpenAI. La procedencia de la imagen no sustituye la revisión de términos
 comerciales del servicio ni la revisión independiente de textos, datos, marcas o elementos de

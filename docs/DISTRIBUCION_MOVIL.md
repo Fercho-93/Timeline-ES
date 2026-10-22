@@ -42,7 +42,7 @@ registrar sus claves según el procedimiento de Google.
 - Añadir a las personas como testers, no como miembros del equipo. La primera beta externa pasa
   la revisión de Apple; sigue pendiente invitar y probar con testers externos.
 - Google Play Console sigue pendiente. Ficha, textos y declaraciones en
-  [docs/TIENDAS.md](docs/TIENDAS.md).
+  [docs/TIENDAS.md](TIENDAS.md).
 
 ## Enlaces
 

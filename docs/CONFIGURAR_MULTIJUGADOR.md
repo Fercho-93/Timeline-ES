@@ -4,7 +4,7 @@ El juego online usa el proyecto de Firebase `timeline-es` (el identificador cons
 antiguo; ver «Nombre del proyecto» más abajo): Authentication para el invitado y la cuenta de
 Apple, Firestore para salas, duelos, mesas, progreso y ranking, Cloud Functions para avisos y
 limpieza, y App Check. La configuración pública está en `js/nube/firebase-client.js` y `js/nube/deployment.js`.
-El mapa de colecciones está en [docs/MODELO_DE_DATOS.md](docs/MODELO_DE_DATOS.md).
+El mapa de colecciones está en [docs/MODELO_DE_DATOS.md](MODELO_DE_DATOS.md).
 
 ## Despliegue
 

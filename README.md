@@ -37,18 +37,18 @@ El resto de la documentación:
 
 | Documento | De qué trata |
 | --- | --- |
-| [ROADMAP.md](ROADMAP.md) | Estado del proyecto: lo hecho y lo pendiente. Es la referencia única de estado. |
-| [BETA_CHECKLIST.md](BETA_CHECKLIST.md) | Pruebas de la beta, testers, incidencias y requisitos previos a tiendas. |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Estado del proyecto: lo hecho y lo pendiente. Es la referencia única de estado. |
+| [docs/BETA_CHECKLIST.md](docs/BETA_CHECKLIST.md) | Pruebas de la beta, testers, incidencias y requisitos previos a tiendas. |
 | [docs/TIENDAS.md](docs/TIENDAS.md) | Ficha de App Store y Google Play, notas de revisión y declaraciones de privacidad. |
-| [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md) | Firebase, **despliegue** de web, reglas, Functions y beta, y plazos de conservación. |
+| [docs/CONFIGURAR_MULTIJUGADOR.md](docs/CONFIGURAR_MULTIJUGADOR.md) | Firebase, **despliegue** de web, reglas, Functions y beta, y plazos de conservación. |
 | [docs/MODELO_DE_DATOS.md](docs/MODELO_DE_DATOS.md) | Cada colección de Firestore: para qué, quién la lee y escribe, cuánto se conserva. |
-| [SEGURIDAD_Y_OPERACION.md](SEGURIDAD_Y_OPERACION.md) | Modelo de confianza, medidas antitrampas y App Check. |
-| [CUENTAS_Y_RANKING.md](CUENTAS_Y_RANKING.md) | Invitado, Iniciar sesión con Apple, borrado de cuenta y ranking. |
-| [DUELOS-ASINCRONOS.md](DUELOS-ASINCRONOS.md) | Duelos por turnos y sus Cloud Functions. |
-| [MATCHMAKING_PUBLICO.md](MATCHMAKING_PUBLICO.md) | Jugar online: tablón de mesas y partida rápida. |
-| [DISTRIBUCION_MOVIL.md](DISTRIBUCION_MOVIL.md) | Compilaciones firmadas, TestFlight y enlaces universales. |
+| [docs/SEGURIDAD_Y_OPERACION.md](docs/SEGURIDAD_Y_OPERACION.md) | Modelo de confianza, medidas antitrampas y App Check. |
+| [docs/CUENTAS_Y_RANKING.md](docs/CUENTAS_Y_RANKING.md) | Invitado, Iniciar sesión con Apple, borrado de cuenta y ranking. |
+| [docs/DUELOS-ASINCRONOS.md](docs/DUELOS-ASINCRONOS.md) | Duelos por turnos y sus Cloud Functions. |
+| [docs/MATCHMAKING_PUBLICO.md](docs/MATCHMAKING_PUBLICO.md) | Jugar online: tablón de mesas y partida rápida. |
+| [docs/DISTRIBUCION_MOVIL.md](docs/DISTRIBUCION_MOVIL.md) | Compilaciones firmadas, TestFlight y enlaces universales. |
 | [PRIVACIDAD.md](PRIVACIDAD.md) | Política de privacidad (la misma que `privacidad.html`). |
-| [CONTENIDO_Y_DERECHOS.md](CONTENIDO_Y_DERECHOS.md), [PROCEDENCIA_ARTE_IA.md](PROCEDENCIA_ARTE_IA.md) | Fuentes de las cartas y procedencia del arte. |
+| [docs/CONTENIDO_Y_DERECHOS.md](docs/CONTENIDO_Y_DERECHOS.md), [PROCEDENCIA_ARTE_IA.md](PROCEDENCIA_ARTE_IA.md) | Fuentes de las cartas y procedencia del arte. |
 | [tests/README.md](tests/README.md) | Qué comprueba cada prueba y dónde se ejecuta. |
 
 ## Tu nombre y tu avatar
@@ -63,7 +63,7 @@ solo móvil se usa el nombre disponible.
 
 `js/jugador/identidad.js` guarda el nombre en `continuum-identidad-v1` y lo copia en `hilo-nombre-v1`,
 usado por duelos y salas. Con cuenta se guarda también en ella, y un nombre ocupado por otra
-cuenta se rechaza con aviso (ver [CUENTAS_Y_RANKING.md](CUENTAS_Y_RANKING.md)).
+cuenta se rechaza con aviso (ver [docs/CUENTAS_Y_RANKING.md](docs/CUENTAS_Y_RANKING.md)).
 
 ## Retos rápidos
 
@@ -131,7 +131,7 @@ Juego de ordenar cartas para jugar solo o con 2–9 personas, pasando un solo m�
 el suyo o en mesas públicas. El nombre es **Continuum**, en la aplicación, su instalación móvil,
 la documentación y las fichas comerciales. La web está en `https://continuumjuego.es/` (GitHub
 Pages, rama `main`) y la app de iPhone se reparte en beta por TestFlight; el objetivo es
-publicarlo en App Store y Google Play (ver [ROADMAP.md](ROADMAP.md)).
+publicarlo en App Store y Google Play (ver [docs/ROADMAP.md](docs/ROADMAP.md)).
 
 El nombre del repositorio (`Timeline-ES`) y el nombre visible del proyecto de Firebase se
 administran fuera del código; sigue pendiente unificarlos a **Continuum**. Con el dominio propio,
@@ -190,7 +190,7 @@ así que añadir uno es declararlo en `js/juego/modes.js` y sumarlo a `games`. E
 - **Velocidad de animales:** 69 referencias que identifican movimiento y tipo de medición:
   esprint, nado, picado, crucero o media de una carrera. No es una tabla de récords absolutos.
 - Todas las cartas de Naturaleza llevan su fuente (ver
-  [CONTENIDO_Y_DERECHOS.md](CONTENIDO_Y_DERECHOS.md)); eso no equivale a certificar cada dato.
+  [docs/CONTENIDO_Y_DERECHOS.md](docs/CONTENIDO_Y_DERECHOS.md)); eso no equivale a certificar cada dato.
 
 **Geografía**
 
@@ -482,7 +482,7 @@ Tres formatos, los tres sin conexión y con la marca guardada en el propio móvi
   terminar se puede compartir el resultado —puntuación y una cuadrícula de aciertos al estilo
   Wordle, sin desvelar ninguna carta— por donde el móvil ofrezca o copiado al portapapeles. Con
   cuenta, el resultado se guarda en el progreso y, si se acepta, entra en el ranking diario y
-  semanal (ver [CUENTAS_Y_RANKING.md](CUENTAS_Y_RANKING.md)).
+  semanal (ver [docs/CUENTAS_Y_RANKING.md](docs/CUENTAS_Y_RANKING.md)).
 - **Ronda:** 10 cartas sacadas con preferencia de las que aún no están en el álbum y ordenadas de la
   más holgada a la más apretada respecto a la línea. Acabarla con vidas la supera y cada vida que
   queda es una estrella; se guarda la mejor ronda por juego y dificultad. Se puede dejar a medias.
@@ -589,7 +589,7 @@ probar reglas sin tocarlo están las pruebas del emulador (`tests/README.md`).
 ## Instalarlo en el móvil
 
 La web se publica en `https://continuumjuego.es/` con GitHub Pages, directamente desde la rama
-`main` (ver «Despliegue» en [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#despliegue)).
+`main` (ver «Despliegue» en [docs/CONFIGURAR_MULTIJUGADOR.md](docs/CONFIGURAR_MULTIJUGADOR.md#despliegue)).
 
 1. Abre la dirección una vez desde el móvil.
 2. En Android/Chrome, elige **Añadir a pantalla de inicio**. En iPhone/Safari, pulsa **Compartir → Añadir a pantalla de inicio**.
@@ -659,8 +659,8 @@ sin reescribir el juego ni duplicarlo por plataforma:
   `android/app/build.gradle` (`versionName`) y en `ios/App/App.xcodeproj/project.pbxproj`
   (`MARKETING_VERSION`).
 - La beta de iPhone se compila, firma y sube a TestFlight desde GitHub Actions al cambiar
-  `.github/beta-request.json` (ver [DISTRIBUCION_MOVIL.md](DISTRIBUCION_MOVIL.md)). Falta probar
-  Android en un dispositivo real y crear su ficha en Google Play ([ROADMAP.md](ROADMAP.md)).
+  `.github/beta-request.json` (ver [docs/DISTRIBUCION_MOVIL.md](docs/DISTRIBUCION_MOVIL.md)). Falta probar
+  Android en un dispositivo real y crear su ficha en Google Play ([docs/ROADMAP.md](docs/ROADMAP.md)).
 
 ## Conexión, cuentas y Firebase
 
@@ -673,7 +673,7 @@ anuncios, compras ni servicios de pago.
 
 Las salas, los duelos, las mesas públicas, el ranking y las cuentas usan el proyecto de Firebase
 `timeline-es` (plan Blaze, por las Cloud Functions). Cómo se publican las reglas, las Functions y
-la web está en [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#despliegue): las reglas se
+la web está en [docs/CONFIGURAR_MULTIJUGADOR.md](docs/CONFIGURAR_MULTIJUGADOR.md#despliegue): las reglas se
 publican solas al subir `firestore.rules` a `main`, después de pasar las pruebas del emulador, y
 no hay que volver a publicarlas al añadir un mazo nuevo.
 

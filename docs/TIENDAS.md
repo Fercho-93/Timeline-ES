@@ -1,9 +1,9 @@
 # Continuum en las tiendas
 
 Ficha, notas de revisión, declaraciones de privacidad y preparación comercial para App Store
-y Google Play. El estado general está en [ROADMAP.md](../ROADMAP.md); la beta y sus pruebas, en
-[BETA_CHECKLIST.md](../BETA_CHECKLIST.md); la firma y la subida de compilaciones, en
-[DISTRIBUCION_MOVIL.md](../DISTRIBUCION_MOVIL.md).
+y Google Play. El estado general está en [ROADMAP.md](ROADMAP.md); la beta y sus pruebas, en
+[BETA_CHECKLIST.md](BETA_CHECKLIST.md); la firma y la subida de compilaciones, en
+[DISTRIBUCION_MOVIL.md](DISTRIBUCION_MOVIL.md).
 
 Estado a 11 de octubre de 2026: la app de iPhone se distribuye por TestFlight; Google Play
 todavía no tiene ficha. Nada de este documento se ha enviado aún a revisión. Todo lo que se
@@ -186,7 +186,7 @@ usan los duelos (y que sus reglas hacen valer en los dos sentidos): quien bloque
 esa persona y su nombre en el ranking, no entra en mesas públicas donde ya esté sentada y no puede retarla
 ni ser retado. Se deshace en Atlas → «Tu cuenta y tus datos» → «Personas bloqueadas». Tras denunciar se
 ofrece «Bloquear también». Las denuncias llegan a la colección `reports` y las revisa el responsable en la
-consola de Firebase (ver «Denuncias de nombres» en [CONFIGURAR_MULTIJUGADOR.md](../CONFIGURAR_MULTIJUGADOR.md)).
+consola de Firebase (ver «Denuncias de nombres» en [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md)).
 Apple también espera un contacto publicado (el correo de soporte) y responder a las denuncias con rapidez:
 comprométete a revisarlas en un plazo razonable (los rechazos que se ven en los foros piden actuar en 24 horas)
 antes de enviar la app. Límites conocidos: el bloqueo no impide que la persona bloqueada entre después en una
@@ -368,7 +368,7 @@ del código.
 No enviar una compilación como definitiva hasta que:
 
 1. Se haya probado en un iPhone y un Android reales.
-2. No queden bloqueos P0/P1 (ver [BETA_CHECKLIST.md](../BETA_CHECKLIST.md)).
+2. No queden bloqueos P0/P1 (ver [BETA_CHECKLIST.md](BETA_CHECKLIST.md)).
 3. La política de privacidad tenga responsable, contacto, dirección y URL definitivos.
 4. La ficha y las declaraciones describan exactamente las funciones de la versión enviada.
 5. Firebase (reglas, Functions y App Check) esté activo y verificado para la revisión.

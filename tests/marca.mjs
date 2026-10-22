@@ -46,7 +46,7 @@ try {
   check("nombre del paquete", pkg.name === brand.toLowerCase());
   check("título del actualizador", read("actualizar.html").includes(`<title>Actualizar ${brand}</title>`));
   check("título de la documentación", read("README.md").startsWith(`# ${brand}\n`));
-  check("título de la hoja de ruta", read("ROADMAP.md").startsWith(`# ${brand} — hoja de ruta\n`));
+  check("título de la hoja de ruta", read("docs/ROADMAP.md").startsWith(`# ${brand} — hoja de ruta\n`));
   for (const script of w.document.querySelectorAll("script[src]:not([type=\"module\"])")) w.eval(read(script.getAttribute("src")));
   checkScreen("Inicio");
   w.CONTINUUM.localNavigate('jugar');

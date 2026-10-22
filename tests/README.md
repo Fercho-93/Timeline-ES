@@ -187,7 +187,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 
 Además, `npm test` ejecuta `scripts/check-assets.mjs` (dimensiones, decodificación y presupuesto
 de peso de las imágenes) y `scripts/audit-content.mjs` (inventario de fuentes; ver
-`CONTENIDO_Y_DERECHOS.md`).
+`docs/CONTENIDO_Y_DERECHOS.md`).
 
 ## Notas sobre algunas suites
 

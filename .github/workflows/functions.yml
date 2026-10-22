@@ -6,7 +6,7 @@ name: Publicar Cloud Functions
 # decisión explícita.
 #
 # Usa la misma credencial que las reglas (FIREBASE_SERVICE_ACCOUNT). Esa cuenta de servicio
-# necesita además permisos para desplegar Functions; ver CONFIGURAR_MULTIJUGADOR.md.
+# necesita además permisos para desplegar Functions; ver docs/CONFIGURAR_MULTIJUGADOR.md.
 on:
   workflow_dispatch:
 
