@@ -45,7 +45,7 @@ try {
     await page.evaluate(() => { window.__duelStub = CONTINUUM.Duelo; });
     await page.addScriptTag({ url: '/duelo.js' });
     await page.evaluate(() => { CONTINUUM.Duelo = { ...CONTINUUM.Duelo, ...window.__duelStub }; });
-    await page.addScriptTag({ content: `const auth={currentUser:{uid:'me'}};\n${source}\nwindow.showDuel=(options={})=>{cachedGames=options.nextGames||[];current={id:'layout',mode:'history',kind:'orden',seed:'test',total:15,turnIndex:0,turnUid:'me',status:'playing',playersOrder:['me','them'],players:{me:{alias:'Explorador'},them:{alias:'Un rival con nombre largo'}},scores:{me:0,them:0},timeline:[1],...options};enteredAt=Date.now();pendingIndex=null;render();clearInterval(timer);}; window.redrawDuel=()=>{render();clearInterval(timer);};` });
+    await page.addScriptTag({ content: `const auth={currentUser:{uid:'me'}};\n${source}\nwindow.showDuel=(options={})=>{cachedGames=options.nextGames||[];current={id:'layout',mode:'history',kind:'orden',seed:'test',total:15,turnIndex:0,turnUid:'me',status:'playing',playersOrder:['me','them'],players:{me:{alias:'Explorador'},them:{alias:'Un rival con nombre largo'}},scores:{me:0,them:0},timeline:[1],...options};enteredAt=Date.now();pendingIndex=null;render();}; window.redrawDuel=()=>{render();};` });
     const fits = async label => {
       const sizes = await page.evaluate(() => ({ viewport: innerWidth, page: document.documentElement.scrollWidth, shell: document.querySelector('.turn-duel-shell').getBoundingClientRect().right }));
       assert.ok(sizes.page <= sizes.viewport + 1, `${width}px ${label}: page overflow ${JSON.stringify(sizes)}`);
@@ -79,7 +79,7 @@ try {
     await page.locator('summary').click();
     await fits('invitation link');
     // Sin reloj ni cuenta atrás: al entrar en tu turno la carta ya está en la mano.
-    await page.addScriptTag({ content: `window.previewTurn=()=>{preparingTurn=null;prepareTurn();render();clearInterval(timer);return enteredAt;};window.reenterTurn=()=>{prepareTurn();render();clearInterval(timer);return enteredAt;};` });
+    await page.addScriptTag({ content: `window.previewTurn=()=>{preparingTurn=null;prepareTurn();render();return enteredAt;};window.reenterTurn=()=>{prepareTurn();render();return enteredAt;};` });
     await page.evaluate(() => showDuel());
     const entered = await page.evaluate(() => previewTurn());
     assert.equal(await page.locator('.hand-card').count(), 1);

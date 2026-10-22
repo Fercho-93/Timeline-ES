@@ -77,8 +77,14 @@ try {
     await page.keyboard.press('Escape');
     assert.ok(await page.locator('[data-quick="ack"]').isVisible());
     await page.screenshot({path: `test-results/quick-challenges/result-${width}.png`, fullPage: true});
+    // Al recargar se vuelve al Inicio, como en la app: la partida guardada se retoma desde
+    // la propia pantalla de Retos rápidos.
     await page.reload();
     await page.evaluate(() => window.CONTINUUM_SPLASH?.finish());
+    await page.locator('[data-action="toggle-modes"]').click();
+    await page.locator('[data-action="friends-hub"]').click();
+    await page.locator('[data-action="local-hub"]').click();
+    await page.locator('[data-friend-quick="local"]').click();
     await page.locator('[data-quick="resume"]').click();
     assert.ok(await page.locator('[data-quick="ack"]').isVisible());
     await page.locator('[data-quick="ack"]').click();
