@@ -3,14 +3,14 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import {initializeTestEnvironment,assertSucceeds,assertFails} from '@firebase/rules-unit-testing';
 import {collection,deleteDoc,getDocs,query,where,doc,getDoc,setDoc,updateDoc,serverTimestamp,runTransaction,onSnapshot,writeBatch} from 'firebase/firestore';
-import {queueFresh} from '../public-matchmaking.js';
+import {queueFresh} from '../js/online/public-matchmaking.js';
 const env=await initializeTestEnvironment({projectId:'demo-hilo',firestore:{rules:fs.readFileSync('firestore.rules','utf8'),host:'127.0.0.1',port:8080}});
-const w={};for(const p of ['cards.js','movies.js','music.js','videogames.js','animals.js','lifespan.js','speed.js','inventos.js','mundo.js','astronomy.js','medicine.js','countries.js','population.js','idiomas.js','distances.js','modes.js','engine.js','quick-challenges-data.js','quick-challenges-engine.js','cartera.js','tournament.js','final.js','quick-room.js'])vm.runInNewContext(fs.readFileSync(p,'utf8'),{window:w});
+const w={};for(const p of ['mazos/cards.js','mazos/movies.js','mazos/music.js','mazos/videogames.js','mazos/animals.js','mazos/lifespan.js','mazos/speed.js','mazos/inventos.js','mazos/mundo.js','mazos/astronomy.js','mazos/medicine.js','mazos/countries.js','mazos/population.js','mazos/idiomas.js','mazos/distances.js','js/juego/modes.js','js/juego/engine.js','mazos/quick-challenges-data.js','js/retos/quick-challenges-engine.js','js/jugador/cartera.js','js/juego/tournament.js','js/juego/final.js','js/retos/quick-room.js'])vm.runInNewContext(fs.readFileSync(p,'utf8'),{window:w});
 const R=w.CONTINUUM.QuickRoom, E=w.CONTINUUM.QuickEngine;
 const rounds=[{id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}];
 const host=env.authenticatedContext('host').firestore(),guest=env.authenticatedContext('guest').firestore(),out=env.authenticatedContext('outsider').firestore();
 const ref=db=>doc(db,'quickRooms','ABCDEFGH23');
-// Una sala nueva (revisión 0) se crea junto con su registro de cuota, como en quick-online.js.
+// Una sala nueva (revisión 0) se crea junto con su registro de cuota, como en js/retos/quick-online.js.
 // Antes se borra la cuota anterior: las pruebas crean salas seguidas sin esperar los 10 s.
 const uidOf=new Map([[host,'host'],[guest,'guest'],[out,'outsider']]);
 const libre=uid=>env.withSecurityRulesDisabled(c=>deleteDoc(doc(c.firestore(),'creationQuota',uid)));
@@ -76,7 +76,7 @@ try {
   await assertFails(write(host,{...next,revision:next.revision+1,commands:[...next.commands,{type:'next'}],phase:'turn'}));
   // The production adapter uses the real SDK against the emulator, including listeners,
   // concurrent join transactions, late reconnect and stale-turn rejection.
-  const source=fs.readFileSync('quick-online.js','utf8').replace(/^import .*;\r?\n/gm,'').replace(/^export /gm,'');
+  const source=fs.readFileSync('js/retos/quick-online.js','utf8').replace(/^import .*;\r?\n/gm,'').replace(/^export /gm,'');
   w.CONTINUUM.QuickNetwork={fingerprint:()=>1,compatible:value=>value===1};
   // Antes de cada alta el cliente espera a que pase la cuota; aquí se simula vaciándola.
   w.CONTINUUM.creationSlot=async()=>{for(const uid of ['host','guest','outsider'])await libre(uid);};

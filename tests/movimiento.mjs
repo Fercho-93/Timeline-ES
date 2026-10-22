@@ -393,7 +393,7 @@ console.log("\nLo que separa una app instalada de una web en un navegador");
 // móvil puesta: son comportamientos del aparato. Lo que sí se puede sujetar desde aquí es
 // que las declaraciones que los evitan sigan en su sitio cuando alguien toque la hoja.
 {
-  const hojas = { "styles.css": read("styles.css"), "edition.css": read("edition.css"), "splash.css": read("splash.css") };
+  const hojas = { "css/styles.css": read("css/styles.css"), "css/edition.css": read("css/edition.css"), "css/splash.css": read("css/splash.css") };
   // En una pantalla táctil no hay puntero que se retire: el primer toque deja el estado
   // `:hover` puesto hasta que se toca en otro sitio. Un hueco que se queda resaltado
   // parece que sigue esperando la carta; un botón, que sigue pulsado.
@@ -422,7 +422,7 @@ console.log("\nLo que separa una app instalada de una web en un navegador");
     const sueltos = hoversSinPuerta(css);
     ok(`${nombre}: todo :hover está tras (hover: hover)${sueltos.length ? ` — falta en ${sueltos.join(" | ")}` : ""}`, !sueltos.length);
   }
-  const raiz = hojas["styles.css"].slice(hojas["styles.css"].indexOf("html {"), hojas["styles.css"].indexOf("}", hojas["styles.css"].indexOf("html {")));
+  const raiz = hojas["css/styles.css"].slice(hojas["css/styles.css"].indexOf("html {"), hojas["css/styles.css"].indexOf("}", hojas["css/styles.css"].indexOf("html {")));
   // El recuadro gris que el navegador pinta al tocar es el aviso más ruidoso de que esto
   // es una página. En `button` no basta: las filas de partida son `div` y los enlaces no
   // son botones, y destellaban igual.
@@ -432,10 +432,10 @@ console.log("\nLo que separa una app instalada de una web en un navegador");
   // La tira temporal se desplaza a los lados: al llegar al extremo, el gesto encadenaba
   // con la página y con el «atrás» del navegador en mitad de una jugada.
   ok("la línea temporal se queda su propio desplazamiento en los extremos",
-    /\.timeline-wrap \{[^}]*overscroll-behavior-x:\s*contain/.test(hojas["styles.css"]));
+    /\.timeline-wrap \{[^}]*overscroll-behavior-x:\s*contain/.test(hojas["css/styles.css"]));
   // Por debajo de 16px, Safari amplía la página al enfocar el campo y no la devuelve.
   ok("ningún campo de texto hace que la página se amplíe al escribir",
-    /input, select, textarea \{ font-size:max\(1rem,16px\); \}/.test(hojas["styles.css"]));
+    /input, select, textarea \{ font-size:max\(1rem,16px\); \}/.test(hojas["css/styles.css"]));
 }
 
 console.log("\nAterrizaje de la carta al soltarla");
@@ -676,7 +676,7 @@ const pantalla = w => el(w, "#app").dataset.screen;
   game(w);
   await sleep(5);
   ok("en plena partida la flecha se queda: el gesto no sale de ella", !listo());
-  const css = read("edition.css");
+  const css = read("css/edition.css");
   ok("y solo se oculta en pantallas táctiles, sin sacarla del documento", /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*html\.swipe-back-ready[\s\S]*opacity: 0/.test(css) && !/swipe-back-ready[^}]*display: none/.test(css));
   w.close();
 }
@@ -727,9 +727,9 @@ const pantalla = w => el(w, "#app").dataset.screen;
   w.close();
 }
 
-const css = read("styles.css");
+const css = read("css/styles.css");
 const reduced = css.slice(css.indexOf("@media (prefers-reduced-motion: reduce)"));
 ok("el estilo reducido cubre navegación, cartas, diálogos y espera", [".selection-enter", ".placement-enter", ".dialog-exit", ".game-row.active", ".spinner", ".drag-ghost"].every(selector => reduced.includes(selector)));
-const edition = read("edition.css");
+const edition = read("css/edition.css");
 ok("la entrada gestionada impide que CSS vuelva a arrancar al finalizar", edition.includes("#app .motion-managed") && edition.includes("continuum-ink-enter"));
 console.log(`\n${checks} comprobaciones de movimiento correctas`);

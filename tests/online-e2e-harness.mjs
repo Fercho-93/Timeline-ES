@@ -1,7 +1,7 @@
 // Arnés de extremo a extremo para «Jugar online»: la aplicación real (index.html con
-// cuentas, online.js, matchmaking) en Chromium, contra los emuladores de Auth y
+// cuentas, js/online/online.js, matchmaking) en Chromium, contra los emuladores de Auth y
 // Firestore con las reglas reales. El SDK de Firebase es el que lleva la app (vendor/firebase/) y
-// firebase-client.js se conecta a los emuladores.
+// js/nube/firebase-client.js se conecta a los emuladores.
 // Requiere: firebase emulators:start --only auth,firestore (auth 9099, firestore 8080).
 import { createServer } from 'node:http';
 import fs from 'node:fs/promises';
@@ -23,7 +23,7 @@ export async function startHarness() {
   const server = createServer(async (req, res) => {
     try {
       const p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-      if (p === '/firebase-client.js') { res.setHeader('Content-Type', 'text/javascript'); res.end(CLIENT); return; }
+      if (p === '/js/nube/firebase-client.js') { res.setHeader('Content-Type', 'text/javascript'); res.end(CLIENT); return; }
       const f = path.join(root, p === '/' ? 'index.html' : p);
       let body = await fs.readFile(f);
       // La política de seguridad solo deja hablar con googleapis: se abre a los emuladores.
@@ -36,7 +36,7 @@ export async function startHarness() {
   const browser = await chromium.launch();
   async function player(label, { viewport = { width: 390, height: 844 } } = {}) {
     const ctx = await browser.newContext({ viewport, serviceWorkers: 'block', reducedMotion: 'reduce', deviceScaleFactor: 1 });
-    // La edad ya respondida (edad.js): la pregunta se prueba en tests/edad.mjs.
+    // La edad ya respondida (js/jugador/edad.js): la pregunta se prueba en tests/edad.mjs.
     await ctx.addInitScript(() => { try { localStorage.setItem('continuum-edad-v1', 'mayor'); } catch { /* sin almacenamiento */ } });
     const page = await ctx.newPage();
     const log = [];

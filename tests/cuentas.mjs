@@ -6,15 +6,15 @@ function setup(user=null,seed={}){
  const dom=new JSDOM('<main id="app"></main>',{url:'https://example.com',runScripts:'outside-only'}),w=dom.window;
  const data=new Map(Object.entries(seed));
  w.CONTINUUM={escapeHtml:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),Scene:{apply(){}},Storage:{getItem:k=>w.localStorage.getItem(k),setItem:(k,v)=>{w.localStorage.setItem(k,v);return true;},removeItem:k=>w.localStorage.removeItem(k),notice(){}},isSessionActive:()=>false};
- w.eval(read('a11y.js'));
- w.eval(read('account-storage.js'));
- w.eval(read('avatares.js'));
+ w.eval(read('js/interfaz/a11y.js'));
+ w.eval(read('js/jugador/account-storage.js'));
+ w.eval(read('js/jugador/avatares.js'));
  const auth={currentUser:user,authStateReady:async()=>{}};w.auth=auth;w.db={};
  const snap=key=>({exists:()=>data.has(key),data:()=>data.get(key)});
  Object.assign(w,{collection:(_,...parts)=>parts.join('/'),query:(...args)=>args,orderBy:()=>null,limit:()=>null,getDocsFromServer:async q=>{const base=typeof q==='string'?q:(typeof q[0]==='string'?q[0]:'dailyRanking');return {docs:[...data].filter(([k])=>k.startsWith(base+'/')&&k.split('/').length===base.split('/').length+1).map(([k,v])=>({id:k.split('/').pop(),data:()=>v}))};},browserLocalPersistence:{},setPersistence:async()=>{},signInAnonymously:async()=>{auth.currentUser={uid:'guest',isAnonymous:true,getIdToken:async()=>''};return {user:auth.currentUser};},doc:(_,...parts)=>parts.join('/'),getDocFromServer:async key=>snap(key),serverTimestamp:()=>123,onAuthStateChanged:()=>{},runTransaction:async(_,fn)=>{
   const pending=[];const result=await fn({delete:key=>pending.push([key,null]),get:async key=>snap(key),set:(key,value)=>pending.push([key,value])});for(const [k,v]of pending)v===null?data.delete(k):data.set(k,v);return result;
  }});
- let source=read('accounts.js').replace(/^import .*;\n/gm,'').replace('export async function startAccounts','async function startAccounts');
+ let source=read('js/nube/accounts.js').replace(/^import .*;\n/gm,'').replace('export async function startAccounts','async function startAccounts');
  w.eval(source+'\nwindow.testAccounts={startAccounts,enter,flush,rename,editNameScreen};');
  return {w,dom,auth,data};
 }
@@ -44,7 +44,7 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  let started=0;await w.testAccounts.startAccounts(()=>started++);
  assert.equal(started,1,'entra sin cuenta en vez de bloquear el arranque');
  assert.equal(auth.currentUser,null);
- assert.equal(w.CONTINUUM.Accounts,undefined,'sin cuenta: el resto de la app juega sin CT.Accounts, como cuando accounts.js no llega a cargar');
+ assert.equal(w.CONTINUUM.Accounts,undefined,'sin cuenta: el resto de la app juega sin CT.Accounts, como cuando js/nube/accounts.js no llega a cargar');
  assert.equal(w.document.querySelector('#account-load'),null);
  dom.window.close();
 }
@@ -270,8 +270,8 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  assert.equal(data.has(`dailyScores/${diaAntiguo}/players/a`),false,'una fila de hace 200 días también se borra');
  dom.window.close();
 }
-assert.match(read('index.html'),/src="boot.js"/);assert.doesNotMatch(read('index.html'),/src="app.js"/);
-assert.doesNotMatch(read('online.js'),/signInAnonymously/);
+assert.match(read('index.html'),/src="js\/arranque\/boot.js"/);assert.doesNotMatch(read('index.html'),/src="js\/juego\/app.js"/);
+assert.doesNotMatch(read('js/online/online.js'),/signInAnonymously/);
 {
  // Ranking de descubrimientos: por cartas en total y por sección; quien tiene cero en una sección no sale en ella.
  const {w,dom}=setup(user('a'),{'playerProfiles/a':profile,'discoveryScores/b':{alias:'Luna',avatar:'star',cards:40,collections:10,quick:30},'discoveryScores/c':{alias:'Atlas',avatar:'globe',cards:25,collections:25,quick:0},'discoveryScores/a':{alias:'Fer',avatar:'compass',cards:12,collections:9,quick:3}});
@@ -295,7 +295,7 @@ assert.doesNotMatch(read('online.js'),/signInAnonymously/);
  // Moderación: el nombre elegido pasa por el filtro, y el botón «Denunciar» abre un diálogo que escribe una
  // denuncia por pareja (las reglas impiden repetirla: «sin permiso» significa «ya la enviaste»).
  const {w,dom,data}=setup(user('a'),{'playerProfiles/a':{...profile,aliasKey:'fer'},'playerNames/fer':{uid:'a'}});
- w.eval(read('moderacion.js'));
+ w.eval(read('js/jugador/moderacion.js'));
  await w.testAccounts.startAccounts(()=>{});
  for(const malo of ['Gilipollas','Admin','Continuum oficial']){
   w.testAccounts.editNameScreen();w.document.getElementById('account-alias').value=malo;
@@ -386,7 +386,7 @@ assert.doesNotMatch(read('online.js'),/signInAnonymously/);
 {
  // Quien está bloqueado desaparece de las tablas del ranking de quien bloqueó.
  const {w,dom}=setup(user('a'),{'playerProfiles/a':profile,'duelPreferences/a/blocked/b':{alias:'Luna'},'discoveryScores/b':{alias:'Luna',avatar:'star',cards:40,collections:10,quick:30},'discoveryScores/c':{alias:'Atlas',avatar:'globe',cards:25,collections:25,quick:0},'discoveryScores/a':{alias:'Fer',avatar:'compass',cards:12,collections:9,quick:3}});
- w.eval(read('moderacion.js'));
+ w.eval(read('js/jugador/moderacion.js'));
  await w.testAccounts.startAccounts(()=>{});
  assert.equal(w.CONTINUUM.Bloqueos.has('b'),true,'al entrar se cargan los bloqueados');
  w.document.getElementById('app').innerHTML=w.CONTINUUM.Accounts.card();

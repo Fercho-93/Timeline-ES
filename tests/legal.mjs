@@ -24,17 +24,16 @@ for (const page of PAGES) {
     if (file && file !== 'index.html') assert.ok(fs.existsSync(new URL(`../${file}`, import.meta.url)), `${page}: ${target} existe`);
     if (anchor) assert.ok(ids(file || page).has(anchor), `${page}: la ancla #${anchor} existe en ${file || page}`);
   }
-  // Viaja en la app móvil y en la caché del juego.
-  assert.ok(read('scripts/build.mjs').includes(`"${page}"`), `${page} entra en la app móvil`);
-  assert.ok(read('service-worker-258.js').includes(`"./${page}"`), `${page} entra en la caché sin conexión`);
+  // Viaja en la caché del juego y, con ella, en la app móvil (scripts/build.mjs copia la lista de precarga).
+  assert.ok(read('service-worker-258.js').includes(`"./${page}"`), `${page} entra en la caché sin conexión y en la app móvil`);
 }
 
 // Enlaces de la app y de la política.
-const places = { 'Ajustes': read('settings.js'), 'la política': html['privacidad.html'], 'PRIVACIDAD.md': read('PRIVACIDAD.md') };
+const places = { 'Ajustes': read('js/interfaz/settings.js'), 'la política': html['privacidad.html'], 'PRIVACIDAD.md': read('PRIVACIDAD.md') };
 for (const [where, text] of Object.entries(places)) for (const page of ['terminos.html', 'aviso-legal.html', 'soporte.html', 'borrar-cuenta.html']) {
   assert.ok(text.includes(page), `${where} enlaza ${page}`);
 }
-assert.ok(read('app.js').includes('terminos.html'), 'la bienvenida enlaza las condiciones');
+assert.ok(read('js/juego/app.js').includes('terminos.html'), 'la bienvenida enlaza las condiciones');
 
 // Coherencia con la política y con el juego.
 assert.match(html['terminos.html'], /14 años/, 'las condiciones repiten la edad de la política');
@@ -43,7 +42,7 @@ assert.match(html['aviso-legal.html'], /Fernando Sirvent Merino/);
 assert.match(html['aviso-legal.html'], /continuumjuego\.es/);
 assert.match(html['borrar-cuenta.html'], /Atlas[\s\S]*Tu cuenta y tus datos[\s\S]*Eliminar/, 'los pasos coinciden con los del juego');
 assert.match(html['borrar-cuenta.html'], /un mes/, 'el plazo del RGPD');
-assert.match(read('accounts.js'), /Tu cuenta y tus datos/, 'el juego tiene la sección que nombran los textos');
+assert.match(read('js/nube/accounts.js'), /Tu cuenta y tus datos/, 'el juego tiene la sección que nombran los textos');
 for (const plazo of ['90 días', '30 días']) assert.ok(html['borrar-cuenta.html'].includes(plazo) || html['privacidad.html'].includes(plazo));
 
 // La política abre con el resumen y la tabla de datos, y lleva versión.

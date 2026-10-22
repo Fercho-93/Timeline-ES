@@ -130,7 +130,7 @@ Object.defineProperty(w.navigator, 'onLine', {configurable: true, get: () => tru
 // El texto tras fallar una carta concuerda con quien juega: «Pierdes…» en solitario, «Ana pierde…» en mesa,
 // y con 0 aciertos provisionales no dice «pierde 0 aciertos».
 {
-  const src = read('quick-challenges.js'), f = src.slice(src.indexOf('  function resultNote'), src.indexOf('  function render() {'));
+  const src = read('js/retos/quick-challenges.js'), f = src.slice(src.indexOf('  function resultNote'), src.indexOf('  function render() {'));
   const nota = (room, players) => new Function('room', 'state', 'esc', f + ';return resultNote;')(room, {players}, x => x);
   const solo = nota(null, [1]), mesa = nota(null, [1, 2]);
   assert.equal(solo({correct: true}, {name: 'Tú', points: 1}), 'Tienes 1 acierto provisional.');

@@ -1,7 +1,7 @@
 // Duelo por turnos entre dos móviles. El documento de la partida es la autoridad:
 // el cliente solo puede escribir la jugada del turno que le corresponde.
-import { auth, db } from './firebase-client.js';
-import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, runTransaction, serverTimestamp, setDoc, Timestamp, where } from './vendor/firebase/firebase-firestore.js';
+import { auth, db } from '../nube/firebase-client.js';
+import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, runTransaction, serverTimestamp, setDoc, Timestamp, where } from '../../vendor/firebase/firebase-firestore.js';
 
 const CT = window.CONTINUUM;
 // Sin plazo por turno (`seconds` = 0), tope del tiempo que se apunta en `ms`; y plazo con el que se

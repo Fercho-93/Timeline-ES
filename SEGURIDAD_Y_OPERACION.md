@@ -18,7 +18,7 @@ dispositivo.
 
 - **Retos rápidos firmados.** Cada comando de una sala de Retos rápidos (`quickRooms`) lleva
   quién lo jugó (`by`). Las reglas exigen que `by` sea quien escribe, y `QuickRoom.validate`
-  (`quick-room.js`) reconstruye la partida en cada cliente y rechaza un comando cuyo autor no sea
+  (`js/retos/quick-room.js`) reconstruye la partida en cada cliente y rechaza un comando cuyo autor no sea
   el participante de turno (o el anfitrión, para pasar de reto). Así nadie juega las cartas de
   otro apuntándose como `actor`. Los comandos sin firma de salas anteriores se siguen aceptando.
 - **Expulsar de la sala de espera de Retos rápidos.** Solo quien lleva la sala (`host`, siempre el
@@ -34,8 +34,8 @@ dispositivo.
   correcta guardada en la sala es la de la carta: una final manipulada se rechaza y el resultado se
   declara no válido.
 - **Salas cercanas con código.** En las salas entre iPhones por MultipeerConnectivity
-  (`local-peer.js`), cualquier iPhone al alcance puede conectarse, pero solo se sienta quien
-  escribe el código de 4 cifras que ve el anfitrión (`local-session.js`). Cada intento fallido
+  (`js/sin-conexion/local-peer.js`), cualquier iPhone al alcance puede conectarse, pero solo se sienta quien
+  escribe el código de 4 cifras que ve el anfitrión (`js/sin-conexion/local-session.js`). Cada intento fallido
   cierra el canal y, tras cinco, el código cambia.
 - **Sala Wi-Fi local.** El anfitrión es la fuente de verdad. Cada canal queda atado a la persona que
   se unió por él, así que sus mensajes siempre hablan en su nombre; el identificador, el nombre
@@ -54,8 +54,8 @@ dispositivo.
   para el día o la semana en curso según la hora del servidor, y con al menos un segundo por
   acierto (`firestore.rules`). No lo hace infalible —sigue siendo declarado por el móvil—, pero
   corta las puntuaciones imposibles y las de otros días.
-- **Edad.** El juego pregunta una vez si se tienen 14 años o más (`edad.js`); sin permiso de los
-  padres no se conecta al servidor (`app-config.js`) ni deja activar el ranking.
+- **Edad.** El juego pregunta una vez si se tienen 14 años o más (`js/jugador/edad.js`); sin permiso de los
+  padres no se conecta al servidor (`js/nube/app-config.js`) ni deja activar el ranking.
 - **Borrado y limpieza.** Borrado completo de la cuenta desde el juego (lo hace el servidor con
   `deleteMyAccount`, y el móvil si el servidor no responde), borrado manual por el titular (workflow
   «Borrar cuenta de un jugador») y limpieza diaria de lo caducado (`purgeExpiredData`).
@@ -63,9 +63,9 @@ dispositivo.
 ## App Check
 
 App Check añade a cada petición a Firebase una prueba de que sale de Continuum y no de un script.
-Se inicia en `firebase-client.js` antes de abrir Firestore.
+Se inicia en `js/nube/firebase-client.js` antes de abrir Firestore.
 
-- **Web:** reCAPTCHA Enterprise, con la clave pública `appCheckSiteKey` de `deployment.js`.
+- **Web:** reCAPTCHA Enterprise, con la clave pública `appCheckSiteKey` de `js/nube/deployment.js`.
 - **iPhone:** App Attest. El plugin nativo `ios/App/App/AppAttestationPlugin.swift` obtiene el token
   con el SDK de Firebase usando los datos públicos de `deployment.iosAppCheck` (no hace falta
   `GoogleService-Info.plist`); el entitlement `appattest-environment` está en `production`.

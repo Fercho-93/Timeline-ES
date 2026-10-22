@@ -3,13 +3,13 @@
 import fs from 'node:fs/promises';
 import vm from 'node:vm';
 import {createHash} from 'node:crypto';
-const files=['cards.js','movies.js','music.js','videogames.js','animals.js','lifespan.js','speed.js','inventos.js','mundo.js','astronomy.js','medicine.js','countries.js','population.js','idiomas.js','distances.js'];
+const files=['mazos/cards.js','mazos/movies.js','mazos/music.js','mazos/videogames.js','mazos/animals.js','mazos/lifespan.js','mazos/speed.js','mazos/inventos.js','mazos/mundo.js','mazos/astronomy.js','mazos/medicine.js','mazos/countries.js','mazos/population.js','mazos/idiomas.js','mazos/distances.js'];
 const cards=[];
 for(const file of files) {
   const window={}; vm.runInNewContext(await fs.readFile(file,'utf8'),{window});
   for(const list of Object.values(window).filter(Array.isArray)) for(const card of list) if(card.id && card.title) cards.push({file,id:card.id,title:card.title,value:card.value??card.year,source:card.source||null,reviewStatus:card.reviewStatus||null,comparison:card.comparison||null,reviewedAt:card.reviewedAt||null});
 }
-const natural=cards.filter(c=>['animals.js','lifespan.js','speed.js'].includes(c.file));
+const natural=cards.filter(c=>['mazos/animals.js','mazos/lifespan.js','mazos/speed.js'].includes(c.file));
 const missing=natural.filter(c=>!c.source);
 if(process.argv.includes('--write')) {
   await fs.mkdir('docs',{recursive:true});

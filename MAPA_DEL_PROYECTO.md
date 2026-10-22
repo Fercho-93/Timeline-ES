@@ -18,49 +18,164 @@ pieza y de qué otras depende.
 5. Todo se guarda en GitHub. Cada vez que se sube un cambio a la rama `main`, unos **robots de
    GitHub** (workflows, en `.github/workflows/`) pasan las pruebas y publican la web.
 
-## Raíz del proyecto: la app
+## De un vistazo
 
-Casi todo el juego vive suelto en la carpeta principal. Se agrupa aquí por función.
+```
+index.html, *.html    Las páginas: el juego y las que tienen dirección propia (legales, invitación…)
+service-worker-258.js El que guarda una copia del juego para jugar sin internet
+js/                   El juego, repartido por áreas (ver abajo)
+css/                  Las hojas de estilo
+mazos/                Los datos de las cartas, un archivo por mazo
+assets/               Imágenes
+vendor/               Código de otros autores que va dentro del juego (Firebase y los QR)
+tests/                Pruebas automáticas      scripts/   Programas de mantenimiento
+functions/            Tareas en la nube        docs/      Documentación de trabajo
+ios/, android/        Los envoltorios de app   .github/   Los robots de GitHub
+```
 
-### Arranque y estructura
+Cómo se carga: `index.html` pide, en este orden, las hojas de `css/`, los mazos, los scripts de
+`js/` y por último `js/arranque/boot.js`, que abre el juego. Casi todos los scripts no se
+importan entre sí: cuelgan de un objeto común, `window.CONTINUUM` (abreviado `CT` en el código),
+así que **el orden de `index.html` importa**. Los que hablan con Firebase (cuentas, salas online,
+duelos por turnos, mesas públicas) son módulos que se piden con `import()` cuando hacen falta.
+
+## La raíz: lo que tiene que estar ahí
 
 | Archivo | Qué es |
 | --- | --- |
 | `index.html` | La página principal: el esqueleto que el navegador abre primero y que carga todo lo demás, en orden. |
-| `boot.js` | Lo primero que se ejecuta: decide si se abre el juego, una invitación o la bienvenida. |
-| `splash.js`, `splash.css` | La portada animada de apertura mientras carga el juego. |
-| `app.js` | El corazón del juego en un solo móvil: dibuja cada pantalla y responde a cada toque. |
-| `home-modes-v1.js`, `home-modes-v1.css` | Las entradas ilustradas de la pantalla de Inicio. |
-| `modes.js` | La lista de modalidades (mazos y formas de jugar) y sus reglas. La leen tanto el juego local como el online. |
-| `engine.js` | Reglas puras de una partida: robar cartas, comprobar si un hueco es correcto. |
-| `final.js` | Cómo se decide el ganador cuando hay empate o final numérica. |
-| `ghost.js` | El modo «Fantasma» (cartas con poderes) y los niveles de dificultad. |
-| `tournament.js` | El modo Competición: varias rondas con mazos distintos. |
-| `tiempo.js` | El tiempo por jugada (sin tiempo, 15, 20 o 30 segundos). |
-| `session.js` | Un reloj común para que todos los móviles de una partida midan igual el tiempo. |
+| `service-worker-258.js` | Guarda una copia del juego para que funcione sin internet. Su número de versión (`continuum-vNNN`) se sube en cada cambio para que los móviles descarguen lo nuevo, y su lista `ASSETS` es también lo que lleva dentro la app móvil. Tiene que estar en la raíz (solo controla su carpeta y las de debajo) y llamarse así: el «258» es un accidente histórico, pero es la dirección que tienen registrada los móviles que ya lo instalaron. |
+| `invitation.html` | La página que abre un enlace de invitación en la app. |
+| `actualizar.html` | «Actualizar Continuum»: descarta la copia guardada sin borrar el perfil. |
+| `privacidad.html`, `terminos.html`, `aviso-legal.html`, `soporte.html`, `borrar-cuenta.html`, `licencias.html` | Páginas legales, de soporte y de licencias, con dirección pública (las enlazan las tiendas). `privacidad.html` cuenta lo mismo que `PRIVACIDAD.md`; `licencias.html` la genera `scripts/licencias.mjs`. `aviso-legal.html` identifica al titular (LSSI art. 10) sin NIF ni domicilio mientras el juego sea gratuito (ver `docs/TIENDAS.md`). |
+| `manifest.webmanifest`, `icon.svg` | Ficha e icono de la web cuando se instala en el móvil desde el navegador. |
+| `CNAME`, `.nojekyll`, `.well-known/` | Publican la web en GitHub Pages con el dominio `continuumjuego.es`, y demuestran a Apple que el dominio es del juego para que los enlaces abran la app (`.well-known/` lo genera `scripts/domain-associations.mjs`). |
+| `firestore.rules` | Las reglas de seguridad de la base de datos. **Subirlas a `main` las publica en producción.** |
+| `firebase.json`, `firebase-e2e.json` | Configuración de las herramientas de Firebase para publicar y para probar en local. |
+| `package.json`, `package-lock.json` | La lista de herramientas que necesita el proyecto y los atajos (`npm test`, `npm run build`…). |
+| `capacitor.config.json` | Configuración del envoltorio de app móvil. |
+| `vite.config.js` | Servidor de pruebas en el ordenador (`npm run dev`). |
+| `eslint.config.js` | El revisor de código (`npm run lint`): solo busca errores de verdad, no estilo. |
+| `asset-budget.json` | Límite de peso de las imágenes y del paquete (el de Google Play es de 200 MB), que comprueba `scripts/check-assets.mjs`. |
+| `.gitignore`, `.gitattributes`, `.editorconfig`, `.nvmrc` | Qué no se guarda en git, cómo se tratan los archivos, el formato del editor y la versión de Node. |
+| `README.md`, `CLAUDE.md`, `MAPA_DEL_PROYECTO.md` | Presentación del proyecto, normas de trabajo y este mapa. |
+| `PRIVACIDAD.md`, `PROCEDENCIA_ARTE_IA.md` | La política de privacidad (igual que `privacidad.html`) y de dónde sale cada ilustración. Se quedan en la raíz porque se enlazan desde fuera. |
+| `LICENSE` | Los derechos del propio juego: es privado, todos los derechos reservados. |
 
-### Aspecto
+## `js/`: el juego
+
+### `js/arranque/` — lo primero que corre
 
 | Archivo | Qué es |
 | --- | --- |
-| `styles.css` | El estilo general: colores, letras, papel, botones. |
-| `edition.css` | Ajustes visuales de la interfaz (no de las cartas). Su número `?v=` en `index.html` se sube en cada cambio. |
-| `accounts.css` | Estilo de las pantallas de cuenta y bienvenida. |
-| `quick-challenges.css` | Estilo de Retos rápidos. |
-| `mesa-escala.js`, `mesa-escala.css` | La mesa de juego siempre igual: se dibuja como en la pantalla de un iPhone Pro (402 × 874) y se escala entera a cualquier móvil u ordenador, con las mismas posiciones y proporciones. En tabletas táctiles (≥ 700 × 600) pone `data-tablet="vertical"` u `"horizontal"` en `<html>`: en vertical la mesa sigue escalada; en horizontal no se escala y la partida usa `tablet.css`. |
-| `vendor/firebase/`, `scripts/vendor-firebase.mjs` | El SDK de Firebase dentro de la app (auth, firestore, app-check, functions y app): los mismos módulos que publica el paquete npm `firebase`, con `firebase-app.js` apuntando a su vecino en vez de gstatic. Así la app no descarga código en cada arranque y arranca sin red. Al subir la versión de `firebase` en `package.json`: `npm install && npm run vendor:firebase` (lo vigila `tests/firebase-local.mjs`). |
-| `tablet.css` | Diseño adaptable para tabletas (iPad y tabletas Android): partida a dos columnas en horizontal (tu carta a la izquierda, la línea del tiempo a todo lo alto a la derecha, el resultado de cada carta bajo tu carta) e inicio en dos columnas. Todo cuelga de `html[data-tablet]`, así que móvil y ordenador no cambian. Pruebas: `tests/tablet.mjs` y `tests/tablet-browser.mjs`. |
-| `tutorial.js`, `tutorial.css` | La guía en vídeo con la que se abre la Guía (y «Ver el manual», bajo «Jugar» en la portada). No se abre sola: solo desde esos dos botones. Escenas que se reproducen solas con un subtítulo corto y un dedo que hace las jugadas; quien mira no tiene que jugar nada. Tres capítulos: lo básico (cartas, línea, turno, fallo y dónde está cada cosa en Inicio), jugar solo (rondas, dificultad, Retos rápidos y reto del día) y en grupo (mano, quién empieza y desempate, con amigos, poderes y online). |
-| `effects.js`, `immersion.js`, `mapa.js` | Animaciones, ambiente de la mesa y zoom de la línea de cartas. Solo decoran: no deciden jugadas. |
-| `drag.js`, `swipe.js` | Arrastrar cartas con el dedo y deslizar para volver atrás. |
-| `a11y.js` | Accesibilidad: poder jugar con teclado o con lector de pantalla. |
-| `sonidos.js` | Los efectos de sonido (coger, colocar, acertar, fallar, fin de partida…), sintetizados al momento sin archivos de audio. |
-| `icon.svg`, `manifest.webmanifest` | Icono y ficha de la web cuando se instala en el móvil desde el navegador. |
+| `splash.js` | La portada animada de apertura mientras carga el juego. Se ejecuta en `<head>`, antes que nada. |
+| `boot.js` | Lo último que carga `index.html`: espera a que se pulse «Jugar», prepara la cuenta y carga `js/juego/app.js`. |
+| `updates.js` | Detecta que hay una versión nueva y la instala (`CT.APP_VERSION`, que se sube a la vez que la caché del service worker). |
+| `actualizar.js` | El script de `actualizar.html`. |
 
-### Mazos de cartas (los datos)
+### `js/juego/` — las reglas y las pantallas
+
+| Archivo | Qué es |
+| --- | --- |
+| `app.js` | El corazón del juego en un solo móvil: dibuja cada pantalla y responde a cada toque. Empieza con un índice de sus secciones. |
+| `modes.js` | La lista de modalidades (mazos y formas de jugar), sus ejes y unidades, y ayudantes comunes como `CT.escapeHtml`. La leen tanto el juego local como el online. |
+| `engine.js` | Reglas puras de una partida: robar cartas, comprobar si un hueco es correcto. |
+| `final.js` | Cómo se decide el ganador cuando hay empate o final numérica, y quién empieza (`CT.Starter`). |
+| `ghost.js` | El modo «Fantasma» (cartas con poderes) y los niveles de dificultad. |
+| `tournament.js` | El modo Competición: varias rondas con mazos distintos. |
+| `tiempo.js` | El tiempo por jugada (sin tiempo, 15, 20 o 30 segundos) y lo demás que se elige antes de una partida en directo: cartas iniciales, poderes y máximo de participantes (`CT.ManoInicial`). |
+| `session.js` | El reloj del servidor: que todos los móviles de una sala online midan igual el tiempo. |
+
+### `js/interfaz/` — lo que se ve y se toca
+
+| Archivo | Qué es |
+| --- | --- |
+| `home-modes-v1.js` | Las entradas ilustradas de la pantalla de Inicio y las pantallas de elección («Jugar solo», «Jugar con amigos»…). |
+| `tutorial.js` | La guía en vídeo: escenas que se reproducen solas con subtítulos y un dedo que hace las jugadas. Se abre desde la Guía y desde «Ver el manual». |
+| `settings.js` | La pantalla de Ajustes. |
+| `a11y.js` | Pintar cada pantalla sin perder el foco del teclado, anunciar cambios al lector de pantalla, abrir las capas como diálogos, el aviso breve de abajo (`CT.toast`), las animaciones de las cartas y la ficha ampliada de una carta. |
+| `immersion.js` | La cabecera, la barra de navegación, los diálogos de confirmación, la mano en abanico y el ajuste de la mesa al alto de la pantalla. |
+| `effects.js`, `sonidos.js` | Ambiente de cada mazo y efectos al acertar, fallar o abrir diálogos; los sonidos se sintetizan al momento, sin archivos de audio. Solo decoran: no deciden jugadas. |
+| `mapa.js` | El zoom de la línea de cartas. |
+| `drag.js`, `swipe.js` | Arrastrar cartas con el dedo y deslizar para volver atrás. |
+| `mesa-escala.js` | La mesa siempre igual: se dibuja como en la pantalla de un iPhone Pro (402 × 874) y se escala entera a cualquier móvil u ordenador. En tabletas (≥ 700 × 600) pone `data-tablet="vertical"` u `"horizontal"` en `<html>`; en horizontal no escala y la partida usa `css/tablet.css`. |
+
+### `js/jugador/` — perfil, progreso y guardado
+
+| Archivo | Qué es |
+| --- | --- |
+| `storage.js` | Guarda datos en el propio móvil y avisa si el guardado falla. |
+| `account-storage.js` | Separa lo guardado de cada cuenta, para que dos personas en el mismo móvil no se mezclen. |
+| `saves.js` | Guarda una partida a medias para poder seguirla después. |
+| `progreso.js` | Estadísticas del jugador: qué ha jugado, qué acierta y qué falla. |
+| `identidad.js`, `avatares.js` | El nombre y el dibujo (avatar) del jugador. |
+| `moderacion.js` | Filtro de nombres ofensivos o reservados y botón «Denunciar» junto a los nombres ajenos. |
+| `edad.js` | Pregunta una vez si quien juega tiene 14 años o más (o el permiso de sus padres). Sin permiso, el juego funciona sin conexión y sin ranking. |
+| `enciclopedia.js` | El Atlas: el álbum de cartas descubiertas. |
+| `cartera.js` | Decide a qué mazos tiene acceso cada jugador. Hoy todos están abiertos. |
+| `recent-players.js` | Los nombres de las últimas personas con las que se jugó en el mismo móvil. |
+
+### `js/nube/` — cuentas y Firebase
+
+| Archivo | Qué es |
+| --- | --- |
+| `firebase-client.js` | Conecta con Firebase y con App Check (la comprobación de que quien llama es el juego de verdad). |
+| `deployment.js` | Configuración pública: correo de contacto, claves públicas de App Check, avisos push. Nunca contraseñas. |
+| `accounts.js` | Cuentas: invitado automático, entrar con Apple, ranking, borrado de cuenta. |
+| `app-config.js` | Cartel remoto: lee `appConfig/current` para pedir actualizar una versión antigua o pausar el online. |
+| `push.js` | Avisos al móvil (preparado y apagado: `nativePush` en `deployment.js`). |
+
+### `js/online/` — jugar por internet
+
+| Archivo | Qué es |
+| --- | --- |
+| `online.js` | Partidas online con amigos (salas con código) y mesas públicas. Empieza con un índice de sus secciones. |
+| `public-tables.js`, `public-matchmaking.js`, `public-matchmaking-online.js` | El tablón de mesas públicas, las reglas puras de la partida rápida (y la versión del cliente que exigen las salas) y la cola con desconocidos. |
+| `duelo.js` | Duelo por enlace: los dos juegan las mismas cartas, cada uno cuando quiere. |
+| `duelo-turnos.js` | Duelo por turnos entre dos móviles a través de internet. |
+| `links.js`, `invitation.js` | Los enlaces de invitación y los códigos de sala: qué dirección tienen y el script de `invitation.html`. |
+
+### `js/retos/` — Retos rápidos
+
+| Archivo | Qué es |
+| --- | --- |
+| `quick-challenges.js`, `quick-challenges-engine.js` | Retos rápidos: la pantalla y sus reglas. |
+| `quick-room.js`, `quick-network.js`, `quick-online.js` | Retos rápidos con varias personas: las reglas de la sala, el enlace entre el juego y la red, y la sala por internet. |
+
+### `js/sin-conexion/` — varios móviles sin internet
+
+| Archivo | Qué es |
+| --- | --- |
+| `local-multiplayer.js` | La pantalla de «Sin conexión»: jugar en la misma Wi-Fi sin internet. |
+| `local-room.js` | Las reglas de una sala sin conexión (las mismas que las de una sala online). |
+| `local-session.js`, `local-transport.js`, `local-peer.js` | Cómo se conectan los móviles entre sí (WebRTC por Wi-Fi, o la tecnología de AirDrop entre iPhones). |
+| `local-share.js` | Pasar un texto de un móvil a otro: compartir, pegar, enseñar un QR o leerlo con la cámara. Lo usan también las salas online y Retos rápidos. |
+| `qr-encode.js`, `qr-scanner.js` | Dibujar y leer códigos QR, con las bibliotecas de `vendor/qr/`. |
+
+## `css/`: el aspecto
+
+Se cargan en este orden y cada una retoca a la anterior. Su `?v=` en `index.html` se sube cuando
+cambian (`edition.css` y `tablet.css`, en cada cambio).
+
+| Archivo | Qué es |
+| --- | --- |
+| `splash.css` | La portada animada de apertura. |
+| `styles.css` | El estilo general: colores, letras, papel, botones. Es la única hoja que cargan las páginas legales. |
+| `edition.css` | La piel de la interfaz sobre `styles.css`, escrita por capas: empieza con un índice de sus 29 bloques. |
+| `accounts.css` | Pantallas de cuenta, bienvenida y ranking. |
+| `quick-challenges.css` | Retos rápidos. |
+| `home-modes-v1.css` | Las entradas ilustradas de Inicio (va con `js/interfaz/home-modes-v1.js`). |
+| `atlas-voyage.css`, `guide-journal.css` | El Atlas personal y la Guía. |
+| `tutorial.css` | La guía en vídeo. |
+| `navigation-nautical.css` | La barra de navegación inferior que se ve hoy. |
+| `mesa-escala.css` | La mesa a escala (va con `js/interfaz/mesa-escala.js`). |
+| `tablet.css` | Tabletas: partida a dos columnas en horizontal e inicio en dos columnas. Todo cuelga de `html[data-tablet]`, así que móvil y ordenador no cambian. |
+
+## `mazos/`: las cartas
 
 Cada archivo es una lista de cartas con su título, su explicación, el valor que hay que ordenar
-(un año, una superficie, una velocidad…) y la fuente de donde sale el dato.
+(un año, una superficie, una velocidad…) y la fuente de donde sale el dato. Las ilustraciones
+están en `assets/<mazo>-cards/`.
 
 | Archivo | Mazo |
 | --- | --- |
@@ -74,102 +189,44 @@ Cada archivo es una lista de cartas con su título, su explicación, el valor qu
 | `countries.js`, `population.js`, `distances.js`, `idiomas.js` | Superficie de países, población, distancias entre ciudades y hablantes de cada idioma |
 | `quick-challenges-data.js` | Las cartas de los Retos rápidos (temas cortos) |
 
-### Jugador, progreso y guardado
+## `vendor/`: código de otros autores
 
-| Archivo | Qué es |
+No se edita a mano.
+
+| Carpeta | Qué es |
 | --- | --- |
-| `storage.js` | Guarda datos en el propio móvil y avisa si el guardado falla. |
-| `account-storage.js` | Separa lo guardado de cada cuenta, para que dos personas en el mismo móvil no se mezclen. |
-| `saves.js` | Guarda una partida a medias para poder seguirla después. |
-| `progreso.js` | Estadísticas del jugador: qué ha jugado, qué acierta y qué falla. |
-| `identidad.js`, `avatares.js` | El nombre y el dibujo (avatar) del jugador. |
-| `moderacion.js` | Filtro de nombres ofensivos o reservados y botón «Denunciar» que se pone junto a los nombres ajenos. |
-| `edad.js` | Pregunta una vez si quien juega tiene 14 años o más (o el permiso de sus padres). Sin permiso, el juego funciona sin conexión y sin ranking. |
-| `enciclopedia.js` | El Atlas: el álbum de cartas descubiertas. |
-| `cartera.js` | Decide a qué mazos tiene acceso cada jugador. Hoy todos están abiertos. |
-| `recent-players.js` | Los nombres de las últimas personas con las que se jugó en el mismo móvil. |
-| `settings.js` | La pantalla de Ajustes. |
-| `updates.js`, `service-worker-258.js`, `actualizar.html`, `actualizar.js` | Actualizaciones: el *service worker* guarda una copia del juego para que funcione sin internet, y su número de versión (`continuum-vNNN`) se sube en cada cambio para que los móviles descarguen lo nuevo. |
+| `vendor/firebase/` | El SDK de Firebase (auth, firestore, app-check, functions y app), los mismos módulos que publica el paquete npm `firebase`, para que la app no descargue código en cada arranque y funcione sin red. Al subir la versión de `firebase` en `package.json`: `npm install && npm run vendor:firebase` (lo vigila `tests/firebase-local.mjs`). |
+| `vendor/qr/` | `qrcode-generator.js` (dibuja los QR) y `jsqr.js` (los lee con la cámara), con sus licencias. |
 
-### Cuentas y nube (Firebase)
-
-| Archivo | Qué es |
-| --- | --- |
-| `firebase-client.js` | Conecta con Firebase y con App Check (la comprobación de que quien llama es el juego de verdad). |
-| `deployment.js` | Configuración pública: correo de contacto, claves públicas de App Check. Nunca contraseñas. |
-| `accounts.js` | Cuentas: invitado automático, entrar con Apple, ranking, borrado de cuenta. |
-| `app-config.js` | Cartel remoto: lee `appConfig/current` para pedir actualizar una versión antigua o pausar el online. |
-| `push.js` | Avisos al móvil (preparado y apagado: `nativePush` en `deployment.js`). |
-| `firestore.rules` | Las reglas de seguridad de la base de datos. **Subirlas a `main` las publica en producción.** |
-| `firebase.json`, `firebase-e2e.json` | Configuración de las herramientas de Firebase para publicar y para probar en local. |
-
-### Formas de jugar con otras personas
-
-| Archivo | Qué es |
-| --- | --- |
-| `online.js` | Partidas online con amigos (salas con código). |
-| `public-tables.js`, `public-matchmaking.js`, `public-matchmaking-online.js` | Mesas públicas y partida rápida con desconocidos. |
-| `duelo.js` | Duelo por enlace: los dos juegan las mismas cartas, cada uno cuando quiere. |
-| `duelo-turnos.js` | Duelo por turnos entre dos móviles a través de internet. |
-| `quick-challenges.js`, `quick-challenges-engine.js` | Retos rápidos: la pantalla y sus reglas. |
-| `quick-room.js`, `quick-network.js`, `quick-online.js` | Retos rápidos con varias personas: por Wi-Fi local o por internet. |
-| `local-multiplayer.js` | La pantalla de «Sin conexión»: jugar en la misma Wi-Fi sin internet. |
-| `local-room.js` | Las reglas de una sala sin conexión. |
-| `local-session.js`, `local-transport.js`, `local-share.js`, `local-peer.js` | Cómo se conectan los móviles entre sí sin internet (WebRTC por Wi-Fi, o la tecnología de AirDrop entre iPhones). |
-| `qr-encode.js`, `qr-scanner.js` | Dibujar y leer los códigos QR de invitación. |
-| `qrcode-generator.js`, `jsqr.js` | Bibliotecas de otros autores que hacen el trabajo de los QR (con sus licencias `LICENSE-*.txt`). |
-| `links.js`, `invitation.html`, `invitation.js` | Los enlaces de invitación: qué dirección tienen y la página que los abre en la app. |
-
-### Páginas legales
-
-| Archivo | Qué es |
-| --- | --- |
-| `privacidad.html` | Política de privacidad (la que ve el jugador). `PRIVACIDAD.md` es la misma en el repositorio. |
-| `terminos.html` | Condiciones de uso: conducta, nombres, denuncias, propiedad intelectual y responsabilidad. |
-| `aviso-legal.html` | Identificación del titular (LSSI art. 10): nombre y correo. Sin NIF ni domicilio mientras el juego sea gratuito y sin ingresos (ver `docs/TIENDAS.md`). |
-| `soporte.html` | Contacto y preguntas frecuentes; es la URL de soporte de las tiendas. |
-| `borrar-cuenta.html` | Cómo borrar la cuenta (en el juego o por correo): la URL pública que pide Google Play. |
-| `licencias.html` | Licencias de las piezas de otros autores. Se genera con `scripts/licencias.mjs`. |
-| `LICENSE` | Los derechos del propio juego: es privado, todos los derechos reservados. |
-
-### Configuración de herramientas
-
-| Archivo | Qué es |
-| --- | --- |
-| `package.json`, `package-lock.json` | La lista de herramientas que necesita el proyecto y los atajos (`npm test`, `npm run build`…). |
-| `capacitor.config.json` | Configuración del envoltorio de app móvil. |
-| `vite.config.js` | Servidor de pruebas en el ordenador (`npm run dev`). |
-| `asset-budget.json` | Límite de peso de las imágenes y del paquete (el de Google Play es de 200 MB), que comprueba `scripts/check-assets.mjs`. |
-| `CNAME`, `.nojekyll` | Hacen que la web se publique en GitHub Pages con el dominio `continuumjuego.es`. |
-| `.gitignore`, `.gitattributes` | Qué archivos no se guardan en git y cómo se tratan. |
-
-## Carpetas
+## Otras carpetas
 
 | Carpeta | Qué hay |
 | --- | --- |
-| `assets/` | Imágenes y sonido. Una carpeta por mazo (`*-cards/`) con la ilustración de cada carta; `avatars/` (los 36 retratos), `quick-cards/` (Retos rápidos), `texturas/`, y sueltas las portadas de cada sección (`hero-*`, `menu-*`, `mode-*`). |
+| `assets/` | Imágenes. Una carpeta por mazo (`*-cards/`) con la ilustración de cada carta; `avatars/` (los 36 retratos), `quick-cards/` (Retos rápidos), `texturas/`, y sueltas las portadas de cada sección (`hero-*`, `menu-*`, `mode-*`). |
 | `docs/` | Documentación de trabajo: tiendas, modelo de datos, auditorías de mazos y, en `.json`, las fuentes y la procedencia del arte de cada carta. `docs/promo/` guarda el vídeo promocional y la página de la que se graba. |
-| `tests/` | Las pruebas automáticas. Cada archivo comprueba una parte del juego; [tests/README.md](tests/README.md) dice qué hace cada una. |
+| `tests/` | Las pruebas automáticas. La lista de cuáles se ejecutan y dónde está en `tests/suites.mjs`; [tests/README.md](tests/README.md) dice qué comprueba cada una. |
 | `scripts/` | Pequeños programas de mantenimiento (ver abajo). |
 | `functions/` | Las tareas automáticas en la nube (Cloud Functions). Ver abajo. |
-| `ios/` | El envoltorio de la app de iPhone (proyecto de Xcode). Ver abajo. |
-| `android/` | El envoltorio de la app de Android (proyecto de Android Studio). Ver abajo. |
+| `ios/`, `android/` | Los envoltorios de la app de iPhone (Xcode) y de Android (Android Studio). Ver abajo. |
 | `resources/` | Las imágenes originales del icono y de la pantalla de carga, a partir de las que se generan todos los tamaños (`npm run icons`). |
 | `.github/` | Los robots de GitHub (`workflows/`), las plantillas para abrir incidencias y `beta-request.json`. |
-| `.well-known/` | Un archivo que demuestra a Apple que el dominio es del juego, para que los enlaces de invitación abran la app (lo genera `scripts/domain-associations.mjs`). |
-| `.agents/` | Instrucciones para asistentes de IA que generan ilustraciones de cartas. |
-| `dist/`, `node_modules/` | No se guardan en git: los crea el ordenador al compilar (`dist/`) y al instalar herramientas (`node_modules/`). |
+| `.claude/skills/` | Instrucciones para Claude Code: las reglas «antislop» de diseño y textos. Sus auditorías se guardan en `anti-slop/`. |
+| `.agents/skills/` | Instrucciones para asistentes de IA que generan ilustraciones de cartas. |
+| `dist/`, `node_modules/`, `test-results/` | No se guardan en git: los crea el ordenador al compilar la app (`dist/`), al instalar herramientas (`node_modules/`) y al pasar las pruebas de navegador (`test-results/`). |
 
 ### `scripts/`
 
 | Archivo | Qué hace |
 | --- | --- |
-| `build.mjs` | Prepara la carpeta `dist/` con lo que va dentro de la app móvil. |
+| `build.mjs` | Prepara la carpeta `dist/` con lo que va dentro de la app móvil: lo mismo que precarga el service worker, más las páginas que no pasan por él. |
+| `bump-version.mjs` | `npm run version:bump`: sube a la vez la versión de caché en el service worker, `js/arranque/updates.js` e `index.html`. |
+| `run-tests.mjs` | Ejecuta un grupo de pruebas de `tests/suites.mjs` (`npm test`, `npm run test:rapido`, `test:reglas`, `test:navegador`…). |
 | `check-assets.mjs` | Comprueba que ninguna imagen pese demasiado y que no falte ninguna. |
 | `audit-content.mjs` | Cuenta las cartas con fuente y actualiza el inventario del arte (`docs/inventario-arte.json`). |
 | `audit-licenses.mjs` | Lista las licencias de las herramientas instaladas. |
 | `licencias.mjs` | Genera `licencias.html`. |
 | `icons.mjs` | Genera los iconos y pantallas de carga de iPhone y Android en todos los tamaños. |
+| `vendor-firebase.mjs` | Copia el SDK de Firebase a `vendor/firebase/`. |
 | `borrar-cuenta.mjs` | Borra la cuenta de un jugador entera; lo lanza el workflow «Borrar cuenta de un jugador». |
 | `domain-associations.mjs` | Genera los archivos que permiten abrir los enlaces del juego directamente en la app. |
 | `render-intro.mjs` | Graba el vídeo promocional de la intro. |
@@ -180,6 +237,7 @@ Cada archivo es una lista de cartas con su título, su explicación, el valor qu
 | --- | --- |
 | `index.js` | Las tareas: avisos de duelos, mantenimiento de duelos caducados, `deleteMyAccount` (borrado de cuenta) y `purgeExpiredData`, la limpieza diaria de las 04:17. |
 | `account-purge.js` | Todo lo que se borra al eliminar una cuenta. Lo usan la función de borrado, la limpieza de invitados y el borrado manual. |
+| `purge.js` | La limpieza diaria de una colección, con un tope por ejecución para que un fallo no pueda vaciarla. |
 | `retention.js` | Cuánto tiempo se guarda cada tipo de dato. Debe coincidir con la política de privacidad. |
 | `duel-policy.js` | Cuándo se manda un recordatorio de duelo y con qué texto. |
 
@@ -211,10 +269,10 @@ que en iPhone) y `res/` (iconos, pantallas de carga y textos).
 
 | Archivo | Cuándo corre | Qué hace |
 | --- | --- | --- |
-| `pruebas.yml` | En cada subida | Pasa `npm test` y comprueba que la app móvil se compila. |
-| `zoom-visual.yml` («Pruebas en navegador») | Al cambiar la interfaz | Abre el juego en navegadores de verdad y prueba pantallas pequeñas, zoom, duelos y partidas online. |
+| `pruebas.yml` | En cada subida | Pasa `npm test` y las reglas, y comprueba que la app móvil se compila. |
+| `zoom-visual.yml` («Pruebas en navegador») | Al cambiar la interfaz | Pasa el grupo `navegador` de `tests/suites.mjs` en navegadores de verdad (pantallas pequeñas, zoom, duelos, navegación) y la partida online de extremo a extremo. |
 | `reglas-firestore.yml` | Al cambiar `firestore.rules` | Prueba las reglas y **las publica en producción**. |
-| `functions.yml` | Solo a mano | Publica las Cloud Functions. |
+| `functions.yml` | Solo a mano | Prueba y publica las Cloud Functions. |
 | `borrar-cuenta.yml` | Solo a mano | Borra la cuenta de un jugador (moderación o petición por correo). |
 | `beta-firmada.yml` | Al cambiar `.github/beta-request.json` | Compila la app firmada y la sube a TestFlight. Solo cuando lo pida el titular. |
 

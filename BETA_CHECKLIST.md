@@ -21,7 +21,7 @@ validada hasta observar uso real y repetición voluntaria.
 - [ ] `npx cap sync`
 - [ ] Sin referencias visibles a la marca anterior (lo vigila `tests/marca.mjs`).
 - [ ] Las imágenes referenciadas existen en `dist/` (`tests/build-movil.mjs`).
-- [ ] El service worker sirve la versión actual: `CACHE`, `CT.APP_VERSION` y `edition.css?v=`
+- [ ] El service worker sirve la versión actual: `CACHE`, `CT.APP_VERSION` y `css/edition.css?v=`
       subidos juntos (ver `CLAUDE.md`).
 
 ## B. Pruebas del juego

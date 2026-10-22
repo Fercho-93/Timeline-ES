@@ -1,4 +1,4 @@
-// Multijugador Wi-Fi local entre iPhones con MultipeerConnectivity (`local-peer.js`): no hay
+// Multijugador Wi-Fi local entre iPhones con MultipeerConnectivity (`js/sin-conexion/local-peer.js`): no hay
 // plugin nativo en Node, así que dos ventanas se hablan a través de un "sistema operativo"
 // de mentira (anuncio, búsqueda, invitación, mensajes). Todo lo demás —sesión, sala,
 // pantallas— es el código real.

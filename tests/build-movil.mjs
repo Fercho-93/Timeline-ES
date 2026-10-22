@@ -45,7 +45,7 @@ ok("iPhone y Android llevan la misma versión pública", iosVersions.length > 0 
 
 // Rutas rotas: cada imagen referenciada de forma literal (no armada a partir de una
 // variable en tiempo de ejecución) debe existir de verdad dentro de dist/assets.
-const jsFuentes = fs.readdirSync(REPO).filter(f => f.endsWith(".js")).map(f => fs.readFileSync(path.join(REPO, f), "utf8")).join("\n");
+const jsFuentes = ["", "js", "mazos"].flatMap(dir => fs.readdirSync(path.join(REPO, dir), { recursive: dir !== "" }).filter(f => f.endsWith(".js")).map(f => path.join(REPO, dir, f))).map(f => fs.readFileSync(f, "utf8")).join("\n");
 const imagenesLiterales = [...jsFuentes.matchAll(/assets\/([a-z0-9_-]+\.(?:webp|svg|png))/gi)].map(m => `assets/${m[1]}`);
 const imagenesRotas = imagenesLiterales.filter(ruta => !fs.existsSync(path.join(DIST, ruta)));
 ok(`ninguna imagen referenciada de forma literal falta en dist/${imagenesRotas.length ? ` (falta ${[...new Set(imagenesRotas)].join(", ")})` : ""}`, !imagenesRotas.length);

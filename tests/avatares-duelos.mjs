@@ -12,7 +12,7 @@ const CT = {
   Identidad: { nombre: () => 'Fer' }
 };
 const context = vm.createContext({window: {CONTINUUM: CT}, document: {querySelectorAll: () => images}, console});
-vm.runInContext(read('avatares.js'), context);
+vm.runInContext(read('js/jugador/avatares.js'), context);
 const A = CT.Avatares;
 const src = html => html.match(/src="([^"]+)"/)[1];
 const node = uid => {
@@ -33,7 +33,7 @@ assert.ok(src(A.forUser('Fer', 'me')).includes('zorro'), 'Se conserva el avatar 
 assert.equal(src(A.forUser('Sin UID', null)), src(A.markup('Sin UID')), 'Las partidas antiguas sin UID conservan alternativa por nombre');
 
 // Dos filas reales con códigos diferentes muestran el mismo rival.
-const turnSource = read('duelo-turnos.js');
+const turnSource = read('js/online/duelo-turnos.js');
 const rowFunction = turnSource.slice(turnSource.indexOf('function quickRowMarkup('), turnSource.indexOf('function profileMarkup('));
 Object.assign(context, {CT, safe: CT.escapeHtml, archivedIds: new Set()});
 vm.runInContext(rowFunction, context);
@@ -44,7 +44,7 @@ assert.equal(src(first), src(second));
 assert.ok(src(first).includes(chosen), 'La lista usa la elección pública conocida');
 
 // El marcador real de Retos rápidos usa la misma cuenta que la lista.
-const quickSource = read('quick-challenges.js');
+const quickSource = read('js/retos/quick-challenges.js');
 const avatarFunction = quickSource.slice(quickSource.indexOf('  function playerAvatar('), quickSource.indexOf('  // Qué significa cada extremo'));
 Object.assign(context, {room: {members: ['me', 'makelele']}, myId: 'me', state: {players: [{name: 'Fer'}, {name: 'Makelele'}]}});
 vm.runInContext(avatarFunction, context);
@@ -52,7 +52,7 @@ assert.equal(src(context.playerAvatar({name: 'Makelele'}, 1)), src(first));
 assert.ok(src(context.playerAvatar({name: 'Fer'}, 0)).includes('zorro'));
 
 // La lectura pública se agrupa por UID y actualiza imágenes sin repintar el juego.
-const accounts = read('accounts.js');
+const accounts = read('js/nube/accounts.js');
 const resolver = accounts.slice(accounts.indexOf('const avatarReads ='), accounts.indexOf('function metadata()'));
 let calls = 0, answer = 'marie-curie', unavailable = false;
 Object.assign(context, {
@@ -70,12 +70,12 @@ assert.equal(src(A.forUser('Sergio', 'sergio')), src(A.markup('Sergio', {seed: '
 answer = 'compass'; unavailable = false;
 await context.loadAvatars(['legacy']);
 assert.equal(src(A.forUser('Legacy', 'legacy')), src(A.markup('Legacy', {seed: 'uid:legacy'})), 'Los avatares antiguos no generan rutas inválidas');
-assert.match(read('quick-challenges.js'), /forUser\(p.name, room\?\.members\?\.\[i\], \{size:28\}\)/);
-assert.doesNotMatch(read('quick-challenges.js'), /seed:'room:'\+room.members/);
+assert.match(read('js/retos/quick-challenges.js'), /forUser\(p.name, room\?\.members\?\.\[i\], \{size:28\}\)/);
+assert.doesNotMatch(read('js/retos/quick-challenges.js'), /seed:'room:'\+room.members/);
 assert.doesNotMatch(turnSource, /seed: 'quick:' \+ x.code/);
 const cacheVersion = read('service-worker-258.js').match(/const CACHE = "([^"]+)"/)[1];
-assert.ok(read('updates.js').includes(cacheVersion), 'La versión visible coincide con la caché nueva');
-for (const file of ['avatares.js','accounts.js','duelo-turnos.js','quick-challenges.js']) {
+assert.ok(read('js/arranque/updates.js').includes(cacheVersion), 'La versión visible coincide con la caché nueva');
+for (const file of ['js/jugador/avatares.js','js/nube/accounts.js','js/online/duelo-turnos.js','js/retos/quick-challenges.js']) {
   new vm.Script(read(file).replace(/^import .*;\n/gm, '').replace(/^export /gm, ''), {filename: file});
 }
 console.log('OK: mismo rival en dos duelos, elección pública, avatar propio, sin UID, sin conexión, consultas agrupadas y sintaxis.');

@@ -2,8 +2,8 @@
 // tiene aquí una ficha con su configuración (contenido, plazas y tiempo) y quién hay
 // sentado. Solo la escribe el móvil que lleva la mesa; el resto la lista para elegir
 // dónde entrar. La sala sigue siendo la fuente de verdad: la ficha solo sirve para verla.
-import { db } from './firebase-client.js';
-import { collection, deleteDoc, doc, getDoc, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc } from './vendor/firebase/firebase-firestore.js';
+import { db } from '../nube/firebase-client.js';
+import { collection, deleteDoc, doc, getDoc, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc } from '../../vendor/firebase/firebase-firestore.js';
 import { STALE_MS } from './public-matchmaking.js';
 
 // Quien lleva la mesa renueva la ficha cada 45 s; sin renovar en `STALE_MS` (dos minutos), la

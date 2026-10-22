@@ -10,50 +10,37 @@ import { fileURLToPath } from "node:url";
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const dist = path.join(root, "dist");
 
-// Misma lista que ASSETS en service-worker-258.js (sin el "./"), más las páginas
-// y scripts que no pasan por el service worker (actualizar.*) y las carpetas
-// de imágenes que se piden bajo demanda. El nombre "-258" es un accidente
-// histórico que se ha quedado así a propósito: es la URL exacta que
-// `updates.js` registra, y cambiarla dejaría sin caché a quien ya lo tenga
-// instalado, como si abriera la aplicación por primera vez sin conexión.
-const FILES = [
-  "tiempo.js", "quick-room.js", "quick-network.js", "quick-online.js", "quick-challenges.css", "quick-challenges-data.js", "quick-challenges-engine.js", "quick-challenges.js",
-  "invitation.html", "invitation.js", "index.html", "actualizar.html", "privacidad.html", "terminos.html", "aviso-legal.html", "soporte.html", "borrar-cuenta.html", "licencias.html", "manifest.webmanifest", "icon.svg",
-  "splash.css", "splash.js", "styles.css", "edition.css", "atlas-voyage.css", "navigation-nautical.css", "guide-journal.css", "tutorial.css", "tutorial.js", "home-modes-v1.css", "home-modes-v1.js", "service-worker-258.js",
-  "cards.js", "movies.js", "music.js", "videogames.js", "animals.js",
-  "lifespan.js", "speed.js", "inventos.js", "mundo.js", "astronomy.js",
-  "medicine.js", "countries.js", "population.js", "idiomas.js", "distances.js", "modes.js",
-  "deployment.js", "accounts.css", "firebase-client.js", "account-storage.js", "recent-players.js", "accounts.js", "boot.js", "engine.js", "final.js", "tournament.js", "links.js", "storage.js", "saves.js", "updates.js", "session.js", "avatares.js", "moderacion.js", "edad.js", "identidad.js", "enciclopedia.js", "progreso.js", "cartera.js", "duelo.js", "local-transport.js", "local-peer.js", "local-room.js", "local-session.js", "local-share.js", "qrcode-generator.js", "qr-encode.js", "qr-scanner.js", "jsqr.js", "local-multiplayer.js", "ghost.js", "drag.js", "swipe.js",
-  "a11y.js", "mapa.js", "settings.js", "effects.js", "sonidos.js", "mesa-escala.js", "mesa-escala.css", "tablet.css", "immersion.js", "duelo-turnos.js", "push.js", "app-config.js", "public-matchmaking.js", "public-matchmaking-online.js", "public-tables.js", "app.js", "online.js", "actualizar.js"
-];
-
+// La lista de archivos es la de precarga del service worker (ASSETS en
+// service-worker-258.js): lo que la web guarda para funcionar sin conexión es
+// lo mismo que la app lleva dentro. El nombre "-258" es un accidente histórico
+// que se ha quedado así a propósito: es la URL exacta que `updates.js`
+// registra, y cambiarla dejaría sin caché a quien ya lo tenga instalado.
+// Se añaden las páginas que no pasan por el service worker (la invitación y
+// «Actualizar Continuum», con sus scripts) y las carpetas enteras de imágenes
+// y bibliotecas, que incluyen lo que se pide bajo demanda.
+const EXTRA = ["invitation.html", "js/online/invitation.js", "actualizar.html", "js/arranque/actualizar.js"];
 const DIRS = ["assets", "vendor"];
 
 async function build() {
+  const sw = await readFile(path.join(root, "service-worker-258.js"), "utf8");
+  const assets = sw.match(/const ASSETS = \[([\s\S]*?)\];/);
+  if (!assets) throw new Error("No se encuentra la lista ASSETS en service-worker-258.js");
+  const precargados = [...assets[1].matchAll(/"\.\/([^"]*)"/g)].map(m => m[1]).filter(Boolean);
+  // Lo que cuelga de DIRS se copia con su carpeta; el resto, archivo a archivo.
+  const files = [...new Set([...precargados, ...EXTRA])].filter(file => !DIRS.some(dir => file.startsWith(`${dir}/`)));
+
   await rm(dist, { recursive: true, force: true });
   await mkdir(dist, { recursive: true });
-
-  for (const file of FILES) {
+  for (const file of files) {
     const from = path.join(root, file);
     if (!existsSync(from)) throw new Error(`Falta ${file}, referenciado por el build`);
+    await mkdir(path.dirname(path.join(dist, file)), { recursive: true });
     await cp(from, path.join(dist, file));
   }
-
   for (const dir of DIRS) {
     await cp(path.join(root, dir), path.join(dist, dir), { recursive: true });
   }
-
-  // Aviso si el service worker referencia algo que el build no ha copiado, para
-  // detectar antes de publicar que dist/ y la lista de caché se han desincronizado.
-  const sw = await readFile(path.join(root, "service-worker-258.js"), "utf8");
-  const assetMatch = sw.match(/const ASSETS = \[([\s\S]*?)\];/);
-  if (assetMatch) {
-    const referenced = [...assetMatch[1].matchAll(/"\.\/([^"]+)"/g)].map(m => m[1]);
-    const missing = referenced.filter(f => !existsSync(path.join(dist, f)));
-    if (missing.length) throw new Error(`El build no incluye archivos que pide el service worker: ${missing.join(", ")}`);
-  }
-
-  console.log(`dist/ generado con ${FILES.length} archivos y ${DIRS.length} carpetas.`);
+  console.log(`dist/ generado con ${files.length} archivos y ${DIRS.length} carpetas.`);
 }
 
 build().catch(error => {

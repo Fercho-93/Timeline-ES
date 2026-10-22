@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
 
-const source = fs.readFileSync(new URL('../a11y.js', import.meta.url), 'utf8');
+const source = fs.readFileSync(new URL('../js/interfaz/a11y.js', import.meta.url), 'utf8');
 function boot(reduce = false) {
   const w = new JSDOM('<main id="app"><section class="collection-entry"><button data-action="test">Explorar</button><p>Contenido visible</p></section></main>', { runScripts: 'outside-only', pretendToBeVisual: true }).window;
   w.matchMedia = () => ({ matches: reduce });

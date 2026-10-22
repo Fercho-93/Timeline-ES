@@ -14,7 +14,7 @@ assert.match(manifest, /<uses-permission\s+android:name="android.permission.CAME
 assert.match(manifest, /<uses-feature\s+android:name="android.hardware.camera"\s+android:required="false"\s*\/>/,
   "el juego también debe poder instalarse en dispositivos sin cámara");
 // El iPhone no abre la cámara «por sorpresa» al crear una sala Wi-Fi: antes se explica para qué y se deja elegir.
-const transport = read("local-transport.js"), multiplayer = read("local-multiplayer.js");
+const transport = read("js/sin-conexion/local-transport.js"), multiplayer = read("js/sin-conexion/local-multiplayer.js");
 assert.ok(transport.indexOf("cameraConsent") > 0 && transport.indexOf("cameraConsent") < transport.indexOf("getUserMedia({"),
   "withCapture pregunta antes de pedir la cámara");
 assert.match(multiplayer, /CT\.cameraConsent = \(\) => \{\s*if \(!enIPhone\(\)\) return Promise\.resolve\(true\);/, "solo la app de iPhone muestra el aviso previo");

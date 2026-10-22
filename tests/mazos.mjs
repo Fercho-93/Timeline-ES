@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.window = {};
-for (const archivo of ["cards.js", "movies.js", "music.js", "videogames.js", "animals.js", "lifespan.js", "speed.js", "inventos.js", "mundo.js", "astronomy.js", "medicine.js", "countries.js", "population.js", "idiomas.js", "distances.js", "modes.js"]) {
+for (const archivo of ["mazos/cards.js", "mazos/movies.js", "mazos/music.js", "mazos/videogames.js", "mazos/animals.js", "mazos/lifespan.js", "mazos/speed.js", "mazos/inventos.js", "mazos/mundo.js", "mazos/astronomy.js", "mazos/medicine.js", "mazos/countries.js", "mazos/population.js", "mazos/idiomas.js", "mazos/distances.js", "js/juego/modes.js"]) {
   new Function(fs.readFileSync(path.join(REPO, archivo), "utf8")).call(globalThis);
 }
 const { HISTORY_CARDS, MOVIE_CARDS, MUSIC_CARDS, VIDEOGAME_CARDS, ANIMAL_WEIGHT_CARDS, ANIMAL_LIFESPAN_CARDS, ANIMAL_SPEED_CARDS, INVENTION_CARDS, WORLD_CARDS, ASTRONOMY_CARDS, MEDICINE_CARDS, COUNTRY_CARDS, POPULATION_CARDS, LANGUAGE_CARDS, CITY_DISTANCE_CARDS } = globalThis.window;
@@ -129,9 +129,9 @@ ok("los identificadores no chocan entre modalidades", new Set(todos.map(c => c.i
 // separados a propósito produce muchas más coincidencias de año que cualquiera de ellos
 // por separado, y esa dificultad extra es justo lo que la hace la modalidad más difícil.
 // Excepción: Inventos comparte con Astronomía y Medicina una quincena de hitos con el mismo
-// año y un título casi calcado (relatividad, Sputnik, Hubble, vacunas...). modes.js los
+// año y un título casi calcado (relatividad, Sputnik, Hubble, vacunas...). js/juego/modes.js los
 // descarta al construir la mezcla para no darle al jugador dos cartas casi idénticas; ese
-// descuento se refleja aquí con el mismo conjunto de IDs que usa modes.js, en vez de fijar
+// descuento se refleja aquí con el mismo conjunto de IDs que usa js/juego/modes.js, en vez de fijar
 // un número aparte que se desincronizaría en silencio.
 console.log("\nGran mezcla");
 const mixed = CT.cards("mixed");

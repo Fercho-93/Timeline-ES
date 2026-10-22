@@ -25,8 +25,8 @@
 //   - Compartir, QR y cámara
 //   - Cerrar la sala y navegar
 //   - Reconexión y oyentes de la página
-import { auth, db } from './firebase-client.js';
-import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, onSnapshot, runTransaction, serverTimestamp, setDoc, writeBatch } from "./vendor/firebase/firebase-firestore.js";
+import { auth, db } from '../nube/firebase-client.js';
+import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, onSnapshot, runTransaction, serverTimestamp, setDoc, writeBatch } from "../../vendor/firebase/firebase-firestore.js";
 import { CLIENT_VERSION } from './public-matchmaking.js';
 
 // ==== Estado de la sala ==========================================================================

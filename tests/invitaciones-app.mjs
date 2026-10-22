@@ -9,7 +9,7 @@ let listener, launch;
 const CT = {};
 const cap = {isNativePlatform:()=>true,registerPlugin:()=>({addListener(_event, callback){listener=callback;},getLaunchUrl:async()=>launch})};
 const ctx = vm.createContext({window:{CONTINUUM:CT,Capacitor:cap},URL,URLSearchParams,location:new URL('capacitor://localhost/'),Date,Promise});
-vm.runInContext(read('links.js'),ctx);
+vm.runInContext(read('js/online/links.js'),ctx);
 const routes = [{room:'ABCD2345'},{duelo:'v1|Fer|history|123'},{turnDuel:'a'.repeat(32)},{quickRoom:'ABCD234567'},{quickDuel:'eyJ2IjozfQ'}];
 for (const target of routes) {
   const invitation = CT.Links.invitation(target);
@@ -42,7 +42,7 @@ assert.deepEqual(delivered,[routes[3],routes[4]],'app abierta recibe también el
 // Ejecutar la pantalla real sin Firebase ni almacenamiento del navegador.
 for (const target of routes) {
   const dom = new JSDOM(read('invitation.html'),{url:CT.Links.invitation(target),runScripts:'outside-only'});
-  dom.window.eval(read('links.js'));dom.window.eval(read('invitation.js'));
+  dom.window.eval(read('js/online/links.js'));dom.window.eval(read('js/online/invitation.js'));
   const button=dom.window.document.getElementById('open-app');
   assert.equal(button.hidden,false);
   assert.deepEqual(plain(CT.Links.parse(button.href)),target);
@@ -51,11 +51,11 @@ for (const target of routes) {
 }
 assert.doesNotMatch(read('invitation.html'),/firebase|accounts\.js|boot\.js/);
 let redirected;
-vm.runInNewContext(read('boot.js'),{window:{CONTINUUM:CT},location:{href:base+'#quick-room=ABCD234567',replace:url=>redirected=url}});
+vm.runInNewContext(read('js/arranque/boot.js'),{window:{CONTINUUM:CT},location:{href:base+'#quick-room=ABCD234567',replace:url=>redirected=url}});
 assert.equal(redirected,CT.Links.invitation(routes[3]),'invitación antigua sale antes de iniciar cuentas');
 
-// Ejecutar el receptor real de app.js. El UID ya autenticado se conserva.
-const app = read('app.js');
+// Ejecutar el receptor real de js/juego/app.js. El UID ya autenticado se conserva.
+const app = read('js/juego/app.js');
 const routeSource=app.slice(app.indexOf('  function openInvitation(target) {'),app.indexOf('  const params = new URLSearchParams(location.hash',app.indexOf('  function openInvitation(target) {')));
 const opened=[];let active=false, receiver;
 const currentUser={uid:'usuario-app-existente'};
@@ -64,7 +64,7 @@ for(const target of routes) {active=!active;receiver(target);}
 await new Promise(resolve=>setImmediate(resolve));
 assert.equal(opened.length,5);
 assert.ok(opened.every(entry=>entry.includes(currentUser.uid)),'todos los modos usan la sesión existente');
-assert.match(read('app.js'),/if \(target\?\.quickRoom \|\| target\?\.quickDuel\) CT\.Quick\.open\(render, target\)/,'invitación tiene prioridad sobre el menú guardado');
+assert.match(read('js/juego/app.js'),/if \(target\?\.quickRoom \|\| target\?\.quickDuel\) CT\.Quick\.open\(render, target\)/,'invitación tiene prioridad sobre el menú guardado');
 assert.match(read('ios/App/App/Info.plist'),/<string>continuum<\/string>/);
 assert.match(read('android/app/src/main/AndroidManifest.xml'),/android:scheme="continuum" android:host="invite"/);
 console.log('OK: cinco tipos de invitación, app cerrada/abierta, sin perfil web y sesión nativa conservada.');

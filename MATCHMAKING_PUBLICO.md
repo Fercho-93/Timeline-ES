@@ -11,11 +11,11 @@ privadas ni el modo Wi-Fi. Tiene dos caminos en la misma pantalla:
 
 | Pieza | Archivo |
 | --- | --- |
-| Pantallas de Jugar online | `home-modes-v1.js` |
-| Tablón de mesas (`publicTables`) | `public-tables.js` |
-| Claves de cola, compatibilidad y arranque | `public-matchmaking.js` |
-| Transacciones de Grandes colecciones (`rooms` + `publicQueues`) | `online.js`, `public-matchmaking-online.js` |
-| Transacciones de Retos rápidos (`quickRooms` + `quickPublicQueues`) | `quick-online.js`, `quick-room.js` |
+| Pantallas de Jugar online | `js/interfaz/home-modes-v1.js` |
+| Tablón de mesas (`publicTables`) | `js/online/public-tables.js` |
+| Claves de cola, compatibilidad y arranque | `js/online/public-matchmaking.js` |
+| Transacciones de Grandes colecciones (`rooms` + `publicQueues`) | `js/online/online.js`, `js/online/public-matchmaking-online.js` |
+| Transacciones de Retos rápidos (`quickRooms` + `quickPublicQueues`) | `js/retos/quick-online.js`, `js/retos/quick-room.js` |
 | Reglas | `firestore.rules` (`publicTables`, `publicQueues`, `quickPublicQueues`, `rooms`, `quickRooms`) |
 
 ## Principios
@@ -94,7 +94,7 @@ mesa y nadie se queda esperando para siempre.
 - **Pantalla.** Arriba, la colección y el estado con la cuenta atrás; debajo, los jugadores con su
   estado (tú, en la mesa, pensando su cifra, ha respondido, sin señal) y el minijuego. Sin
   «Anfitrión». Al terminar, «Buscar otra partida».
-- **Retos rápidos.** Las mismas reglas de arranque y de salida (acción `leave` en `quick-room.js`
+- **Retos rápidos.** Las mismas reglas de arranque y de salida (acción `leave` en `js/retos/quick-room.js`
   y regla `leaving`).
 
 ## Pruebas

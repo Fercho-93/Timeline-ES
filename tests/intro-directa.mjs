@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {JSDOM} from 'jsdom';
-const source = fs.readFileSync(new URL('../splash.js', import.meta.url), 'utf8');
+const source = fs.readFileSync(new URL('../js/arranque/splash.js', import.meta.url), 'utf8');
 for (const returning of [false, true]) {
   const dom = new JSDOM('<div id="app-splash"></div><main id="app">Juego</main>', {url:'https://intro.test/', runScripts:'outside-only'});
   const w = dom.window, requests = [];

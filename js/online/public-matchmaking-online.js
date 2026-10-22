@@ -1,6 +1,6 @@
 // Partida rápida con desconocidos: busca una mesa pública libre y entra en ella a través de Firestore.
-import { auth, db } from './firebase-client.js';
-import { doc, getDoc, runTransaction, serverTimestamp } from './vendor/firebase/firebase-firestore.js';
+import { auth, db } from '../nube/firebase-client.js';
+import { doc, getDoc, runTransaction, serverTimestamp } from '../../vendor/firebase/firebase-firestore.js';
 import { publicQueueKey, isJoinablePublicRoom, makePublicRoomCode, normalizePublicCapacity, queueFresh, CLIENT_VERSION } from './public-matchmaking.js';
 
 const CT = window.CONTINUUM;

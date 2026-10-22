@@ -11,7 +11,7 @@ for (const screen of ['game', 'solo', 'online-game']) {
     w.CONTINUUM = {};
     w.matchMedia = () => ({matches:true});
     w.scrollTo = () => {};
-    for (const file of ['a11y.js', 'mapa.js']) w.eval(fs.readFileSync(new URL('../'+file, import.meta.url), 'utf8'));
+    for (const file of ['js/interfaz/a11y.js', 'js/interfaz/mapa.js']) w.eval(fs.readFileSync(new URL('../'+file, import.meta.url), 'utf8'));
     const app = w.document.getElementById('app');
     w.Element.prototype.getBoundingClientRect = function () {
       const wrap = this.closest('.timeline-wrap');

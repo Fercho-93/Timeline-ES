@@ -12,7 +12,7 @@
   let starting = false;
   function loadApp() {
     const script = document.createElement('script');
-    script.src = 'app.js';
+    script.src = 'js/juego/app.js';
     script.onload = () => window.CONTINUUM_SPLASH?.finish();
     script.onerror = () => { starting = false; failed(); };
     document.body.append(script);
@@ -23,7 +23,7 @@
     app.innerHTML = '';
     window.CONTINUUM_SPLASH?.show();
     // El invitado se prepara mientras se ve la portada: el botón no espera a la red.
-    const accounts = import('./accounts.js');
+    const accounts = import('../nube/accounts.js');
     accounts.catch(() => { /* El fallo se atiende abajo, al pedir el módulo. */ });
     try {
       // Entrar es un acto de quien juega, no del reloj.

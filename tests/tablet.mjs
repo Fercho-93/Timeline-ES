@@ -1,7 +1,7 @@
-// Tabletas: el diseño adaptable (tablet.css) y cuándo la mesa deja de escalarse como un iPhone.
+// Tabletas: el diseño adaptable (css/tablet.css) y cuándo la mesa deja de escalarse como un iPhone.
 // - Móvil y ordenador con ratón: la mesa a escala, como siempre.
 // - Tableta vertical: sigue la mesa a escala (cabe entera a lo alto y las cartas salen grandes).
-// - Tableta horizontal: la partida usa las medidas reales, con dos columnas (tablet.css).
+// - Tableta horizontal: la partida usa las medidas reales, con dos columnas (css/tablet.css).
 // Girar la tableta en plena partida cambia de un modo al otro.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -14,10 +14,10 @@ function entorno({width, height, coarse = true}) {
   const medidas = {width, height};
   const poner = (ancho, alto) => { medidas.width = ancho; medidas.height = alto; Object.defineProperty(w, 'innerWidth', {value: ancho, configurable: true}); Object.defineProperty(w, 'innerHeight', {value: alto, configurable: true}); };
   poner(width, height);
-  // La consulta que usa mesa-escala.js: pantalla táctil de al menos 700 × 600.
+  // La consulta que usa js/interfaz/mesa-escala.js: pantalla táctil de al menos 700 × 600.
   w.matchMedia = consulta => ({get matches() { return consulta.includes('pointer: coarse') ? coarse && medidas.width >= 700 && medidas.height >= 600 : false; }, addEventListener() {}});
   w.CONTINUUM = {};
-  w.eval(read('mesa-escala.js'));
+  w.eval(read('js/interfaz/mesa-escala.js'));
   const app = w.document.getElementById('app');
   return {w, app, CT: w.CONTINUUM, atributo: () => w.document.documentElement.getAttribute('data-tablet'), gira: (ancho, alto) => { poner(ancho, alto); w.dispatchEvent(new w.Event('resize')); }};
 }
@@ -89,21 +89,20 @@ function entorno({width, height, coarse = true}) {
   assert.equal(CT.Mesa.activa(), true);
 }
 
-// tablet.css: todo cuelga de html[data-tablet], para no tocar móvil ni ordenador.
-const css = read('tablet.css').replace(/\/\*[\s\S]*?\*\//g, '');
+// css/tablet.css: todo cuelga de html[data-tablet], para no tocar móvil ni ordenador.
+const css = read('css/tablet.css').replace(/\/\*[\s\S]*?\*\//g, '');
 const reglas = [...css.matchAll(/([^{}]+)\{[^{}]*\}/g)].map(m => m[1].trim()).filter(Boolean);
-assert.ok(reglas.length >= 10, 'tablet.css tiene reglas');
+assert.ok(reglas.length >= 10, 'css/tablet.css tiene reglas');
 for (const lista of reglas) for (const selector of lista.split(/,(?![^()]*\))/).map(s => s.trim())) {
   assert.match(selector, /^html\[data-tablet(="(horizontal|vertical)")?\]/, `selector fuera de html[data-tablet]: ${selector}`);
 }
-assert.doesNotMatch(css, /@media/, 'la condición de tableta la marca mesa-escala.js, no una consulta de CSS');
+assert.doesNotMatch(css, /@media/, 'la condición de tableta la marca js/interfaz/mesa-escala.js, no una consulta de CSS');
 
 // Cableado: se carga, se guarda para jugar sin conexión y entra en el paquete móvil.
 const index = read('index.html');
-assert.match(index, /<link rel="stylesheet" href="tablet\.css\?v=\d+"/);
-assert.ok(index.indexOf('tablet.css') > index.indexOf('edition.css'), 'tablet.css va después de edition.css para poder redefinirla');
-assert.equal(index.match(/tablet\.css\?v=(\d+)/)[1], index.match(/edition\.css\?v=(\d+)/)[1], 'tablet.css sube de versión a la vez que edition.css');
-assert.match(read('service-worker-258.js'), /"\.\/tablet\.css"/);
-assert.match(read('scripts/build.mjs'), /"tablet\.css"/);
+assert.match(index, /<link rel="stylesheet" href="css\/tablet\.css\?v=\d+"/);
+assert.ok(index.indexOf('css/tablet.css') > index.indexOf('css/edition.css'), 'css/tablet.css va después de css/edition.css para poder redefinirla');
+assert.equal(index.match(/css\/tablet\.css\?v=(\d+)/)[1], index.match(/css\/edition\.css\?v=(\d+)/)[1], 'css/tablet.css sube de versión a la vez que css/edition.css');
+assert.match(read('service-worker-258.js'), /"\.\/css\/tablet\.css"/);
 
 console.log('Tabletas: mesa a escala en móvil, ordenador y tableta vertical; dos columnas en horizontal; giro en partida; CSS acotado: OK');

@@ -55,13 +55,13 @@ El resto de la documentación:
 
 La bienvenida propone un alias y un avatar; los dos se pueden cambiar después en el Atlas, y
 cambiar el nombre no cambia el avatar. Hay 36 medallones originales en `assets/avatars/`,
-dibujados con el mismo papel y color que el resto del juego (`avatares.js`). Al entrar se asigna
+dibujados con el mismo papel y color que el resto del juego (`js/jugador/avatares.js`). Al entrar se asigna
 uno a partir del UID, y la elección propia se guarda en el perfil de la cuenta: ese mismo
 jugador se ve igual en el Atlas, las salas, los duelos, las mesas y el ranking, sin guardar ni
 transmitir una imagen. En salas por Wi-Fi viaja el identificador del avatar; en partidas en un
 solo móvil se usa el nombre disponible.
 
-`identidad.js` guarda el nombre en `continuum-identidad-v1` y lo copia en `hilo-nombre-v1`,
+`js/jugador/identidad.js` guarda el nombre en `continuum-identidad-v1` y lo copia en `hilo-nombre-v1`,
 usado por duelos y salas. Con cuenta se guarda también en ella, y un nombre ocupado por otra
 cuenta se rechaza con aviso (ver [CUENTAS_Y_RANKING.md](CUENTAS_Y_RANKING.md)).
 
@@ -106,8 +106,8 @@ accesibles al revelar y al repasar el orden completo; las cifras que cambian con
 indican su fecha de referencia («Datos a 2026»). La colocación admite empates reales y retos de
 orden ascendente o descendente.
 
-`quick-challenges-data.js` contiene el catálogo. `quick-challenges-engine.js` reutiliza la comparación de `engine.js`;
-`quick-challenges.js` presenta los turnos y guarda una configuración y un historial
+`mazos/quick-challenges-data.js` contiene el catálogo. `js/retos/quick-challenges-engine.js` reutiliza la comparación de `js/juego/engine.js`;
+`js/retos/quick-challenges.js` presenta los turnos y guarda una configuración y un historial
 de acciones en el almacenamiento de la cuenta. La recuperación reproduce acciones
 válidas en vez de aceptar puntuaciones guardadas. Si cambia el significado de los
 datos o las reglas, debe incrementarse `QuickCatalog.version`.
@@ -123,7 +123,7 @@ La Competición es el último panel de la lista de Grandes colecciones, en Jugar
 En solitario se suman los aciertos. En multijugador se reparten las cartas elegidas a cada participante (ajustadas si el mazo es pequeño), gana quien termine una vuelta completa sin cartas y se usa la final numérica secreta si hay varios. Ganar una ronda suma un punto; quedarse con cartas en la mano al terminarla penaliza con su número menos uno (una carta no resta nada, dos cartas restan un punto, tres restan dos, y así sucesivamente). Al terminar, el marcador muestra el ganador o el empate global en puntos.
 
 En un móvil se conserva la competición por separado de las partidas normales. En varios móviles, el anfitrión pasa al siguiente mazo dentro de la misma sala; se conservan participantes e historial y se preparan nuevas manos. Se puede reconectar con el mismo código. En la sala online lo admiten las reglas publicadas
-desde el cliente 42; en la sala Wi-Fi, `local-room.js`.
+desde el cliente 42; en la sala Wi-Fi, `js/sin-conexion/local-room.js`.
 
 ## Nombre y destino del producto
 
@@ -148,7 +148,7 @@ de las pantallas locales. Este cambio de denominación no modifica la licencia d
 ## Bloques y juegos
 
 Los juegos se agrupan en seis bloques. La portada enseña el bloque y lista sus juegos debajo,
-así que añadir uno es declararlo en `modes.js` y sumarlo a `games`. En total son 15 mazos y
+así que añadir uno es declararlo en `js/juego/modes.js` y sumarlo a `games`. En total son 15 mazos y
 1.272 cartas (recuento de octubre de 2026; la cifra exacta la da `CT.cards(mazo)`).
 
 **Historia**
@@ -203,7 +203,7 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`. En total s
   quien aprende un idioma de adulto no cuenta, y por eso el inglés aparece por detrás del
   español. Del chino y del árabe solo están las variedades principales. Las cifras grandes son de
   Ethnologue 2022 a través de una recopilación de Wikipedia; las lenguas pequeñas llegan aparte y
-  con otro corte temporal, una mezcla de fuentes asumida a conciencia (explicada en `idiomas.js`).
+  con otro corte temporal, una mezcla de fuentes asumida a conciencia (explicada en `mazos/idiomas.js`).
 - **Distancias entre ciudades:** 70 pares urbanos de París–Versalles a Madrid–Auckland. Se mide
   la distancia geodésica en línea recta entre centros urbanos, no una ruta por carretera, tren o avión.
 
@@ -279,7 +279,7 @@ descubre también en su mazo de origen.
 
 ## La cartera
 
-`cartera.js` es el único sitio del juego que responde a **«¿tiene derecho este jugador a
+`js/jugador/cartera.js` es el único sitio del juego que responde a **«¿tiene derecho este jugador a
 este mazo?»**. Hoy la respuesta es siempre que sí: no hay nada a la venta y la concesión de
 arranque —`CT.Cartera.concede({ origen: "beta" })`— abre el catálogo entero.
 
@@ -345,7 +345,7 @@ admite su unidad** y se convierte a la del mazo: «40 g», «2,5 t», «3 días�
 «47 millones». Sin unidad se entiende la del mazo, y una que no se reconoce descarta la
 respuesta entera en vez de colarse como si fuera la básica.
 
-Las unidades las declara cada eje en `modes.js`, y el campo de respuesta las lista debajo:
+Las unidades las declara cada eje en `js/juego/modes.js`, y el campo de respuesta las lista debajo:
 sin eso no hay manera de saber en qué se responde. Lo que no se hace es elegir la unidad por
 carta —«¿cuánto pesa, en gramos?»—, porque eso regalaría el orden de magnitud, que es justo
 lo que había que adivinar.
@@ -363,7 +363,7 @@ que termina, así que el reloj de la primera carta empieza cuando de verdad se v
 
 Sin un plazo por carta, cualquiera puede ir a buscar la respuesta a otra parte, y quien la
 busca gana. Por eso el plazo se elige al crear el duelo —**sin tiempo, 15, 20 o 30 segundos**,
-las mismas opciones de todo el juego (`tiempo.js`)— y, una vez elegido, no se puede parar. Sin
+las mismas opciones de todo el juego (`js/juego/tiempo.js`)— y, una vez elegido, no se puede parar. Sin
 tiempo, en cifras la rapidez sigue desempatando contra un tope amplio de diez minutos por carta.
 
 Eso obliga a medirlo **restando marcas de `Date.now()`, nunca descontando de un contador**.
@@ -384,7 +384,7 @@ Se apoya en lo mismo que el reto diario: dos móviles que barajan con la misma s
 reciben las mismas cartas. Allí la semilla es la fecha; aquí viaja dentro del enlace, junto
 con el mazo, el número de cartas, la marca de quien reta y su cuadrícula de aciertos, todo
 en base64url. La versión que abre la carga útil no numera el formato: **numera las reglas
-con las que se jugó**, y la tabla `REGLAS` de `duelo.js` dice cuáles son. Dos partidas con
+con las que se jugó**, y la tabla `REGLAS` de `js/online/duelo.js` dice cuáles son. Dos partidas con
 plazos distintos no se pueden comparar, así que un enlace viejo no se rechaza ni se
 reinterpreta: se lee con su propio plazo y se juega como se jugó, avisando de ello en la
 pantalla de invitación. En el duelo de cifras eso además es obligatorio para que cuadren los
@@ -451,8 +451,8 @@ también las dos etiquetas de color de la barra del navegador.
 | **Claro** | El papel de la edición: crema frío, tinta carbón y latón. |
 | **Oscuro** | Cuero entintado, marfil cálido y latón, con capas diferenciadas para la navegación, los modales y el tablero. |
 
-Los dos temas viven en variables CSS: las de la interfaz en `edition.css` (`--edition-*`)
-y las de la mesa en `styles.css`. Un tema que
+Los dos temas viven en variables CSS: las de la interfaz en `css/edition.css` (`--edition-*`)
+y las de la mesa en `css/styles.css`. Un tema que
 cambie el fondo tiene que traer **todas** las superficies, no solo el papel: si una se
 queda con su valor claro, el texto de encima —que sí cambia— deja de leerse. Eso lo
 vigila `tests/accesibilidad.mjs`, que además comprueba que los seis colores de cada
@@ -628,7 +628,7 @@ Deslizar de izquierda a derecha vuelve a la pantalla de detrás, exactamente igu
 botón **Volver** de esa pantalla: cierra el diálogo que haya encima (la guía, los ajustes,
 la enciclopedia) o retrocede un paso en la navegación. Funciona en la web y en las dos
 tiendas, no solo en Android. El gesto pide un recorrido claramente horizontal y hacia la
-derecha (`swipe.js`), y no navega en tres sitios a propósito: dentro de una partida —una
+derecha (`js/interfaz/swipe.js`), y no navega en tres sitios a propósito: dentro de una partida —una
 partida se abandona por su menú, que pregunta antes, y no por un gesto que se puede hacer
 sin querer al mirar la mesa—, encima de una tira que se desplaza a los lados, como la línea
 temporal o el marcador, y sobre un campo de texto o un desplegable. Desde el inicio no hace
@@ -652,7 +652,7 @@ sin reescribir el juego ni duplicarlo por plataforma:
 - Los iconos y la pantalla de apertura se generan con `npm run icons` (usa `sharp`; las fuentes en
   alta resolución viven en `resources/`) a partir de `icon.svg` y del emblema.
 - El botón/gesto Atrás de Android cierra el diálogo abierto, pregunta antes de abandonar una
-  partida o vuelve al inicio (`a11y.js`, `backPressed`, y `app.js`); solo se activa dentro de
+  partida o vuelve al inicio (`js/interfaz/a11y.js`, `backPressed`, y `js/juego/app.js`); solo se activa dentro de
   Capacitor. El deslizamiento de izquierda a derecha comparte ese mismo «atrás» en todas las
   versiones, sin interrumpir una partida ni cerrar la aplicación.
 - La versión de la beta (`0.1.1`, distinta del número de caché del service worker) vive en
@@ -696,7 +696,7 @@ las funciones de la modalidad activa: Pulso, reto diario, partida libre, competi
 gestión de sala.
 
 - Antes de repartir se juega el minijuego de quién empieza: todos dicen la cifra de la misma
-  carta y la mesa se sienta por orden de cercanía (`CT.Starter`, en `final.js`). Empieza quien
+  carta y la mesa se sienta por orden de cercanía (`CT.Starter`, en `js/juego/final.js`). Empieza quien
   más se acerca y el turno avanza en ese orden.
 - Cada persona recibe cuatro cartas por defecto; se puede elegir entre una y seis.
 - El dato que ordena el mazo —fecha, superficie, población, peso, longevidad, velocidad o
@@ -784,14 +784,14 @@ la aplica mediante «Actualizar ahora», fuera de una partida y sin guardados pe
 Hay que cerrar las otras pestañas de Continuum antes de aplicarla. Los errores del modo
 sin conexión muestran un aviso y permiten seguir jugando. Al publicar un cambio visible hay que
 subir la versión a la vez en tres sitios —`CACHE` en `service-worker-258.js`,
-`CT.APP_VERSION` en `updates.js` y `edition.css?v=` en `index.html`— con el formato
+`CT.APP_VERSION` en `js/arranque/updates.js` y `css/edition.css?v=` en `index.html`— con el formato
 `continuum-vNNN` (ver `CLAUDE.md`). Si alguien se queda atascado en una versión vieja,
 `actualizar.html` descarta el service worker y su caché sin borrar su progreso.
 
 ## Salas online: reloj, presencia y relevo
 
 El tiempo por turno se elige al preparar la partida: sin tiempo, 15, 20 o 30 segundos, las
-mismas opciones en todas las formas de jugar (`tiempo.js`). En las salas online el reloj se
+mismas opciones en todas las formas de jugar (`js/juego/tiempo.js`). En las salas online el reloj se
 ancla con una confirmación del servidor y avanza con un contador monotónico: cambiar la hora
 del teléfono no cambia el turno. Antes de sincronizar, muestra «…» y no salta turnos. La
 latencia puede introducir una pequeña diferencia entre contadores visibles.
@@ -806,7 +806,7 @@ demás subcolecciones a los siete días sin actividad.
 
 Retos rápidos usa las mismas cartas, tamaños, arrastre, confirmación, giro, zoom y ajustes del
 tablero compartido. Sus salas usan `quickRooms`, con turnos transaccionales e historial de
-comandos firmados que cada cliente reconstruye y valida (`quick-room.js`). Los resultados son de
+comandos firmados que cada cliente reconstruye y valida (`js/retos/quick-room.js`). Los resultados son de
 juego casual, sin clasificación competitiva del servidor. En Wi-Fi local, quien crea la sala
 debe mantenerla abierta. El reto diario se fija por fecha local y conserva un intento por
 perfil. El duelo con las mismas cartas incluye las cartas y el resultado en el enlace.

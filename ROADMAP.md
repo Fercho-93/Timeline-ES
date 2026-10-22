@@ -24,7 +24,7 @@ externa o una decisión del titular. Las listas de comprobación de la beta est�
   Wi-Fi sin internet; poderes Pulso y Fantasma.
 - Salas online con turnos, presencia, abandono, relevo del anfitrión, final numérica validada
   contra la carta (`CT.Final.valid`) y minijuego de quién empieza.
-- Mesas públicas: tablón (`public-tables.js`) y partida rápida (`public-matchmaking.js`) para
+- Mesas públicas: tablón (`js/online/public-tables.js`) y partida rápida (`js/online/public-matchmaking.js`) para
   Grandes colecciones y Retos rápidos, con sus reglas y pruebas de emulador.
 - Retos rápidos en red con comandos firmados por su autor (`by`), validados en `QuickRoom.validate`.
 - Cuota de altas: una partida online nueva cada 10 s por persona (`creationQuota`) y una sala
@@ -35,7 +35,7 @@ externa o una decisión del titular. Las listas de comprobación de la beta est�
   borrado de cuenta con revocación del acceso.
 - **Borrado de cuenta** desde el Atlas: perfil, alias, progreso, ranking, bloqueados,
   archivados, avisos y registros de cuota. Lo hace el servidor (`deleteMyAccount`, con las filas de ranking de
-  todos los días y el acceso) y, si no responde, el móvil (`purgeServerData` en `accounts.js`). El titular puede
+  todos los días y el acceso) y, si no responde, el móvil (`purgeServerData` en `js/nube/accounts.js`). El titular puede
   borrar a cualquiera con el workflow «Borrar cuenta de un jugador».
 - **Limpieza diaria** de datos caducados (`purgeExpiredData`, plazos en `functions/retention.js`,
   ver [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#conservación-y-limpieza-de-datos)).
@@ -115,7 +115,7 @@ externa o una decisión del titular. Las listas de comprobación de la beta est�
 - [ ] AAB Android firmado y probado; Google Play Closed Testing.
 - [ ] TestFlight con testers externos.
 - [ ] Avisos del móvil: las Cloud Functions envían avisos, pero el registro del dispositivo
-      (`push.js`) está apagado con `nativePush: false` en `deployment.js` (`tests/push-apagado.mjs`): falta
+      (`js/nube/push.js`) está apagado con `nativePush: false` en `js/nube/deployment.js` (`tests/push-apagado.mjs`): falta
       `google-services.json` en Android, `aps-environment` en iPhone y la integración de APNs con FCM.
       Al activarlo, declarar el token del dispositivo en las tiendas y en la política.
 - [ ] Prueba de actualización conservando una partida y una sala pendiente.
@@ -146,7 +146,7 @@ porque no se desplegó. Si algún día se quiere competición pública arbitrada
       2. Firebase Authentication: borrar todos los usuarios (invitados y vinculados con Apple).
       3. Firestore: borrar todas las colecciones (perfiles, progreso, ranking, salas, duelos,
          mesas, cuotas y registros de avisos).
-      4. En el código, cambiar `SEASON` de `account-storage.js` (`'launch-1'` → `'launch-2'`)
+      4. En el código, cambiar `SEASON` de `js/jugador/account-storage.js` (`'launch-1'` → `'launch-2'`)
          para que las copias guardadas en los móviles de la beta no se suban a las cuentas nuevas,
          y subir la caché.
       5. Quitar de `privacidad.html` y `PRIVACIDAD.md` la frase sobre el correo de Apple de
@@ -162,19 +162,19 @@ Objetivo: que varias personas jueguen la misma partida en tiempo real sin conexi
 
 Hecho. Arquitectura:
 
-- `local-room.js`: reductor puro con las mismas reglas que la sala online (minijuego de quién
+- `js/sin-conexion/local-room.js`: reductor puro con las mismas reglas que la sala online (minijuego de quién
   empieza, final secreta, Pulso, Fantasma, revancha y competición por rondas). Se escribió
-  aparte de `online.js` para no arriesgar el modo con internet.
-- `local-transport.js`: `RTCDataChannel` en estrella con el anfitrión como fuente de verdad, sin
+  aparte de `js/online/online.js` para no arriesgar el modo con internet.
+- `js/sin-conexion/local-transport.js`: `RTCDataChannel` en estrella con el anfitrión como fuente de verdad, sin
   servidores STUN/TURN (solo candidatos locales).
-- `local-session.js`: traduce cada mensaje en una acción del reductor. Un invitado nunca aplica
+- `js/sin-conexion/local-session.js`: traduce cada mensaje en una acción del reductor. Un invitado nunca aplica
   el reductor: manda la acción y refleja lo que vuelve. Cada canal queda atado a quien se unió
   por él, y el identificador, el nombre y el avatar que llegan de otro móvil se validan antes de
   aceptarlos.
 - Señalización sin internet: la invitación completa cabe en un único QR (`qrcode-generator`,
-  MIT) que se lee con la cámara (`qr-scanner.js` con `jsQR`, Apache-2.0); compartir por el
+  MIT) que se lee con la cámara (`js/sin-conexion/qr-scanner.js` con `jsQR`, Apache-2.0); compartir por el
   sistema o pegar el texto queda como alternativa.
-- Interfaz en `local-multiplayer.js`, dentro de «Cada uno en su móvil».
+- Interfaz en `js/sin-conexion/local-multiplayer.js`, dentro de «Cada uno en su móvil».
 - Pruebas: `sala-local`, `transporte-local`, `sesion-local`, `compartir-local`, `qr-local`,
   `multijugador-local` y `competicion-wifi`.
 - Límite conocido: quien conozca el identificador de alguien desconectado podría ocupar su
@@ -187,7 +187,7 @@ Pendiente:
 
 ### Fase 2 — Descubrimiento nativo sin QR
 
-- [x] iPhone con iPhone: `LocalPeerPlugin.swift` (MultipeerConnectivity) + `local-peer.js`. Los
+- [x] iPhone con iPhone: `LocalPeerPlugin.swift` (MultipeerConnectivity) + `js/sin-conexion/local-peer.js`. Los
       iPhones ven las salas cercanas («Unirme a una sala → Buscar salas cercanas») y entran con
       el código de 4 cifras que ve el anfitrión; Android y la web siguen por WebRTC en la misma
       sala (`tests/multijugador-cercano.mjs`).

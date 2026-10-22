@@ -1,4 +1,4 @@
-// El reductor de la sala sin conexión (`local-room.js`) es puro: sin red, sin fecha del
+// El reductor de la sala sin conexión (`js/sin-conexion/local-room.js`) es puro: sin red, sin fecha del
 // sistema, sin baraja propia. Eso permite probar una partida entera aquí, en Node, sin
 // levantar WebRTC ni un móvil real — con las mismas reglas que la sala online: minijuego
 // de quién empieza, final secreta, Fantasma, Pulso y plaza reservada al desconectarse.
@@ -14,17 +14,17 @@ const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " 
 
 function boot() {
   const dom = new JSDOM("<!doctype html><html><body></body></html>", { runScripts: "outside-only", url: "https://hilo.test/" });
-  // `engine.js` solo se cuelga de `window.CONTINUUM` si ya existe cuando se ejecuta —en la
-  // app real lo crea `modes.js` antes—, así que aquí se adelanta a mano.
+  // `js/juego/engine.js` solo se cuelga de `window.CONTINUUM` si ya existe cuando se ejecuta —en la
+  // app real lo crea `js/juego/modes.js` antes—, así que aquí se adelanta a mano.
   dom.window.CONTINUUM = { escapeHtml: String };
-  ["engine.js", "ghost.js", "local-room.js"].forEach(file => dom.window.eval(read(file)));
+  ["js/juego/engine.js", "js/juego/ghost.js", "js/sin-conexion/local-room.js"].forEach(file => dom.window.eval(read(file)));
   return dom.window;
 }
 
 const noShuffle = cards => [...cards];
 const valueOf = id => Number(String(id).split("-")[1]);
 const mazo = (n, prefix = "c") => Array.from({ length: n }, (_, i) => `${prefix}-${i}`);
-// Final de juguete: la cifra buscada es 100; `rank` sigue el criterio de `final.js`.
+// Final de juguete: la cifra buscada es 100; `rank` sigue el criterio de `js/juego/final.js`.
 let finales = 0;
 const makeFinal = (players, previous) => ({ round: (previous?.round || 0) + 1, players: [...players], cardId: `f-${++finales}`, target: 100, submitted: [], used: [] });
 const rank = (final, answers) => {

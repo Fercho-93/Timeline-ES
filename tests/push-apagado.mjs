@@ -5,13 +5,13 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 const read = name => fs.readFileSync(new URL(`../${name}`, import.meta.url), "utf8");
-assert.match(read("deployment.js"), /nativePush:\s*false/, "los avisos push deben seguir apagados hasta integrar FCM y APNs");
+assert.match(read("js/nube/deployment.js"), /nativePush:\s*false/, "los avisos push deben seguir apagados hasta integrar FCM y APNs");
 
-// push.js importa Firebase desde internet: se sustituyen los import por piezas falsas para ejecutarlo aquí.
-const fuente = read("push.js")
+// js/nube/push.js importa Firebase desde internet: se sustituyen los import por piezas falsas para ejecutarlo aquí.
+const fuente = read("js/nube/push.js")
   .replace(/^import \{ auth, db \} from '\.\/firebase-client\.js';$/m, "const auth = {}, db = {};")
-  .replace(/^import \{[^}]*\} from '\.\/vendor\/firebase\/[^']*';$/m, "const doc = () => ({}), serverTimestamp = () => 0, setDoc = async () => {};");
-assert.ok(!/^import /m.test(fuente), "el test debe poder sustituir todos los import de push.js");
+  .replace(/^import \{[^}]*\} from '(?:\.\.\/)+vendor\/firebase\/[^']*';$/m, "const doc = () => ({}), serverTimestamp = () => 0, setDoc = async () => {};");
+assert.ok(!/^import /m.test(fuente), "el test debe poder sustituir todos los import de js/nube/push.js");
 
 async function arrancar(nativePush) {
   const llamadas = [];

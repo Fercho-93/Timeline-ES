@@ -97,7 +97,7 @@ ok("vuelve a la entrada del modo, no al menú principal", w.document.body.innerH
 
 
 // ---------------------------------------------------------------------------
-// Transporte de mentira: el mismo contrato que `local-transport.js`, pero los mensajes
+// Transporte de mentira: el mismo contrato que `js/sin-conexion/local-transport.js`, pero los mensajes
 // viajan entre dos ventanas de JSDOM en vez de por WebRTC. Se copian por JSON, como en
 // el cable, y llegan en otra vuelta del bucle de eventos.
 function fakeNetwork() {

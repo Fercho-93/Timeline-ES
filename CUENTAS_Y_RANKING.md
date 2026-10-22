@@ -1,7 +1,7 @@
 # Cuentas, Apple y ranking de Continuum
 
-El código está en `accounts.js` (cuenta, progreso y ranking), `account-storage.js` (espacio
-local de cada cuenta), `avatares.js` e `identidad.js` (alias y avatar) y, en iPhone,
+El código está en `js/nube/accounts.js` (cuenta, progreso y ranking), `js/jugador/account-storage.js` (espacio
+local de cada cuenta), `js/jugador/avatares.js` e `js/jugador/identidad.js` (alias y avatar) y, en iPhone,
 `ios/App/App/AppleSignInPlugin.swift`. Las colecciones de Firestore que usa se describen en
 [docs/MODELO_DE_DATOS.md](docs/MODELO_DE_DATOS.md).
 

@@ -645,7 +645,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
    tamaño dentro de los diálogos, así que aquí se le da el suyo. */
 #app[data-screen="mazo-cerrado"] .big-icon { font-size: 2.6rem; line-height: 1; margin-bottom: 8px; }
 #app .solo-intro { position: relative; isolation: isolate; padding: 16px 0 18px; }
-#app .solo-intro::before { content: ''; position: absolute; z-index: -1; inset: -8px -8px 0 35%; background: url('assets/mode-walk-solo.webp') right center / cover no-repeat; opacity: .3; mix-blend-mode: multiply; -webkit-mask-image: radial-gradient(ellipse,#000 25%,transparent 72%); mask-image: radial-gradient(ellipse,#000 25%,transparent 72%); }
+#app .solo-intro::before { content: ''; position: absolute; z-index: -1; inset: -8px -8px 0 35%; background: url('../assets/mode-walk-solo.webp') right center / cover no-repeat; opacity: .3; mix-blend-mode: multiply; -webkit-mask-image: radial-gradient(ellipse,#000 25%,transparent 72%); mask-image: radial-gradient(ellipse,#000 25%,transparent 72%); }
 #app .solo-intro .lead { margin: 10px 0; font: .95rem/1.4 var(--ui-font); }
 #app .solo-intro-rule { max-width: 37ch; margin: 0; color: var(--edition-muted); font: .77rem/1.45 var(--ui-font); }
 #app .solo-fold summary { display: flex; align-items: center; gap: 12px; list-style: none; }
@@ -2836,15 +2836,15 @@ html body::before {
   box-shadow: none;
 }
 html::before {
-  background: #e9dcc3 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
+  background: #e9dcc3 url("../assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
 }
 :root[data-theme="dark"]::before {
-  background: linear-gradient(#140d08d6, #140d08e6), #140d08 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
+  background: linear-gradient(#140d08d6, #140d08e6), #140d08 url("../assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
 }
 /* Fuera de la portada hay textos sobre el fondo: un velo de papel deja la ilustración
    como ambiente sin que las órbitas pasen por detrás de las letras. */
 :root[data-theme="dark"]:not(:has(#app[data-screen="home"]))::before {
-  background: linear-gradient(#140d08e6, #140d08f0), #140d08 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
+  background: linear-gradient(#140d08e6, #140d08f0), #140d08 url("../assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
 }
 /* Los adornos de la portada van en la misma capa fija que la lámina (html::before, más abajo):
    una segunda capa fija a pantalla completa solo en Inicio era lo único que esa pantalla tenía
@@ -2980,17 +2980,17 @@ html::before { filter: saturate(.9) sepia(.08); }
    el velo de la lámina los atenúa (antes iban al 18 % de opacidad en una capa propia). */
 html:has(#app[data-screen="home"])::before {
   background:
-    url("assets/home-deco-left.webp") left top / min(165px, calc(39 * var(--vw))) auto no-repeat,
-    url("assets/home-deco-right.webp") right top / min(165px, calc(39 * var(--vw))) auto no-repeat,
+    url("../assets/home-deco-left.webp") left top / min(165px, calc(39 * var(--vw))) auto no-repeat,
+    url("../assets/home-deco-right.webp") right top / min(165px, calc(39 * var(--vw))) auto no-repeat,
     repeating-conic-gradient(from 200deg at 100% 0%, #fff8e400 0deg 5deg, #fff8e466 7deg, #fff8e400 10deg 15deg) right top / min(420px, calc(90 * var(--vw))) min(520px, calc(60 * var(--vh))) no-repeat,
-    #e9dcc3 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
+    #e9dcc3 url("../assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
 }
 :root[data-theme="dark"]:has(#app[data-screen="home"])::before {
   background:
     linear-gradient(#140d08d6, #140d08e6),
-    url("assets/home-deco-left.webp") left top / min(165px, calc(39 * var(--vw))) auto no-repeat,
-    url("assets/home-deco-right.webp") right top / min(165px, calc(39 * var(--vw))) auto no-repeat,
-    #140d08 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
+    url("../assets/home-deco-left.webp") left top / min(165px, calc(39 * var(--vw))) auto no-repeat,
+    url("../assets/home-deco-right.webp") right top / min(165px, calc(39 * var(--vw))) auto no-repeat,
+    #140d08 url("../assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
 }
 /* En Safari la barra inferior «rebotaba» al desplazar el Inicio: la portada apenas desborda la
    pantalla, así que cada gesto llega al extremo y pliega o despliega la barra del propio Safari, y
@@ -3009,7 +3009,7 @@ html:has(#app[data-screen="home"]) body { height: 100%; min-height: 0; overflow:
 /* Jugar con un punto más de color: el color lo ponen las láminas, que recuperan su
    tono; los tres recuadros comparten el mismo papel terracota suave. */
 html:not(:has(#app[data-screen="home"]))::before {
-  background: linear-gradient(#f3e3c8b3, #f2e1c494 60%, #f0dcbc4d), #e9dcc3 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
+  background: linear-gradient(#f3e3c8b3, #f2e1c494 60%, #f0dcbc4d), #e9dcc3 url("../assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
 }
 
 /* ══ 16 · Retratos, selector de avatares y paneles de Jugar solo y Retar a un amigo ══ */
@@ -3406,7 +3406,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 #app[data-screen="perfil"] .atlas-chart {
   position: relative; isolation: isolate; display: block; width: 100%; max-width: 560px; height: 760px;
   overflow: hidden; margin: 0 auto 28px; border: 1px solid #a6865580; border-radius: 24px;
-  background: linear-gradient(180deg, #f8eedc55, transparent 24%), url("assets/atlas-ocean-v1.webp") center / 100% 100% no-repeat, #d9e4dc;
+  background: linear-gradient(180deg, #f8eedc55, transparent 24%), url("../assets/atlas-ocean-v1.webp") center / 100% 100% no-repeat, #d9e4dc;
   box-shadow: 0 16px 36px #45301d25, inset 0 0 0 7px #f8eddaaa, inset 0 0 0 8px #a78d6259;
   color: #392a1d;
 }
@@ -3909,7 +3909,7 @@ html #app .home-nav.atlas-nav button[aria-current="page"] small {
    serpentea, pequeños hitos de latón con el número del mazo y una estrella discreta al final.
    Cada mazo es una lámina a sangre con su ilustración de fondo y el texto sobre un velo. */
 #app #deck-collection .collection-decks .games { padding: 8px 0 30px 40px; gap: 12px; }
-#app #deck-collection .collection-decks .games::before { left: 4px; top: 6px; bottom: 22px; width: 24px; filter: none; background: url("assets/camino-senda.svg") center top / 24px 120px repeat-y; }
+#app #deck-collection .collection-decks .games::before { left: 4px; top: 6px; bottom: 22px; width: 24px; filter: none; background: url("../assets/camino-senda.svg") center top / 24px 120px repeat-y; }
 #app #deck-collection .collection-decks .games::after { content: "✦"; left: 7px; bottom: 2px; width: 18px; height: 18px; font-size: .7rem; color: #a8824a; background: #f8efdd; border: 1px solid #c9a86a; box-shadow: none; animation: none; }
 #app #deck-collection .collection-decks .game-row::before { inset: 50% auto auto -38px; width: 22px; height: 22px; margin-top: -11px; color: #7a5a2c; font: 600 .66rem/1 var(--font-display); text-shadow: none; background: #fbf4e4; border: 1px solid #b08a52; box-shadow: 0 0 0 3px #f5ead3, 0 1px 3px #5a3f1f33; animation: none; }
 #app #deck-collection .collection-decks .game-row-cerrado::before { content: "🔒"; font-size: .55rem; background: #eee7da; border-color: #a39a8a; box-shadow: 0 0 0 3px #f5ead3; }
@@ -4480,8 +4480,8 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
    texto. Se multiplica con lo que hay debajo, así que oscurece apenas y no cambia
    ningún color. */
 :root {
-  --carta-lino: url("assets/texturas/lino.svg");
-  --carta-grano: url("assets/texturas/grano.svg");
+  --carta-lino: url("../assets/texturas/lino.svg");
+  --carta-grano: url("../assets/texturas/grano.svg");
 }
 /* Va por encima del texto (que ya es una capa con z-index 1) y por debajo del sello de
    temática y del pespunte, que son z-index 3. */
@@ -4680,12 +4680,12 @@ html:has(#app.atlas-board) .motas { display: none; }
    La lámina se trata como un grabado tenue sobre papel, limitado a la parte alta.
    Una máscara amplia disuelve sus contornos sin una mancha opaca en el centro.
    Solo cambia el fondo fijo de la mesa (#app.atlas-board). */
-:root[data-scene="history"] { --scene-art: url("assets/hero-history-700.webp"); --scene-art-pos: center 30%; }
-:root[data-scene="entertainment"] { --scene-art: url("assets/hero-entertainment-700.webp"); --scene-art-pos: center 20%; }
-:root[data-scene="science"] { --scene-art: url("assets/hero-science-700.webp"); --scene-art-pos: center 20%; }
-:root[data-scene="nature"] { --scene-art: url("assets/hero-nature-700.webp"); --scene-art-pos: center 25%; }
-:root[data-scene="globe"] { --scene-art: url("assets/hero-geography-700.webp"); --scene-art-pos: center 15%; }
-:root[data-scene="mixed"] { --scene-art: url("assets/hero-mixed-700.webp"); --scene-art-pos: center 25%; }
+:root[data-scene="history"] { --scene-art: url("../assets/hero-history-700.webp"); --scene-art-pos: center 30%; }
+:root[data-scene="entertainment"] { --scene-art: url("../assets/hero-entertainment-700.webp"); --scene-art-pos: center 20%; }
+:root[data-scene="science"] { --scene-art: url("../assets/hero-science-700.webp"); --scene-art-pos: center 20%; }
+:root[data-scene="nature"] { --scene-art: url("../assets/hero-nature-700.webp"); --scene-art-pos: center 25%; }
+:root[data-scene="globe"] { --scene-art: url("../assets/hero-geography-700.webp"); --scene-art-pos: center 15%; }
+:root[data-scene="mixed"] { --scene-art: url("../assets/hero-mixed-700.webp"); --scene-art-pos: center 25%; }
 :root:is([data-scene="history"], [data-scene="entertainment"], [data-scene="science"], [data-scene="nature"], [data-scene="globe"], [data-scene="mixed"]):has(#app.atlas-board) {
   background: radial-gradient(ellipse at 85% 0%, color-mix(in srgb, var(--scene-wash) 9%, transparent), transparent 65%), var(--edition-paper);
 }

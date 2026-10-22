@@ -1,5 +1,5 @@
-// Competición sin internet: la sala Wi-Fi (`local-room.js`) lleva varios temas al azar, uno
-// por ronda, con las mismas reglas que la sala online (`online.js`): puntos por ronda,
+// Competición sin internet: la sala Wi-Fi (`js/sin-conexion/local-room.js`) lleva varios temas al azar, uno
+// por ronda, con las mismas reglas que la sala online (`js/online/online.js`): puntos por ronda,
 // cambio de mazo entre temas, sin minijuego desde la segunda ronda (empieza el siguiente de
 // la mesa) y sin que entre nadie nuevo con la competición empezada.
 import { JSDOM } from "jsdom";
@@ -15,7 +15,7 @@ const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " 
 const dom = new JSDOM("<!doctype html><html><body></body></html>", { runScripts: "outside-only", url: "https://hilo.test/" });
 const w = dom.window;
 w.CONTINUUM = { escapeHtml: String, mode: key => ({ name: key }) };
-["engine.js", "ghost.js", "local-room.js", "tournament.js"].forEach(file => w.eval(read(file)));
+["js/juego/engine.js", "js/juego/ghost.js", "js/sin-conexion/local-room.js", "js/juego/tournament.js"].forEach(file => w.eval(read(file)));
 const Room = w.CONTINUUM.LocalRoom;
 const intenta = fn => { try { fn(); return null; } catch (e) { return e.message; } };
 const ctx = { valueOf: id => Number(String(id).split("-")[1]), shuffle: cards => [...cards], random: () => 0, now: 1 };

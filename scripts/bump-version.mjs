@@ -1,5 +1,5 @@
 // Sube la versión de caché en los tres sitios a la vez: `CACHE` del service worker, `CT.APP_VERSION` de
-// updates.js y los `?v=` de edition.css y tablet.css en index.html (tests/version-cache.mjs los vigila).
+// js/arranque/updates.js y los `?v=` de css/edition.css y css/tablet.css en index.html (tests/version-cache.mjs los vigila).
 //
 //   node scripts/bump-version.mjs          sube una sobre la mayor de la copia local y de origin/main
 //   node scripts/bump-version.mjs 812      fija esa versión (debe ser mayor que la actual)
@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const file = name => path.join(root, name);
-const SW = 'service-worker-258.js', UPDATES = 'updates.js', INDEX = 'index.html';
+const SW = 'service-worker-258.js', UPDATES = 'js/arranque/updates.js', INDEX = 'index.html';
 const PATTERNS = {
   [SW]: /(const CACHE = "continuum-v)(\d+)(")/,
   [UPDATES]: /(CT\.APP_VERSION = "continuum-v)(\d+)(")/,
@@ -30,7 +30,7 @@ function remoteVersion() {
 }
 
 const current = [versionIn(read(SW), PATTERNS[SW]), versionIn(read(UPDATES), PATTERNS[UPDATES]), remoteVersion()].filter(Number.isFinite);
-if (current.length < 2) throw new Error('No encuentro la versión actual en el service worker o en updates.js.');
+if (current.length < 2) throw new Error('No encuentro la versión actual en el service worker o en js/arranque/updates.js.');
 const highest = Math.max(...current);
 const requested = process.argv[2] === undefined ? highest + 1 : Number(process.argv[2]);
 if (!Number.isInteger(requested) || requested <= highest) {
@@ -44,7 +44,7 @@ for (const name of [SW, UPDATES]) {
 }
 let index = read(INDEX);
 for (const sheet of SHEETS) {
-  const pattern = new RegExp(`(href="${sheet}\\.css\\?v=)\\d+(")`);
+  const pattern = new RegExp(`(href="css/${sheet}\\.css\\?v=)\\d+(")`);
   if (!pattern.test(index)) throw new Error(`No encuentro ${sheet}.css?v= en ${INDEX}.`);
   index = index.replace(pattern, `$1${requested}$2`);
 }

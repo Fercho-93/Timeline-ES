@@ -7,7 +7,7 @@ import {
   publicQueueKey,
   isJoinablePublicRoom,
   makePublicRoomCode
-} from '../public-matchmaking.js';
+} from '../js/online/public-matchmaking.js';
 
 assert.equal(normalizePublicCapacity(2), 2);
 assert.equal(normalizePublicCapacity('4'), 4);

@@ -1,7 +1,7 @@
 // Retos rápidos por internet: salas y duelos guardados en Firestore, con cada jugada firmada por su autor.
-import {auth, db} from './firebase-client.js';
-import {collection, doc, getDoc, getDocs, query, where, runTransaction, onSnapshot, serverTimestamp} from './vendor/firebase/firebase-firestore.js';
-import {queueFresh} from './public-matchmaking.js';
+import {auth, db} from '../nube/firebase-client.js';
+import {collection, doc, getDoc, getDocs, query, where, runTransaction, onSnapshot, serverTimestamp} from '../../vendor/firebase/firebase-firestore.js';
+import {queueFresh} from '../online/public-matchmaking.js';
 const CT=window.CONTINUUM, R=CT.QuickRoom;
 export const PUBLIC_VERSION=1;
 function publicKey(capacity){return 'quick:'+capacity+':v'+PUBLIC_VERSION+':'+CT.QuickNetwork.fingerprint();}
@@ -13,7 +13,7 @@ const PUBLIC_WAIT_MS=30000;
 // El tablón de mesas abiertas (`public-tables.js`): quien lleva la mesa mantiene su ficha.
 // Se carga aparte y sin bloquear: si no está, la mesa funciona igual por la cola.
 let tablesModule=null;
-const tables=()=>(tablesModule??=import('./public-tables.js'));
+const tables=()=>(tablesModule??=import('../online/public-tables.js'));
 // Código de sala de diez caracteres. 256 es múltiplo de 32, así que cada letra sale con la misma probabilidad.
 const freshCode=()=>Array.from(crypto.getRandomValues(new Uint8Array(10)),n=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[n%32]).join('');
 // «Crear mesa» abre una mesa nueva con su configuración, sin pasar por la cola de la

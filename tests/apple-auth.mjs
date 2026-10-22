@@ -6,7 +6,7 @@ function setup({enabled = true, ios = true, apple = false} = {}) {
   const dom = new JSDOM('<main id="app"></main>', {url:'https://example.com', runScripts:'outside-only', virtualConsole:new VirtualConsole()});
   const w = dom.window, data = new Map();
   w.CONTINUUM = {escapeHtml:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),Storage:{getItem:k=>w.localStorage.getItem(k),setItem:(k,v)=>w.localStorage.setItem(k,v),removeItem:k=>w.localStorage.removeItem(k)},isSessionActive:()=>false,Scene:{apply(){}}};
-  for (const file of ['a11y.js','account-storage.js','avatares.js']) w.eval(read(file));
+  for (const file of ['js/interfaz/a11y.js','js/jugador/account-storage.js','js/jugador/avatares.js']) w.eval(read(file));
   const u = {uid:'guest',isAnonymous:!apple,providerData:apple?[{providerId:'apple.com'}]:[],getIdToken:async()=>''};
   const auth = {currentUser:u,authStateReady:async()=>{}};
   let listener;
@@ -25,7 +25,7 @@ function setup({enabled = true, ios = true, apple = false} = {}) {
     deleteUser:async()=>{calls.deleted++;},
     writeBatch:()=>({set(){},delete(){},update(){},commit:async()=>{calls.batch++;}})
   });
-  const source=read('accounts.js').replace(/^import .*;\n/gm,'').replace('export async function startAccounts','async function startAccounts').replaceAll('location.reload()','window.appleReloads++');
+  const source=read('js/nube/accounts.js').replace(/^import .*;\n/gm,'').replace('export async function startAccounts','async function startAccounts').replaceAll('location.reload()','window.appleReloads++');
   w.eval(source+'\nwindow.appleTest={startAccounts,signInApple,signOutApple,deleteScreen,removeAccount,setLoader:f=>{loadFunctions=f;}};');
   return {w,dom,data,auth,calls};
 }

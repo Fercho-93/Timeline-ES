@@ -18,12 +18,12 @@ for (const name of MODULES) {
 }
 
 // Ningún archivo del juego (ni sus importaciones dinámicas) carga código de gstatic.
-const juego = fs.readdirSync(new URL('..', import.meta.url)).filter(f => /\.(js|html)$/.test(f) && !/^(jsqr|qrcode-generator)\.js$/.test(f));
+const juego = [...fs.readdirSync(new URL('..', import.meta.url)).filter(f => /\.(js|html)$/.test(f)), ...fs.readdirSync(new URL('../js', import.meta.url), { recursive: true }).filter(f => f.endsWith('.js')).map(f => 'js/' + f.replaceAll('\\', '/'))];
 const usados = new Set();
 for (const file of juego) {
   const text = read(file);
   if (file !== 'index.html') assert.doesNotMatch(text, /https:\/\/www\.gstatic\.com\/firebasejs/, `${file}: importa Firebase de gstatic`);
-  for (const [, name] of text.matchAll(/['"]\.\/vendor\/firebase\/(firebase-[\w-]+)\.js['"]/g)) usados.add(name);
+  for (const [, name] of text.matchAll(/['"](?:\.\.?\/)+vendor\/firebase\/(firebase-[\w-]+)\.js['"]/g)) usados.add(name);
 }
 for (const name of usados) assert.ok(MODULES.includes(name), `${name} se importa pero no está en la lista de scripts/vendor-firebase.mjs`);
 assert.ok(usados.size >= 4, 'el juego usa el SDK local');

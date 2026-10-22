@@ -5,7 +5,7 @@ Pasada de comprobación sobre las 1.272 cartas de las Grandes colecciones (más 
 ## Método
 
 1. Volcado de todas las cartas y comprobaciones automáticas (duplicados, años imposibles, empates, orden, fuentes vacías).
-2. Recálculo de las distancias de `distances.js` con la fórmula del círculo máximo y contraste con las coordenadas.
+2. Recálculo de las distancias de `mazos/distances.js` con la fórmula del círculo máximo y contraste con las coordenadas.
 3. Lectura de cada mazo buscando fechas, cifras y titulares dudosos.
 4. Los casos dudosos se contrastaron con búsquedas web de fuentes institucionales, enciclopédicas o de prensa.
 

@@ -2,8 +2,8 @@
 
 Un duelo por turnos se juega entre dos cuentas, cada una cuando puede. Se crea desde
 **Jugar con amigos → Cada uno en su móvil → Crear partida**, eligiendo el ritmo **Por turnos**, y
-se sigue en **Tus partidas**. El código está en `duelo-turnos.js` (Grandes colecciones,
-colección `turnDuels`) y en `quick-challenges.js` / `quick-online.js` para los duelos de Retos
+se sigue en **Tus partidas**. El código está en `js/online/duelo-turnos.js` (Grandes colecciones,
+colección `turnDuels`) y en `js/retos/quick-challenges.js` / `js/retos/quick-online.js` para los duelos de Retos
 rápidos (salas de dos en `quickRooms`). Los dos ejes del juego siguen igual: ordenar o cifras.
 
 ## Organización
@@ -26,7 +26,7 @@ la lista; no se actualiza en vivo mientras está abierta.
 
 ## Tiempo, resultados y conexión
 
-El tiempo por carta se elige al crear el duelo: **sin tiempo, 15, 20 o 30 segundos** (`tiempo.js`,
+El tiempo por carta se elige al crear el duelo: **sin tiempo, 15, 20 o 30 segundos** (`js/juego/tiempo.js`,
 los mismos valores que admiten las reglas). No hay pantalla de «listo»: el plazo empieza al
 descubrir la carta y se guarda en el dispositivo, así que volver a entrar no lo reinicia. Si se
 agota, la jugada cuenta como fallo por tiempo. Sin plazo, lo que se tarda queda solo como dato.
@@ -83,7 +83,7 @@ desde `main`: ver [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#despli
 servidor.
 
 **Avisos del móvil:** las Functions envían por Firebase Cloud Messaging a los tokens guardados en
-`playerProfiles/{uid}/pushTokens`, pero la app todavía no registra el dispositivo (`push.js` no se
+`playerProfiles/{uid}/pushTokens`, pero la app todavía no registra el dispositivo (`js/nube/push.js` no se
 inicia) y falta integrar el token APNs de iOS con FCM. Mientras tanto, el navegador puede mostrar
 un aviso local cuando te toca y no tienes la pestaña a la vista. Los fallos de entrega no se
 reintentan, para evitar duplicados.

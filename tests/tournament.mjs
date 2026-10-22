@@ -69,7 +69,7 @@ w.close();
 // La pantalla de resultado no puede ensancharse más que el móvil: sin una pista de rejilla acotada, el recorrido de
 // una competición (capítulos en fila) empujaba todo el resultado fuera de la pantalla y solo se veía el fondo.
 {
-  const css=read('edition.css');
+  const css=read('css/edition.css');
   assert.match(css,/\.pass-screen\s*\{\s*grid-template-columns:\s*minmax\(0,\s*1fr\);?\s*\}/,'.pass-screen tiene una única columna acotada');
   assert.match(css,/\.chapter-journey ol > li\.chapter-stop\s*\{[^}]*display:\s*grid/,'los capítulos del recorrido no heredan el flex de las listas del marcador');
 }

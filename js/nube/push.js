@@ -1,7 +1,7 @@
 // Registro de notificaciones push para las versiones nativas de las Stores.
 // En navegador se conserva el aviso local que ya ofrece duelo-turnos.js.
 import { auth, db } from './firebase-client.js';
-import { doc, serverTimestamp, setDoc } from './vendor/firebase/firebase-firestore.js';
+import { doc, serverTimestamp, setDoc } from '../../vendor/firebase/firebase-firestore.js';
 
 const CT = window.CONTINUUM;
 let started = false;

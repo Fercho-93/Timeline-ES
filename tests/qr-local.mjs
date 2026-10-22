@@ -1,9 +1,9 @@
-// El código QR de la invitación (`qr-encode.js`, sobre la librería vendorizada
-// `qrcode-generator.js`) es la pieza más delicada del modo "Sin conexión": si genera un
+// El código QR de la invitación (`js/sin-conexion/qr-encode.js`, sobre la librería vendorizada
+// `vendor/qr/qrcode-generator.js`) es la pieza más delicada del modo "Sin conexión": si genera un
 // código que parece válido pero no decodifica bien, la sala nunca llegaría a conectar y
 // nadie lo sabría hasta probarlo con dos móviles de verdad. Por eso esta prueba no se
 // queda en "genera una matriz" — la renderiza a píxeles reales y la decodifica con el
-// mismo `jsQR` que usa la cámara (`qr-scanner.js`), para varios tamaños de texto,
+// mismo `jsQR` que usa la cámara (`js/sin-conexion/qr-scanner.js`), para varios tamaños de texto,
 // incluido uno del tamaño real de una invitación completa.
 import { JSDOM } from "jsdom";
 import fs from "node:fs";
@@ -18,9 +18,9 @@ const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " 
 function boot() {
   const dom = new JSDOM("<!doctype html><html><body></body></html>", { runScripts: "outside-only", url: "https://hilo.test/" });
   dom.window.CONTINUUM = {};
-  dom.window.eval(read("qrcode-generator.js"));
-  dom.window.eval(read("qr-encode.js"));
-  dom.window.eval(read("jsqr.js"));
+  dom.window.eval(read("vendor/qr/qrcode-generator.js"));
+  dom.window.eval(read("js/sin-conexion/qr-encode.js"));
+  dom.window.eval(read("vendor/qr/jsqr.js"));
   return dom.window;
 }
 
@@ -35,7 +35,7 @@ ok("el mismo texto siempre genera la misma matriz", JSON.stringify(QrEncode.matr
 ok("un texto más largo usa una matriz más grande, no la misma de siempre", QrEncode.matrix("Q".repeat(2000)).length > QrEncode.matrix("ABC").length);
 
 // Renderiza la matriz a un buffer RGBA en memoria, con el mismo esquema de colores que
-// draw() en qr-encode.js, y la decodifica con jsQR — sin esto, un bug en el orden de los
+// draw() en js/sin-conexion/qr-encode.js, y la decodifica con jsQR — sin esto, un bug en el orden de los
 // bits o en la máscara de la librería podría producir un código que "se ve" como un QR
 // pero que ninguna cámara real llegaría a leer.
 function decodifica(text) {
@@ -58,7 +58,7 @@ function decodifica(text) {
 }
 
 console.log("\nDecodificado real con jsQR (no solo generar, también leer)");
-ok("un código corto (como el de sala de online.js) decodifica igual", decodifica("HOLA1234") === "HOLA1234");
+ok("un código corto (como el de sala de js/online/online.js) decodifica igual", decodifica("HOLA1234") === "HOLA1234");
 ok("un texto de tamaño medio decodifica igual", decodifica("X".repeat(300)) === "X".repeat(300));
 
 // El tamaño real de una invitación completa (código de sala + huella del mazo + la señal
@@ -74,13 +74,13 @@ console.log("\nLímites");
 ok("un texto absurdamente largo se rechaza en vez de fallar en silencio", (() => { try { QrEncode.matrix("Q".repeat(4000)); return false; } catch (e) { return e.message === "QR_TEXT_TOO_LONG"; } })());
 
 // Una invitación completa genera un QR bastante más denso (100+ cuadraditos) que el
-// código corto de sala de online.js: si el CSS lo encoge a un cuadrado pequeño, cada
+// código corto de sala de js/online/online.js: si el CSS lo encoge a un cuadrado pequeño, cada
 // cuadradito queda por debajo de lo que una cámara real puede resolver a la distancia
 // normal a la que se enseña una pantalla a otra — visto en una prueba real (cámara activa,
 // código centrado, pero sin ninguna reacción). El marco y el lienzo tienen que poder crecer
 // con el hueco disponible, no quedarse en un tamaño fijo pensado para un código más simple.
-console.log("\nTamaño en pantalla (styles.css)");
-const css = fs.readFileSync(path.join(REPO, "styles.css"), "utf8");
+console.log("\nTamaño en pantalla (css/styles.css)");
+const css = fs.readFileSync(path.join(REPO, "css/styles.css"), "utf8");
 const marco = css.match(/\.qr-frame\s*\{([^}]*)\}/)?.[1] || "";
 const lienzo = css.match(/\.qr-frame canvas\s*\{([^}]*)\}/)?.[1] || "";
 const anchoMarco = Number(marco.match(/width:\s*min\(100%,\s*(\d+)px\)/)?.[1]);

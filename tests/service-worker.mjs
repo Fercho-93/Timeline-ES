@@ -128,13 +128,13 @@ console.log("\nService worker");
 }
 {
   const sw = arrancar();
-  sw.guardado.set("./online.js", respuesta("online.js viejo"));
+  sw.guardado.set("./online.js", respuesta("js/online/online.js viejo"));
   const primera = await sw.pedir("./online.js");
-  ok("responde con la copia guardada, para poder jugar sin conexión", primera.cuerpo === "online.js viejo");
+  ok("responde con la copia guardada, para poder jugar sin conexión", primera.cuerpo === "js/online/online.js viejo");
   await espera();
   ok("no mezcla código nuevo con la partida abierta", sw.peticiones.length === 0);
   const segunda = await sw.pedir("./online.js");
-  ok("conserva la misma versión hasta activar una actualización", segunda.cuerpo === "online.js viejo");
+  ok("conserva la misma versión hasta activar una actualización", segunda.cuerpo === "js/online/online.js viejo");
 }
 {
   // Una lámina de animal no precargada: la primera vez que se pide viaja a la red
@@ -191,13 +191,33 @@ console.log("\nService worker");
   // instalar: la aplicación se abriría rota al quedarse sin conexión.
   const fuente = fs.readFileSync(path.join(REPO, "service-worker-258.js"), "utf8");
   const precargados = [...fuente.matchAll(/"(\.\/[^"]+)"/g)].map(m => m[1]);
-  const guiones = [...fs.readFileSync(path.join(REPO, "index.html"), "utf8")
-    .matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => `./${m[1]}`);
-  const olvidados = guiones.filter(archivo => !precargados.includes(archivo));
-  ok(`todos los guiones de index.html se precargan${olvidados.length ? ` (falta ${olvidados.join(", ")})` : ""}`, !olvidados.length);
+  const html = fs.readFileSync(path.join(REPO, "index.html"), "utf8");
+  // Todo lo que pide la página: guiones (clásicos y módulos), hojas de estilo y, desde cada
+  // guion, sus `import`, `import()` y los `script.src` que se añaden a mano. Los módulos
+  // resuelven contra su propia carpeta; `script.src`, contra la página.
+  const pedidos = new Set([...html.matchAll(/<(?:script[^>]*\bsrc|link rel="stylesheet" href)="([^"?]+)/g)].map(m => m[1]));
+  const pendientes = [...pedidos].filter(f => f.endsWith(".js"));
+  while (pendientes.length) {
+    const archivo = pendientes.pop();
+    if (!fs.existsSync(path.join(REPO, archivo))) continue;
+    const texto = fs.readFileSync(path.join(REPO, archivo), "utf8");
+    const modulos = [...texto.matchAll(/(?:\bfrom\s*|\bimport\s*\(\s*)['"](\.{1,2}\/[^'"]+)['"]/g)].map(m => path.posix.join(path.posix.dirname(archivo), m[1]));
+    const sueltos = [...texto.matchAll(/\bscript\.src\s*=\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
+    for (const f of [...modulos, ...sueltos]) if (!pedidos.has(f)) { pedidos.add(f); pendientes.push(f); }
+  }
+  ok(`se encuentran los archivos que pide la página (${pedidos.size})`, pedidos.size > 80);
+  const inexistentes = [...pedidos].filter(f => !fs.existsSync(path.join(REPO, f)));
+  ok(`todos existen en disco${inexistentes.length ? ` (falta ${inexistentes.join(", ")})` : ""}`, !inexistentes.length);
+  const olvidados = [...pedidos].filter(f => !precargados.includes(`./${f}`));
+  ok(`y todos se precargan${olvidados.length ? ` (falta ${olvidados.join(", ")})` : ""}`, !olvidados.length);
+  // Las `url()` de las hojas son relativas a la hoja, no a la página.
+  const rotas = [...pedidos].filter(f => f.endsWith(".css")).flatMap(hoja =>
+    [...fs.readFileSync(path.join(REPO, hoja), "utf8").matchAll(/url\(["']?(?!data:|https?:|#)([^"')]+)["']?\)/g)]
+      .map(m => path.posix.join(path.posix.dirname(hoja), m[1])).filter(f => !fs.existsSync(path.join(REPO, f))));
+  ok(`las url() de las hojas apuntan a archivos que existen${rotas.length ? ` (rotas: ${rotas.join(", ")})` : ""}`, !rotas.length);
 
   // Y lo mismo con las carátulas, que se piden por su nombre montado a mano.
-  const app = fs.readFileSync(path.join(REPO, "app.js"), "utf8");
+  const app = fs.readFileSync(path.join(REPO, "js/juego/app.js"), "utf8");
   const archivos = [...new Set([...app.matchAll(/archivo: "(hero-[a-z]+)"/g)].map(m => m[1]))];
   const anchos = (app.match(/const ancho = active \? (\d+) : (\d+);/) || []).slice(1);
   const caratulas = archivos.flatMap(nombre => anchos.map(ancho => `./assets/${nombre}-${ancho}.webp`));

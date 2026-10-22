@@ -174,9 +174,9 @@ console.log("\nSin entrada desde dentro de una partida");
   ok("no hay enciclopedia en el solitario", !existe(w, '[data-action="home-encyclopedia"]'));
 }
 {
-  // online.js no se puede ejecutar en Node (carga Firebase desde una CDN), así que se
+  // js/online/online.js no se puede ejecutar en Node (carga Firebase desde una CDN), así que se
   // comprueba en su propio texto que ninguna cabecera de sala ofrece la enciclopedia.
-  const online = read("online.js");
+  const online = read("js/online/online.js");
   ok("no hay enciclopedia en ninguna pantalla de varios móviles", !online.includes('data-action="enciclopedia"'));
 }
 

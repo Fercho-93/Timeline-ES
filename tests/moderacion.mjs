@@ -3,9 +3,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-// Lo único de modes.js que usa: escapar el nombre en el botón de denunciar.
+// Lo único de js/juego/modes.js que usa: escapar el nombre en el botón de denunciar.
 const window = { CONTINUUM: { escapeHtml: value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])) } };
-vm.runInNewContext(fs.readFileSync(new URL('../moderacion.js', import.meta.url), 'utf8'), { window });
+vm.runInNewContext(fs.readFileSync(new URL('../js/jugador/moderacion.js', import.meta.url), 'utf8'), { window });
 const M = window.CONTINUUM.Moderacion;
 
 const NO = [

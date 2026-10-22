@@ -1,4 +1,4 @@
-// El transporte del multijugador sin conexión (`local-transport.js`) no se puede probar de
+// El transporte del multijugador sin conexión (`js/sin-conexion/local-transport.js`) no se puede probar de
 // verdad en Node: no hay RTCPeerConnection ni cámara. Esta suite cubre lo que sí es puro —
 // codificar y descodificar la señal que viaja por el QR, y los mensajes del canal de
 // datos— y comprueba que el resto falla con un error claro en vez de reventar al cargar.
@@ -14,7 +14,7 @@ const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " 
 
 function boot() {
   const dom = new JSDOM("<!doctype html><html><body></body></html>", { runScripts: "outside-only", url: "https://hilo.test/" });
-  dom.window.eval(read("local-transport.js"));
+  dom.window.eval(read("js/sin-conexion/local-transport.js"));
   return dom.window;
 }
 

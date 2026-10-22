@@ -149,12 +149,12 @@ console.log("\nEl nombre que se propone al jugar es siempre el del perfil");
   const w = boot({ "continuum-identidad-v1": JSON.stringify({ nombre: "Lucía" }), "hilo-online-PVU73NZ4": JSON.stringify({ name: "Pr" }) });
   w.CONTINUUM.Accounts = { ...(w.CONTINUUM.Accounts || {}), profile: { alias: "OtroAlias" } };
   ok("el perfil manda sobre el alias de la cuenta", w.CONTINUUM.Identidad.propio() === "Lucía");
-  const online = read("online.js");
+  const online = read("js/online/online.js");
   ok("al entrar en una sala por invitación, el perfil manda sobre el nombre usado antes en esa sala", /CT\.Identidad\?\.propio\?\.\(\) \|\| known\?\.name/.test(online));
   const sinPerfil = boot();
   sinPerfil.CONTINUUM.Accounts = { profile: { alias: "  Ana  " } };
   ok("sin perfil todavía, se usa el alias de la cuenta", sinPerfil.CONTINUUM.Identidad.propio() === "Ana");
-  for (const archivo of ["online.js", "local-multiplayer.js", "quick-challenges.js", "duelo-turnos.js", "public-matchmaking-online.js"]) {
+  for (const archivo of ["js/online/online.js", "js/sin-conexion/local-multiplayer.js", "js/retos/quick-challenges.js", "js/online/duelo-turnos.js", "js/online/public-matchmaking-online.js"]) {
     ok(`${archivo} no propone el alias de la cuenta por delante del perfil`, !/profile\?\.alias \|\|/.test(read(archivo)));
   }
 }

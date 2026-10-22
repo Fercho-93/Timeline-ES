@@ -13,7 +13,7 @@ function app(native, url = 'https://continuumjuego.es/') {
   w.open = (...args) => { opened.push(args); return null; };
   if (native) w.Capacitor = {isNativePlatform: () => true};
   w.CONTINUUM = {};
-  w.eval(read('links.js'));
+  w.eval(read('js/online/links.js'));
   // En el iPhone, la página se sirve desde capacitor://localhost, no desde el dominio.
   const click = id => { const e = new w.MouseEvent('click', {bubbles: true, cancelable: true}); w.document.getElementById(id).dispatchEvent(e); return e.defaultPrevented; };
   return {w, opened, click};
@@ -54,7 +54,7 @@ function app(native, url = 'https://continuumjuego.es/') {
 
 // Todos los enlaces legales del juego están en los textos de la interfaz con target="_blank" relativo
 // (lo que el manejador cubre) o ya son absolutos.
-for (const file of ['settings.js', 'accounts.js', 'app.js']) {
+for (const file of ['js/interfaz/settings.js', 'js/nube/accounts.js', 'js/juego/app.js']) {
   for (const [, href] of read(file).matchAll(/href="([^"]*\.html[^"]*)"/g)) {
     assert.ok(/^(https:\/\/continuumjuego\.es\/)?(privacidad|terminos|aviso-legal|soporte|borrar-cuenta|licencias)\.html(#[a-z-]+)?$/.test(href) || /^invitation\.html/.test(href), `${file}: enlace a ${href} sin tratar`);
   }

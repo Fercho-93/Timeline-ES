@@ -6,7 +6,7 @@ const recommended = Object.fromEntries(Object.entries(js.configs.recommended.rul
   .filter(([name]) => !['no-undef', 'no-unused-vars', 'no-empty', 'no-useless-escape', 'no-prototype-builtins', 'no-cond-assign', 'no-control-regex', 'no-useless-assignment', 'preserve-caught-error', 'no-irregular-whitespace'].includes(name)));
 
 export default [
-  { ignores: ['node_modules/**', 'dist/**', 'vendor/**', 'jsqr.js', 'qrcode-generator.js', 'android/**', 'ios/**', 'docs/**', 'functions/node_modules/**', 'test-results/**'] },
+  { ignores: ['node_modules/**', 'dist/**', 'vendor/**', 'android/**', 'ios/**', 'docs/**', 'functions/node_modules/**', 'test-results/**'] },
   { files: ['**/*.js', '**/*.mjs'], languageOptions: { ecmaVersion: 'latest', sourceType: 'module' }, rules: { ...recommended, 'no-irregular-whitespace': ['error', { skipStrings: true, skipTemplates: true, skipComments: true, skipRegExps: true }] } },
   { files: ['**/*.cjs', 'functions/**/*.js', 'tests/duelo-policy.cjs'], languageOptions: { ecmaVersion: 'latest', sourceType: 'commonjs' } },
 ];

@@ -123,7 +123,7 @@
 #app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading {
   position: relative; isolation: isolate; overflow: hidden; min-height: 228px;
   margin: 0 0 20px; padding: 28px 26px; border: 1px solid #b6935f80; border-radius: 22px;
-  background: linear-gradient(90deg, #fbf1ddf5 0%, #fbf1dde8 43%, #fbf1dd20 76%), url("assets/atlas-ocean-v1.webp") right 18% / 100% auto no-repeat, #ece0c7;
+  background: linear-gradient(90deg, #fbf1ddf5 0%, #fbf1dde8 43%, #fbf1dd20 76%), url("../assets/atlas-ocean-v1.webp") right 18% / 100% auto no-repeat, #ece0c7;
   box-shadow: 0 12px 26px #34524b1f, inset 0 0 0 6px #fff7e460, inset 0 0 0 7px #a3865550;
   text-align: left;
 }

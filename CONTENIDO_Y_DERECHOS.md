@@ -12,7 +12,7 @@ Todas las cartas de Naturaleza (peso, longevidad y velocidad de animales) llevan
 la prueba falla si vuelve a aparecer una sin ella y sin aviso. Los títulos distinguen medias,
 sexo, ejemplares, rangos, cautividad o fases adultas cuando corresponde: los datos aproximados no
 deben presentarse como récords exactos ni compararse como si fueran medidas homogéneas. Las
-cartas de Retos rápidos llevan fuente y curiosidad en `quick-challenges-data.js`, y sus revisiones
+cartas de Retos rápidos llevan fuente y curiosidad en `mazos/quick-challenges-data.js`, y sus revisiones
 y fuentes ampliadas están en `docs/revision-*.md` y `docs/fuentes-*.json`.
 
 El estado de la revisión carta por carta está en [docs/AUDITORIA_MAZOS.md](docs/AUDITORIA_MAZOS.md):

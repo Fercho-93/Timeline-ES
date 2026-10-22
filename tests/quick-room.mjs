@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
-const window={CONTINUUM:{}};for(const p of ['engine.js','quick-challenges-data.js','quick-challenges-engine.js','quick-room.js'])vm.runInNewContext(fs.readFileSync(p,'utf8'),{window});
+const window={CONTINUUM:{}};for(const p of ['js/juego/engine.js','mazos/quick-challenges-data.js','js/retos/quick-challenges-engine.js','js/retos/quick-room.js'])vm.runInNewContext(fs.readFileSync(p,'utf8'),{window});
 const {QuickRoom:R,QuickEngine:E}=window.CONTINUUM;
 const rounds=[{id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}];
 let r=R.create('a','Ana',2),before=JSON.stringify(r);

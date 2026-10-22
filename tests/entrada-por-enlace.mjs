@@ -38,7 +38,7 @@ await runTransaction(db, async transaction => {
   });
 });
 
-// connectToRoom(): decide con la misma condición que online.js.
+// connectToRoom(): decide con la misma condición que js/online/online.js.
 let seenSelfInRoom = false;
 let expulsadoPorError = false;
 const vistas = [];

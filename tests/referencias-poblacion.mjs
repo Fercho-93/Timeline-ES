@@ -4,7 +4,7 @@ import fs from "node:fs";
 import vm from "node:vm";
 
 const window = {};
-vm.runInNewContext(fs.readFileSync("population.js", "utf8"), { window });
+vm.runInNewContext(fs.readFileSync("mazos/population.js", "utf8"), { window });
 const cards = window.POPULATION_CARDS;
 
 assert.equal(cards.length, 77, "El mazo de población debe conservar sus 77 cartas");

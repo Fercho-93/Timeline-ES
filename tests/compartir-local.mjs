@@ -13,7 +13,7 @@ const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " 
 
 function boot() {
   const dom = new JSDOM("<!doctype html><html><body></body></html>", { runScripts: "outside-only", url: "https://hilo.test/" });
-  dom.window.eval(read("local-share.js"));
+  dom.window.eval(read("js/sin-conexion/local-share.js"));
   return dom.window;
 }
 const intentaAsync = async fn => { try { await fn(); return null; } catch (e) { return e.message; } };

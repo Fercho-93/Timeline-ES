@@ -19,7 +19,7 @@
     if (loadingLibrary) return loadingLibrary;
     loadingLibrary = new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      script.src = "jsqr.js";
+      script.src = "vendor/qr/jsqr.js";
       script.onload = () => (typeof jsQR === "function" ? resolve() : reject(new Error("CAMERA_LIBRARY_UNAVAILABLE")));
       script.onerror = () => reject(new Error("CAMERA_LIBRARY_UNAVAILABLE"));
       document.head.appendChild(script);

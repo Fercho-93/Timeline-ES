@@ -35,7 +35,7 @@ Quedan pendientes 202 cartas de retos rápidos: 19 de `drinks` y 183 de otros 14
 
 | Mazo | Estado | Resultado |
 | --- | --- | --- |
-| `astronomy.js` · Astronomía y espacio | 55/55, cerrado el 30-09-2026 | Contraste individual de fecha, hito, modalidad y explicación con fuentes institucionales de NASA, ESA, ESO, IAU, LIGO, CNSA y otras instituciones. Se explicitaron las fechas aproximadas antiguas; Rømer no calculó una velocidad en distancia/tiempo; la cefeida de Andrómeda se identificó en 1923, con anuncio de la conclusión en 1924; la señal de LIGO se captó en 2015, pero se anunció en 2016; Philae rebotó tras el primer contacto. Las 55 cartas enlazan su fuente específica. |
+| `mazos/astronomy.js` · Astronomía y espacio | 55/55, cerrado el 30-09-2026 | Contraste individual de fecha, hito, modalidad y explicación con fuentes institucionales de NASA, ESA, ESO, IAU, LIGO, CNSA y otras instituciones. Se explicitaron las fechas aproximadas antiguas; Rømer no calculó una velocidad en distancia/tiempo; la cefeida de Andrómeda se identificó en 1923, con anuncio de la conclusión en 1924; la señal de LIGO se captó en 2015, pero se anunció en 2016; Philae rebotó tras el primer contacto. Las 55 cartas enlazan su fuente específica. |
 
 > **Pasada de verificación del 20 de octubre de 2026.** Se comprobaron fechas y cifras de las 14
 > Grandes colecciones restantes y se muestrearon los Retos rápidos pendientes: 11 correcciones

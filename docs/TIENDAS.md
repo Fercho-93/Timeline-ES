@@ -147,7 +147,7 @@ tienda, sin nombres ni salas reales y sin simular funciones que la versión no t
 6. Sala con amigos o mesa pública.
 7. Ajustes con el texto ampliado.
 
-La app se declara para iPhone y iPad (`TARGETED_DEVICE_FAMILY = "1,2"`): App Store Connect exige además capturas de iPad de 13" (y las de iPhone de 6,9"), y Google Play pide capturas de tableta si se publica para tabletas. En iPad, la partida en horizontal usa dos columnas (`tablet.css`) y en vertical la mesa a escala; hacer capturas de las dos orientaciones desde un iPad real o el simulador, no desde el navegador.
+La app se declara para iPhone y iPad (`TARGETED_DEVICE_FAMILY = "1,2"`): App Store Connect exige además capturas de iPad de 13" (y las de iPhone de 6,9"), y Google Play pide capturas de tableta si se publica para tabletas. En iPad, la partida en horizontal usa dos columnas (`css/tablet.css`) y en vertical la mesa a escala; hacer capturas de las dos orientaciones desde un iPad real o el simulador, no desde el navegador.
 
 Las imágenes del navegador durante el desarrollo no valen como capturas aprobadas. El icono
 actual es el candidato, sujeto a la elección del titular.
@@ -178,7 +178,7 @@ actual es el candidato, sujeto a la elección del titular.
 - La política de privacidad y el soporte están en las URL de arriba.
 
 **Moderación (guía 1.2 de Apple):** el único contenido creado por usuarios son los alias, y la
-app tiene las piezas que pide la guía: un filtro de nombres ofensivos y reservados (`moderacion.js`,
+app tiene las piezas que pide la guía: un filtro de nombres ofensivos y reservados (`js/jugador/moderacion.js`,
 también al cambiar de nombre), un botón «Denunciar o bloquear» junto a los nombres ajenos (ranking,
 tablón y plazas de las mesas, menú de la sala durante la partida y al terminar, rivales de los duelos)
 y el bloqueo. Bloquear es privado y se guarda en `duelPreferences/{uid}/blocked`, la misma lista que
@@ -343,7 +343,7 @@ alcance mientras no exista un servidor autoritativo: competición pública arbit
 clasificaciones certificadas.
 
 **Monetización:** pendiente del feedback de la beta. Comparar pago único y ampliaciones de
-contenido con personas reales antes de implementar cobros. La cartera (`cartera.js`) ya separa
+contenido con personas reales antes de implementar cobros. La cartera (`js/jugador/cartera.js`) ya separa
 qué se puede jugar; si algún día se venden mazos, hará falta usar las compras oficiales de cada
 tienda, restauración, reembolsos, validación de recibos en servidor y pruebas en sandbox. No
 añadir un sistema de pago ficticio.

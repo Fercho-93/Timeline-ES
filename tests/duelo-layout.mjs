@@ -7,7 +7,7 @@ import path from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ? pathToFileURL(process.env.PLAYWRIGHT_MODULE).href : 'playwright');
 const root = fileURLToPath(new URL('../', import.meta.url));
-const source = (await fs.readFile(path.join(root, 'duelo-turnos.js'), 'utf8')).replace(/^import .*;\r?\n/gm, '');
+const source = (await fs.readFile(path.join(root, 'js/online/duelo-turnos.js'), 'utf8')).replace(/^import .*;\r?\n/gm, '');
 const server = http.createServer(async (req, res) => {
   try {
     if (req.url === '/') { res.setHeader('Content-Type', 'text/html'); res.end('<html><body></body></html>'); return; }
@@ -28,7 +28,7 @@ try {
     await page.goto(`http://127.0.0.1:${server.address().port}/`);
     // Disable all application scripts: no network game or authentication is created.
     await page.route('**/*', route => route.request().url().startsWith(`http://127.0.0.1:${server.address().port}/`) ? route.continue() : route.abort());
-    await page.setContent(`<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/edition.css"><link rel="stylesheet" href="/accounts.css"><main id="app"></main><div id="toast"></div>`);
+    await page.setContent(`<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/css/styles.css"><link rel="stylesheet" href="/css/edition.css"><link rel="stylesheet" href="/css/accounts.css"><main id="app"></main><div id="toast"></div>`);
     await page.evaluate(() => {
       const cards = Array.from({ length: 20 }, (_, i) => ({ id: i + 1, title: `Acontecimiento histórico número ${i + 1}`, year: 1000 + i, detail: 'Explicación de la carta.' }));
       window.CONTINUUM = {
@@ -40,10 +40,10 @@ try {
         Duelo: { CARTAS: 15, reparto: () => cards.map(c => c.id), Cifras: { reparto: () => cards.map(c => c.id), regla: () => ({ pregunta: '¿En qué año fue?' }), campo: (_, id, { attrs = '', hintId = '' } = {}) => `<div class="field cifra-field"><label for="${id}">Tu respuesta</label><input id="${id}" type="text" inputmode="numeric" autocomplete="off" ${attrs}><p class="hint"${hintId ? ` id="${hintId}"` : ''}></p></div>` } }
       };
     });
-    await page.addScriptTag({ url: '/mapa.js' });
+    await page.addScriptTag({ url: '/js/interfaz/mapa.js' });
     // El estado de la lista de duelos sale del módulo real; el reparto sigue siendo el de la prueba.
     await page.evaluate(() => { window.__duelStub = CONTINUUM.Duelo; });
-    await page.addScriptTag({ url: '/duelo.js' });
+    await page.addScriptTag({ url: '/js/online/duelo.js' });
     await page.evaluate(() => { CONTINUUM.Duelo = { ...CONTINUUM.Duelo, ...window.__duelStub }; });
     await page.addScriptTag({ content: `const auth={currentUser:{uid:'me'}};\n${source}\nwindow.showDuel=(options={})=>{cachedGames=options.nextGames||[];current={id:'layout',mode:'history',kind:'orden',seed:'test',total:15,turnIndex:0,turnUid:'me',status:'playing',playersOrder:['me','them'],players:{me:{alias:'Explorador'},them:{alias:'Un rival con nombre largo'}},scores:{me:0,them:0},timeline:[1],...options};enteredAt=Date.now();pendingIndex=null;render();}; window.redrawDuel=()=>{render();};` });
     const fits = async label => {

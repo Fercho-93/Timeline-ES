@@ -46,7 +46,7 @@ registrar sus claves según el procedimiento de Google.
 
 ## Enlaces
 
-El juego vive en `https://continuumjuego.es/` (GitHub Pages, archivo `CNAME`). `links.js` acepta
+El juego vive en `https://continuumjuego.es/` (GitHub Pages, archivo `CNAME`). `js/online/links.js` acepta
 `continuumjuego.es`, `www.continuumjuego.es` y la dirección antigua
 `https://fercho-93.github.io/Timeline-ES/` (GitHub redirige la antigua, así que los enlaces ya
 enviados siguen funcionando), y procesa `appUrlOpen` y el enlace de arranque. Las invitaciones

@@ -3,7 +3,7 @@ rules_version = '2';
 // Las reglas validan la *estructura* de cada jugada: quién escribe, en qué fase,
 // qué campos toca y que las cartas no se creen ni se dupliquen. La comprobación de
 // si el año encaja en la línea temporal sigue siendo del cliente: sin backend no
-// hay forma de verificarla, porque las fechas viven en cards.js / movies.js.
+// hay forma de verificarla, porque las fechas viven en mazos/cards.js / mazos/movies.js.
 service cloud.firestore {
   match /databases/{database}/documents {
     // Temporada de lanzamiento: invitados automáticos y datos nuevos por UID.
@@ -408,7 +408,7 @@ service cloud.firestore {
       allow delete: if false;
     }
     function owner(uid) { return registered() && request.auth.uid == uid; }
-    // Los seis avatares del primer diseño y los 36 del selector actual (avatares.js). El elegido se publica con el perfil para que los demás lo vean en el ranking.
+    // Los seis avatares del primer diseño y los 36 del selector actual (js/jugador/avatares.js). El elegido se publica con el perfil para que los demás lo vean en el ranking.
     function validAvatar(a) { return a is string && a in ['compass', 'globe', 'star', 'book', 'rocket', 'owl', 'alfonso-x', 'felipe-ii', 'carlos-iii', 'cleopatra', 'marie-curie', 'isabel-catolica', 'ballena-azul', 'elefante', 'leon', 'panda', 'jirafa', 'buho-real', 'el-cid', 'cervantes', 'juana-i', 'melies', 'chaplin', 'ingrid-bergman', 'beethoven', 'aretha-franklin', 'david-bowie', 'piloto-arcade', 'aventurera', 'creador-puzles', 'tigre', 'lince', 'pulpo', 'flamenco', 'pinguino', 'zorro', 'caballera', 'ninja', 'automata', 'hechicera', 'explorador', 'piloto-espacial']; }
     function validName(uid) {
       let d=request.resource.data;
@@ -419,7 +419,7 @@ service cloud.firestore {
     }
     // Nombres que nadie puede reservar: los del propio juego y los de quien lo gestiona. Solo se
     // comprueba al reservar uno nuevo, para no tocar a quien ya lo tenía. El filtro de palabras
-    // ofensivas vive en el cliente (moderacion.js): aquí solo hay lo que un cliente modificado no puede saltarse.
+    // ofensivas vive en el cliente (js/jugador/moderacion.js): aquí solo hay lo que un cliente modificado no puede saltarse.
     function reservedName(key) {
       return key.matches('.*continuum.*')
         || key in ['admin', 'administrador', 'administrator', 'moderador', 'moderator', 'mod', 'soporte', 'support', 'staff', 'oficial', 'official', 'sistema', 'system', 'root'];
@@ -495,7 +495,7 @@ service cloud.firestore {
       allow create: if owner(uid) && valid() && request.resource.data.revision == 1;
       allow update: if owner(uid) && valid() && request.resource.data.revision == resource.data.revision + 1;
       // El progreso solo se borra al borrar la cuenta (el perfil desaparece en la misma operación, como hace
-      // `purgeServerData` en accounts.js): un borrado suelto, por un fallo del cliente o a propósito, ya no lo pierde.
+      // `purgeServerData` en js/nube/accounts.js): un borrado suelto, por un fallo del cliente o a propósito, ya no lo pierde.
       allow delete: if owner(uid) && !existsAfter(/databases/$(database)/documents/playerProfiles/$(uid));
     }
     // Marcador social: datos declarados por cliente, nunca resultados competitivos certificados.
@@ -627,7 +627,7 @@ service cloud.firestore {
       allow read, update, delete: if false;
     }
     // Cartel remoto (versión mínima de la app y pausa del online): lo escribe solo quien administra el
-    // proyecto desde la consola; los clientes únicamente lo leen (ver app-config.js).
+    // proyecto desde la consola; los clientes únicamente lo leen (ver js/nube/app-config.js).
     match /appConfig/current {
       allow get: if registered();
       allow write, list: if false;

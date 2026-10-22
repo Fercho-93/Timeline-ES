@@ -7,7 +7,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 globalThis.window = { CONTINUUM: {} };
-new Function('window', fs.readFileSync(new URL('../quick-challenges-data.js', import.meta.url), 'utf8'))(globalThis.window);
+new Function('window', fs.readFileSync(new URL('../mazos/quick-challenges-data.js', import.meta.url), 'utf8'))(globalThis.window);
 const retos = window.CONTINUUM.QuickCatalog.challenges;
 const problemas = [], usadas = new Map();
 for (const reto of retos) {

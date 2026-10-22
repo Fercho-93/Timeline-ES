@@ -39,7 +39,7 @@ async function arrancar() {
   };
   contexto.window = contexto;
   vm.createContext(contexto);
-  vm.runInContext(fs.readFileSync(path.join(REPO, "actualizar.js"), "utf8"), contexto);
+  vm.runInContext(fs.readFileSync(path.join(REPO, "js/arranque/actualizar.js"), "utf8"), contexto);
   // El script es un IIFE async que se dispara solo: hay que dejarle terminar.
   await new Promise(resolve => setTimeout(resolve, 10));
 

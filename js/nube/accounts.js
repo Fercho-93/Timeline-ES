@@ -1,8 +1,8 @@
 // Cuentas del jugador: crea el invitado automático, permite entrar con Apple, sincroniza el progreso con
 // la nube, gestiona el ranking opcional y borra la cuenta con todos sus datos cuando se pide.
 import { auth, db, firebaseApp } from './firebase-client.js';
-import { signInAnonymously, setPersistence, browserLocalPersistence, deleteUser, onAuthStateChanged, OAuthProvider, linkWithCredential, signInWithCredential, reauthenticateWithCredential, revokeAccessToken, signOut } from './vendor/firebase/firebase-auth.js';
-import { doc, getDocFromServer, runTransaction, serverTimestamp, writeBatch, collection, query, orderBy, limit, getDocsFromServer } from './vendor/firebase/firebase-firestore.js';
+import { signInAnonymously, setPersistence, browserLocalPersistence, deleteUser, onAuthStateChanged, OAuthProvider, linkWithCredential, signInWithCredential, reauthenticateWithCredential, revokeAccessToken, signOut } from '../../vendor/firebase/firebase-auth.js';
+import { doc, getDocFromServer, runTransaction, serverTimestamp, writeBatch, collection, query, orderBy, limit, getDocsFromServer } from '../../vendor/firebase/firebase-firestore.js';
 
 const CT = window.CONTINUUM;
 const app = document.getElementById('app');
@@ -782,7 +782,7 @@ function deleteScreen() {
   accountDialog(`<div class="overlay"><section class="modal"><h2>${apple ? 'Eliminar cuenta y progreso' : 'Eliminar invitado y progreso'}</h2><p>Se borrarán tu perfil, progreso y entrada en el ranking. Esta acción no se puede deshacer. Al volver a entrar se creará un invitado nuevo desde cero.</p>${apple ? '<p>Apple te pedirá confirmar que eres tú y el juego dejará de tener acceso a tu cuenta de Apple.</p>' : ''}<button class="btn btn-ghost" data-account-action="delete-confirm">Eliminar definitivamente</button><button class="btn btn-primary" data-account-action="close">Cancelar</button><p id="account-delete-message" role="status"></p></section></div>`,true);
 }
 // Carga perezosa: si la librería no llega, el borrado sigue por el camino de siempre.
-let loadFunctions = () => import('./vendor/firebase/firebase-functions.js');
+let loadFunctions = () => import('../../vendor/firebase/firebase-functions.js');
 // Pide a la función `deleteMyAccount` que borre todo lo de esta cuenta en el servidor, incluido el acceso.
 // Devuelve false si no se pudo (la función no está publicada, sin red, error del servidor).
 // Primero en Madrid (donde viven ahora); después en la región anterior, por si aún no se han vuelto a publicar.

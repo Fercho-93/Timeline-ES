@@ -262,7 +262,7 @@ console.log("\nEl perfil");
     version: 1,
     totals: { games: 1, cards: 10, hits: 1, wins: 0, run: 0, bestRun: 1 },
     byBand: { "history:antigua": { mode: "history", band: "antigua", hits: 1, misses: 9 } },
-    misses: { [read("cards.js").match(/id: (\d+)/)[1]]: { mode: "history", count: 4, lastDay: "2026-02-02" } }
+    misses: { [read("mazos/cards.js").match(/id: (\d+)/)[1]]: { mode: "history", count: 4, lastDay: "2026-02-02" } }
   }));
   click(w, '[data-action="perfil"]');
   const filas = [...w.document.querySelectorAll(".weak-row")];
@@ -278,7 +278,7 @@ console.log("\nEl perfil");
 // teniendo su versión oscura.
 console.log("\nCada superficie del tema claro tiene su versión oscura");
 {
-  const css = read("styles.css");
+  const css = read("css/styles.css");
   // El último de cada uno, no el primero: los bloques de la paleta anterior siguen
   // arriba en el archivo y son los que ganarían un `indexOf`.
   const bloque = (inicio, fin) => {
@@ -335,7 +335,7 @@ console.log("\nCada superficie del tema claro tiene su versión oscura");
 // Las dos cosas pasaron y dejaron los botones descolocados sin que fallara nada.
 console.log("\nLa cabecera se centra en móvil");
 {
-  const css = read("styles.css");
+  const css = read("css/styles.css");
   const regla = css.match(/^\.topbar \{[^}]*\}/m)?.[0] || "";
   const acciones = css.match(/^\.topbar-actions \{[^}]*\}/m)?.[0] || "";
   ok("se encuentran las dos reglas base", !!regla && !!acciones);
@@ -355,7 +355,7 @@ console.log("\nLa cabecera se centra en móvil");
 // que las bandas— y cubre los dos temas.
 console.log("\nContraste de los temas de la interfaz");
 {
-  const css = read("edition.css");
+  const css = read("css/edition.css");
   const lineal = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
   const completo = hex => hex.length === 4 ? "#" + [...hex.slice(1)].map(c => c + c).join("") : hex;
   const canales = hex => [1, 3, 5].map(i => parseInt(completo(hex).slice(i, i + 2), 16));
@@ -397,7 +397,7 @@ console.log("\nContraste de los temas de la interfaz");
 
 console.log("\nContraste de las bandas de época");
 {
-  const css = read("styles.css");
+  const css = read("css/styles.css");
   const bandas = [...css.matchAll(/^\.era-([a-z]+) \{ background: (#[0-9a-f]{6}); \}/gm)];
   const lineal = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
   const canales = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));

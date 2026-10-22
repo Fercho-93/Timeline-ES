@@ -59,7 +59,7 @@ try {
   w.CONTINUUM.openDeckAs("collections");
   click("start-free");
   checkScreen("Partida libre");
-  check("cabecera compartida del modo online", /CT.UI.header/.test(read("online.js")));
+  check("cabecera compartida del modo online", /CT.UI.header/.test(read("js/online/online.js")));
   console.log(`\n${checks} comprobaciones de marca correctas`);
 } finally {
   w.close();

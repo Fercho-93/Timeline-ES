@@ -1,5 +1,5 @@
-// `local-session.js` es la pieza que junta `local-room.js` (las reglas) con
-// `local-transport.js` (el canal). La traducción de mensaje a acción (`actionFromMessage`)
+// `js/sin-conexion/local-session.js` es la pieza que junta `js/sin-conexion/local-room.js` (las reglas) con
+// `js/sin-conexion/local-transport.js` (el canal). La traducción de mensaje a acción (`actionFromMessage`)
 // y la sesión del anfitrión se pueden probar sin WebRTC de verdad: solo `invitePeer` (que
 // abre una `RTCPeerConnection`) y la sesión de invitado (que abre una nada más crearse)
 // lo necesitan, y ahí basta con comprobar que fallan con un motivo claro.
@@ -25,7 +25,7 @@ function boot() {
     sortValue: (key, card) => Number(card.id.split("-")[1]),
     shuffle: cards => [...cards]
   };
-  ["engine.js", "local-transport.js", "local-room.js", "local-session.js"].forEach(file => dom.window.eval(read(file)));
+  ["js/juego/engine.js", "js/sin-conexion/local-transport.js", "js/sin-conexion/local-room.js", "js/sin-conexion/local-session.js"].forEach(file => dom.window.eval(read(file)));
   return dom.window;
 }
 
@@ -51,7 +51,7 @@ let ultimoEstado = null;
 const host = Session.createHostSession({ roomCode: "LOC001", hostName: "Fer", modeKey: MODE, deckFingerprint: "v1", now: () => 1000, onChange: room => { ultimoEstado = room; } });
 ok("crear la sesión ya avisa del estado inicial", ultimoEstado?.status === "lobby" && ultimoEstado.hostId === Session.HOST_ID);
 ok("saltar turno antes de jugar se rechaza igual que en el reductor", intenta(() => host.act("skip-turn")) === "NOT_ALLOWED");
-// El anfitrión no puede empezar solo: hacen falta dos, igual que en `online.js`.
+// El anfitrión no puede empezar solo: hacen falta dos, igual que en `js/online/online.js`.
 ok("el anfitrión solo no puede empezar la partida", intenta(() => host.act("start", { handSize: 4, starterId: Session.HOST_ID })) === "INVALID_START");
 
 console.log("\nEl anfitrión: solo abre conexiones de verdad al invitar");

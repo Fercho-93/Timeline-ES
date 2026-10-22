@@ -10,11 +10,11 @@ const html = read('index.html');
 const scripts = [...html.matchAll(/<script\b[^>]*\bsrc="([^"?]+)(?:\?[^"]*)?"[^>]*>/g)].map(match => match[1]);
 const window = {};
 // Descubre los catálogos desde la página real, para detectar también nuevos mazos.
-const catalogs = scripts.filter(file => !file.includes('/') && /window\.\w+_CARDS\s*=/.test(read(file)));
-for (const file of [...catalogs, 'modes.js', 'enciclopedia.js', 'quick-challenges-data.js']) vm.runInNewContext(read(file), { window });
+const catalogs = scripts.filter(file => !file.startsWith('vendor/') && /window\.\w+_CARDS\s*=/.test(read(file)));
+for (const file of [...catalogs, 'js/juego/modes.js', 'js/jugador/enciclopedia.js', 'mazos/quick-challenges-data.js']) vm.runInNewContext(read(file), { window });
 const ct = window.CONTINUUM;
-assert(scripts.includes('modes.js'));
-for (const file of catalogs) assert(scripts.indexOf(file) < scripts.indexOf('modes.js'), `${file} se carga después de modes.js`);
+assert(scripts.includes('js/juego/modes.js'));
+for (const file of catalogs) assert(scripts.indexOf(file) < scripts.indexOf('js/juego/modes.js'), `${file} se carga después de js/juego/modes.js`);
 const files = fs.readdirSync(path.join(root, 'assets'), { recursive: true }).map(file => 'assets/' + file.replaceAll('\\', '/'));
 const exactPaths = new Set(files);
 const artFiles = files.filter(file => /^assets\/[^/]+-cards\/.*\.(webp|png|jpe?g)$/i.test(file));
@@ -22,7 +22,7 @@ const used = new Set(), uniqueCards = new Map();
 const groups = Object.values(ct.BLOCKS).flatMap(block => Array.from(block.games));
 assert.equal(new Set(groups).size, groups.length, 'Mazo repetido entre colecciones');
 assert.deepEqual([...groups].sort(), Object.keys(ct.MODES).sort(), 'Mazos fuera de las colecciones');
-const source = read('modes.js');
+const source = read('js/juego/modes.js');
 for (const [key, mode] of Object.entries(ct.MODES)) {
   assert(ct.usesAnimalArt(key), `${key} no activa las ilustraciones`);
   assert(mode.cards.length > 0, `${key} está vacío`);

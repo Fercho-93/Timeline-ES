@@ -133,11 +133,11 @@
   // La lista de mesas abiertas se mantiene al día mientras se ve; al salir de la pantalla
   // se deja de escuchar.
   let stopBoard = null;
-  const boardVersions = () => Promise.all([import('./public-matchmaking-online.js'), import('./quick-online.js')])
+  const boardVersions = () => Promise.all([import('../online/public-matchmaking-online.js'), import('../retos/quick-online.js')])
     .then(([collections, quick]) => ({ collections: collections.CLIENT_VERSION, quick: quick.PUBLIC_VERSION }));
   function watchBoard() {
     stopBoard?.(); stopBoard = null;
-    Promise.all([import('./public-tables.js'), boardVersions()]).then(([tables, versions]) => {
+    Promise.all([import('../online/public-tables.js'), boardVersions()]).then(([tables, versions]) => {
       if (!app.querySelector('[data-public-board]')) return;
       let lastList = [];
       const draw = () => {

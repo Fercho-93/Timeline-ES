@@ -43,9 +43,9 @@
   // Las modalidades, sus ejes y los ayudantes que comparte con el modo de varios
   // móviles están en modes.js, para declararlos una sola vez.
   const CT = window.CONTINUUM;
-  const turnDuelReady = import('./duelo-turnos.js').catch(() => null);
-  const pushReady = import('./push.js').catch(() => null);
-  const appConfigReady = import('./app-config.js').catch(() => null);
+  const turnDuelReady = import('../online/duelo-turnos.js').catch(() => null);
+  const pushReady = import('../nube/push.js').catch(() => null);
+  const appConfigReady = import('../nube/app-config.js').catch(() => null);
   const { escapeHtml, shuffle, announce, seedFrom, seededRandom, shuffleWith } = CT;
   pushReady.then(module => module?.start?.());
   appConfigReady.then(module => module?.start?.());
@@ -4010,14 +4010,14 @@
       : table?.code ? ["Entrando en la mesa", "Ocupando tu plaza…"] : ["Buscando partida", "Buscando una mesa pública compatible…"];
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">${title}</h2><p>${text}</p></div></section></div>`);
     try {
-      const matchmaking = await import("./public-matchmaking-online.js");
+      const matchmaking = await import("../online/public-matchmaking-online.js");
       if (table) {
         let timer;
         const pending = table.create
           ? matchmaking.createTable(table.mode, table.capacity, table.seconds, table.handSize).then(code => ({ code, mode: table.mode }))
           : matchmaking.joinTable(table.code).then(mode => ({ code: table.code, mode }));
         const { code, mode } = await Promise.race([pending, new Promise((_, reject) => { timer = setTimeout(() => reject(Error("MATCH_TIMEOUT")), 30000); })]).finally(() => clearTimeout(timer));
-        const online = await import("./online.js");
+        const online = await import("../online/online.js");
         await online.openOnlineMode({ roomCode: code, modeKey: mode, onBack: () => CT.ModeHubs ? CT.ModeHubs.open("hub-online") : home() });
         return;
       }
@@ -4035,7 +4035,7 @@
         new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('MATCH_TIMEOUT')),30000);})
       ]).finally(()=>clearTimeout(timer));
       const {code,mode}=found;
-      const online = await import("./online.js");
+      const online = await import("../online/online.js");
       // Al salir de una mesa pública se vuelve a «Jugar online», no al menú de un mazo.
       await online.openOnlineMode({ roomCode: code, modeKey: mode, onBack: () => CT.ModeHubs ? CT.ModeHubs.open("hub-online") : home() });
     } catch (error) {
@@ -4058,7 +4058,7 @@
     screen = "online-loading";
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">Conectando la sala</h2><p>Preparando el modo multijugador…</p></div></section></div>`);
     try {
-      const online = await import("./online.js");
+      const online = await import("../online/online.js");
       await online.openOnlineMode({ roomCode, modeKey: selectedModeKey, competition, createOnly, onBack: backMenu });
     } catch (error) {
       console.error(error);

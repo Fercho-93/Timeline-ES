@@ -45,7 +45,7 @@ function checkPendingHand(document) {
     'ninguna carta de arriba está seleccionada durante la vista previa');
   assert.ok(document.querySelector('.hand-placement-pending'), 'el carrusel mantiene un centro sin resaltarlo en rojo');
 }
-assert.match(read('edition.css'), /\.hand\.hand-fan:not\(\.hand-placement-pending\) \.hand-card\.fan-center\s*\{/,
+assert.match(read('css/edition.css'), /\.hand\.hand-fan:not\(\.hand-placement-pending\) \.hand-card\.fan-center\s*\{/,
   'el centro del carrusel solo tiene el resaltado rojo cuando no hay vista previa');
 {
   const window = boot(), document = window.document;
@@ -102,7 +102,7 @@ assert.match(read('edition.css'), /\.hand\.hand-fan:not\(\.hand-placement-pendin
 {
   const window = boot(), document = window.document;
   try {
-    const online = read('online.js').replace(/^import .*;$/gm, '').replace('export async function', 'async function');
+    const online = read('js/online/online.js').replace(/^import .*;$/gm, '').replace('export async function', 'async function');
     window.eval(`(() => {
       const initializeApp=()=>({}),getAuth=()=>({}),getFirestore=()=>({});
       ${online}
@@ -155,8 +155,8 @@ assert.match(read('edition.css'), /\.hand\.hand-fan:not\(\.hand-placement-pendin
     window.matchMedia = () => ({matches: true});
     window.requestAnimationFrame = () => 1;
     window.cancelAnimationFrame = () => {};
-    window.eval(read('mesa-escala.js'));
-    window.eval(read('immersion.js'));
+    window.eval(read('js/interfaz/mesa-escala.js'));
+    window.eval(read('js/interfaz/immersion.js'));
     const app = window.document.querySelector('#app');
     const renderHand = (screen, count, pending = false, solo = false) => {
       app.dataset.screen = screen;

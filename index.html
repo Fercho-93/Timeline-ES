@@ -17,20 +17,20 @@
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
     <link rel="preload" href="assets/continuum-splash-blue-v5.webp" as="image" type="image/webp" fetchpriority="high" />
-    <link rel="stylesheet" href="splash.css?v=793" />
-    <link rel="stylesheet" href="styles.css?v=793" />
-    <link rel="stylesheet" href="edition.css?v=794" />
-    <link rel="stylesheet" href="accounts.css?v=793" />
-    <link rel="stylesheet" href="quick-challenges.css?v=793" />
-    <link rel="stylesheet" href="home-modes-v1.css?v=793" />
-    <link rel="stylesheet" href="atlas-voyage.css?v=793" />
-    <link rel="stylesheet" href="guide-journal.css?v=793" />
-    <link rel="stylesheet" href="tutorial.css?v=793" />
-    <link rel="stylesheet" href="navigation-nautical.css?v=793" />
-    <link rel="stylesheet" href="mesa-escala.css?v=705" />
-    <link rel="stylesheet" href="tablet.css?v=794" />
+    <link rel="stylesheet" href="css/splash.css?v=793" />
+    <link rel="stylesheet" href="css/styles.css?v=793" />
+    <link rel="stylesheet" href="css/edition.css?v=795" />
+    <link rel="stylesheet" href="css/accounts.css?v=793" />
+    <link rel="stylesheet" href="css/quick-challenges.css?v=793" />
+    <link rel="stylesheet" href="css/home-modes-v1.css?v=793" />
+    <link rel="stylesheet" href="css/atlas-voyage.css?v=793" />
+    <link rel="stylesheet" href="css/guide-journal.css?v=793" />
+    <link rel="stylesheet" href="css/tutorial.css?v=793" />
+    <link rel="stylesheet" href="css/navigation-nautical.css?v=793" />
+    <link rel="stylesheet" href="css/mesa-escala.css?v=705" />
+    <link rel="stylesheet" href="css/tablet.css?v=795" />
     <!-- Se ejecuta en <head> para decidir si hay telón antes de que el body pueda pintarse. -->
-    <script src="splash.js"></script>
+    <script src="js/arranque/splash.js"></script>
     <title>Continuum</title>
   </head>
   <body>
@@ -73,71 +73,71 @@
     </div>
     <main id="app"></main>
     <div id="toast" class="toast" role="status" aria-live="assertive"></div>
-    <script src="cards.js"></script>
-    <script src="movies.js"></script>
-    <script src="music.js"></script>
-    <script src="videogames.js"></script>
-    <script src="animals.js"></script>
-    <script src="lifespan.js"></script>
-    <script src="speed.js"></script>
-    <script src="inventos.js"></script>
-    <script src="mundo.js"></script>
-    <script src="astronomy.js"></script>
-    <script src="medicine.js"></script>
-    <script src="countries.js"></script>
-    <script src="population.js"></script>
-    <script src="idiomas.js"></script>
-    <script src="distances.js"></script>
-    <script src="modes.js"></script>
-    <script src="deployment.js"></script>
-    <script src="engine.js"></script>
-    <script src="tiempo.js"></script>
-    <script src="quick-challenges-data.js"></script>
-    <script src="quick-challenges-engine.js"></script>
-    <script src="quick-room.js"></script>
-    <script src="quick-network.js"></script>
-    <script src="quick-challenges.js"></script>
-    <script src="final.js"></script>
-    <script src="tournament.js"></script>
-    <script src="links.js"></script>
-  <script src="storage.js"></script>
-  <script src="account-storage.js"></script>
-  <script src="recent-players.js"></script>
-  <script src="saves.js"></script>
-  <script src="updates.js"></script>
-  <script src="session.js"></script>
-  <script src="avatares.js"></script>
-  <script src="moderacion.js"></script>
-  <script src="edad.js"></script>
-  <script src="identidad.js"></script>
-    <script src="enciclopedia.js"></script>
-    <script src="progreso.js"></script>
-    <script src="cartera.js"></script>
-    <script src="duelo.js"></script>
-    <script type="module" src="duelo-turnos.js"></script>
-    <script type="module" src="app-config.js"></script>
-    <script type="module" src="public-matchmaking-online.js"></script>
-    <script src="local-transport.js"></script>
-    <script src="local-peer.js"></script>
-    <script src="local-room.js"></script>
-    <script src="local-session.js"></script>
-    <script src="local-share.js"></script>
-    <script src="qrcode-generator.js"></script>
-    <script src="qr-encode.js"></script>
-    <script src="qr-scanner.js"></script>
-    <script src="local-multiplayer.js"></script>
-    <script src="ghost.js"></script>
-    <script src="tutorial.js"></script>
-    <script src="drag.js"></script>
-    <script src="swipe.js"></script>
-    <script src="a11y.js"></script>
-    <script src="mapa.js"></script>
-    <script src="settings.js"></script>
-  <script src="effects.js"></script>
-    <script src="sonidos.js"></script>
-    <script src="mesa-escala.js"></script>
-    <script src="immersion.js"></script>
-    <script src="home-modes-v1.js"></script>
-    <script src="boot.js"></script>
+    <script src="mazos/cards.js"></script>
+    <script src="mazos/movies.js"></script>
+    <script src="mazos/music.js"></script>
+    <script src="mazos/videogames.js"></script>
+    <script src="mazos/animals.js"></script>
+    <script src="mazos/lifespan.js"></script>
+    <script src="mazos/speed.js"></script>
+    <script src="mazos/inventos.js"></script>
+    <script src="mazos/mundo.js"></script>
+    <script src="mazos/astronomy.js"></script>
+    <script src="mazos/medicine.js"></script>
+    <script src="mazos/countries.js"></script>
+    <script src="mazos/population.js"></script>
+    <script src="mazos/idiomas.js"></script>
+    <script src="mazos/distances.js"></script>
+    <script src="js/juego/modes.js"></script>
+    <script src="js/nube/deployment.js"></script>
+    <script src="js/juego/engine.js"></script>
+    <script src="js/juego/tiempo.js"></script>
+    <script src="mazos/quick-challenges-data.js"></script>
+    <script src="js/retos/quick-challenges-engine.js"></script>
+    <script src="js/retos/quick-room.js"></script>
+    <script src="js/retos/quick-network.js"></script>
+    <script src="js/retos/quick-challenges.js"></script>
+    <script src="js/juego/final.js"></script>
+    <script src="js/juego/tournament.js"></script>
+    <script src="js/online/links.js"></script>
+  <script src="js/jugador/storage.js"></script>
+  <script src="js/jugador/account-storage.js"></script>
+  <script src="js/jugador/recent-players.js"></script>
+  <script src="js/jugador/saves.js"></script>
+  <script src="js/arranque/updates.js"></script>
+  <script src="js/juego/session.js"></script>
+  <script src="js/jugador/avatares.js"></script>
+  <script src="js/jugador/moderacion.js"></script>
+  <script src="js/jugador/edad.js"></script>
+  <script src="js/jugador/identidad.js"></script>
+    <script src="js/jugador/enciclopedia.js"></script>
+    <script src="js/jugador/progreso.js"></script>
+    <script src="js/jugador/cartera.js"></script>
+    <script src="js/online/duelo.js"></script>
+    <script type="module" src="js/online/duelo-turnos.js"></script>
+    <script type="module" src="js/nube/app-config.js"></script>
+    <script type="module" src="js/online/public-matchmaking-online.js"></script>
+    <script src="js/sin-conexion/local-transport.js"></script>
+    <script src="js/sin-conexion/local-peer.js"></script>
+    <script src="js/sin-conexion/local-room.js"></script>
+    <script src="js/sin-conexion/local-session.js"></script>
+    <script src="js/sin-conexion/local-share.js"></script>
+    <script src="vendor/qr/qrcode-generator.js"></script>
+    <script src="js/sin-conexion/qr-encode.js"></script>
+    <script src="js/sin-conexion/qr-scanner.js"></script>
+    <script src="js/sin-conexion/local-multiplayer.js"></script>
+    <script src="js/juego/ghost.js"></script>
+    <script src="js/interfaz/tutorial.js"></script>
+    <script src="js/interfaz/drag.js"></script>
+    <script src="js/interfaz/swipe.js"></script>
+    <script src="js/interfaz/a11y.js"></script>
+    <script src="js/interfaz/mapa.js"></script>
+    <script src="js/interfaz/settings.js"></script>
+  <script src="js/interfaz/effects.js"></script>
+    <script src="js/interfaz/sonidos.js"></script>
+    <script src="js/interfaz/mesa-escala.js"></script>
+    <script src="js/interfaz/immersion.js"></script>
+    <script src="js/interfaz/home-modes-v1.js"></script>
+    <script src="js/arranque/boot.js"></script>
   </body>
 </html>

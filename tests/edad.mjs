@@ -1,5 +1,5 @@
-// Edad declarada (edad.js): se pregunta una vez, se guarda en el dispositivo y decide si se puede jugar
-// online y aparecer en el ranking. Lo aplican app-config.js (corta la conexión) y accounts.js (ranking).
+// Edad declarada (js/jugador/edad.js): se pregunta una vez, se guarda en el dispositivo y decide si se puede jugar
+// online y aparecer en el ranking. Lo aplican js/nube/app-config.js (corta la conexión) y js/nube/accounts.js (ranking).
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
@@ -10,7 +10,7 @@ function cargar(inicial = {}) {
   const w = dom.window, guardado = new Map(Object.entries(inicial)), eventos = [];
   w.CONTINUUM = { Storage: { getItem: k => guardado.has(k) ? guardado.get(k) : null, setItem: (k, v) => guardado.set(k, String(v)), removeItem: k => guardado.delete(k) } };
   w.document.addEventListener("continuum:edad", e => eventos.push(e.detail.estado));
-  w.eval(read("edad.js"));
+  w.eval(read("js/jugador/edad.js"));
   return { w, E: w.CONTINUUM.Edad, guardado, eventos };
 }
 const pulsa = (w, cual) => { const b = w.document.querySelector(`.edad-overlay [data-edad="${cual}"]`); assert.ok(b, `hay botón ${cual}`); b.click(); };
@@ -65,10 +65,9 @@ const espera = () => new Promise(r => setTimeout(r, 0));
 }
 
 // Cableado: se carga en la web, la app y la caché; Ajustes lo muestra; el ranking lo respeta.
-assert.match(read("index.html"), /<script src="edad\.js"><\/script>/);
-assert.match(read("scripts/build.mjs"), /"edad\.js"/);
-assert.match(read("service-worker-258.js"), /"\.\/edad\.js"/);
-assert.match(read("settings.js"), /Edad\?\.resumen/);
-assert.match(read("accounts.js"), /function askRanking\(\) \{[\s\S]{0,300}CT\.Edad && !CT\.Edad\.permiteOnline\(\)\) return;/, "no se pregunta por el ranking a un menor sin permiso");
-assert.match(read("accounts.js"), /async function setRanking\(value\) \{\n {2}if \(value === true && CT\.Edad && !CT\.Edad\.permiteOnline\(\)\)/, "ni se le deja activarlo");
+assert.match(read("index.html"), /<script src="js\/jugador\/edad\.js"><\/script>/);
+assert.match(read("service-worker-258.js"), /"\.\/js\/jugador\/edad\.js"/);
+assert.match(read("js/interfaz/settings.js"), /Edad\?\.resumen/);
+assert.match(read("js/nube/accounts.js"), /function askRanking\(\) \{[\s\S]{0,300}CT\.Edad && !CT\.Edad\.permiteOnline\(\)\) return;/, "no se pregunta por el ranking a un menor sin permiso");
+assert.match(read("js/nube/accounts.js"), /async function setRanking\(value\) \{\n {2}if \(value === true && CT\.Edad && !CT\.Edad\.permiteOnline\(\)\)/, "ni se le deja activarlo");
 console.log("Edad: pregunta única, permiso de los padres, solo sin conexión sin permiso y cambio desde Ajustes: OK");

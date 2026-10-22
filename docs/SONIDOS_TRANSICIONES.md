@@ -5,37 +5,37 @@ Los sonidos de acción usan texturas suaves de papel y madera. Se activan con
 
 | Acción | Respuesta | Punto de conexión |
 | --- | --- | --- |
-| Avanzar o volver entre pantallas, con botón o gesto | Roce de hoja tenue, filtrado y con entrada/salida gradual; velocidad distinta al volver | `a11y.js`: `paint` (transición `page` / `back`) |
-| Desenrollar colección, perfil o guía | Roce de pergamino más largo | `a11y.js`: `unrollSheet` |
-| Desplegar o plegar formatos, solitario y mazos de enciclopedia | Papel breve | `app.js`, `effects.js`: activación de `summary` |
-| Abrir/cerrar ajustes, guía, ilustraciones, QR, menús y confirmaciones | Papel y toque tenue al abrir; papel al cerrar | `a11y.js`: `openDialog`, `closeDialog` |
-| Elegir una carta o una posición | Madera ligera / colocación sobre papel | `a11y.js`: diferencias entre repintados |
-| Levantar una carta con dedo o ratón | Toque ligero y vibración opcional | `drag.js`: `startDrag` |
-| Rozar un nuevo hueco durante el arrastre | Toque muy tenue, limitado a uno cada 180 ms | `drag.js`: cambio de destino |
-| Soltar en un hueco o devolver a la mano | Colocación / roce de retorno | `drag.js`: `onPointerUp` |
-| Cancelar la posición elegida | Roce de retorno | `a11y.js`: desaparición de la confirmación |
-| Girar una carta para leerla | Papel corto y rápido | `a11y.js`: `toggleFlip` |
-| Recibir la siguiente carta o cartas automáticas | Papel y apoyo suave | `a11y.js`: `paint`, `dealIn` |
-| Cambio de turno, Pulso o ronda | Dos golpes suaves | `a11y.js`, `online.js`: aviso de turno |
-| Revelar cifras de la final | Giro de papel | `a11y.js`: entrada de `.final-results` |
-| Final de partida o competición | Tres toques amortiguados | `a11y.js`: pantallas de fin |
-| Zoom y cambios de preferencias | Toque muy suave, solo al cambiar el valor | `mapa.js`, `settings.js` |
+| Avanzar o volver entre pantallas, con botón o gesto | Roce de hoja tenue, filtrado y con entrada/salida gradual; velocidad distinta al volver | `js/interfaz/a11y.js`: `paint` (transición `page` / `back`) |
+| Desenrollar colección, perfil o guía | Roce de pergamino más largo | `js/interfaz/a11y.js`: `unrollSheet` |
+| Desplegar o plegar formatos, solitario y mazos de enciclopedia | Papel breve | `js/juego/app.js`, `js/interfaz/effects.js`: activación de `summary` |
+| Abrir/cerrar ajustes, guía, ilustraciones, QR, menús y confirmaciones | Papel y toque tenue al abrir; papel al cerrar | `js/interfaz/a11y.js`: `openDialog`, `closeDialog` |
+| Elegir una carta o una posición | Madera ligera / colocación sobre papel | `js/interfaz/a11y.js`: diferencias entre repintados |
+| Levantar una carta con dedo o ratón | Toque ligero y vibración opcional | `js/interfaz/drag.js`: `startDrag` |
+| Rozar un nuevo hueco durante el arrastre | Toque muy tenue, limitado a uno cada 180 ms | `js/interfaz/drag.js`: cambio de destino |
+| Soltar en un hueco o devolver a la mano | Colocación / roce de retorno | `js/interfaz/drag.js`: `onPointerUp` |
+| Cancelar la posición elegida | Roce de retorno | `js/interfaz/a11y.js`: desaparición de la confirmación |
+| Girar una carta para leerla | Papel corto y rápido | `js/interfaz/a11y.js`: `toggleFlip` |
+| Recibir la siguiente carta o cartas automáticas | Papel y apoyo suave | `js/interfaz/a11y.js`: `paint`, `dealIn` |
+| Cambio de turno, Pulso o ronda | Dos golpes suaves | `js/interfaz/a11y.js`, `js/online/online.js`: aviso de turno |
+| Revelar cifras de la final | Giro de papel | `js/interfaz/a11y.js`: entrada de `.final-results` |
+| Final de partida o competición | Tres toques amortiguados | `js/interfaz/a11y.js`: pantallas de fin |
+| Zoom y cambios de preferencias | Toque muy suave, solo al cambiar el valor | `js/interfaz/mapa.js`, `js/interfaz/settings.js` |
 | Aviso nuevo en el juego, sala o ajustes | Toque discreto | Funciones `showToast` |
-| Acierto o fallo | Respuestas distintas de madera y papel | `effects.js`: `feedback` |
-| Tu jugada en salas online, por Wi-Fi y duelos por turnos (también al defender un Pulso) | Acierto o fallo, con vibración | `online.js`, `local-multiplayer.js`, `duelo-turnos.js`, `quick-challenges.js` |
-| Te toca en una sala o duelo, y al pasar el móvil en Retos rápidos | Dos golpes suaves y vibración media | `online.js`, `local-multiplayer.js`, `duelo-turnos.js`, `quick-challenges.js` |
-| Fin de partida en todos los modos (también duelo de cifras, Wi-Fi, duelos por turnos y Retos rápidos) | Tres toques y vibración media | `a11y.js` (pantallas de fin), `duelo-turnos.js`, `quick-challenges.js` |
-| Entrar en una final numérica o un desempate | Dos golpes suaves | `a11y.js`: `final-local`, `online-final`, `online-tiebreak`, `local-final-secreta` |
-| Lámina o carta nueva en la colección (todas las mesas y Retos rápidos) | Arpegio de lámina y vibración de éxito | `effects.js`: `discovery` |
-| Logro desbloqueado (también al acabar solitario, duelos, competición, online y reto diario rápido) | Acorde de logro y vibración de éxito | `effects.js`: `achievement` |
-| Tres últimos segundos y tiempo agotado (también salas online, Wi-Fi y duelos por enlace) | Tic por segundo con toque ligero; nota grave con aviso al agotarse | `effects.js`: `clock` |
-| Activar Fantasma, lanzar un Pulso o recibir una carta de poder | Brillo que sube y vibración media | `effects.js`: `power` |
-| Plantarse en Retos rápidos | Tres notas de madera que suben y vibración media | `effects.js`: `bank` |
-| Resultado de quién empieza | Dos golpes suaves y vibración media, una vez por sorteo | `effects.js`: `starterResult` |
-| Botón de volver (flecha de la cabecera, «Volver», gesto de deslizar) | Siempre el mismo toque grave de madera, el de Atlas; solo suena en estos botones | `sonidos.js`: `atras` |
-| Cualquier botón del menú al avanzar | Toque de madera que sube un escalón de la escala cada vez (dos octavas); volver baja uno e Inicio la devuelve al grave (no se reinicia con el tiempo) | `sonidos.js`: `sube`, `pagina` |
-| Cualquier otro botón, enlace o pestaña sin sonido propio | Toque de madera de menú, 90 ms después si nada más ha sonado | `sonidos.js`: toque genérico |
-| Portada del mazo en Retos rápidos y elegir modo en solitario | Toque de madera | `quick-challenges.js` |
+| Acierto o fallo | Respuestas distintas de madera y papel | `js/interfaz/effects.js`: `feedback` |
+| Tu jugada en salas online, por Wi-Fi y duelos por turnos (también al defender un Pulso) | Acierto o fallo, con vibración | `js/online/online.js`, `js/sin-conexion/local-multiplayer.js`, `js/online/duelo-turnos.js`, `js/retos/quick-challenges.js` |
+| Te toca en una sala o duelo, y al pasar el móvil en Retos rápidos | Dos golpes suaves y vibración media | `js/online/online.js`, `js/sin-conexion/local-multiplayer.js`, `js/online/duelo-turnos.js`, `js/retos/quick-challenges.js` |
+| Fin de partida en todos los modos (también duelo de cifras, Wi-Fi, duelos por turnos y Retos rápidos) | Tres toques y vibración media | `js/interfaz/a11y.js` (pantallas de fin), `js/online/duelo-turnos.js`, `js/retos/quick-challenges.js` |
+| Entrar en una final numérica o un desempate | Dos golpes suaves | `js/interfaz/a11y.js`: `final-local`, `online-final`, `online-tiebreak`, `local-final-secreta` |
+| Lámina o carta nueva en la colección (todas las mesas y Retos rápidos) | Arpegio de lámina y vibración de éxito | `js/interfaz/effects.js`: `discovery` |
+| Logro desbloqueado (también al acabar solitario, duelos, competición, online y reto diario rápido) | Acorde de logro y vibración de éxito | `js/interfaz/effects.js`: `achievement` |
+| Tres últimos segundos y tiempo agotado (también salas online, Wi-Fi y duelos por enlace) | Tic por segundo con toque ligero; nota grave con aviso al agotarse | `js/interfaz/effects.js`: `clock` |
+| Activar Fantasma, lanzar un Pulso o recibir una carta de poder | Brillo que sube y vibración media | `js/interfaz/effects.js`: `power` |
+| Plantarse en Retos rápidos | Tres notas de madera que suben y vibración media | `js/interfaz/effects.js`: `bank` |
+| Resultado de quién empieza | Dos golpes suaves y vibración media, una vez por sorteo | `js/interfaz/effects.js`: `starterResult` |
+| Botón de volver (flecha de la cabecera, «Volver», gesto de deslizar) | Siempre el mismo toque grave de madera, el de Atlas; solo suena en estos botones | `js/interfaz/sonidos.js`: `atras` |
+| Cualquier botón del menú al avanzar | Toque de madera que sube un escalón de la escala cada vez (dos octavas); volver baja uno e Inicio la devuelve al grave (no se reinicia con el tiempo) | `js/interfaz/sonidos.js`: `sube`, `pagina` |
+| Cualquier otro botón, enlace o pestaña sin sonido propio | Toque de madera de menú, 90 ms después si nada más ha sonado | `js/interfaz/sonidos.js`: toque genérico |
+| Portada del mazo en Retos rápidos y elegir modo en solitario | Toque de madera | `js/retos/quick-challenges.js` |
 
 ## Repeticiones y prioridad
 

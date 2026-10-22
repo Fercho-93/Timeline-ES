@@ -5,7 +5,7 @@ import './conexion-nativa.mjs';
 import './confirmacion-extremos.mjs';
 const CT = {shuffle: cards => [...cards].reverse()};
 const context = vm.createContext({window:{CONTINUUM:CT},location:{origin:'https://local.test',pathname:'/'},URL,URLSearchParams,crypto});
-for(const file of ['engine.js','links.js']) vm.runInContext(fs.readFileSync(new URL('../'+file,import.meta.url),'utf8'),context);
+for(const file of ['js/juego/engine.js','js/online/links.js']) vm.runInContext(fs.readFileSync(new URL('../'+file,import.meta.url),'utf8'),context);
 const plain = x => JSON.parse(JSON.stringify(x));
 assert.deepEqual(plain(CT.Engine.draw([1,2],[3])),{cardId:1,deck:[2],discard:[3]});
 assert.deepEqual(plain(CT.Engine.draw([],[3,4])),{cardId:4,deck:[3],discard:[]});

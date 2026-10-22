@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import '../engine.js';
+import '../js/juego/engine.js';
 const E=globalThis.ContinuumEngine;
 const value=id=>id;
 const freeze=o=>{if(o&&typeof o==='object'){Object.values(o).forEach(freeze);Object.freeze(o);}return o;};

@@ -8,13 +8,13 @@ const read = file => fs.readFile(new URL(`../${file}`, import.meta.url), 'utf8')
 const escape = text => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const block = text => `<pre style="white-space:pre-wrap;font-size:.8rem;line-height:1.45">${escape(text.trim())}</pre>`;
 
-const apache = await read('LICENSE-JSQR.txt');
-const qrcode = await read('LICENSE-QRCODE-GENERATOR.txt');
+const apache = await read('vendor/qr/LICENSE-JSQR.txt');
+const qrcode = await read('vendor/qr/LICENSE-QRCODE-GENERATOR.txt');
 const capacitor = await read('node_modules/@capacitor/core/LICENSE');
 
 const html = `<!doctype html>
 <!-- Generada por scripts/licencias.mjs: no editar a mano. -->
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>Licencias · Continuum</title><link rel="stylesheet" href="styles.css"></head>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>Licencias · Continuum</title><link rel="stylesheet" href="css/styles.css"></head>
 <body><main class="shell rules"><h1>Licencias de terceros</h1>
 <p>Continuum incluye piezas de software de otros autores. Sus licencias permiten usarlas y distribuirlas siempre que se acompañe este aviso. El resto del juego (código, diseño y arte) pertenece a su autor y no se ofrece bajo estas licencias.</p>
 <h2>Componentes</h2>

@@ -1,12 +1,12 @@
 // Competición por turnos: varios temas al azar en un mismo duelo por turnos. Se juega una
-// partida entera de dos temas entre dos jugadores con el código real de duelo-turnos.js y
+// partida entera de dos temas entre dos jugadores con el código real de js/online/duelo-turnos.js y
 // se comprueba lo que exigen las reglas de Firestore, que no cambian: el documento lleva
 // los mismos campos de siempre, la línea guardada solo crece una carta por acierto y nunca
 // se vacía al pasar de tema.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
-const source = fs.readFileSync('duelo-turnos.js', 'utf8').replace(/^import .*;\r?\n/gm, '');
+const source = fs.readFileSync('js/online/duelo-turnos.js', 'utf8').replace(/^import .*;\r?\n/gm, '');
 const dom = new JSDOM('<main id="app"></main><div id="toast"></div>', { url: 'https://continuum.test/', runScripts: 'outside-only' });
 const w = dom.window;
 w.scrollTo = () => {};
@@ -32,7 +32,7 @@ w.CONTINUUM = {
   // Reparto fijo: el orden del mazo tal cual, tantas cartas como pida el tema más la de salida.
   Duelo: { CARTAS: 15, reparto: (mode, _seed, total) => decks[mode].slice(0, total + 1).map(c => c.id), crearSemilla: () => 'semilla', Cifras: { CARTAS: 10 } }
 };
-w.eval(fs.readFileSync('links.js', 'utf8'));
+w.eval(fs.readFileSync('js/online/links.js', 'utf8'));
 const created = [];
 w.__deps = {
   auth: { get currentUser() { return { uid: me }; } }, db: {}, doc: (_, ...args) => args.at(-1),

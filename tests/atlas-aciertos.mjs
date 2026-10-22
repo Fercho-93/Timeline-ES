@@ -67,7 +67,7 @@ assert.equal(w.document.querySelector('.enc-card-modal .year'), null);
 
  // Recuperar duelos antiguos exige un acierto real, no puntos parciales.
 P.reset();
-w.eval('const auth = {currentUser: {uid: "atlas-owner"}};\n' + read('duelo-turnos.js').replace(/^import .*;\r?\n/gm, '') + '\nwindow.recoverAtlasPlays = discoverOwnPlays;');
+w.eval('const auth = {currentUser: {uid: "atlas-owner"}};\n' + read('js/online/duelo-turnos.js').replace(/^import .*;\r?\n/gm, '') + '\nwindow.recoverAtlasPlays = discoverOwnPlays;');
 w.recoverAtlasPlays({mode:'history',kind:'orden',plays:[
   {uid:'other',cardId:a.id,correct:true},
   {uid:'atlas-owner',cardId:b.id,correct:false},

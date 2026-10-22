@@ -19,7 +19,7 @@ const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'ut
 const html = gameHtml(read('index.html'));
 {
   const portada = new JSDOM(html).window.document;
-  const css = read('splash.css');
+  const css = read('css/splash.css');
   assert.equal(portada.querySelectorAll('.splash-float-card').length, 3, 'la portada compone tres cartas que pueden moverse por separado');
   assert.ok([...portada.querySelectorAll('.splash-float-card img')].every(img => img.getAttribute('src')?.startsWith('assets/')), 'las cartas flotantes reutilizan láminas propias del juego');
   assert.match(css, /@keyframes splash-card-drift/, 'las cartas tienen un vaivén independiente');
@@ -115,7 +115,7 @@ function splashClock(reduce = false, caja = 'abierta') {
   w.setTimeout = (callback, delay = 0) => { timers.set(++id, {callback, at:time + delay}); return id; };
   w.clearTimeout = id => timers.delete(id);
   Object.defineProperty(w.document, 'readyState', {value:'complete'});
-  w.eval(read('splash.js'));
+  w.eval(read('js/arranque/splash.js'));
   const advance = ms => {
     const end = time + ms;
     for (;;) {
@@ -219,13 +219,13 @@ for (const reduce of [false, true]) {
   }
 }
 {
-  const arranque = read('boot.js');
+  const arranque = read('js/arranque/boot.js');
   assert.match(arranque, /CONTINUUM_SPLASH\?\.gate\(\)/, 'el arranque espera al botón');
   assert.ok(arranque.indexOf('gate()') < arranque.indexOf('startAccounts('), 'y lo espera antes de montar la cuenta');
   assert.doesNotMatch(arranque, /Ambience/, 'y ya no enciende música con ese toque');
-  // Sin internet no hay invitado que preparar (accounts.js no llega a importarse), pero
+  // Sin internet no hay invitado que preparar (js/nube/accounts.js no llega a importarse), pero
   // el resto del juego —incluido el modo sin conexión— no necesita ninguno: entra
-  // igualmente en vez de enseñar el aviso de "necesitas internet". accounts.js ya
+  // igualmente en vez de enseñar el aviso de "necesitas internet". js/nube/accounts.js ya
   // resuelve por su cuenta cualquier fallo de red dentro de `enter()`, así que si el
   // error llega hasta aquí solo puede ser que el propio módulo no se haya descargado
   // — no hace falta (ni conviene: navigator.onLine no es de fiar en Android) distinguir
@@ -367,7 +367,7 @@ console.log('Vista Android compacta: detección independiente y ampliación del 
       assert.equal(w.document.querySelectorAll('#ajuste-tema optgroup').length, 0, 'dos opciones directas, sin grupos vacíos');
     } finally { w.close(); }
   }
-  const estilos = read('edition.css') + read('styles.css');
+  const estilos = read('css/edition.css') + read('css/styles.css');
   for (const theme of ASPECTOS.filter(t => t !== 'light')) {
     assert.ok(estilos.includes(`[data-theme="${theme}"]`), `el aspecto ${theme} tiene paleta en la hoja de estilo`);
   }
@@ -408,7 +408,7 @@ console.log('Vista Android compacta: detección independiente y ampliación del 
 }
 console.log('Temas: selección Claro/Oscuro, barra del navegador y migración de preferencias: OK');
 // El atajo al inicio es el único botón de la barra que es un dibujo y no una palabra, así
-// que necesita su propia caja. Se le escapó una vez: el tamaño estaba puesto en styles.css
+// que necesita su propia caja. Se le escapó una vez: el tamaño estaba puesto en css/styles.css
 // y lo pisaba la barra agrupada del móvil, que aprieta todos sus botones y les quita el
 // ancho mínimo. Esto fija las dos cosas a la vez —que ese aprieto sigue existiendo y que
 // el del atajo le gana—, porque comprobar solo la caja dejaría pasar el mismo fallo.

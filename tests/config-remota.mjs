@@ -1,4 +1,4 @@
-// Cartel remoto (app-config.js): pide actualizar a una versión antigua, pausa el online sin tocar el modo sin
+// Cartel remoto (js/nube/app-config.js): pide actualizar a una versión antigua, pausa el online sin tocar el modo sin
 // conexión, y ante cualquier fallo de lectura deja el juego como está. Firebase se simula; se ejecuta el archivo real.
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -6,17 +6,16 @@ import { JSDOM } from "jsdom";
 
 const read = name => fs.readFileSync(new URL(`../${name}`, import.meta.url), "utf8");
 
-// El módulo está cableado: se carga desde app.js, index.html, el build móvil y la precarga del service worker.
-assert.match(read("app.js"), /import\('\.\/app-config\.js'\)/, "app.js debe cargar app-config.js");
-assert.match(read("app.js"), /appConfigReady\.then\(module => module\?\.start\?\.\(\)\)/, "app.js debe arrancar el cartel remoto");
-assert.match(read("index.html"), /src="app-config\.js"/, "index.html debe listar app-config.js");
-assert.match(read("scripts/build.mjs"), /"app-config\.js"/, "el build móvil debe copiar app-config.js");
-assert.match(read("service-worker-258.js"), /"\.\/app-config\.js"/, "el service worker debe precargar app-config.js");
+// El módulo está cableado: se carga desde js/juego/app.js, index.html, el build móvil y la precarga del service worker.
+assert.match(read("js/juego/app.js"), /import\('\.\.\/nube\/app-config\.js'\)/, "js/juego/app.js debe cargar js/nube/app-config.js");
+assert.match(read("js/juego/app.js"), /appConfigReady\.then\(module => module\?\.start\?\.\(\)\)/, "js/juego/app.js debe arrancar el cartel remoto");
+assert.match(read("index.html"), /src="js\/nube\/app-config\.js"/, "index.html debe listar js/nube/app-config.js");
+assert.match(read("service-worker-258.js"), /"\.\/js\/nube\/app-config\.js"/, "el service worker debe precargar js/nube/app-config.js");
 
-const fuente = read("app-config.js")
+const fuente = read("js/nube/app-config.js")
   .replace(/^import \{ auth, db \} from '\.\/firebase-client\.js';$/m, "const { auth, db } = globalThis.__fake;")
-  .replace(/^import \{[^}]*\} from '\.\/vendor\/firebase\/[^']*';$/m, "const { doc, getDocFromServer, disableNetwork, enableNetwork } = globalThis.__fake;");
-assert.ok(!/^import /m.test(fuente), "el test debe poder sustituir todos los import de app-config.js");
+  .replace(/^import \{[^}]*\} from '(?:\.\.\/)+vendor\/firebase\/[^']*';$/m, "const { doc, getDocFromServer, disableNetwork, enableNetwork } = globalThis.__fake;");
+assert.ok(!/^import /m.test(fuente), "el test debe poder sustituir todos los import de js/nube/app-config.js");
 
 let n = 0;
 async function cargar({ version = "continuum-v100", native = false, config, fallo = false, sinSesion = false }) {
@@ -115,7 +114,7 @@ async function cargar({ version = "continuum-v100", native = false, config, fall
   assert.deepEqual(anonimo.llamadas, []);
 }
 
-// Menor sin permiso (edad.js): ni se lee el cartel ni se conecta; se retira del ranking antes de cortar.
+// Menor sin permiso (js/jugador/edad.js): ni se lee el cartel ni se conecta; se retira del ranking antes de cortar.
 {
   const menor = await cargar({ config: undefined });
   const retiradas = [];
@@ -136,6 +135,6 @@ async function cargar({ version = "continuum-v100", native = false, config, fall
   assert.equal((await menor.modulo.check()).mode, "ok");
   assert.ok(menor.llamadas.includes("enableNetwork") && menor.llamadas.includes("get appConfig/current"));
 }
-assert.match(read("app-config.js"), /await CT\.Edad\?\.preguntar\?\.\(\);[\s\S]*await check\(\);/, "la edad se pregunta antes del primer chequeo");
+assert.match(read("js/nube/app-config.js"), /await CT\.Edad\?\.preguntar\?\.\(\);[\s\S]*await check\(\);/, "la edad se pregunta antes del primer chequeo");
 
 console.log("Cartel remoto: actualizar, pausar el online, levantar la pausa, menores sin permiso y no hacer nada ante fallos: OK");

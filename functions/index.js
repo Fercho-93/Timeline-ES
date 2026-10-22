@@ -15,7 +15,7 @@ const { deleteAccount } = require('./account-purge');
 const { purgeCollection } = require('./purge');
 
 // En Madrid, junto a la base de datos: los datos no salen de España para procesarse y los avisos
-// de Firestore no cruzan de región. El juego llama a `deleteMyAccount` aquí (accounts.js, FUNCTIONS_REGIONS).
+// de Firestore no cruzan de región. El juego llama a `deleteMyAccount` aquí (js/nube/accounts.js, FUNCTIONS_REGIONS).
 // Las tareas programadas van en Bélgica (SCHEDULED_REGION): Cloud Scheduler no existe en Madrid.
 setGlobalOptions({ region: 'europe-southwest1' });
 const SCHEDULED_REGION = 'europe-west1';

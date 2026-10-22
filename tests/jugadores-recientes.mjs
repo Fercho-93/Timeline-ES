@@ -23,7 +23,7 @@ function recent(storage = new Map()) {
     setItem: (key, value) => { storage.set(key, String(value)); return true; },
     removeItem: key => storage.delete(key)
   } };
-  w.eval(read("recent-players.js"));
+  w.eval(read("js/jugador/recent-players.js"));
   return { w, api: w.CONTINUUM.RecentPlayers };
 }
 

@@ -4,7 +4,7 @@ import fs from "node:fs";
 import vm from "node:vm";
 
 const window = {};
-vm.runInNewContext(fs.readFileSync("idiomas.js", "utf8"), { window });
+vm.runInNewContext(fs.readFileSync("mazos/idiomas.js", "utf8"), { window });
 
 const cards = window.LANGUAGE_CARDS;
 assert.equal(cards.length, 50, "El mazo de idiomas debe conservar sus 50 cartas");
@@ -38,7 +38,7 @@ for (const card of cards) {
 const files = fs.readdirSync("assets/language-cards").filter(file => file.endsWith(".webp")).sort();
 assert.deepEqual(files, Array.from(cards, card => `${card.id}.webp`).sort(), "No debe haber láminas huérfanas ni faltar cartas");
 
-const modes = fs.readFileSync("modes.js", "utf8");
+const modes = fs.readFileSync("js/juego/modes.js", "utf8");
 assert.match(modes, /LANGUAGE_ART_BY_ID[\s\S]*window\.LANGUAGE_CARDS/, "Falta el enlace por ID del mazo");
 assert.match(modes, /sourceMode === "languages"\) return LANGUAGE_ART_BY_ID\[card\.id\]/, "cardArt no resuelve Idiomas");
 assert.match(modes, /sourceMode === "languages" \? "language-cards"/, "animalArt no apunta a la carpeta de Idiomas");

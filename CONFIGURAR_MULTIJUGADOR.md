@@ -3,7 +3,7 @@
 El juego online usa el proyecto de Firebase `timeline-es` (el identificador conserva el nombre
 antiguo; ver «Nombre del proyecto» más abajo): Authentication para el invitado y la cuenta de
 Apple, Firestore para salas, duelos, mesas, progreso y ranking, Cloud Functions para avisos y
-limpieza, y App Check. La configuración pública está en `firebase-client.js` y `deployment.js`.
+limpieza, y App Check. La configuración pública está en `js/nube/firebase-client.js` y `js/nube/deployment.js`.
 El mapa de colecciones está en [docs/MODELO_DE_DATOS.md](docs/MODELO_DE_DATOS.md).
 
 ## Despliegue
@@ -25,8 +25,8 @@ HTML, recursos) tiene que subir a la vez la versión en tres sitios, o el servic
 sirviendo la anterior:
 
 - `service-worker-258.js`: `const CACHE = "continuum-vNNN";`
-- `updates.js`: `CT.APP_VERSION = "continuum-vNNN";`
-- `index.html`: `edition.css?v=NNN`
+- `js/arranque/updates.js`: `CT.APP_VERSION = "continuum-vNNN";`
+- `index.html`: `css/edition.css?v=NNN`
 
 Las reglas para hacerlo sin pisar a otras sesiones están en `CLAUDE.md`. Ajustes → «Versión y
 conexión» enseña la versión que tiene guardada cada móvil, que es la forma rápida de comprobar

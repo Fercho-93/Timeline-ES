@@ -81,7 +81,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `confirmacion-extremos.mjs` | test | El botón de confirmar se ve y recibe el foco en los dos extremos de la línea. |
 | `cuentas-reglas.mjs` | reglas | Invitados, aislamiento, nombres, revisiones, privacidad del ranking y borrado. |
 | `cuentas.mjs` | test | Alta automática, reentrada, fallo de red, cambio de nombre, ranking, aislamiento y conflictos. |
-| `despliegue.mjs` | test | `deployment.js`: qué plataformas tienen App Check; pasar `audience` a «public» no cierra las salas del iPhone. |
+| `despliegue.mjs` | test | `js/nube/deployment.js`: qué plataformas tienen App Check; pasar `audience` a «public» no cierra las salas del iPhone. |
 | `diagnostico.mjs` | test | Un error sin capturar enseña un aviso con versión, pantalla y mazo en vez de una pantalla en blanco. |
 | `duelo-layout.mjs` | navegador | Maquetación de los duelos por turnos en móvil y escritorio, sin desbordamiento. |
 | `duelo-policy.cjs` | test (y `functions.yml`) | Recordatorios a las 48 h, uno por turno, caducidad a los 7 días y textos de los avisos. |
@@ -99,7 +99,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `entrada-por-enlace.mjs` | reglas | La primera instantánea al entrar por enlace llega de la caché y no se confunde con una expulsión. |
 | `entry-board-browser.mjs` | navegador | Recorre las puertas del inicio hasta la mesa jugable o la sala de espera. |
 | `estabilizacion.mjs` | test | Competición guardada, versiones de guardado, almacenamiento lleno y actualizaciones en partida. |
-| `fantasma-online.mjs` | reglas | `online.js` real con dos clientes: Fantasma y Pulso contra las reglas, y escrituras tramposas rechazadas. |
+| `fantasma-online.mjs` | reglas | `js/online/online.js` real con dos clientes: Fantasma y Pulso contra las reglas, y escrituras tramposas rechazadas. |
 | `fantasma.mjs` | test | 90.000 repartos deterministas del Fantasma, su uso, duración y dificultades del solitario. |
 | `final-helper.mjs` | (auxiliar) | Ayuda compartida para terminar una final numérica local en otras pruebas. |
 | `final-reglas.mjs` | reglas | Final privada: respuestas secretas, recibos atómicos, inmutabilidad y nueve finalistas. |
@@ -132,7 +132,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `nombres-salas.mjs` | test | Los nombres escritos al crear o unirse a una sala pasan por el mismo filtro de nombres que el perfil. |
 | `online-e2e-harness.mjs` | (auxiliar) | Arnés de `online-e2e.mjs`: la app real en Chromium contra los emuladores. |
 | `online-e2e.mjs` | `test:online-e2e` | «Jugar online» con varias personas a la vez: mesas, sala de espera, salida y relevo. |
-| `orden-salida-online.mjs` | reglas | Minijuego de quién empieza y relevo del anfitrión en mesas públicas, con `online.js` real. |
+| `orden-salida-online.mjs` | reglas | Minijuego de quién empieza y relevo del anfitrión en mesas públicas, con `js/online/online.js` real. |
 | `partida-local.mjs` | test | Partidas completas de un solo móvil sobre el DOM real. |
 | `partidas-al-azar.mjs` | test | Partidas reproducibles en cuatro mazos: sin bloqueos y sin cartas creadas ni perdidas. |
 | `presencia-reglas.mjs` | reglas | Presencia privada, reloj del servidor y relevo tras inactividad. |
@@ -169,18 +169,18 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `scroll-estable.mjs` | test | La entrada animada de una colección (`unrollCollection`) libera sus capas al terminar o al interrumpirse y, con movimiento reducido, no anima ni oculta el contenido. |
 | `service-worker.mjs` | test | Qué versión ve el móvil: caché por versión, refresco y precarga de todo lo que pide `index.html`. |
 | `sesion-local.mjs` | test | La sesión que une sala y transporte Wi-Fi, sin WebRTC real. |
-| `sintaxis.mjs` | test | Que todos los archivos del juego parsean; la única red que cubre `online.js`. |
+| `sintaxis.mjs` | test | Que todos los archivos del juego parsean; la única red que cubre `js/online/online.js`. |
 | `solitario.mjs` | test | Solitario, reto diario, confirmación al colocar y llegada animada de las cartas automáticas. |
 | `sorteo-online-reglas.mjs` | reglas | El sorteo de quién empieza en las salas online contra las reglas. |
 | `tablet-browser.mjs` | navegador | Tabletas en un navegador real: dos columnas con medidas reales en horizontal, mesa a escala en vertical y en móvil. |
-| `tablet.mjs` | test | `tablet.css` y cuándo la mesa deja de escalarse como un iPhone (móvil, tableta vertical y tableta horizontal). |
+| `tablet.mjs` | test | `css/tablet.css` y cuándo la mesa deja de escalarse como un iPhone (móvil, tableta vertical y tableta horizontal). |
 | `tiempo.mjs` | test | Tiempo por carta (sin tiempo, 15, 20 o 30 s) en todas las configuraciones; al agotarse, fallo. |
 | `tournament.mjs` | test | Competición por rondas desde un solo móvil y sus ajustes. |
 | `transitions-browser.mjs` | navegador | Transiciones en Chromium móvil, con y sin movimiento reducido. |
 | `transporte-local.mjs` | test | Señal WebRTC compacta para el QR y mensajes del canal. |
 | `turn-duel-layout-browser.mjs` | navegador | Maquetación de un turno activo de duelo. |
 | `valores-repetidos.mjs` | test | Un reparto no lleva dos cartas con el mismo valor, y con semilla es reproducible. |
-| `version-cache.mjs` | test | La versión de caché coincide en el service worker, `updates.js` y los `?v=` de `index.html` (`npm run version:bump` los sube a la vez). |
+| `version-cache.mjs` | test | La versión de caché coincide en el service worker, `js/arranque/updates.js` y los `?v=` de `index.html` (`npm run version:bump` los sube a la vez). |
 | `wow.mjs` | test | Pantalla final del Atlas: abanico, logros nuevos y movimiento reducido. |
 | `zoom-browser.mjs` | navegador | El zoom de la mesa en un navegador real: las imágenes no se encogen. |
 | `zoom.mjs` | test | Zoom simulado: escala, desplazamiento, límites y conservación del DOM. |
@@ -199,7 +199,7 @@ debe aparecer. Ninguna prueba de reglas toca Firebase de producción.
 
 `entrada-por-enlace.mjs` fija el comportamiento del SDK del que depende `connectToRoom()`: al
 entrar por una invitación, la primera instantánea de `onSnapshot` llega de la caché y todavía no
-incluye a quien acaba de entrar. Comprueba el SDK y la condición, no `online.js`, que no se puede
+incluye a quien acaba de entrar. Comprueba el SDK y la condición, no `js/online/online.js`, que no se puede
 importar desde Node porque carga el SDK de Firebase como módulo de navegador (`vendor/firebase/`).
 
 `service-worker.mjs` ejecuta el archivo real con un entorno de service worker simulado: se

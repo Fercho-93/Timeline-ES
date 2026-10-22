@@ -435,7 +435,7 @@
 :is(#app, #app-splash) .tv-card.is-hidden .tv-back { display: block; }
 :is(#app, #app-splash) .tv-card.is-hidden .tv-art { display: none; }
 :is(#app, #app-splash) .tv-big .tv-back { max-height: 128px; }
-:is(#app, #app-splash) .tv-minihand i { background: url('assets/continuum-emblem-800.webp') center / 90% auto no-repeat, var(--tv-cardback); }
+:is(#app, #app-splash) .tv-minihand i { background: url('../assets/continuum-emblem-800.webp') center / 90% auto no-repeat, var(--tv-cardback); }
 @media (max-width: 360px) {
   :is(#app, #app-splash) .tv-way { padding-right: 56px; }
   :is(#app, #app-splash) .tv-way > .tv-menu-art { width: 50px; }

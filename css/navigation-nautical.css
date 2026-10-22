@@ -12,7 +12,7 @@ html #app[data-screen][data-screen] .home-nav.atlas-nav {
   gap: 0; margin: 0; padding: 5px max(11px, env(safe-area-inset-right)) calc(5px + env(safe-area-inset-bottom)) max(11px, env(safe-area-inset-left)); overflow: visible;
   border: 0; border-top: 1px solid var(--nav-brass); border-radius: 0;
   background-color: var(--nav-paper); opacity: 1;
-  background: url("assets/navigation-filigree.svg") center / 100% 100% no-repeat,
+  background: url("../assets/navigation-filigree.svg") center / 100% 100% no-repeat,
     radial-gradient(ellipse at 40% 0%, #fff9edb3, transparent 65%),
     repeating-linear-gradient(15deg, #a17a3c04 0 1px, transparent 1px 4px),
     linear-gradient(145deg, var(--nav-paper), var(--nav-paper-shade)) var(--nav-paper);
@@ -48,7 +48,7 @@ html #app[data-screen][data-screen] .home-nav.atlas-nav button::after { content:
 html #app[data-screen][data-screen] .home-nav.atlas-nav button + button::before {
   content: ""; position: absolute; left: 0; top: 5px; bottom: 5px; width: 7px;
   transform: translateX(-50%); pointer-events: none;
-  background: url("assets/navigation-divider.svg") center / 7px 100% no-repeat;
+  background: url("../assets/navigation-divider.svg") center / 7px 100% no-repeat;
 }
 html #app[data-screen][data-screen] .home-nav.atlas-nav button span,
 html #app[data-screen][data-screen] .home-nav.atlas-nav button:nth-child(n) span {
@@ -85,7 +85,7 @@ html #app[data-screen][data-screen] :is(.enc-modal, .settings-modal, .rules):has
 :root[data-theme="dark"] #app[data-screen][data-screen] .home-nav.atlas-nav {
   --nav-paper: #33362d; --nav-paper-shade: #252d28; --nav-ink: #dfceb0;
   --nav-brass: #c4a365; --nav-hairline: #c4a36555; --nav-active: #ddc38e;
-  background: url("assets/navigation-filigree.svg") center / 100% 100% no-repeat, radial-gradient(ellipse at 40% 0%, #e4c48112, transparent 65%), linear-gradient(145deg, var(--nav-paper), var(--nav-paper-shade)) var(--nav-paper);
+  background: url("../assets/navigation-filigree.svg") center / 100% 100% no-repeat, radial-gradient(ellipse at 40% 0%, #e4c48112, transparent 65%), linear-gradient(145deg, var(--nav-paper), var(--nav-paper-shade)) var(--nav-paper);
   box-shadow: inset 0 1px 0 #fff2, 0 8px 22px #0006, 0 2px 3px #0003;
 }
 :root[data-theme="dark"] #app[data-screen][data-screen] .home-nav.atlas-nav button svg { filter: none; }

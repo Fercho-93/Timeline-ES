@@ -28,7 +28,7 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
   try {
     const titulo = w.document.querySelector('.home-masthead:not(.splash-masthead) .home-wordmark');
     assert.equal(titulo?.textContent.trim(), 'Continuum', 'el título principal sigue siendo texto legible');
-    const css = read('styles.css');
+    const css = read('css/styles.css');
     assert.match(css, /\.home-masthead:not\(\.splash-masthead\) \.home-wordmark\s*\{[^}]*max-width:\s*100%/s,
       'el relieve se limita a Inicio y conserva el encaje en móvil');
     assert.match(css, /\.home-masthead:not\(\.splash-masthead\) \.home-wordmark\s*\{[^}]*color:\s*var\(--ink\)[^}]*text-shadow:[^}]*var\(--paper\)[^}]*var\(--accent-dark\)/s,
@@ -79,7 +79,7 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
     w.eval(`(() => {
       const initializeApp=()=>({}),getAuth=()=>({}),getFirestore=()=>({}),firebaseApp={},auth={},db={};
       const deleteDoc=async()=>{},disableNetwork=async()=>{},enableNetwork=async()=>{},doc=()=>({}),getDoc=async()=>({exists:()=>false,data:()=>null}),onSnapshot=()=>()=>{},runTransaction=async()=>{},serverTimestamp=()=>null,setDoc=async()=>{},writeBatch=()=>({set(){},update(){},delete(){},commit:async()=>{}});
-      ${read('online.js').replace(/^import .*;$/gm,'').replace('export async function','async function')}
+      ${read('js/online/online.js').replace(/^import .*;$/gm,'').replace('export async function','async function')}
       const ids=CT.cards('animals').map(c=>c.id);
       user={uid:'fer'};selectedModeKey='animals';roomCode='ABCD2345';roomRef={};
       roomState={mode:'animals',status:'playing',phase:'turn',players:{fer:{name:'Fer',hand:ids.slice(1,5)},ana:{name:'Ana',hand:ids.slice(5,9)}},playerOrder:['fer','ana'],current:0,hostUid:'ana',timeline:[ids[0]],deck:ids.slice(9),discard:[],round:1,turnsInRound:0,turnSeconds:0,version:1};
@@ -121,11 +121,11 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
 // llega a ser sesenta veces por segundo. Poner esas variables en la portada obligaba al
 // navegador a recalcular el estilo de todo lo que cuelga de ella —fondo, dibujo, rótulo,
 // índice, lámina— y no solo el de la capa que se mueve. Ahora van declaradas sin herencia
-// (@property en edition.css) y se escriben capa por capa, que es lo que lo evita. Las dos
+// (@property en css/edition.css) y se escriben capa por capa, que es lo que lo evita. Las dos
 // mitades tienen que ir juntas: con la declaración sin la escritura en las capas, el
 // efecto se apagaría en silencio.
 {
-  const css = read('edition.css');
+  const css = read('css/edition.css');
   for (const [nombre, tipo] of [['--depth-x','<length>'],['--depth-y','<length>'],['--scene-scroll','<length>'],['--cover-rx','<angle>'],['--cover-ry','<angle>']]) {
     const regla = new RegExp(`@property ${nombre} \\{[^}]*syntax: '${tipo}'[^}]*inherits: false`);
     assert.ok(regla.test(css), `${nombre} se declara como ${tipo} y sin heredarse`);

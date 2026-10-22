@@ -4,8 +4,8 @@ import vm from 'node:vm';
 
 // Ejecuta las funciones reales; solo Firebase y los efectos de pantalla se simulan.
 // Ninguna prueba crea salas de producción.
-const source = fs.readFileSync(new URL('../online.js', import.meta.url), 'utf8');
-const links = fs.readFileSync(new URL('../links.js', import.meta.url), 'utf8');
+const source = fs.readFileSync(new URL('../js/online/online.js', import.meta.url), 'utf8');
+const links = fs.readFileSync(new URL('../js/online/links.js', import.meta.url), 'utf8');
 const helpers = source.slice(source.indexOf('function invitationUrl('), source.indexOf('function rememberRoom('));
 const operations = source.slice(source.indexOf('async function createRoom('), source.indexOf('function connectToRoom('));
 const code = 'ABCD2345';

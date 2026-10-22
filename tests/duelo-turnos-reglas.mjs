@@ -11,7 +11,7 @@ const creator = env.authenticatedContext('creator', claims).firestore();
 const guest = env.authenticatedContext('guest', claims).firestore();
 const outsider = env.authenticatedContext('outsider', claims).firestore();
 const publicDb = env.unauthenticatedContext().firestore();
-// Un duelo nuevo se crea junto con su registro de cuota, como en duelo-turnos.js. Antes se
+// Un duelo nuevo se crea junto con su registro de cuota, como en js/online/duelo-turnos.js. Antes se
 // borra la cuota anterior: las pruebas crean duelos seguidos sin esperar los 10 s.
 const uidOf = new Map([[creator, 'creator'], [guest, 'guest'], [outsider, 'outsider']]);
 const libre = uid => env.withSecurityRulesDisabled(c => deleteDoc(doc(c.firestore(), 'creationQuota', uid)));

@@ -9,7 +9,7 @@ html.splash-active #app-splash {
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-  background: #e9dcc3 url("assets/continuum-splash-blue-v5.webp") center / cover no-repeat;
+  background: #e9dcc3 url("../assets/continuum-splash-blue-v5.webp") center / cover no-repeat;
   opacity: 1;
   isolation: isolate;
   transition: opacity 420ms cubic-bezier(.22,.61,.36,1);
@@ -207,15 +207,15 @@ html.splash-active #app-splash .splash-masthead {
 #app-splash .splash-backdrop { z-index: -2; background: inherit; }
 /* Reutiliza la ilustración con una máscara en sus mismas coordenadas. La capa
    acompaña el acercamiento inicial; solo las nubes derivan después, sin mover el globo. */
-@supports ((mask-image: url("assets/splash-clouds-mask.svg")) or (-webkit-mask-image: url("assets/splash-clouds-mask.svg"))) {
+@supports ((mask-image: url("../assets/splash-clouds-mask.svg")) or (-webkit-mask-image: url("../assets/splash-clouds-mask.svg"))) {
   #app-splash .splash-backdrop::after {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
     background: inherit;
-    -webkit-mask: url("assets/splash-clouds-mask.svg") var(--splash-cloud-position, center) / cover no-repeat;
-    mask: url("assets/splash-clouds-mask.svg") var(--splash-cloud-position, center) / cover no-repeat;
+    -webkit-mask: url("../assets/splash-clouds-mask.svg") var(--splash-cloud-position, center) / cover no-repeat;
+    mask: url("../assets/splash-clouds-mask.svg") var(--splash-cloud-position, center) / cover no-repeat;
     transform-origin: center bottom;
   }
 }
@@ -284,8 +284,8 @@ html.splash-active #app-splash .splash-masthead {
     position: absolute;
     inset: 0;
     display: block;
-    -webkit-mask: url("assets/continuum-emblem-800.webp") center / contain no-repeat;
-    mask: url("assets/continuum-emblem-800.webp") center / contain no-repeat;
+    -webkit-mask: url("../assets/continuum-emblem-800.webp") center / contain no-repeat;
+    mask: url("../assets/continuum-emblem-800.webp") center / contain no-repeat;
     background: linear-gradient(105deg, transparent 36%, #fff3c800 38%, #fff3c8b3 50%, #fff3c800 62%, transparent 64%) no-repeat;
     background-size: 250% 100%;
     mix-blend-mode: screen;

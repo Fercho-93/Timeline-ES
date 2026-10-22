@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import {JSDOM} from 'jsdom';
 
 const read = name => fs.readFileSync(new URL(`../${name}`, import.meta.url), 'utf8');
-const css = read('edition.css');
+const css = read('css/edition.css');
 const rule = css.match(/:is\(\.hand-card, \.timeline-card, \.slot-confirm-card, \.drag-card-preview\)[^{]+\{([^}]+)\}/)?.[1];
 assert.ok(rule, 'las cartas comparten la regla de palabras completas');
 for (const property of ['overflow-wrap: normal', 'word-break: normal', '-webkit-hyphens: none', 'hyphens: none']) {
@@ -20,8 +20,8 @@ try {
   window.requestAnimationFrame = callback => {frames.set(++next, callback); return next;};
   window.cancelAnimationFrame = id => frames.delete(id);
   const flush = () => {const pending = [...frames.values()]; frames.clear(); pending.forEach(callback => callback());};
-  window.eval(read('mesa-escala.js'));
-  window.eval(read('immersion.js'));
+  window.eval(read('js/interfaz/mesa-escala.js'));
+  window.eval(read('js/interfaz/immersion.js'));
   const app = window.document.querySelector('#app');
   for (const screen of ['game', 'local-game', 'online-game', 'quick-game']) {
     app.dataset.screen = screen;
