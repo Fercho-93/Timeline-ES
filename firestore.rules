@@ -77,13 +77,19 @@ service cloud.firestore {
       }
       // Dejar una mesa pública antes de empezar. Si se va quien la llevaba, la lleva quien
       // queda primero (la única vez que cambia `host`).
+      // La lista sin la posición k. `members` y `names` van en paralelo: quien se va se lleva solo su plaza y su
+      // nombre, y todo lo demás queda igual y en el mismo orden (si no, quien se va elegiría al nuevo anfitrión
+      // y reescribiría los nombres de los que se quedan). Una sala admite como máximo 8 personas.
+      function without(l,k) { return k == 0 ? l[1:l.size()] : k == l.size() - 1 ? l[0:k] : l[0:k].concat(l[k+1:l.size()]); }
+      function dropAt(a,b,k) { return a.members.size() > k && b.members == without(a.members,k) && b.names == without(a.names,k); }
+      function leftAt(a,b,k) { return a.members.size() > k && a.members[k] == request.auth.uid && dropAt(a,b,k); }
       function leaving(a,b) {
         return a.get('matchmaking','private') == 'public' && a.phase == 'lobby' && b.phase == 'lobby'
           && request.auth.uid in a.members && !(request.auth.uid in b.members)
           && b.diff(a).affectedKeys().hasOnly(['members','names','host','actor','starter','revision','updatedAt'])
           && b.members.size() == a.members.size() - 1 && b.members.size() >= 1
-          && b.members.toSet() == a.members.toSet().difference([request.auth.uid].toSet())
-          && b.names.size() == b.members.size() && b.host == b.members[0] && b.actor == b.host;
+          && (leftAt(a,b,0) || leftAt(a,b,1) || leftAt(a,b,2) || leftAt(a,b,3) || leftAt(a,b,4) || leftAt(a,b,5) || leftAt(a,b,6) || leftAt(a,b,7))
+          && b.host == b.members[0] && b.actor == b.host;
       }
       // Echar a alguien de la sala de espera: solo quien la lleva, en una sala privada y antes de empezar. Sale una
       // persona que no es quien la lleva (que sigue siendo la primera de la lista) y nada más cambia salvo su respuesta
@@ -93,8 +99,7 @@ service cloud.firestore {
           && request.auth.uid == a.host && a.members.size() >= 2
           && b.diff(a).affectedKeys().hasOnly(['members','names','starter','revision','updatedAt'])
           && b.members.size() == a.members.size() - 1 && b.members[0] == a.host
-          && b.members.toSet().difference(a.members.toSet()).size() == 0
-          && b.names.size() == b.members.size();
+          && (dropAt(a,b,1) || dropAt(a,b,2) || dropAt(a,b,3) || dropAt(a,b,4) || dropAt(a,b,5) || dropAt(a,b,6) || dropAt(a,b,7));
       }
       // Quién empieza: quien lleva la sala sortea una carta (y repetirlo borra las respuestas) y cada
       // persona responde una vez, solo con su propia cifra.
@@ -312,6 +317,8 @@ service cloud.firestore {
             && !blocked(request.auth.uid, r.playersOrder[0])
             && (!('invitedUid' in r) || invited())
             && request.time < r.updatedAt + duration.value(7, 'd')
+            && d.updatedAt == request.time
+            && (d.get('resultText', null) == null || (d.resultText is string && d.resultText.size() <= 160))
             && d.playersOrder.size() == 2
             && d.playersOrder[0] == r.playersOrder[0]
             && d.playersOrder[1] == request.auth.uid
@@ -335,6 +342,8 @@ service cloud.firestore {
             && d.playersOrder == r.playersOrder
             && d.players == r.players
             && request.time < r.updatedAt + duration.value(7, 'd')
+            && d.updatedAt == request.time
+            && (d.get('resultText', null) == null || (d.resultText is string && d.resultText.size() <= 160))
             && d.turnIndex == 1 && d.plays.size() == 1
             && p.uid == me && p.cardId is int
             && d.scores.diff(r.scores).affectedKeys().hasOnly([me])
@@ -358,6 +367,8 @@ service cloud.firestore {
             && d.players == r.players
             && d.plays.removeAll([p]) == r.plays
             && request.time < r.updatedAt + duration.value(7, 'd')
+            && d.updatedAt == request.time
+            && (d.get('resultText', null) == null || (d.resultText is string && d.resultText.size() <= 160))
             && d.turnIndex == i + 1
             && d.plays.size() == r.plays.size() + 1
             && p.uid == me

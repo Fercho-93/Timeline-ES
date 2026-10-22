@@ -181,12 +181,24 @@ try {
     await assertFails(updateDoc(doc(guest, 'turnDuels', firstId), first('guest')));
     await assertFails(updateDoc(doc(creator, 'turnDuels', firstId), first('creator', { turnIndex: 2 })));
     await assertFails(updateDoc(doc(creator, 'turnDuels', firstId), first('creator', { scores: { creator: 5 } })));
+    // TRAMPA: la fecha de la última jugada la pone el servidor. Si la pusiera el cliente, un duelo con fecha futura no
+    // caducaría ni se borraría nunca (30 días de conservación), y con fecha pasada nacería caducado para el rival.
+    await assertFails(updateDoc(doc(creator, 'turnDuels', firstId), first('creator', { updatedAt: Timestamp.fromMillis(Date.now() + 365 * 86400000) })));
+    await assertFails(updateDoc(doc(creator, 'turnDuels', firstId), first('creator', { updatedAt: Timestamp.fromMillis(0) })));
+    await assertFails(updateDoc(doc(creator, 'turnDuels', firstId), first('creator', { resultText: 'x'.repeat(500) })));
     await assertSucceeds(updateDoc(doc(creator, 'turnDuels', firstId), first('creator')));
     await assertFails(updateDoc(doc(creator, 'turnDuels', firstId), { ...first('creator'), plays: [...[{ uid: 'creator', cardId: 2, index: 0, correct: false }, { uid: 'creator', cardId: 3, index: 0, correct: false }]], turnIndex: 2 }));
     const join = (turnUid, extra = {}) => ({ playersOrder: ['creator', 'guest'], players: { creator: { alias: 'Ana' }, guest: { alias: 'Bea' } }, scores: { creator: 0, guest: 0 }, status: 'playing', turnUid, updatedAt: serverTimestamp(), ...extra });
     await assertFails(updateDoc(doc(guest, 'turnDuels', firstId), join('creator')));
     await assertFails(updateDoc(doc(guest, 'turnDuels', firstId), join('guest', { plays: [] })));
+    await assertFails(updateDoc(doc(guest, 'turnDuels', firstId), join('guest', { updatedAt: Timestamp.fromMillis(Date.now() + 365 * 86400000) })));
     await assertSucceeds(updateDoc(doc(guest, 'turnDuels', firstId), join('guest')));
+    for (const trampa of [{ updatedAt: Timestamp.fromMillis(Date.now() + 365 * 86400000) }, { updatedAt: Timestamp.fromMillis(0) }, { resultText: 'x'.repeat(500) }]) {
+      await assertFails(runTransaction(guest, async transaction => {
+        const ref = doc(guest, 'turnDuels', firstId), game = (await transaction.get(ref)).data();
+        transaction.update(ref, { plays: [...game.plays, { uid: 'guest', cardId: 3, index: 1, correct: true, at: Timestamp.now() }], timeline: [1, 3], scores: { ...game.scores, guest: 1 }, turnIndex: 2, turnUid: 'creator', status: 'playing', updatedAt: serverTimestamp(), resultText: null, ...trampa });
+      }));
+    }
     await assertSucceeds(runTransaction(guest, async transaction => {
       const ref = doc(guest, 'turnDuels', firstId), game = (await transaction.get(ref)).data();
       transaction.update(ref, { plays: [...game.plays, { uid: 'guest', cardId: 3, index: 1, correct: true, at: Timestamp.now() }], timeline: [1, 3], scores: { ...game.scores, guest: 1 }, turnIndex: 2, turnUid: 'creator', status: 'playing', updatedAt: serverTimestamp(), resultText: null });

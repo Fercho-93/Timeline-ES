@@ -171,6 +171,31 @@ try {
   assert.equal(sinAna.host,'guest');
   await assertFails(write(guest,{...sinAna,host:'host'}));
   await assertSucceeds(write(host,sinAna));
+  // TRAMPA: al irse, solo se lleva su plaza y su nombre. Ni elige quién lleva la mesa, ni cambia el orden de
+  // los demás, ni reescribe sus nombres (por ejemplo, para hacerse pasar por «Soporte»).
+  await env.clearFirestore();
+  {
+    let tres=R.create('host','Ana',4);tres.matchmaking='public';
+    tres=R.reduce(tres,'guest',{type:'join',name:'Bea'});
+    tres=R.reduce(tres,'outsider',{type:'join',name:'Cid'});
+    const guardar=()=>env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'quickRooms','ABCDEFGH23'),{...JSON.parse(JSON.stringify(tres)),catalog:1,updatedAt:new Date()}));
+    await guardar();
+    // Se va Bea (en medio): el orden de los que quedan no se toca.
+    const sinBea=R.reduce(tres,'guest',{type:'leave'});
+    assert.equal(JSON.stringify(sinBea.members),'["host","outsider"]');
+    await assertFails(write(guest,{...sinBea,names:['Ana','Soporte']}));
+    await assertFails(write(guest,{...sinBea,names:['Cid','Ana'],members:['outsider','host'],host:'outsider',actor:'outsider'}));
+    await assertFails(write(guest,{...sinBea,members:['host','guest'],names:['Ana','Bea']}));
+    await assertSucceeds(write(guest,sinBea));
+    // Se va quien lleva la mesa: la lleva quien queda primero, no quien él quiera.
+    await guardar();
+    const sinAna3=R.reduce(tres,'host',{type:'leave'});
+    assert.equal(sinAna3.host,'guest');
+    await assertFails(write(host,{...sinAna3,members:['outsider','guest'],names:['Cid','Bea'],host:'outsider',actor:'outsider'}));
+    await assertFails(write(host,{...sinAna3,names:['Bea','Soporte']}));
+    await assertFails(write(host,{...sinAna3,names:['Cid','Bea']}));
+    await assertSucceeds(write(host,sinAna3));
+  }
   // Expulsar de la sala de espera: solo quien la lleva, en una sala privada y antes de empezar.
   await env.clearFirestore();
   {
@@ -191,6 +216,9 @@ try {
     await assertFails(write(host,{...sinBea,members:['host'],names:['Ana'],starter:{...sinBea.starter,guesses:{}}}));
     // Nadie entra por la puerta de atrás mientras se echa a otro, y no cambia nada más de la sala.
     await assertFails(write(host,{...sinBea,members:['host','intruso'],names:['Ana','Intruso']}));
+    // Se echa a Bea, pero los nombres de los demás no se reescriben ni se descolocan.
+    await assertFails(write(host,{...sinBea,names:['Ana','Soporte']}));
+    await assertFails(write(host,{...sinBea,members:['host','guest'],names:['Ana','Cid']}));
     await assertFails(write(host,{...sinBea,capacity:3}));
     await assertFails(write(host,{...sinBea,matchmaking:'public'}));
     await assertSucceeds(write(host,sinBea));
