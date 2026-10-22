@@ -55,3 +55,41 @@ try {
   console.log('ok  acierto, fallo, salto, reconexión y espectadores tienen avisos coherentes');
 } finally { w.close(); }
 assert.match(source, /autoCreate[\s\S]*?createRoom\(profileName\)/, "desde «Crear partida» la sala se crea con el nombre del perfil, sin pedirlo otra vez");
+
+// Mesa pública: se reparten las cartas iniciales que eligió quien la abrió, no siempre 4.
+// Se ejecuta el `online.js` real (sin Firebase) sobre la página del juego.
+{
+  const { gameHtml } = await import("./game-fixture.mjs");
+  const read = file => fs.readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
+  const html = gameHtml(read("index.html"));
+  const scripts = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map(match => match[1]);
+  const win = new JSDOM(html.replace(/<script src="[^"]+"><\/script>/g, ""), { runScripts: "outside-only", url: "https://continuum.test", pretendToBeVisual: true }).window;
+  try {
+    win.scrollTo = () => {};
+    win.Element.prototype.scrollIntoView = () => {};
+    win.matchMedia = () => ({ matches: true });
+    scripts.forEach(file => win.eval(read(file)));
+    const online = read("online.js").replace(/^import .*;$/gm, "").replace("export async function", "async function");
+    win.eval(`(() => {
+      const db = {}, doc = (...parts) => parts.slice(1).join('/'), serverTimestamp = () => 0;
+      const getDoc = async () => ({ exists: () => false, data: () => undefined }), setDoc = async () => {};
+      const onSnapshot = () => () => {}, deleteDoc = async () => {}, writeBatch = () => ({ set() {}, async commit() {} });
+      const disableNetwork = async () => {}, enableNetwork = async () => {};
+      const runTransaction = async (_db, work) => work({ get: async () => ({ exists: () => true, data: () => window.salaPublica }), update: (_ref, cambios) => { window.reparto = cambios; } });
+      ${online}
+      window.salaPublica = { roomCode: 'PABCDEFG', matchmaking: 'public', mode: 'history', deckFingerprint: CT.deckFingerprint('history'),
+        status: 'lobby', phase: 'lobby', version: 3, capacity: 2, handSize: 6, turnSeconds: 15, hostUid: 'yo', playerOrder: ['yo', 'ana'],
+        players: { yo: { name: 'Yo', hand: [], clientVersion: CLIENT_VERSION }, ana: { name: 'Ana', hand: [], clientVersion: CLIENT_VERSION } } };
+      user = { uid: 'yo' }; roomCode = 'PABCDEFG'; roomRef = {}; roomState = JSON.parse(JSON.stringify(window.salaPublica));
+      renderPublicLobby();
+      window.empezarMesa = () => startRoom();
+    })()`);
+    assert.equal(win.document.getElementById("online-hand-size").value, "6", "la sala de espera pública guarda las cartas iniciales de la mesa");
+    assert.match(win.document.querySelector(".public-lobby-head").textContent, /6 cartas iniciales/);
+    await win.empezarMesa();
+    assert.ok(win.reparto, "la mesa pública empieza");
+    assert.equal(win.reparto.handSize, 6, "la mesa pública reparte las cartas que eligió quien la abrió");
+    for (const uid of ["yo", "ana"]) assert.equal(win.reparto.players[uid].hand.length, 6);
+    console.log("ok  la mesa pública reparte las cartas iniciales que eligió quien la abrió");
+  } finally { win.close(); }
+}
