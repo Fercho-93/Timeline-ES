@@ -1,8 +1,7 @@
-/* Sistema editorial: papel cálido, tinta carbón y terracota para las decisiones.
-   Los colores tienen una función: la tinta manda la navegación, el terracota invita a
-   actuar, el verde confirma aciertos y el petróleo se reserva para Ciencia y online.
-   `--*-solid` se reserva para fondos con texto claro y conserva el contraste en ambos
-   temas. */
+/* Sistema editorial: los colores tienen una función. La tinta manda la navegación, el
+   terracota invita a actuar y el verde confirma aciertos. La paleta está en el :root del
+   pergamino («gabinete de un cronista», más abajo) y en su versión oscura; `--*-solid` se
+   reserva para fondos con texto claro y conserva el contraste en ambos temas. */
 /* Medidas de la pantalla en variables: fuera de la partida son las del móvil real; dentro,
    la mesa las fija a las de un iPhone Pro y se escala entera (mesa-escala.js), así se ve
    igual en cualquier móvil y en el ordenador. */

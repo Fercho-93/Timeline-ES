@@ -1,3 +1,41 @@
+/* edition.css · la piel de la interfaz sobre styles.css.
+   Se escribió por capas: cada bloque retoca lo anterior y el orden importa (con la misma
+   especificidad gana la regla posterior), así que no se mueven reglas de un bloque a otro.
+   Cada bloque empieza con una cabecera «══ N · … ══»; para ir a uno, busca «══ N ·».
+    1 · Variables de la edición, escenas por mazo y fondo
+    2 · Piel común sobre styles.css: barra superior, inicio, botones, diálogos y barra inferior sencilla
+    3 · Menús y colecciones: galería, archivo de libros, carta única, enciclopedia y Android estrecho
+    4 · Mesa del atlas (#app.atlas-board): cabecera, profundidad, medida de la mesa y mazos cerrados
+    5 · Jugar en solitario: reto diario, duelo por enlace, carta en la mano y resultado
+    6 · Competición, colecciones con dioramas y mesa de explorador
+    7 · Enciclopedia, Ajustes, resultado, competición y sala de espera
+    8 · Colecciones como lámina editorial
+    9 · Barra de navegación arqueada (la redefine navigation-nautical.css) y movimiento común
+   10 · Pestañas: Atlas, Enciclopedia, Guía y Ajustes
+   11 · Portada de tres puertas, presentación del reto diario e identidad
+   12 · Portada en láminas
+   13 · Lista de duelos y ruleta del reto diario
+   14 · Mesa: carta por jugar, marcador multijugador y partida compacta
+   15 · Portada encuadernada y lámina de fondo común (html::before)
+   16 · Retratos, selector de avatares y paneles de Jugar solo y Retar a un amigo
+   17 · Reverso común, mano en abanico y ficha de la carta
+   18 · Atlas personal (lo completa atlas-voyage.css)
+   19 · Mesa al alto útil (data-board-fit), duelo por turnos y retos rápidos
+   20 · Barra de navegación en cuatro fichas (la redefine navigation-nautical.css)
+   21 · Camino de mazos de una colección
+   22 · Mesa de juego unificada: zoom, marcador, cabecera, Gran mezcla, modo oscuro y salida
+   23 · Pergamino en selección y configuración, «pasa el móvil», Atlas, Guía y ranking
+   24 · Colecciones ligeras y pantallas estrechas
+   25 · Materia y vida: texturas, polvo, vista previa, escenario y animaciones de la mesa
+   26 · Pastillas, tiempo por carta, vidas, dificultad, bienvenida y hub de Jugar solo
+   27 · Preparación ilustrada, Retos rápidos en solitario, pista de colocación y deslizar para volver
+   28 · Partida guardada, mazos del desplegable, cabeceras y selector de tiempo único
+   29 · Contraste de noche (modo oscuro)
+   Detrás de esta hoja cargan (index.html) y la retocan: accounts, quick-challenges,
+   home-modes-v1, atlas-voyage (Atlas), guide-journal (Guía), tutorial, navigation-nautical
+   (la barra inferior que se ve), mesa-escala y tablet. */
+
+/* ══ 1 · Variables de la edición, escenas por mazo y fondo ══ */
 /* La edición de la interfaz. Sus variables son independientes de las cartas:
    no sustituir --paper, --surface, --ink ni las tintas de los mazos. */
 :root {
@@ -38,6 +76,8 @@ html body::before {
   background: radial-gradient(circle at 96% 10%, transparent 0 179px, var(--edition-line) 180px, transparent 181px 215px, var(--edition-line) 216px, transparent 217px 320px, var(--edition-line) 321px, transparent 322px);
 }
 :root[data-theme="dark"] body { background: radial-gradient(ellipse at 80% 0%, color-mix(in srgb, var(--scene-wash) 12%, transparent), transparent 55%), var(--edition-paper); }
+
+/* ══ 2 · Piel común sobre styles.css: barra superior, inicio, botones, diálogos y barra inferior sencilla ══ */
 .shell { position: relative; }
 .home-shell { max-width: 1160px; padding-inline: clamp(18px, calc(4 * var(--vw)), 48px); padding-bottom: calc(112px + var(--safe-bottom)); }
 .topbar { color: var(--edition-ink); border-color: var(--edition-line); }
@@ -168,7 +208,9 @@ html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-s
   .quick-actions { margin-bottom: 28px; }
 }
 @media (max-width: 359px) { .home-shell .gallery { grid-template-columns: minmax(0, 1fr); } }
-/* Presentación de menús para la prueba móvil de septiembre. */
+
+/* ══ 3 · Menús y colecciones: galería, archivo de libros, carta única, enciclopedia y Android estrecho ══ */
+/* Cabecera centrada en las pantallas de menús de la galería. */
 #app .home-gallery-shell .topbar { justify-content: center; align-items: center; }
 #app .home-gallery-shell .topbar-actions { display: flex; justify-content: center; width: auto; padding: 0; border: 0; background: transparent; }
 #app .home-gallery-shell .topbar-actions::after { content: none; }
@@ -315,6 +357,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 @keyframes edition-line { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @media (min-width: 960px) { .splash-hitos { grid-column: 2; margin: 10px 0 0; } }
 
+/* ══ 4 · Mesa del atlas (#app.atlas-board): cabecera, profundidad, medida de la mesa y mazos cerrados ══ */
 /* Atlas: navegación común, arte integrado y mesa compacta. */
 :root { --atlas-selection: #9b452b; }
 :root[data-theme="dark"] { --atlas-selection: #f2aa83; }
@@ -621,6 +664,8 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .solo-fold-body > p { font: .84rem/1.45 var(--ui-font); margin: 8px 0 14px; }
 #app .solo-fold-body .hint { font-size: .76rem; margin: 10px 0; }
 #app .solo-fold-body .field { margin-bottom: 12px; }
+
+/* ══ 5 · Jugar en solitario: reto diario, duelo por enlace, carta en la mano y resultado ══ */
 /* ——— Jugar en solitario: reto diario y duelo por enlace ———
    Todo se apoya en el latón del tema y en superficies con filete fino, como las fichas
    de la enciclopedia: nada de placas macizas, que eran lo que hacía pesada la pantalla. */
@@ -771,6 +816,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 .drag-card-preview > .hidden-date { position: relative; font-size: .65rem; }
 #app.atlas-board .slot.drop-target { border-radius: 12px; }
 
+/* ══ 6 · Competición, colecciones con dioramas y mesa de explorador ══ */
 /* Competición: una lámina de atlas al final de las colecciones. */
 @media (max-width: 699px) {
   #app[data-screen="competition-menu"] .setup-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; padding: 14px; margin-bottom: 14px; }
@@ -1046,6 +1092,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   .slot-correct.correction-target { animation: none; }
 }
 
+/* ══ 7 · Enciclopedia, Ajustes, resultado, competición y sala de espera ══ */
 /* Enciclopedia como álbum: primero las láminas, después la herramienta de consulta. */
 #app .enc-modal { background: var(--edition-paper); }
 #app .enc-modal > .atlas-dialog-back {
@@ -1299,6 +1346,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   .table-seat > span { width: 38px; height: 38px; }
 }
 
+/* ══ 8 · Colecciones como lámina editorial ══ */
 /* Colecciones como lámina editorial: pergamino claro, marcos de latón y navegación
    tallada. Esta capa final conserva la estructura y las imágenes reales del juego. */
 #app[data-screen="home"] {
@@ -1473,8 +1521,9 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   text-shadow: 0 2px 4px #0f0907;
 }
 
-/* La navegación no vive dentro de una caja: una base baja y arqueada une los cinco
-   botones, dejando que la silueta superior acompañe sus curvas. */
+/* ══ 9 · Barra de navegación arqueada (la redefine navigation-nautical.css) y movimiento común ══ */
+/* Barra de navegación arqueada, versión anterior a navigation-nautical.css: aquella hoja
+   carga después y redefine casi todo; aquí queda lo que todavía no pisa. */
 html #app .home-nav.atlas-nav {
   color: #3e3028;
 }
@@ -1613,6 +1662,7 @@ html #app .home-nav.atlas-nav::before {
   #app .motion-managed, #app .motion-managed * { animation: none !important; transition: none !important; }
 }
 
+/* ══ 10 · Pestañas: Atlas, Enciclopedia, Guía y Ajustes ══ */
 /* Pestañas del atlas: una anchura de lectura compartida y secciones jerarquizadas. */
 #app > .overlay > :is(.enc-modal, .settings-modal, .rules) {
   padding-inline: max(20px, calc((100% - 1040px) / 2));
@@ -1740,6 +1790,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .enc-toolbar-compact .band-chip { min-height: 44px; font-size: .75rem; }
 #app .enc-toolbar-compact .enc-locks { flex-wrap: wrap; }
 
+/* ══ 11 · Portada de tres puertas, presentación del reto diario e identidad ══ */
 /* La portada: tres puertas —el reto del día, jugar y el atlas— con la misma lámina en
    sepia que la competición. El aviso de duelos solo aparece cuando hay algo pendiente. */
 #app .home-doors { display: grid; max-width: 720px; margin: 0 auto; }
@@ -1835,6 +1886,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .table-seat > span.seat-avatar, #app .manage-player > span.seat-avatar { padding: 0; color: inherit; }
 #app .seat-avatar svg { width: 100%; height: 100%; }
 
+/* ══ 12 · Portada en láminas ══ */
 /* Portada Continuum: cada acceso es una lámina completa con el foco de lectura a la izquierda. */
 #app .home-doors { gap: 12px; }
 #app .home-door,
@@ -2121,6 +2173,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   #app .home-doors-shell .home-door-art img { transition: none; }
 }
 
+/* ══ 13 · Lista de duelos y ruleta del reto diario ══ */
 /* Lista de duelos: cada fila dice contra quién, de qué mazo, a quién le toca, por qué
    carta vais y el marcador. Toda la fila entra en el duelo. */
 #app .turn-duel-profile-row { grid-template-columns: minmax(0, 1fr); gap: 6px; margin-bottom: 12px; }
@@ -2452,7 +2505,8 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .turn-duel-avatar:has(svg.avatar) { border: 0; background: transparent; overflow: visible; }
 #app .turn-duel-avatar svg.avatar { width: 100%; height: 100%; }
 
-/* v344 · La carta por jugar ocupa el centro y la línea queda como destino inferior. */
+/* ══ 14 · Mesa: carta por jugar, marcador multijugador y partida compacta ══ */
+/* La carta por jugar ocupa el centro y la línea queda como destino inferior. */
 #app.atlas-board .board-question { width: min(100%, 430px); margin: 3px auto 5px; text-align: center; }
 #app.atlas-board .board-question h2 { margin: 0 0 3px; color: var(--edition-ink); font: 700 clamp(1.2rem, calc(5.3 * var(--vw)), 1.65rem)/1.05 var(--font-display); letter-spacing: -.025em; }
 #app.atlas-board .board-axis { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border: 1px solid color-mix(in srgb, var(--edition-brass) 42%, transparent); border-radius: 999px; color: var(--edition-muted); background: color-mix(in srgb, var(--edition-surface) 58%, transparent); font: 650 .62rem/1 var(--ui-font); letter-spacing: .09em; text-transform: uppercase; }
@@ -2581,7 +2635,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   }
 }
 
-/* v349 · Espacios propios para la mano, los controles y las láminas. */
+/* Espacios propios para la mano, los controles y las láminas. */
 #app.atlas-board .atlas-hand-section {
   padding-block: 6px 12px;
 }
@@ -2695,6 +2749,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   }
 }
 
+/* ══ 15 · Portada encuadernada y lámina de fondo común (html::before) ══ */
 /* Portada como una serie de láminas encuadernadas: papel, tinta y latón. */
 #app[data-screen="home"] .home-door { --door-paper: #f5eddb; --door-ink: #3e3329; --door-edge: #a98b59; }
 #app[data-screen="home"] .home-door[data-action="jugar"] { --door-paper: #f1eadc; --door-ink: #3e382d; --door-edge: #8e8060; }
@@ -2957,6 +3012,7 @@ html:not(:has(#app[data-screen="home"]))::before {
   background: linear-gradient(#f3e3c8b3, #f2e1c494 60%, #f0dcbc4d), #e9dcc3 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
 }
 
+/* ══ 16 · Retratos, selector de avatares y paneles de Jugar solo y Retar a un amigo ══ */
 /* Retratos ilustrados: el círculo, la moldura y la sombra pertenecen al juego.
    El recorte evita que se vea una miniatura cuadrada sobre el papel de la pantalla. */
 #app .avatar-art,
@@ -3112,6 +3168,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 :root[data-theme="dark"] #app .solo-home .solo-panel .duel-brief > p { color: #eadbc2; }
 :root[data-theme="dark"] #app .solo-home .solo-panel .duel-brief > .duel-rule { color: #cdb99a; }
 
+/* ══ 17 · Reverso común, mano en abanico y ficha de la carta ══ */
 /* El reverso común lleva el emblema real de Continuum. La mano se lee por encima
    de la línea: una carta activa grande, las demás en un abanico limpio y compacto. */
 #app .hand-card, .drag-card-preview {
@@ -3330,6 +3387,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 }
 :root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board[data-platform][data-device][data-screen] .hand.hand-fan .hand-card > strong { font-size: 1rem; }
 
+/* ══ 18 · Atlas personal (lo completa atlas-voyage.css) ══ */
 /* Atlas personal: carta de navegación, estaciones y cuadernos del recorrido. */
 #app[data-screen="perfil"] .perfil-section { margin-inline: auto; }
 #app[data-screen="perfil"] .atlas-page-heading { margin-bottom: 8px; text-align: center; }
@@ -3436,6 +3494,7 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app[data-screen="perfil"] .atlas-chart-heading small { font-size: .84rem; }
 }
 
+/* ══ 19 · Mesa al alto útil (data-board-fit), duelo por turnos y retos rápidos ══ */
 /* Mientras immersion.js mide la mesa (en el mismo fotograma, sin pintarse), las cartas que
    entran volando en la mano cuentan en su sitio: una regla !important manda sobre la animación. */
 #app.mesa-midiendo .hand .hand-card { translate: none !important; rotate: none !important; }
@@ -3758,8 +3817,9 @@ html:not(:has(#app[data-screen="home"]))::before {
 #app.atlas-board .quick-shell .game-head .turn-label { margin: 0; }
 #app.atlas-board .quick-shell .timeline-ends { display: flex; justify-content: space-between; gap: 8px; margin: 0 2px 2px; color: #8a3f2f; font: 700 .68rem/1.2 var(--font-display); letter-spacing: .06em; text-transform: uppercase; }
 
-/* Navegación como cuatro fichas de atlas: pergamino mate, inclinación leve y una
-   elevación contenida para indicar el destino actual sin añadir otra caja brillante. */
+/* ══ 20 · Barra de navegación en cuatro fichas (la redefine navigation-nautical.css) ══ */
+/* Barra en cuatro fichas de atlas, también anterior a navigation-nautical.css: de ella
+   solo quedan aquí las piezas que aquella hoja no redefine. */
 html #app .home-nav.atlas-nav {
   align-items: end;
 }
@@ -3800,6 +3860,7 @@ html #app .home-nav.atlas-nav button[aria-current="page"] small {
 #app.atlas-board[data-platform][data-device][data-screen] .quick-shell .hand.hand-fan .hand-card > strong { font-size: .68rem; overflow-wrap: normal; word-break: normal; hyphens: auto; }
 #app.atlas-board .quick-shell .game-head { margin-top: 2px; padding-bottom: 4px; }
 
+/* ══ 21 · Camino de mazos de una colección ══ */
 /* Mazos de una colección como un camino: una línea con un punto por mazo, y cada mazo en una
    tarjeta cuya ilustración forma parte del propio fondo (se difumina hacia el texto). */
 #app #deck-collection .collection-decks { padding: 4px 0 12px; background: transparent; border: 0; box-shadow: none; }
@@ -3818,8 +3879,8 @@ html #app .home-nav.atlas-nav button[aria-current="page"] small {
 #app #deck-collection .collection-decks .game-row .game-name { padding: 0; border: 0; font-size: 1.12rem; line-height: 1.15; }
 #app #deck-collection .collection-decks .game-row .game-meta { margin-top: 5px; font: .72rem/1.35 var(--ui-font); }
 
-/* El camino de los mazos, como el mapa de niveles de un videojuego: una senda de tierra
-   que serpentea, un medallón numerado por mazo, bandera de salida y estrella de meta. */
+/* El camino de los mazos como mapa de niveles: un medallón numerado por mazo y una
+   estrella de meta. El dibujo final lo pone el «camino fino» de justo debajo. */
 #app #deck-collection .collection-decks .games { counter-reset: nivel; }
 #app #deck-collection .collection-decks .games::before {
   border-radius: 0; opacity: 1;
@@ -3844,7 +3905,7 @@ html #app .home-nav.atlas-nav button[aria-current="page"] small {
 #app #deck-collection .collection-decks .lead + .games > .game-row:first-child::after { right: auto; bottom: auto; width: auto; height: auto; left: -50px; top: -28px; background: #8a3f2f; border-radius: 4px; }
 #app #deck-collection .collection-decks .games { overflow: visible; }
 
-/* Camino fino y elegante (sustituye a la senda gruesa): un hilo dorado punteado que
+/* Camino fino y elegante: un hilo dorado punteado que
    serpentea, pequeños hitos de latón con el número del mazo y una estrella discreta al final.
    Cada mazo es una lámina a sangre con su ilustración de fondo y el texto sobre un velo. */
 #app #deck-collection .collection-decks .games { padding: 8px 0 30px 40px; gap: 12px; }
@@ -3868,6 +3929,7 @@ html #app .home-nav.atlas-nav button[aria-current="page"] small {
 #app #deck-collection .collection-decks .game-row .game-progress-bar { background: #fbf1dc33; }
 #app #deck-collection .collection-decks .game-row .game-progress-bar i { background: #e2c48c; }
 
+/* ══ 22 · Mesa de juego unificada: zoom, marcador, cabecera, Gran mezcla, modo oscuro y salida ══ */
 /* Mesa de juego: la lupa del zoom bajo el contador de pendientes, a la derecha del todo;
    «Tu carta» pegada a la izquierda; y los extremos de la línea según el mazo. */
 #app.atlas-board .game-head-side { position: relative; display: flex; flex: none; margin-left: auto; }
@@ -4076,6 +4138,7 @@ html #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell { 
 #app [data-exit-dialog] .exit-actions .btn-secondary { background: linear-gradient(155deg, rgba(250,246,235,.97), rgba(232,221,201,.96)); border: 1px solid #b9a98e; color: #5b4936; box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 2px 4px rgba(54,41,26,.12); }
 #app [data-exit-dialog] .exit-actions .exit-discard { background: transparent; border-color: transparent; box-shadow: none; color: #8a3f2f; text-decoration: underline; text-underline-offset: 3px; }
 
+/* ══ 23 · Pergamino en selección y configuración, «pasa el móvil», Atlas, Guía y ranking ══ */
 /* ===== Recuadros de selección y configuración: pergamino en vez de blanco =====
    Los paneles donde se eligen jugadores, opciones, salas y ajustes toman la estética de
    «Jugar en solitario»: papel cálido con filete de latón y campos de papel claro. */
@@ -4367,6 +4430,7 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
    (.tournament-board li, .comp-summary li) los convertían en una fila y apretaban los círculos. */
 .chapter-journey ol > li.chapter-stop { display: grid; justify-content: normal; gap: 0; padding: 0; border-bottom: 0; background: none; border-radius: 0; }
 
+/* ══ 24 · Colecciones ligeras y pantallas estrechas ══ */
 /* ---- Colecciones ligeras (móviles con poca memoria gráfica) ----
    Cada tarjeta de colección apilaba un giro 3D, una copia desenfocada de su imagen, una máscara y un filtro, y además
    se recalculaba en cada fotograma de scroll. Con seis tarjetas seguidas, WebKit en algunos iPhone dejaba de pintar
@@ -4403,6 +4467,7 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 #app .quick-shell .quick-card-artist { display: block; margin-top: 2px; font-family: var(--font-body); font-size: .78em; line-height: 1.12; font-weight: 500; color: #675842; }
 #app .quick-shell .hand-card > strong:has(.quick-card-artist) { display: block; -webkit-line-clamp: unset; overflow: visible; }
 
+/* ══ 25 · Materia y vida: texturas, polvo, vista previa, escenario y animaciones de la mesa ══ */
 /* ── Materia y vida ──────────────────────────────────────────────────────────────
    Lo que hace que una mesa de juego digital parezca de verdad: el papel tiene textura,
    las ilustraciones respiran, la luz de la mesa está viva y colocar una carta es un
@@ -4699,6 +4764,7 @@ html:has(#app.atlas-board) .motas { display: none; }
 @keyframes final-brillo { from { background-position: 130% 0; } to { background-position: -30% 0; } }
 @keyframes final-sello { 0% { transform: scale(1); } 40% { transform: scale(1.08) rotate(-1.5deg); box-shadow: 0 0 0 3px #d6a54266, 0 0 26px #e8bd5e80; } 100% { transform: none; } }
 
+/* ══ 26 · Pastillas, tiempo por carta, vidas, dificultad, bienvenida y hub de Jugar solo ══ */
 /* Carta del turno en el móvil: el emblema ocupa el hueco que dejan el rótulo de arriba y el
    título de abajo, en vez de ir fijo en medio. Con un título de tres o cuatro líneas o un
    rótulo en dos («VELOCIDAD OCULTA») ya no se pisan; el papel del reverso cubre toda la carta. */
@@ -4926,8 +4992,8 @@ html #app .tiempo-segmented .segmented-option::after { content: none !important;
 #app .quick-shell .solo-home .solo-panel #quick-error { margin: 8px 0 0; }
 #app .quick-shell .solo-home .solo-panel #quick-error:empty { display: none; }
 
-
-/* Continuum v677: avisos y preparación con el mismo papel y filetes del menú. */
+/* ══ 27 · Preparación ilustrada, Retos rápidos en solitario, pista de colocación y deslizar para volver ══ */
+/* Avisos y preparación con el mismo papel y filetes del menú. */
 #app .solo-shortcut-resume {
   grid-template-columns: minmax(0, 1fr) 42px; gap: 16px;
   border: 1px solid var(--edition-brass); border-radius: 18px;
@@ -5002,7 +5068,7 @@ html #app.atlas-board[data-platform][data-device][data-screen] :is(.board-focus-
 }
 #app .quick-free-setup .solo-panel-head { display: block; }
 
-/* v678: preparación ilustrada de retos rápidos. Los ajustes conservan sus controles. */
+/* Preparación ilustrada de retos rápidos. Los ajustes conservan sus controles. */
 #app .quick-free-setup .solo-panel { overflow: hidden; }
 #app .quick-free-setup .quick-preparation-head {
   position: relative; isolation: isolate; min-height: 126px; display: flex;
@@ -5069,7 +5135,7 @@ html #app.atlas-board[data-platform][data-device][data-screen] :is(.board-focus-
   #app .quick-free-setup .quick-length-all small { max-width: none; margin: 0; }
 }
 
-/* v679: mismo acabado ilustrado en la preparación de cada modalidad. */
+/* Mismo acabado ilustrado en la preparación de cada modalidad. */
 html #app[data-screen] .setup-art-panel {
   border: 1px solid var(--edition-brass); border-radius: 20px;
   background: radial-gradient(ellipse at 10% 0, #fffaf270, transparent 65%), var(--edition-paper);
@@ -5277,6 +5343,7 @@ html #app[data-screen] .setup-art-panel .quick-length-more { min-height: 44px; b
     linear-gradient(125deg, var(--edition-surface), var(--edition-paper));
 }
 
+/* ══ 28 · Partida guardada, mazos del desplegable, cabeceras y selector de tiempo único ══ */
 /* Partida guardada: una lámina compacta, con el cuaderno fundido en el papel. */
 #app .solo-shortcut-resume {
   position: relative; isolation: isolate; display: block; overflow: hidden;
@@ -5462,6 +5529,7 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
   color: #fff3d9; border-color: #d8b37e; background: linear-gradient(145deg, #765236, #493020);
 }
 
+/* ══ 29 · Contraste de noche (modo oscuro) ══ */
 /* Contraste de noche. Las superficies de papel (la carta de la línea, la página final,
    la ficha del resultado, la vista previa del hueco) son claras en los dos temas, pero
    sus textos y sus piezas internas leían las variables del tema, que de noche son crema y
