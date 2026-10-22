@@ -51,7 +51,7 @@ WebKit).
 ## Qué comprueba cada archivo
 
 Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (emulador);
-**navegador** = Playwright, en `zoom-visual.yml` o con `npm run test:navegador`.
+**navegador** = Playwright, en `zoom-visual.yml` o con `npm run test:navegador`; **navegador (a mano)** = Playwright, solo con `npm run test:navegador-manual` (depende de la velocidad del equipo y falló en GitHub Actions).
 
 | Archivo | Dónde | Qué comprueba |
 | --- | --- | --- |
@@ -117,7 +117,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `jugadores-recientes.mjs` | test | Un solo móvil recuerda los nombres de los jugadores recientes. |
 | `legal.mjs` | test | Condiciones de uso, aviso legal, soporte y página de borrado: enlaces y anclas, caché, app móvil, coherencia con la política y lista de huecos `[PENDIENTE: …]` por rellenar. |
 | `limpieza-tope.mjs` | test | La limpieza diaria del servidor tiene plazo mínimo de un día y tope de borrados por ejecución, y reanuda al día siguiente. |
-| `mano-carrusel-browser.mjs` | navegador | La mano en abanico gira como un carrusel con gestos táctiles reales y siempre deja una carta elegida en el centro. |
+| `mano-carrusel-browser.mjs` | navegador (a mano) | La mano en abanico gira como un carrusel con gestos táctiles reales y siempre deja una carta elegida en el centro. |
 | `marca.mjs` | test | Nombre Continuum en la web, iOS, manifiesto, paquete, documentación y pantallas, sin la marca antigua. |
 | `mazos.mjs` | test | Integridad de todos los mazos: repeticiones, huecos, espaciado y cifras que el redondeo no confunda. |
 | `moderacion-reglas.mjs` | reglas | Nombres reservados, el nombre se libera al borrar el perfil, denuncias de solo escritura y topes de tamaño. |
