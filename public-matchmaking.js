@@ -49,21 +49,10 @@ export function isJoinablePublicRoom(room, { mode, capacity, clientVersion, deck
   return true;
 }
 
-export function shouldStartPublicRoom(room) {
-  if (!room || room.matchmaking !== 'public' || room.status !== 'lobby') return false;
-  const capacity = normalizePublicCapacity(room.capacity);
-  return Array.isArray(room.playerOrder) && room.playerOrder.length === capacity;
-}
-
 export function makePublicRoomCode(random = Math.random) {
   const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let suffix = '';
   for (let i = 0; i < 7; i += 1) suffix += alphabet[Math.floor(random() * alphabet.length)];
   return PUBLIC_ROOM_PREFIX + suffix;
-}
-
-export function publicPlayer({ uid, name, avatarId = null, clientVersion, joinedAt = Date.now() }) {
-  if (!uid || !name) throw new Error('INVALID_PUBLIC_PLAYER');
-  return { uid, name: String(name).slice(0, 18), avatarId, clientVersion, joinedAt };
 }
 

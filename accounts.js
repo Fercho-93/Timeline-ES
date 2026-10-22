@@ -822,8 +822,8 @@ async function removeAccount() {
 }
 export async function startAccounts(callback) {
   startGame=callback;
-  CT.Bloqueos={has:uid=>blocked.has(String(uid)),list:()=>[...blocked],reload:loadBlocked};
-  CT.Accounts={get ready(){return ready;},get user(){return identity;},get profile(){return profile;},card:accountCard,flush,rankingDe:(tab)=>ranking(tab),renombra:alias=>rename(alias),sincronizaAvatar:syncAvatar,cargaAvatares:loadAvatars,get rankingPublico(){return rankingPublico();},setRanking};
+  CT.Bloqueos={has:uid=>blocked.has(String(uid)),reload:loadBlocked};
+  CT.Accounts={get ready(){return ready;},get user(){return identity;},get profile(){return profile;},card:accountCard,flush,renombra:alias=>rename(alias),sincronizaAvatar:syncAvatar,cargaAvatares:loadAvatars,get rankingPublico(){return rankingPublico();},setRanking};
   await auth.authStateReady();
   await setPersistence(auth,browserLocalPersistence);
   onAuthStateChanged(auth,u=>{

@@ -238,12 +238,8 @@
     const send = (type, data = {}) => peer.send(type, { ...data, playerId });
     return {
       answerSignal, send, peerConnection: peer.peerConnection, connect: () => peer.connect(),
-      placeCard: (cardId, index) => send("place-card", { cardId, index }),
-      finishTurn: () => send("finish-turn"),
-      skipTurn: () => send("skip-turn"),
-      removePlayer: targetId => send("remove-player", { targetId }),
       leave: () => { send("remove-player", { targetId: playerId }); setTimeout(peer.close, 300); },
-      currentRoom: () => room, close: peer.close, automaticLan: !!lanInvite
+      close: peer.close
     };
   }
 
