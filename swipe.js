@@ -375,9 +375,8 @@
     // drag.js: no todos los navegadores lo disparan, así que no se puede esperar sentado.
     document.addEventListener("click", swallow, { capture: true, once: true });
     setTimeout(() => document.removeEventListener("click", swallow, { capture: true }), 0);
-    // Volver deslizando suena a pasar una hoja; si sonidos.js es de antes, al botón de volver.
-    const sonidos = window.CONTINUUM.Sonidos;
-    if (sonidos?.hoja) sonidos.hoja(); else sonidos?.atras?.();
+    // Volver deslizando suena a pasar una hoja.
+    window.CONTINUUM.Sonidos?.hoja?.();
     if (!view) { goBack(); return; }
     settle(view, window.innerWidth, () => {
       const screenBefore = document.getElementById("app")?.dataset.screen;

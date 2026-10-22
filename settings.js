@@ -1,7 +1,9 @@
-// El único ajuste que no depende de la partida: el tema. Vive aparte porque los dos
-// motores (el local en `app.js` y el compartido en `online.js`) lo necesitan por igual,
-// y porque no se guarda por modalidad como una partida: es del móvil, no del juego que
-// se esté jugando.
+// La pantalla de Ajustes y las preferencias que no dependen de la partida: apariencia
+// (tema y tamaño del texto), sonido, vibración y profundidad, más la ayuda (comentarios
+// con diagnóstico, edad declarada, privacidad). Vive aparte porque se abre igual desde
+// cualquier pantalla (la barra de abajo y el menú de cada partida, local u online) y
+// porque se guarda por móvil, no por cuenta ni por modalidad (`hilo-ajustes-v1`, ver
+// account-storage.js).
 (function () {
   "use strict";
 
@@ -15,8 +17,8 @@
     light: { label: "Claro", barra: "#f3eee4" },
     dark: { label: "Oscuro", barra: "#18110b" }
   };
-  // Pendiente de rellenar antes de repartir la beta: el correo donde debe llegar el
-  // informe de comentarios. Hasta entonces el botón avisa de que aún no hay dirección.
+  // El correo al que llegan los comentarios (deployment.js). Si estuviera vacío, el botón
+  // avisa de que aún no hay dirección.
   const FEEDBACK_EMAIL = CT.Deployment.feedbackEmail;
 
   function migratedTheme(theme) {

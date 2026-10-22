@@ -1,4 +1,8 @@
-// Pantalla de Inicio: las entradas ilustradas a cada forma de jugar y sus animaciones.
+// Las entradas ilustradas de Inicio («Jugar» y sus tres formas, «Unirme a una partida», el
+// resumen del ranking) y las pantallas a las que llevan: Jugar solo, Jugar con amigos, Jugar
+// online con su lista de mesas públicas y Crear mesa. Inicio lo pinta app.js; este archivo
+// lo reordena cada vez que se pinta (un MutationObserver al final) y pinta sus pantallas
+// con `CT.showScreen`, para que entren en el rastro de «Volver».
 (function () {
   'use strict';
 
@@ -487,6 +491,7 @@
   });
 
   const hubs = {'hub-online': openOnlineHub, 'hub-online-create': openPublicCreate, 'hub-online-collections': openOnlineCollections, 'hub-solo': openSoloHub, 'hub-friends-local': openLocalHub, 'hub-friends-online': () => openFriendHub('online'), 'hub-friends': openFriendsHub};
+  // `refreshHome` solo lo usan las pruebas: reordena Inicio sin esperar al observador.
   if (window.CONTINUUM) window.CONTINUUM.ModeHubs = { open(screen) { (hubs[screen] || openSoloHub)(); }, refreshHome() { restructureHome(); } };
 
   // El resumen del inicio habla el mismo idioma que el ranking: aciertos de hoy, de esta semana y la racha.

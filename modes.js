@@ -959,6 +959,9 @@
     return `<span class="carta-reverso" aria-hidden="true"><img class="reverso-emblema" src="assets/continuum-emblem-800.webp" alt="" width="800" height="533" decoding="async"></span>`;
   }
 
+  // El Pulso en una frase: se enseña al elegir a quién retar, en cualquier mesa.
+  const PULSE_RULES = "Los dos colocáis la misma carta a ciegas. Si acertáis los dos, no cambia ninguna mano. Si solo acierta quien reta, pasa una carta suya al defensor. Si solo acierta quien defiende, quien reta roba una carta. Si falláis los dos, la carta se descarta y quien reta roba una. Si no quedan cartas en el mazo ni en el descarte, no hay robo. Una vez por persona.";
+
   // La huella detecta versiones distintas del contenido; no es una validación del
   // servidor ni una protección contra trampas. Permite detectar que dos móviles no llevan el
   // mismo mazo. Cuenta el orden, no solo el conjunto: el reparto depende de en qué
@@ -966,7 +969,6 @@
   // recolocadas no son el mismo. La usan el duelo por enlace —para no comparar dos
   // partidas que no son la misma— y las salas compartidas —para no repartir ni empezar
   // con un móvil que lleva una versión distinta del juego.
-  const PULSE_RULES = "Los dos colocáis la misma carta a ciegas. Si acertáis los dos, no cambia ninguna mano. Si solo acierta quien reta, pasa una carta suya al defensor. Si solo acierta quien defiende, quien reta roba una carta. Si falláis los dos, la carta se descarta y quien reta roba una. Si no quedan cartas en el mazo ni en el descarte, no hay robo. Una vez por persona.";
   function deckFingerprint(modeKey, deck = cards(modeKey)) {
     let hash = 2166136261;
     // Incluye el eje, el protocolo, el orden y los datos que se ven y se comparan.

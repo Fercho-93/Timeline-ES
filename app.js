@@ -1,5 +1,38 @@
 // El corazón del juego en un solo móvil: dibuja cada pantalla (Inicio, partidas, Atlas, Ajustes…) y
 // responde a cada toque. Las partidas por internet las lleva online.js.
+//
+// Todo vive en un mismo cierre que comparte el estado (`screen`, `game`, `solo`, `cifras`,
+// `comp`, el mazo elegido…), así que el archivo se lee por secciones. Cada una empieza con
+// una cabecera «// ── Nombre ──», que se puede buscar tal cual. En orden:
+//
+//   Navegación: pintar y el rastro de «Volver» — paint, rememberView, overlay
+//   Estado compartido y mazo elegido — setMode, saveGame, loadGame, header
+//   Colecciones: galería y lista de mazos — gallery, gameList
+//   Competición: ajustes y rondas en grupo — competitionMenu, competitionFriends, startTournamentRound
+//   Portada, «Volver» y Retos rápidos — backMenu, quickChallenges
+//   Bienvenida — bienvenida, guardaNombre
+//   Inicio — home, dailyDoor, duelsView, jugarView, openMode
+//   Diagnóstico y avisos de fallo — buildDiagnostics, showCrash
+//   Partida en un solo móvil — setup, quién empieza, startGame, gameView, placeCard
+//   El Pulso: un duelo a ciegas — startPulse, placePulse, placePulseDefense
+//   Resultado, final y ganador — renderResult, finishTurn, renderFinalPass, renderWinner
+//   Repaso — timelineReviewScreen, reviewScreen
+//   Enciclopedia — enciclopediaView, openEnciclopedia
+//   El perfil (Atlas) — perfilView, logros, nombre y avatar
+//   Solitario: reglas y estado de la partida — sinVidas, readRecords
+//   El reto diario — dailyModeKey, dailyRecords, startDaily
+//   Récords y guardado del solitario — modeRecords, saveSolo, loadSolo
+//   Menús de Jugar solo y de duelos — soloHome, duelHome, duelPanel, mazo cerrado
+//   Unirse a una partida — friendsJoin, friendsJoinWith
+//   Partida en solitario y duelo de orden — repartoRonda, startSolo, soloView, soloFinish
+//   El duelo de cifras — startCifras, cifrasView, salirDeCifras
+//   Duelo por enlace: antes de empezar, aceptar y compartir — duelReady, duelIntro, acceptDuel
+//   Competición en solitario — startCompetition, compRoundIntro, compFinish
+//   Guía, salidas de la partida y logros — rules, requestPlayExit, gameMenu, showToast
+//   Partidas en varios móviles — launchLocalMultiplayer, launchPublicMatch, launchOnline
+//   Eventos: el repartidor de acciones — los `data-action` de cada pantalla
+//   Lo que se comparte con otros módulos — `CT.*`, botón Atrás de Android, gesto de volver
+//   Arranque — openInvitation y la primera pantalla
 (function () {
   "use strict";
 
@@ -19,6 +52,7 @@
   appConfigReady.then(module => module?.start?.());
   window.addEventListener('continuum:duels-list', () => duelsView());
   window.addEventListener('continuum:turn-duel-open', event => turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: event.detail?.duelId, back: home })));
+  // ── Navegación: pintar y el rastro de «Volver» ─────────────────────────────────────
   // Pintar pasa por aquí para que el foco del teclado no se pierda en cada jugada.
   let playReturn = '';
   let lastPaintedScreen = 'home';
@@ -87,6 +121,7 @@
     app.insertAdjacentHTML("beforeend", html);
     CT.openDialog(app.lastElementChild, cerrable);
   }
+  // ── Estado compartido y mazo elegido ───────────────────────────────────────────────
   let selectedModeKey = CT.Storage.getItem(MODE_STORAGE_KEY) || CT.DEFAULT_MODE;
   if (!CT.has(selectedModeKey)) selectedModeKey = CT.DEFAULT_MODE;
   // Y si el que quedó elegido la última vez ya no es suyo, se vuelve al de siempre. Lo
@@ -140,8 +175,6 @@
   let homeDestination = "home";
   let profileReturn = "home";
   let collectionDetails = false;
-  // Qué bloque de formato está desplegado en el menú del mazo: "multi", "solo" o
-  // ninguno de los dos. Empiezan los dos cerrados, como la colección de la portada.
 
   function currentAxis() { return CT.axis(selectedModeKey); }
 
@@ -215,6 +248,7 @@
     return CT.UI.header(screen === 'home' ? '' : `data-action="${volver}"`);
   }
 
+  // ── Colecciones: galería y lista de mazos ──────────────────────────────────────────
   // Las carátulas van a la caché de la aplicación y se bajan en la primera visita, así
   // que hay dos tamaños de cada una y cada panel pide el que de verdad usa: el lomo mide
   // unos pocos píxeles de ancho y además va en gris y oscurecido: basta con 400;
@@ -307,6 +341,7 @@
     }).join("")}</div>`;
   }
 
+  // ── Competición: ajustes y rondas en grupo ─────────────────────────────────────────
   // La competición es siempre de las Grandes colecciones: temas al azar, uno por ronda. Se elige con
   // quién antes de llegar aquí, así que cada audiencia tiene su pantalla de ajustes: en solitario esta,
   // en un solo móvil la de preparar la partida y, cada uno en su móvil, la de «Competición con amigos».
@@ -450,6 +485,7 @@
     </div></section></div>`);
   }
 
+  // ── Portada, «Volver» y Retos rápidos ──────────────────────────────────────────────
   function homeMasthead() {
     return `<section class="home-masthead" aria-label="Continuum, un juego para ordenar y comparar">
       <div class="home-crest" aria-hidden="true"><img src="assets/continuum-emblem-800.webp" alt="" width="800" height="533" decoding="async" fetchpriority="high"></div>
@@ -582,6 +618,7 @@
     home();
   }
 
+  // ── Inicio ─────────────────────────────────────────────────────────────────────────
   // La portada tiene dos puertas y nada más: jugar y el reto del día (el atlas vive en la barra). Encima,
   // solo cuando hay algo pendiente, el aviso de los duelos en los que te toca.
   function home() {
@@ -756,6 +793,7 @@
     soloHome();
   }
 
+  // ── Diagnóstico y avisos de fallo ──────────────────────────────────────────────────
   // Lo que hace falta para depurar un fallo a distancia: qué versión hay instalada,
   // en qué pantalla estaba la persona y a qué hora. Se usa tanto en la pantalla de
   // «algo ha fallado» de más abajo como en el botón de comentarios de Ajustes, para no
@@ -841,6 +879,7 @@
   // medio: «esto no me cuadra» también merece poder mandarse con contexto.
   CT.appDiagnostics = () => buildDiagnostics();
 
+  // ── Partida en un solo móvil ───────────────────────────────────────────────────────
   // Elegir bloque selecciona su primer juego, que es lo que se espera cuando solo hay uno.
   function setBlock(blockKey) {
     if (!CT.hasBlock(blockKey)) return;
@@ -1192,13 +1231,13 @@
     if (hidden && !keepArt) return CT.Ghost.hiddenCard(card);
     const oculta = hidden && keepArt;
     const era = eraForCard(card);
-    // El identificador no se ve ni se lee: es el ancla que usa `a11y.js` para no perder
-    // el sitio en la línea cuando se repinta la pantalla.
     const textoOculto = "Valor y explicación ocultos durante esta jugada.";
     const valor = oculta ? `<div class="year ghost-value" aria-label="Valor oculto">— —</div>` : `<div class="year">${formatValue(card)}</div>`;
     // La lámina se ve entera; la temática, el título y el valor van en su placa inferior.
     const body = `<div class="card-visual era-${era.key}">${animalArt(card)}</div><div class="card-content">${categoryBadge(card)}<h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(oculta ? textoOculto : card.detail)}</p>${valor}</div>`;
     // Con el valor oculto la carta no se abre: la explicación desvelaría justo lo que se esconde.
+    // El identificador no se ve ni se lee: es el ancla que usa `a11y.js` para no perder
+    // el sitio en la línea cuando se repinta la pantalla.
     if (oculta) return `<article class="timeline-card ghost-card ghost-art animal-timeline-card" data-id="${card.id}" aria-label="${escapeHtml(card.title)}. Valor oculto.">${body}</article>`;
     return `<article class="timeline-card card-flippable animal-timeline-card" data-id="${card.id}" role="button" tabindex="0" aria-label="${escapeHtml(card.title)}. Toca para ver la lámina y los datos.">${body}</article>`;
   }
@@ -1246,8 +1285,7 @@
   }
 
 
-  // ---------------------------------------------------------------------------
-  // El Pulso: un duelo a ciegas
+  // ── El Pulso: un duelo a ciegas ────────────────────────────────────────────────────
   //
   // Una sola vez por partida, en lugar de jugar tu turno, retas a otra persona. El mazo
   // saca una carta que no elige ninguno de los dos y la colocáis los dos: primero quien
@@ -1434,6 +1472,7 @@
     </div></div>`, true);
   }
 
+  // ── Resultado, final y ganador ─────────────────────────────────────────────────────
   function renderResult() {
     game.pendingResult = result;
     saveGame();
@@ -1583,6 +1622,7 @@
     }
   }
 
+  // ── Repaso ─────────────────────────────────────────────────────────────────────────
   // La pantalla de fin solo enseñaba lo fallado: quien gana su partida también quiere
   // repasar la línea entera tal y como quedó, no solo lo que se le atragantó por el camino.
   function timelineReviewScreen(ids, mode, actionsHtml) {
@@ -1625,6 +1665,7 @@
     </section></div>`);
   }
 
+  // ── Enciclopedia ───────────────────────────────────────────────────────────────────
   // El desplegable de mazos agrupado por bloque, igual que la portada los agrupa en la
   // galería: así la enciclopedia no inventa un segundo orden de los quince juegos.
   // Un mazo que no es suyo no se ofrece: elegirlo acabaría en «Todas las cartas» sin
@@ -1765,14 +1806,12 @@
     }, 0);
   }
 
-  // ---------------------------------------------------------------------------
-  // El perfil
+  // ── El perfil (Atlas) ──────────────────────────────────────────────────────────────
   //
   // Lo que hasta ahora era invisible: cuánto has jugado, en qué mazo aciertas y en cuál
   // no, y qué te falta para el siguiente logro. Los números los lleva `progreso.js`; aquí
   // solo se pintan. Es la única pantalla que mira todos los mazos a la vez, así que cada
   // punto débil enlaza con la enciclopedia del suyo en vez de dejarte buscándolo.
-  // ---------------------------------------------------------------------------
 
   const LOGRO_GRUPOS = ["Constancia", "Puntería", "Recorrido", "Oficio"];
 
@@ -2073,6 +2112,7 @@
     </div></div>`, true);
   }
 
+  // ── Solitario: reglas y estado de la partida ───────────────────────────────────────
   const DAILY_CARDS = 10;
   const SOLO_LIVES = 3;
   // Jugar solo se juega por rondas de un puñado de cartas, no con el mazo entero: así hay
@@ -2296,6 +2336,7 @@
     startSolo("daily");
   }
 
+  // ── Récords y guardado del solitario ───────────────────────────────────────────────
   function modeRecords() {
     const records = readRecords();
     return records[selectedModeKey] || { best: 0, streak: 0, lastDay: "", days: {} };
@@ -2327,6 +2368,7 @@
     } catch { return null; }
   }
 
+  // ── Menús de Jugar solo y de duelos ────────────────────────────────────────────────
   const CALENDARIO_DIAS = 28;
 
   // Iconos de trazo para los paneles de «Jugar en solitario», con el mismo grosor que las
@@ -2650,6 +2692,7 @@
     </div>`;
   }
 
+  // ── Unirse a una partida ───────────────────────────────────────────────────────────
   // «Unirme» de Cada uno en su móvil: un solo campo y un solo botón de escanear para
   // cualquier invitación, por internet (sala, duelo por turnos, duelo por enlace o Retos
   // rápidos) o por Wi-Fi (sala de colecciones o de Retos rápidos). Se reconoce sola y se
@@ -2742,6 +2785,7 @@
   }
   CT.openFriendsJoin = friendsJoin;
 
+  // ── Partida en solitario y duelo de orden ──────────────────────────────────────────
   // El nombre se guarda entre duelos: es lo único que hay que escribir, y pedirlo cada
   // vez para acabar poniendo lo mismo sobra.
   const DUEL_NAME_KEY = "hilo-nombre-v1";
@@ -2759,9 +2803,6 @@
     if (campo) saveDuelName(campo.value);
   }
 
-  // `duel` recibe el duelo ya descodificado cuando se acepta un reto ajeno; si no viene,
-  // se estrena uno propio con semilla nueva. En los dos casos el reparto sale de la misma
-  // función, que es justo lo que garantiza que los dos móviles jueguen lo mismo.
   // Las cartas de una ronda: la primera abre la línea y las demás se juegan en orden. Se
   // eligen con preferencia por las que aún no están en el álbum, para que cada ronda haga
   // avanzar el mazo, y se ordenan de la más holgada a la más apretada: la primera cae lejos
@@ -2795,6 +2836,9 @@
   }
   CT.repartoRonda = repartoRonda;
 
+  // `duel` recibe el duelo ya descodificado cuando se acepta un reto ajeno; si no viene,
+  // se estrena uno propio con semilla nueva. En los dos casos el reparto sale de la misma
+  // función, que es justo lo que garantiza que los dos móviles jueguen lo mismo.
   function startSolo(kind, duel = null) {
     if (solo?.pendientes?.length) vuelcaCartas(solo);
     cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
@@ -3040,9 +3084,8 @@
     const esReto = solo.kind === "daily" && !(records.days && records.days[dia]);
     if (esReto) {
       records.days = records.days || {};
-      // `sequence` y `finishedAt` no los usa nada todavía: son lo que necesitaría un
-      // marcador entre amigos del reto diario si algún día existe, guardado desde ya
-      // para no depender de reconstruirlo a partir de partidas viejas que no lo llevan.
+      // `sequence` (aciertos y fallos en orden) la usa «Compartir resultado» desde Inicio, y
+      // `finishedAt` viaja con el progreso de la cuenta (accounts.js).
       records.days[dia] = { hits: solo.hits, total, sequence: solo.sequence || [], finishedAt: new Date().toISOString(), ms: solo.empezadoEn ? Math.max(0, Date.now() - solo.empezadoEn) : null };
       records.streak = records.lastDay === previousDay(dia) ? (records.streak || 0) + 1 : 1;
       records.lastDay = dia;
@@ -3146,11 +3189,11 @@
     </div>`;
   }
 
-  // ——— El duelo de cifras ———
+  // ── El duelo de cifras ─────────────────────────────────────────────────────────────
   //
   // Diez cartas, el mismo plazo que el duelo de orden, y en vez de colocar se escribe el
-  // que puntúa y lo que viaja en el enlace está en duelo.js; aquí está lo que se ve y,
-  // sobre todo, el reloj, que es la regla de la que depende todo lo demás.
+  // número. Lo que puntúa y lo que viaja en el enlace está en duelo.js; aquí está lo que
+  // se ve y, sobre todo, el reloj, que es la regla de la que depende todo lo demás.
   //
   // El reloj se mide siempre restando marcas de `Date.now()`, nunca descontando de un
   // contador. La diferencia no es de estilo: una pestaña escondida congela sus
@@ -3488,7 +3531,7 @@
     </div>`;
   }
 
-  // ——— Antes de empezar ———
+  // ── Duelo por enlace: antes de empezar, aceptar y compartir ────────────────────────
   //
   // Un duelo va a reloj desde la primera carta, así que entrar directamente castigaba a
   // quien todavía estaba leyendo de qué iba. Entre elegir la modalidad y jugar hay ahora
@@ -3664,18 +3707,18 @@
     }
   }
 
-  // Competición: una ronda de ROUND_CARDS cartas por cada modalidad ya establecida, en
-  // un orden al azar y sin repetir ninguna, todas con el mismo motor de colocar-una-a-
-  // una que el solitario (`solo`, con kind: "comp"). Lo único propio de la competición
-  // vive en `comp`: qué temas quedan por jugar y el marcador acumulado de las rondas ya
-  // resueltas.
+  // ── Competición en solitario ───────────────────────────────────────────────────────
+  //
+  // Una ronda de ROUND_CARDS cartas por cada modalidad ya establecida, en un orden al azar
+  // y sin repetir ninguna, todas con el mismo motor de colocar-una-a-una que el solitario
+  // (`solo`, con kind: "comp"). Lo único propio de la competición vive en `comp`: qué
+  // temas quedan por jugar y el marcador acumulado de las rondas ya resueltas.
   //
   // La competición se guarda con una clave independiente de las partidas por mazo.
   const ROUND_CARDS = 5;
   // «Gran mezcla temporal» no es un género propio: combina los demás mazos con eje temporal.
-  // Un tema de
-  // competición que sea «un poco de todo lo anterior» no aporta nada nuevo a la ronda, así
-  // que se excluye de la rotación.
+  // Un tema de competición que sea «un poco de todo lo anterior» no aporta nada nuevo a la
+  // ronda, así que se excluye de la rotación.
   // La rotación sortea temas, así que solo puede sortear los que el jugador tiene. Se
   // calcula al empezar cada competición y no una vez al cargar: entre una y otra puede
   // haber cambiado lo que tiene abierto.
@@ -3816,6 +3859,7 @@
   }
 
 
+  // ── Guía, salidas de la partida y logros ───────────────────────────────────────────
   // La guía explica la forma de jugar que se tiene delante. Con una partida en marcha la
   // dice ella; sin partida empezada la dice la pantalla, porque abrir la guía desde el
   // menú del solitario y leer las reglas de una partida entre varios no ayuda a nadie.
@@ -3954,6 +3998,7 @@
     </div>`;
   }
 
+  // ── Partidas en varios móviles ─────────────────────────────────────────────────────
   // A diferencia de `online.js`, no hace falta un `import()` dinámico: no descarga nada
   // de fuera (ni Firebase ni ninguna CDN), así que se carga siempre con el resto de la
   // aplicación, igual que `duelo.js`. `launchLocalMultiplayer` solo entrega el control.
@@ -4029,6 +4074,7 @@
     }
   }
 
+  // ── Eventos: el repartidor de acciones ─────────────────────────────────────────────
   // Colocar es la única acción cuyo resultado no se ve en ningún titular: hay que decirlo.
   function anunciaHueco(index, cartas) {
     announce(`Hueco ${index + 1} de ${cartas + 1} elegido. Confirma o elige otro.`);
@@ -4408,6 +4454,7 @@
     event.target.click();
   });
 
+  // ── Lo que se comparte con otros módulos ───────────────────────────────────────────
   CT.localNavigate = action => {
     if (action === 'home-encyclopedia') openEnciclopedia('all');
     else if (action === 'perfil') perfilView();
@@ -4423,6 +4470,8 @@
   CT.openMode = openMode;
   // Abre el mazo elegido con una forma de jugar, como lo hacen las pantallas de Jugar: `collections`
   // (en solitario), `local` (un solo móvil) u `online` (cada uno en su móvil).
+  // Solo lo usan las pruebas: abre el mazo elegido como si se llegara por una ruta de
+  // entrada (`collections`, `local`, `online`…) sin recorrer los paneles de Inicio.
   CT.openDeckAs = route => { sessionStorage.setItem('continuum-entry-route', route); openMode(selectedModeKey); };
   // `keep`: al volver a la pantalla se conserva la colección que estaba desplegada.
   CT.competitionPanel = audience => `<div class="gallery">${competitionPanel(audience)}</div>`;
@@ -4468,10 +4517,8 @@
   //   así que el gesto pulsa su salida en vez de repintar por encima de la sala.
   // - Desde el inicio no hay nada detrás: el gesto no hace nada. Cerrar la aplicación sigue
   //   siendo cosa del botón Atrás de Android y de nadie más.
-  // La llamada es opcional a propósito: el service worker sirve cada archivo de su propia
-  // copia, así que en el primer arranque tras una actualización puede convivir este `app.js`
-  // nuevo con un `index.html` viejo que todavía no carga `swipe.js`. Sin gesto se sigue
-  // jugando; con una excepción aquí, la aplicación no arrancaría.
+  // La llamada es opcional a propósito: si `swipe.js` no llegara a cargarse, se sigue
+  // jugando sin el gesto; con una excepción aquí, la aplicación no arrancaría.
   CT.enableSwipeBack?.(() => {
     if (CT.backPressed()) return;
     if (CT.isSessionActive()) return;
@@ -4510,6 +4557,7 @@
     }
     return null;
   });
+  // ── Arranque ───────────────────────────────────────────────────────────────────────
   // Qué mazos tiene abiertos quien juega lo decide `CT.Cartera.arranque()`, que ya se ha
   // ejecutado al cargarse `cartera.js`: este archivo necesita saberlo antes de elegir el
   // mazo de la última partida, mucho antes de llegar hasta aquí. El día que haya tienda,

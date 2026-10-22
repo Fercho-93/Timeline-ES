@@ -1,4 +1,6 @@
 // El tiempo por jugada (sin tiempo, 15, 20 o 30 segundos), igual en todas las formas de jugar.
+// Y, más abajo, el resto de lo que se elige antes de abrir una partida en directo con amigos:
+// cartas iniciales por persona, poderes y máximo de participantes (`CT.ManoInicial`).
 (function () {
   "use strict";
   // Tiempo por jugada: la misma opción en todas las formas de jugar (menos el reto diario,

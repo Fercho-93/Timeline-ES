@@ -9,6 +9,11 @@
 //
 // De ahí las tres piezas de este archivo: pintar conservando el foco, anunciar por una
 // región que sí sobrevive al repintado, y convertir las capas en diálogos de verdad.
+//
+// Como todo repintado pasa por aquí (`CT.paint`), aquí viven también las animaciones que
+// dependen de él: la llegada de las cartas a la línea (`seatCard`, `dealIn`, `inkTrail`),
+// el despliegue de las colecciones (`unrollSheet`) y la ficha ampliada de una carta de la
+// línea (`openTimelineDetail`).
 (function () {
   "use strict";
 
