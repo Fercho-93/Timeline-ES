@@ -263,7 +263,6 @@ async function rename(aliasArg) {
   if (alias === profile?.alias) return;
   validateAlias(alias);
   const aliasKey=nameKey(alias);
-  if (alias.length < 2 || alias.length > 24 || /[<>\x00-\x1f]/.test(alias)) throw Error('Elige un nombre de 2 a 24 caracteres sin símbolos < o >.');
   await flush();
   if (failedConflict) return;
   const r=refs(identity.uid);
