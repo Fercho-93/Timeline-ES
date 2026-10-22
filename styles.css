@@ -169,7 +169,6 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
 .btn { min-height: 50px; border: 0; border-radius: 10px; padding: 13px 20px; font-weight: 650; cursor: pointer; transition: background var(--motion-fast) ease, color var(--motion-fast) ease, transform 110ms ease, box-shadow var(--motion-fast) ease; }
 .btn span { display: inline-block; margin-left: 8px; }
 .btn:active { transform: scale(.975); }
-.btn-primary { color: var(--ink-solid-contrast); background: var(--ink-solid); }
 .btn-secondary { color: var(--ink); background: var(--surface); border: 1px solid var(--line); }
 .btn:disabled { cursor: default; }
 .btn:disabled:active { transform: none; }
@@ -812,7 +811,6 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .perfil-stats b { font-size: 1.35rem; }
 .perfil-section textarea { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 11px 13px; color: var(--ink); font-family: inherit; font-size: .85rem; resize: vertical; }
 .perfil-section .hint { text-align: left; }
-.perfil-section h3 { margin: 0 0 10px; font-size: .95rem; }
 
 .weak-panel h3 + .weak-list { margin-bottom: 18px; }
 .weak-panel .weak-list:last-child { margin-bottom: 0; }
@@ -1131,9 +1129,6 @@ body::before {
   box-shadow: inset 0 0 0 1px var(--boton-icono-luz);
 }
 
-.home-shell { max-width: 980px; padding-bottom: calc(92px + var(--safe-bottom)); }
-.home-shell .topbar { border-bottom: 0; margin-bottom: 0; }
-.home-shell .brand { visibility: hidden; }
 .home-masthead { max-width: 540px; margin: -12px auto 32px; text-align: center; }
 .home-crest {
   position: relative;
@@ -1222,8 +1217,6 @@ body::before {
   box-shadow: 0 3px 9px rgba(70,39,10,.14);
   transition: height var(--motion-base) var(--ease-out), border-color var(--motion-fast) ease, transform var(--motion-fast) ease;
 }
-.home-shell .gallery-panel.active { height: clamp(190px, calc(52 * var(--vw)), 280px); border: 2px solid var(--accent-dark); }
-.home-shell .gallery-panel::after { background: linear-gradient(90deg, rgba(46,28,12,.08), rgba(36,21,8,.18) 35%, rgba(34,20,8,.77)); }
 .home-shell .gallery-panel:not(.active) .panel-art { filter: sepia(.65) saturate(.65) brightness(.9); }
 .home-shell .gallery-panel .panel-art img { object-position: center 43%; }
 .home-shell .panel-spine { display: none; }
@@ -1238,10 +1231,7 @@ body::before {
   color: #fff0cd;
 }
 .home-shell .gallery-panel.active .panel-label { animation: none; }
-.home-shell .gallery-panel.active .panel-label { left: 22px; right: 22px; top: auto; bottom: 22px; transform: none; }
 .home-shell .panel-label strong { font-size: 1.22rem; letter-spacing: 0; }
-.home-shell .panel-label small { color: #e8c990; }
-.collection-decks { margin-top: 10px; padding: 18px; border: 1px solid rgba(130,81,35,.42); border-radius: 8px; background: var(--estante); }
 .collection-decks h2 { max-width: none; margin-bottom: 8px; text-align: center; font-size: clamp(1.55rem, calc(5 * var(--vw)), 2rem); }
 .collection-decks .lead { margin: 0 auto 14px; text-align: center; }
 .games { border-color: rgba(130,81,35,.4); border-radius: 7px; background: var(--reja); }
@@ -1267,7 +1257,6 @@ body::before {
 }
 .home-nav button { min-height: 48px; display: grid; place-items: center; gap: 1px; border: 0; color: var(--ink); background: transparent; cursor: pointer; }
 .home-nav span { font-size: 1.25rem; line-height: 1; }
-.home-nav small { font-family: var(--font-display); font-size: .7rem; }
 /* En móvil la marca y las acciones dejan de disputarse una sola línea. Los botones
    forman una barra compacta debajo: conservan el texto y el área táctil de 44 px,
    pero ninguna acción queda cortada ni obliga a desplazar la página. */
@@ -1336,7 +1325,6 @@ body::before {
     width: 100%;
     padding-inline: 14px;
   }
-  .home-shell .home-masthead { margin-top: 0; }
 }
 
 /* El mismo vocabulario llega a las partidas, los formularios y los resultados. */
@@ -1348,9 +1336,6 @@ body::before {
 }
 .room-code-card { color: var(--ink); }
 .room-code-card small { color: var(--muted); }
-.btn { border-radius: 7px; font-family: var(--font-display); font-size: .96rem; }
-.btn-primary { background: linear-gradient(110deg, #9e451f, #813112); }
-.btn-secondary { border-color: var(--borde-suave); background: var(--boton-suave); }
 .field input, .field select { border-color: var(--borde-suave); border-radius: 6px; background-color: var(--campo); }
 .eyebrow { color: var(--accent-dark); font-family: var(--font-display); }
 .game-head { padding-bottom: 12px; border-bottom: 1px solid rgba(132,84,35,.36); }
@@ -1561,15 +1546,7 @@ body::before {
    una lámina dorada entre carta y carta que competía con las propias cartas. */
 .slot { border-color: #9c6c35; border-radius: 8px; }
 .slot-confirm { border-color: #9c6c35; border-radius: 8px; background: var(--hueco); }
-.overlay { background: rgba(47,29,14,.68); backdrop-filter: blur(6px) sepia(.2); }
-.modal { background: var(--modal-fondo); }
 .toast { border: 1px solid #c08a47; border-radius: 7px; background: #3d2815; color: #f7dfaa; }
-
-@media (min-width: 700px) {
-  .home-masthead { margin-top: 4px; }
-  .home-shell .gallery { grid-template-columns: 1fr; }
-  .home-shell .gallery-panel.active { height: 300px; }
-}
 
 /* Oscuro conserva el lenguaje del atlas y el pergamino, convertido en cuero entintado:
    marfil cálido para lectura, latón para jerarquía y capas de nogal que distinguen la
@@ -1681,9 +1658,6 @@ body::before {
   #app[data-screen="online-game"] .game-head > div:first-child { min-width: 0; }
   #app[data-screen="online-game"] .turn-name { display: block; max-width: none; max-height: none; -webkit-line-clamp: unset; font-size: 1.12rem; line-height: 1.15; overflow-wrap: anywhere; }
   #app[data-screen="online-game"] .turn-label { font-size: .6rem; line-height: 1.3; letter-spacing: .025em; white-space: normal; }
-  #app[data-screen="online-game"] :is(.turn-timer, .deck-count) { min-width: 44px; width: auto; height: auto; padding: 6px; }
-  #app[data-screen="online-game"] :is(.turn-timer, .deck-count) strong { font-size: 1rem; }
-  #app[data-screen="online-game"] :is(.turn-timer, .deck-count) span { font-size: .55rem; }
   #app[data-screen="online-game"] .scoreboard { gap: 6px; padding: 2px 0 6px; margin-bottom: 4px; }
   #app[data-screen="online-game"] .score { padding: 5px 8px; font-size: .75rem; }
   #app[data-screen="online-game"] .score b { max-width: 14ch; white-space: normal; overflow-wrap: anywhere; }

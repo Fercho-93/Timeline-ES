@@ -21,14 +21,11 @@
   --voyage-brass: #ddc38e;
 }
 #app[data-screen="perfil"][data-screen] .perfil-section { max-width: 760px; }
-#app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading { padding: 22px 10px 18px; margin-bottom: 12px; }
 #app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading .eyebrow { color: var(--voyage-sea); font-size: .65rem; letter-spacing: .15em; }
-#app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading h1 { margin: 8px 0 12px; font-size: clamp(2.6rem, 10vw, 4rem); }
 #app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading p { max-width: 38ch; margin: 0 auto; color: var(--edition-muted); font: .9rem/1.65 var(--ui-font); text-wrap: balance; }
 #app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading::after { content: "✦"; display: block; width: 100px; margin: 14px auto 0; color: var(--voyage-brass); font: 1rem/1 var(--font-display); background: linear-gradient(var(--voyage-line), var(--voyage-line)) left center / 35px 1px no-repeat, linear-gradient(var(--voyage-line), var(--voyage-line)) right center / 35px 1px no-repeat; }
 #app[data-screen="perfil"][data-screen] .perfil-section .atlas-identidad { max-width: 490px; margin: 0 auto 16px; padding: 16px; border: 1px solid var(--voyage-line); background: linear-gradient(120deg, var(--voyage-wash), var(--voyage-paper) 70%); box-shadow: 0 5px 16px #334f4814, inset 0 1px #fff5; }
 #app[data-screen="perfil"][data-screen] .perfil-section .atlas-identidad h2 { color: var(--edition-ink); margin-bottom: 10px; }
-#app[data-screen="perfil"][data-screen] .perfil-section .atlas-identidad-avatar { border-color: var(--voyage-brass); }
 #app[data-screen="perfil"][data-screen] .perfil-section .atlas-identidad-acciones { flex-wrap: wrap; gap: 8px; }
 #app[data-screen="perfil"][data-screen] .perfil-section .atlas-identidad-acciones .btn { min-height: 44px; }
 #app[data-screen="perfil"][data-screen] .perfil-section .atlas-chart { margin-bottom: 34px; scroll-margin-top: 20px; }

@@ -122,7 +122,6 @@ html #app .public-create-segmented .segmented-option::after { content: none !imp
 :root[data-theme="dark"] #app .public-table,
 :root[data-theme="dark"] #app .public-board-empty { background: #332a20; border-color: #8c6f45; color: #e8dccb; }
 :root[data-theme="dark"] #app .public-table-copy b { color: #f3e8d6; }
-:root[data-theme="dark"] #app .public-quick-hint { color: #cdbda5; }
 :root[data-theme="dark"] #app .public-table-copy small,
 :root[data-theme="dark"] #app .public-table-seats em { color: #cdbda5; }
 :root[data-theme="dark"] #app .public-table-seats i { border-color: #c9a96f; }
@@ -172,7 +171,6 @@ html #app .public-create-segmented .segmented-option::after { content: none !imp
 .mode-inline-drawer[hidden] { display: none; }
 
 /* Colecciones desplegadas dentro de «Jugar solo»: tarjetas más compactas. */
-#app .mode-inline-drawer .gallery { gap: 10px; }
 #app .mode-inline-drawer .gallery-panel,
 #app .mode-inline-drawer .gallery-panel.active { height: 116px; min-height: 116px; }
 #app .mode-inline-drawer .gallery-panel .panel-label strong { font-size: 1.25rem; }

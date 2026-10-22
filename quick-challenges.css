@@ -91,10 +91,6 @@
 .quick-result .quick-result-note { margin-top: 14px; }
 
 /* Las dos puertas de solitario comparten las acuarelas del resto de Continuum. */
-html #app[data-screen] .quick-free-setup .quick-day-panel {
-  background: radial-gradient(ellipse at 100% 0, #94b1a52b, transparent 60%),
-    radial-gradient(ellipse at 0 100%, #d5ad6022, transparent 55%), var(--edition-surface);
-}
 html #app[data-screen] .quick-free-setup .quick-mode-switch { gap: 12px; align-items: stretch; }
 html #app[data-screen] .quick-free-setup .quick-mode-card {
   --choice-tone: #88642f; --choice-wash: #d9ba7b;
