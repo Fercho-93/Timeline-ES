@@ -309,10 +309,9 @@
   CT.LocalTransport = {
     ICE_CONFIG,
     encodeSignal, decodeSignal, describeSignal, encodeMessage, decodeMessage,
-    // Codificación de texto genérica, sin las validaciones propias de la señal WebRTC:
-    // la usa `local-multiplayer.js` para meter en una sola invitación la señal y los
-    // datos de la sala (código, modalidad, huella del mazo) que el invitado todavía no
-    // conoce antes de unirse.
+    // Codificación de texto genérica (base64url sobre UTF-8), sin las validaciones propias de
+    // la señal WebRTC: la usan los enlaces de duelo, el de las colecciones (`duelo.js`) y el
+    // de Retos rápidos (`quick-challenges.js`).
     encodeText: text => toBase64Url(String(text)),
     decodeText: encoded => fromBase64Url(String(encoded).trim()),
     createGuestPeer, createHostPeer, createHostSession

@@ -362,20 +362,11 @@
     return String(nombre || "").replace(/[|\r\n]/g, " ").trim().slice(0, MAX_NOMBRE);
   }
 
-  // Base64url sobre UTF-8. `btoa` solo entiende bytes, así que el texto se codifica antes:
-  // los nombres llevan tildes y eñes y `btoa` a secas se atragantaría con ellas.
-  function aBase64url(texto) {
-    const bytes = new TextEncoder().encode(texto);
-    let binario = "";
-    for (const byte of bytes) binario += String.fromCharCode(byte);
-    return btoa(binario).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-  }
-
-  function deBase64url(texto) {
-    const relleno = texto.replace(/-/g, "+").replace(/_/g, "/");
-    const binario = atob(relleno + "=".repeat((4 - (relleno.length % 4)) % 4));
-    return new TextDecoder().decode(Uint8Array.from(binario, c => c.charCodeAt(0)));
-  }
+  // Base64url sobre UTF-8 (los nombres llevan tildes y eñes, que `btoa` a secas no admite). Es
+  // el mismo que usan los duelos de Retos rápidos y la señal del modo sin conexión: vive en
+  // local-transport.js, que carga después que este archivo, así que se busca al usarlo.
+  const aBase64url = texto => CT.LocalTransport.encodeText(texto);
+  const deBase64url = texto => CT.LocalTransport.decodeText(texto);
 
   // Ocho campos separados por barras. Compacto a propósito: el enlace entero cabe de
   // sobra en un mensaje, que es por donde va a viajar.
