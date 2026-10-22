@@ -1,23 +1,15 @@
 // Partida rápida con desconocidos: busca una mesa pública libre y entra en ella a través de Firestore.
 import { auth, db } from './firebase-client.js';
-import { doc, getDoc, onSnapshot, runTransaction, serverTimestamp, setDoc } from './vendor/firebase/firebase-firestore.js';
+import { doc, getDoc, runTransaction, serverTimestamp } from './vendor/firebase/firebase-firestore.js';
 import { publicQueueKey, isJoinablePublicRoom, makePublicRoomCode, normalizePublicCapacity } from './public-matchmaking.js';
 
 const CT = window.CONTINUUM;
 const CLIENT_VERSION = 42;
-let busy = false;
-let watchedCode = '';
 
 // El nombre que se ve en la mesa es el de este móvil (el de la bienvenida); el alias de
 // la cuenta queda como respaldo.
 const alias = () => (CT.Identidad?.propio?.() || 'Explorador').slice(0, 18);
 const avatarId = () => CT.Avatares?.ownId?.() || null;
-const notify = text => {
-  const toast=document.getElementById('toast');
-  if(!toast)return;
-  toast.textContent=text;toast.classList.add('show');
-  clearTimeout(notify.timer);notify.timer=setTimeout(()=>toast.classList.remove('show'),2600);
-};
 
 function roomData(code, mode, capacity, uid, seconds = 30, handSize = 4) {
   const name=alias();
@@ -89,24 +81,6 @@ async function findOrCreate(mode, capacityInput, { allowStale = false } = {}) {
     if(!allowStale && error?.code==='permission-denied') return findOrCreate(mode,capacityInput,{allowStale:true});
     throw error;
   });
-}
-
-function watchPublicRoom(code) {
-  if(!code || watchedCode===code) return;
-  watchedCode=code;
-  const reference=doc(db,'rooms',code);
-  const stop=onSnapshot(reference,snap=>{
-    if(!snap.exists()){watchedCode='';stop();return;}
-    const room=snap.data();
-    if(room.matchmaking!=='public'){watchedCode='';stop();return;}
-    const full=room.status==='lobby' && room.playerOrder?.length===room.capacity;
-    const panel=document.querySelector('[data-public-waiting]');
-    if(panel) panel.textContent=full?'Mesa completa. Preparando partida…':`Esperando jugadores · ${room.playerOrder?.length||0}/${room.capacity}`;
-    // El arranque ya no se dispara desde aquí: online.js juega primero el minijuego de
-    // quién empieza con la mesa completa y reparte al terminarlo (o al agotarse el plazo).
-    if(room.status!=='lobby'){watchedCode='';stop();}
-  },()=>{});
-  return stop;
 }
 
 async function readyUser() {
@@ -197,13 +171,4 @@ async function findAcrossModes(modes, capacityInput) {
   return {mode:pool[0],...await findFlexible(pool[0],capacities[0])};
 }
 
-function refresh() {
-  if(document.getElementById('app')?.dataset?.screen==='online-lobby'){
-    const code=CT.Storage.getItem('continuum-last-room');
-    if(code) watchPublicRoom(code);
-  }
-}
-new MutationObserver(refresh).observe(document.getElementById('app'),{childList:true,subtree:true});
-refresh();
-
-export { findOrCreate, findFlexible, findAcrossModes, watchPublicRoom, createTable, joinTable, CLIENT_VERSION };
+export { findOrCreate, findFlexible, findAcrossModes, createTable, joinTable, CLIENT_VERSION };

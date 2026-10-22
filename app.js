@@ -4048,7 +4048,6 @@
         const { code, mode } = await Promise.race([pending, new Promise((_, reject) => { timer = setTimeout(() => reject(Error("MATCH_TIMEOUT")), 30000); })]).finally(() => clearTimeout(timer));
         const online = await import("./online.js");
         await online.openOnlineMode({ roomCode: code, modeKey: mode, onBack: () => CT.ModeHubs ? CT.ModeHubs.open("hub-online") : home() });
-        matchmaking.watchPublicRoom?.(code);
         return;
       }
       const intent=sessionStorage.getItem('continuum-public-kind');
@@ -4068,7 +4067,6 @@
       const online = await import("./online.js");
       // Al salir de una mesa pública se vuelve a «Jugar online», no al menú de un mazo.
       await online.openOnlineMode({ roomCode: code, modeKey: mode, onBack: () => CT.ModeHubs ? CT.ModeHubs.open("hub-online") : home() });
-      matchmaking.watchPublicRoom?.(code);
     } catch (error) {
       console.error("PUBLIC_MATCH_ERROR", error?.code || "", error?.message || error);
       screen = "public-match-error";
