@@ -1,9 +1,35 @@
-// Partidas por internet con amigos (salas con código): crear y unirse a una sala, turnos, jugadas y
-// final, todo guardado en Firestore.
+// Partidas por internet con amigos (salas con código) y mesas públicas: crear y unirse a una sala,
+// turnos, jugadas y final, todo guardado en Firestore (`rooms/{código}` y sus subcolecciones
+// `presence`, `starter` y `finalRounds`). Cada jugada es una transacción que las reglas
+// (firestore.rules) validan campo a campo; local-room.js lleva las mismas reglas para el modo sin
+// conexión.
+//
+// Secciones, en este orden (cada una empieza con «// ==== Nombre ====»):
+//   - Estado de la sala
+//   - Presencia y conexión
+//   - Minijuego de quién empieza: datos
+//   - Caja de conexión y relevo del anfitrión
+//   - Mesas públicas: cola, tablón y relevo automático
+//   - Ayudantes del mazo y de la pantalla
+//   - Códigos, enlaces y entrada en la sala
+//   - Efectos y progreso de cada cambio de la sala
+//   - Sala de espera privada y minijuego
+//   - Mesa pública: sala de espera
+//   - Competición
+//   - Empezar la partida
+//   - Partida: reloj, tablero y jugadas
+//   - El Pulso y Fantasma
+//   - Fin de turno, desempate y final secreta
+//   - Fin de partida y menú de la sala
+//   - Salir, saltar turnos y expulsar
+//   - Compartir, QR y cámara
+//   - Cerrar la sala y navegar
+//   - Reconexión y oyentes de la página
 import { auth, db } from './firebase-client.js';
 import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, onSnapshot, runTransaction, serverTimestamp, setDoc, writeBatch } from "./vendor/firebase/firebase-firestore.js";
 import { CLIENT_VERSION } from './public-matchmaking.js';
 
+// ==== Estado de la sala ==========================================================================
 const appEl = document.getElementById("app");
 const toastEl = document.getElementById("toast");
 // Las modalidades, sus ejes y estos ayudantes están en modes.js, que ya está cargado
@@ -37,10 +63,11 @@ let sessionAchievements = [];
 let fallbackTimerVersion = null;
 let fallbackTimerStartedAt = 0;
 let turnTimerHandle = null;
-// Cada turno tiene 30 segundos por defecto (ajustable en la sala) para colocar la carta; si se agotan, pasa al siguiente
-// jugador. `turnStartedAt` es la marca del servidor, así que la cuenta atrás se ve igual
-// en todos los móviles aunque sus relojes no coincidan.
-const TURN_SECONDS = 20; // Valor de las salas antiguas; las nuevas guardan su ajuste.
+// El tiempo por turno es de la sala (`turnSeconds`, 0 = sin límite): lo fija quien la crea con lo
+// elegido en «Partida con amigos», o la mesa pública. Si se agota, el móvil del anfitrión pasa el
+// turno. `turnStartedAt` es la marca del servidor, así que la cuenta atrás se ve igual en todos
+// los móviles aunque sus relojes no coincidan.
+const TURN_SECONDS = 20; // Salas sin `turnSeconds`: el mismo valor por omisión que usan las reglas.
 const turnSeconds = () => roomState?.turnSeconds ?? TURN_SECONDS;
 let presenceRoom = "", presenceTimer = null, presenceBusy = false, relayTimer = null, relayKick = null, queueTimer = null;
 // Temporizadores y marcas de la sala de espera pública (ver `renderPublicLobby`).
@@ -53,6 +80,8 @@ let connectionMessage = "Conectando con la sala…";
 let starterRoom = "";
 const starterListeners = new Map(), starterRecords = new Map();
 let starterBusy = false;
+
+// ==== Presencia y conexión =======================================================================
 function stopPresence() {
   clearInterval(presenceTimer); presenceTimer = null; presenceRoom = "";
   clearInterval(relayTimer); relayTimer = null; relayKick = null;
@@ -97,6 +126,7 @@ function ensurePresence() {
   for (const [uid, stop] of presenceListeners) if (!roomState.playerOrder.includes(uid)) { stop(); presenceListeners.delete(uid); presenceRecords.delete(uid); }
 }
 
+// ==== Minijuego de quién empieza: datos ==========================================================
 function stopStarterListeners() {
   starterRoom = "";
   for (const stop of starterListeners.values()) stop();
@@ -172,6 +202,8 @@ async function submitStarterGuess() {
   } catch { showToast("No se pudo enviar la respuesta."); }
   finally { starterBusy = false; }
 }
+
+// ==== Caja de conexión y relevo del anfitrión ====================================================
 function canClaimHost() {
   if (!roomState || !user || roomState.hostUid === user.uid || !navigator.onLine || roomState.status === "ended") return false;
   const now = CT.Session.now(), host = presenceRecords.get(roomState.hostUid);
@@ -219,6 +251,7 @@ async function claimHost(auto = false) {
   finally { busy = false; }
 }
 
+// ==== Mesas públicas: cola, tablón y relevo automático ===========================================
 // Mientras alguien espera en una mesa pública con plazas libres, su móvil renueva la cola:
 // así la búsqueda sabe que la mesa sigue viva. Una cola sin renovar en dos minutos se da
 // por abandonada y la siguiente búsqueda abre una mesa nueva (ver
@@ -289,6 +322,7 @@ async function reopenPublicQueue(code = roomCode, queueKey = roomState?.queueKey
   } catch (error) { console.warn("PUBLIC_QUEUE_REOPEN", error?.code || error); }
 }
 
+// ==== Ayudantes del mazo y de la pantalla ========================================================
 // La modalidad la manda la sala; solo antes de entrar en una vale la elegida en la portada.
 function modeKey() { return roomState?.mode || selectedModeKey; }
 
@@ -360,6 +394,7 @@ function showGuide() {
   abreCapa(appEl.querySelector("[data-online-guide]"), true);
 }
 
+// ==== Códigos, enlaces y entrada en la sala ======================================================
 function createRoomCode() { return CT.Links.roomCode(8); }
 
 function cleanCode(value) {
@@ -452,7 +487,7 @@ export async function openOnlineMode(options = {}) {
       connectToRoom(invited);
     }
   } catch {
-    // A new guest may only read a lobby after entering a name.
+    // Un invitado nuevo solo puede leer la sala de espera después de escribir su nombre.
   }
 }
 
@@ -629,11 +664,7 @@ function connectToRoom(code) {
   });
 }
 
-// El perfil se alimenta desde aquí, en el único sitio por el que pasa cada cambio de la
-// sala, y no dentro de las transacciones: una transacción puede reintentarse, y la
-// instantánea que la confirma es la que cuenta. Todo lo demás —no contar las jugadas
-// ajenas, no contar dos veces la misma— lo resuelve `CT.Progreso`, que es quien recuerda
-// entre recargas qué versiones de la sala ya vio.
+// ==== Efectos y progreso de cada cambio de la sala ===============================================
 function showTurnChangeSplash(nextUid, previousState = null) {
   CT.Effects.transition('turn');
   const nextName = roomState?.players?.[nextUid]?.name || "el siguiente jugador";
@@ -662,6 +693,11 @@ function avisaPoder() {
   if (teniaPoder === false && tiene) CT.Effects.power?.();
   teniaPoder = tiene;
 }
+// El perfil se alimenta desde aquí, en el único sitio por el que pasa cada cambio de la
+// sala, y no dentro de las transacciones: una transacción puede reintentarse, y la
+// instantánea que la confirma es la que cuenta. Todo lo demás —no contar las jugadas
+// ajenas, no contar dos veces la misma— lo resuelve `CT.Progreso`, que es quien recuerda
+// entre recargas qué versiones de la sala ya vio.
 function anotaProgreso() {
   avisaPoder();
   const fresca = lastEffectVersion !== null && lastEffectVersion !== roomState.version && roomState.phase === "reveal";
@@ -697,6 +733,7 @@ function anotaProgreso() {
   }
 }
 
+// ==== Sala de espera privada y minijuego =========================================================
 // El panel del minijuego de quién empieza, para el anfitrión y para el resto por igual:
 // mientras no hay carta, solo el anfitrión puede repartirla; en cuanto la hay, cada
 // persona adivina la suya y ve cuándo le toca esperar o ya puede empezar.
@@ -789,7 +826,7 @@ function renderLobby() {
   }
 }
 
-// ---------------------------------------------------------------------------
+// ==== Mesa pública: sala de espera ===============================================================
 // Mesa pública. Como en las salas públicas de otros juegos en línea: nadie organiza, el
 // juego lleva la mesa solo y nadie se queda esperando para siempre.
 // - Con una sola persona, se busca.
@@ -918,6 +955,7 @@ function managePublicStarter() {
   publicClock = setInterval(tick, 500);
 }
 
+// ==== Competición ================================================================================
 function tournamentBoard(winners = []) {
   return CT.Tournament.board(roomState.tournament,roomState.playerOrder.map(id=>({id,name:roomState.players[id].name,hand:roomState.players[id].hand})),winners);
 }
@@ -953,6 +991,7 @@ async function nextTournamentRound() {
   finally {busy=false;}
 }
 
+// ==== Empezar la partida =========================================================================
 async function startRoom(withGhost = true) {
   if (busy || roomState.hostUid !== user.uid) return;
   const handSize = roomState.tournament?.handSize || Number(document.getElementById("online-hand-size")?.value || 4);
@@ -1008,6 +1047,7 @@ async function startRoom(withGhost = true) {
   } finally { busy = false; }
 }
 
+// ==== Partida: reloj, tablero y jugadas ==========================================================
 function clearTurnTimer() {
   if (turnTimerHandle) { clearInterval(turnTimerHandle); turnTimerHandle = null; }
 }
@@ -1212,7 +1252,7 @@ async function placeCard(index) {
   } finally { busy = false; }
 }
 
-// ---------------------------------------------------------------------------
+// ==== El Pulso y Fantasma ========================================================================
 // El Pulso en la sala compartida. Las reglas son las mismas que en un solo móvil, y están
 // explicadas en `app.js`. Lo propio de aquí es que se resuelve en dos transacciones y no
 // en una: entre lanzarlo y colocar la carta hay que enseñársela a quien reta, así que
@@ -1397,6 +1437,7 @@ function takeCard(deckInput, discardInput) {
   return CT.Engine.draw(deckInput, discardInput);
 }
 
+// ==== Fin de turno, desempate y final secreta ====================================================
 async function finishTurn() {
   if (busy || roomState?.phase !== "reveal") return;
   busy = true;
@@ -1560,6 +1601,7 @@ async function nextOnlineFinal() {
   finally { busy = false; }
 }
 
+// ==== Fin de partida y menú de la sala ===========================================================
 function renderWinner() {
   clearTurnTimer();
   const uids = (roomState.winners || [roomState.winner]).filter(uid => roomState.players[uid]);
@@ -1624,6 +1666,7 @@ function roomMenu() {
   abreCapa(appEl.querySelector("[data-room-overlay]"), true);
 }
 
+// ==== Salir, saltar turnos y expulsar ============================================================
 // Dejar una mesa pública que todavía espera jugadores: se libera la plaza al momento y, si
 // se iba quien la llevaba, la lleva quien queda primero. Si no quedaba nadie, se cierra.
 async function leavePublicLobby() {
@@ -1749,6 +1792,7 @@ async function removePlayer(targetUid) {
   } finally { busy = false; }
 }
 
+// ==== Compartir, QR y cámara =====================================================================
 async function shareRoom() {
   const url = invitationUrl();
   try {
@@ -1794,6 +1838,8 @@ async function scanRoomQr() {
     });
   } catch (error) { console.error(error); showToast("No se pudo abrir la cámara. Revisa los permisos."); }
 }
+
+// ==== Cerrar la sala y navegar ===================================================================
 async function deleteRoom() {
   if (!roomRef || roomState?.hostUid !== user.uid) return;
   await deleteDoc(roomRef);
@@ -1868,6 +1914,7 @@ function navigateOnline(action) {
 }
 CT.onlineNavigate = navigateOnline;
 
+// ==== Reconexión y oyentes de la página ==========================================================
 // Un móvil que se bloquea, cambia de pestaña o pierde cobertura un momento puede dejar el
 // listener de Firestore colgado: la conexión persistente se corta y, en algunos
 // navegadores, no se reanuda sola hasta recargar. Al volver a primer plano o recuperar
