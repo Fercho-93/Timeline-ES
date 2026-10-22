@@ -70,5 +70,5 @@ assert.match(read("scripts/build.mjs"), /"edad\.js"/);
 assert.match(read("service-worker-258.js"), /"\.\/edad\.js"/);
 assert.match(read("settings.js"), /Edad\?\.resumen/);
 assert.match(read("accounts.js"), /function askRanking\(\) \{[\s\S]{0,300}CT\.Edad && !CT\.Edad\.permiteOnline\(\)\) return;/, "no se pregunta por el ranking a un menor sin permiso");
-assert.match(read("accounts.js"), /async function setRanking\(value\) \{\n  if \(value === true && CT\.Edad && !CT\.Edad\.permiteOnline\(\)\)/, "ni se le deja activarlo");
+assert.match(read("accounts.js"), /async function setRanking\(value\) \{\n {2}if \(value === true && CT\.Edad && !CT\.Edad\.permiteOnline\(\)\)/, "ni se le deja activarlo");
 console.log("Edad: pregunta única, permiso de los padres, solo sin conexión sin permiso y cambio desde Ajustes: OK");
