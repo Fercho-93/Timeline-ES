@@ -4,8 +4,8 @@ Este registro indica qué cartas se han contrastado de forma individual. Una pru
 
 > **Nota del 11 de octubre de 2026.** Esta tabla es del cierre del 30 de septiembre y del 4 de
 > octubre. El 5 de octubre se ampliaron trece retos con 130 cartas nuevas (diez por reto), cada
-> una con fuente individual: ver `revision-siete-retos-ampliacion-2026-10-05.md` y
-> `revision-seis-retos-ampliacion-2026-10-05.md`. Los recuentos «cerrado» de abajo se refieren a
+> una con fuente individual: ver [revision-siete-retos-ampliacion-2026-10-05.md](revisiones/revision-siete-retos-ampliacion-2026-10-05.md) y
+> [revision-seis-retos-ampliacion-2026-10-05.md](revisiones/revision-seis-retos-ampliacion-2026-10-05.md). Los recuentos «cerrado» de abajo se refieren a
 > las cartas que había entonces; el catálogo actual tiene 567 cartas en 29 retos y las Grandes
 > colecciones, 1.272.
 
@@ -15,10 +15,10 @@ Este registro indica qué cartas se han contrastado de forma individual. Una pru
 | --- | --- | --- |
 | `sports-players` · Deportes por jugadores por equipo | 21/21, cerrado el 30-09-2026 | Las cifras concuerdan con la modalidad indicada. Se precisaron lacrosse de campo masculino, curling de cuatro y natación artística por equipos; esta última admite deportistas varones. La regla ahora aclara béisbol y críquet. Cada carta enlaza una referencia específica de federación, liga u organismo deportivo. |
 | `drinks` · Graduación de bebidas | 2/21, en curso | La graduación no es una propiedad fija de la categoría. Las cartas 1 y 2 ahora nombran productos concretos, Heineken Original y La Sidruca Original, con porcentajes confirmados en sus fichas de fabricante. Próxima: carta 3, vino de mesa. |
-| `companies-revenue` · Empresas por facturación en 2025 | 30/30, revisado el 04-10-2026 | 22 empresas añadidas. Las ocho anteriores revisadas; todas en M€ con media anual 2025 de Eurostat, periodo fiscal y entidad precisos. Fuentes, cálculos y particularidades en `revision-facturacion-empresas-2025.md`. |
-| `spanish-tv` · Programas españoles por fecha de estreno | 19/19, revisado el 04-10-2026 | Diez programas añadidos con referencias de cadenas y productora. Mes y año históricos en lugar de antigüedad; orden cronológico por ambos, con el alcance de cada versión documentado en `revision-programas-estrenos-2026-10-04.md`. |
+| `companies-revenue` · Empresas por facturación en 2025 | 30/30, revisado el 04-10-2026 | 22 empresas añadidas. Las ocho anteriores revisadas; todas en M€ con media anual 2025 de Eurostat, periodo fiscal y entidad precisos. Fuentes, cálculos y particularidades en [revision-facturacion-empresas-2025.md](revisiones/revision-facturacion-empresas-2025.md). |
+| `spanish-tv` · Programas españoles por fecha de estreno | 19/19, revisado el 04-10-2026 | Diez programas añadidos con referencias de cadenas y productora. Mes y año históricos en lugar de antigüedad; orden cronológico por ambos, con el alcance de cada versión documentado en [revision-programas-estrenos-2026-10-04.md](revisiones/revision-programas-estrenos-2026-10-04.md). |
 | `poker` · Manos del póker | 9/9, cerrado el 30-09-2026 | El orden de carta alta a escalera de color es correcto para póker alto tradicional de cinco cartas y sin comodines. Se mantiene sin ilustraciones por decisión de diseño de esta primera fase. |
-| `minimum-wages` · Países por salario mínimo | 22/22, revisado el 04-10-2026 | Serie Eurostat S2 de 2026 contrastada con referencias nacionales; se corrigen Rumanía, Polonia y Bélgica y se uniforma la precisión. Doce países añadidos y 22 ilustraciones renovadas. Registro: `revision-salarios-minimos-2026-10-04.md`. |
+| `minimum-wages` · Países por salario mínimo | 22/22, revisado el 04-10-2026 | Serie Eurostat S2 de 2026 contrastada con referencias nacionales; se corrigen Rumanía, Polonia y Bélgica y se uniforma la precisión. Doce países añadidos y 22 ilustraciones renovadas. Registro: [revision-salarios-minimos-2026-10-04.md](revisiones/revision-salarios-minimos-2026-10-04.md). |
 | `airports` · Aeropuertos por pasajeros | 7/7, cerrado el 30-09-2026 | Las cifras redondeadas coinciden con la tabla oficial de ACI World de tráfico total de pasajeros de 2025; se mantiene el criterio explícito de pasajeros, no movimientos de aeronaves ni carga. |
 | `eurovision-wins` · Países por victorias en Eurovisión | 12/12, cerrado el 30-09-2026 | Las cifras de los países incluidos son correctas. Se aclaró que es una selección y no un listado exhaustivo, y se actualizó la fuente al historial oficial; Bulgaria ganó por primera vez en 2026, pero no forma parte de esta selección. |
 | `storage` · Unidades de almacenamiento | 9/9, cerrado el 30-09-2026 | Orden correcto de byte a yottabyte usando prefijos decimales del SI; se especifica que no son unidades binarias. |
@@ -44,7 +44,7 @@ Quedan pendientes 202 cartas de retos rápidos: 19 de `drinks` y 183 de otros 14
 > dudas que dependían de la fuente con cifras oficiales: ríos de España según el INE y la
 > Confederación del Miño-Sil (Guadiana 818, Duero 895, Ebro 910), «In the End» 2001 e Intellivision
 > aclarada. Detalle en
-> `revision-verificacion-2026-10-20.md`. No sustituye al cierre carta a carta de abajo.
+> [revision-verificacion-2026-10-20.md](revisiones/revision-verificacion-2026-10-20.md). No sustituye al cierre carta a carta de abajo.
 
 Las otras 14 grandes colecciones ya han tenido revisiones generales y algunas correcciones, pero siguen pendientes de cierre individual carta por carta en esta ronda: 1.217 cartas en total. No significa que estén sin mirar, sino que aún no se han certificado formalmente todas sus afirmaciones y fuentes. Sumadas a los 202 retos rápidos pendientes, quedan 1.419 cartas por cerrar formalmente.
 

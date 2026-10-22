@@ -1,4 +1,4 @@
-// Correcciones de la pasada de verificación del 20 de octubre de 2026 (docs/revision-verificacion-2026-10-20.md):
+// Correcciones de la pasada de verificación del 20 de octubre de 2026 (docs/revisiones/revision-verificacion-2026-10-20.md):
 // cada una fija un dato que la revisión encontró equivocado, para que no vuelva por una edición descuidada.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

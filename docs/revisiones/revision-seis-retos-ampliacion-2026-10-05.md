@@ -12,7 +12,7 @@ Se añaden diez cartas a cada bloque: 60 cartas nuevas, cada una con su curiosid
 
 Las 64 cartas previas de estos bloques conservan sus identificadores e ilustraciones. La única corrección de valor de una carta previa es Los Simpson; la fecha visible del bloque de series se precisa para todas sus cartas. No se ha realizado una nueva auditoría integral de los otros 63 datos heredados.
 
-Las referencias, el dato y sus aclaraciones están en [fuentes-seis-retos-ampliacion-2026-10-05.json](fuentes-seis-retos-ampliacion-2026-10-05.json). La procedencia y los prompts de las imágenes están en [arte-seis-retos-ampliacion-2026-10-05.json](arte-seis-retos-ampliacion-2026-10-05.json) y en el inventario general.
+Las referencias, el dato y sus aclaraciones están en [fuentes-seis-retos-ampliacion-2026-10-05.json](../fuentes-seis-retos-ampliacion-2026-10-05.json). La procedencia y los prompts de las imágenes están en [arte-seis-retos-ampliacion-2026-10-05.json](../arte-seis-retos-ampliacion-2026-10-05.json) y en el inventario general.
 
 ## Series por temporadas
 

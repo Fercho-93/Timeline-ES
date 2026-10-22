@@ -8,7 +8,7 @@ Ingresos anuales consolidados vinculados a 2025, en millones de euros (M€), re
 
 Se usan cuentas anuales, no proyecciones ni cifras de otro año obtenidas solo a partir del año de publicación. El cierre fiscal puede caer en 2026: NVIDIA, Walmart, Inditex y Toyota cubren principalmente actividad de 2025. Microsoft cierra en junio: se toma FY2025 para resolver el empate de seis meses de cada año. No se presentan estos periodos como enero–diciembre.
 
-Para todas las monedas se emplea la misma media anual 2025 de [Eurostat](https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ert_bil_eur_a?lang=en&time=2025): 1 EUR = 1.13 USD; 1605.45 KRW; 169.04 JPY. El importe en euros es el publicado en moneda original dividido por esa media, y luego redondeado al millón. No es una traducción contable del informe ni utiliza el cambio de hoy. La copia del conjunto de datos está en [eurostat-cambios-medios-2025.json](eurostat-cambios-medios-2025.json).
+Para todas las monedas se emplea la misma media anual 2025 de [Eurostat](https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ert_bil_eur_a?lang=en&time=2025): 1 EUR = 1.13 USD; 1605.45 KRW; 169.04 JPY. El importe en euros es el publicado en moneda original dividido por esa media, y luego redondeado al millón. No es una traducción contable del informe ni utiliza el cambio de hoy. La copia del conjunto de datos está en [eurostat-cambios-medios-2025.json](../eurostat-cambios-medios-2025.json).
 
 Las cifras se corresponden con los ingresos publicados y el perímetro de cada grupo; bancos, comercio e industria tienen presentaciones contables diferentes. Los bancos usan margen bruto (ingresos totales netos de intereses pagados), mientras Fortune excluye impuestos especiales en CNPC y Sinopec. Repsol incluye esos impuestos en sus ingresos publicados. Estas diferencias se explican en las cartas y no se confunden con beneficios.
 
@@ -49,6 +49,6 @@ IKEA se identifica expresamente como **Inter IKEA Group** para comparar ingresos
 
 Mercadona: cifra de negocios sin IVA de 38.178,460 M€, no los 41.858 M€ de ventas con IVA. Su web oficial devolvió 403 durante la revisión; se contrastó la memoria emitida por la compañía en una [copia accesible](https://www.miciudadreal.es/wp-content/uploads/2026/03/memoria-anual-2025_compressed.pdf), página impresa 107. Se registran enlace original, copia y huella del documento. Repsol: se comprobaron 54.421 M€ de ventas + 440 M€ de otros ingresos ordinarios en las cuentas consolidadas; nota 5.1 para impuestos especiales.
 
-Los importes, entidades, periodos, operaciones de cambio y fuentes de las curiosidades se guardan en [fuentes-facturacion-empresas-2025.json](fuentes-facturacion-empresas-2025.json). Se conservan los ocho identificadores e ilustraciones anteriores. Las 22 cartas nuevas tienen ilustración propia.
+Los importes, entidades, periodos, operaciones de cambio y fuentes de las curiosidades se guardan en [fuentes-facturacion-empresas-2025.json](../fuentes-facturacion-empresas-2025.json). Se conservan los ocho identificadores e ilustraciones anteriores. Las 22 cartas nuevas tienen ilustración propia.
 
-Las 22 ilustraciones nuevas añaden 1.684.118 bytes. Las 30 imágenes se precargan para jugar sin conexión. Se registra el prompt y SHA-256 de cada WebP en `arte-facturacion-empresas-2025.json`.
+Las 22 ilustraciones nuevas añaden 1.684.118 bytes. Las 30 imágenes se precargan para jugar sin conexión. Se registra el prompt y SHA-256 de cada WebP en `docs/arte-facturacion-empresas-2025.json`.

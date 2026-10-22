@@ -24,7 +24,7 @@ Se añaden 70 cartas: diez en cada uno de los siete bloques. El catálogo comple
 
 ## Fuentes y alcance
 
-La consulta se realiza el 5 de octubre de 2026. [fuentes-siete-retos-ampliacion-2026-10-05.json](fuentes-siete-retos-ampliacion-2026-10-05.json) recoge por carta la cifra, unidad, fecha del dato, ubicación en la publicación, alcance, curiosidad y enlaces de ambas fuentes. Incluye extractos estructurados de GeoNames, USDA e IGN y las huellas SHA-256 de los conjuntos descargados.
+La consulta se realiza el 5 de octubre de 2026. [fuentes-siete-retos-ampliacion-2026-10-05.json](../fuentes-siete-retos-ampliacion-2026-10-05.json) recoge por carta la cifra, unidad, fecha del dato, ubicación en la publicación, alcance, curiosidad y enlaces de ambas fuentes. Incluye extractos estructurados de GeoNames, USDA e IGN y las huellas SHA-256 de los conjuntos descargados.
 
 - **Aeropuertos:** pasajeros del año natural 2025, con datos de Aena, Groupe ADP y Royal Schiphol Group. No se suman aeropuertos de un grupo empresarial. Las ocho cifras de Aena conservan su total exacto para ordenar y se muestran redondeadas a una décima de millón; los dos operadores europeos ya publican cifras redondeadas.
 - **Capitales:** altura aproximada del punto urbano de referencia de GeoNames, columna DEM del conjunto cities15000. Se usa el mismo campo en las diez nuevas cartas, sin mezclarlo con el campo elevation. La ficha contiene coordenadas, valor y fecha de modificación. El modelo SRTM3/GTOPO30 no mide una altitud media municipal: las ciudades tienen relieve y el terreno modelizado puede apartarse de una cota topográfica precisa. Esto se aclara en las cartas.
@@ -38,7 +38,7 @@ La ampliación conserva los datos, identificadores y arte de las 68 cartas anter
 
 ## Ilustraciones y comprobaciones
 
-Setenta ilustraciones originales de 512 × 768, WebP, grabado sepia sobre papel envejecido y sin texto ni marco. Revisión visual por bloque; las dos imágenes de Adele se corrigieron para representar a la artista. [arte-siete-retos-ampliacion-2026-10-05.json](arte-siete-retos-ampliacion-2026-10-05.json) registra el prompt y SHA-256 de cada imagen, también incorporados al inventario de arte.
+Setenta ilustraciones originales de 512 × 768, WebP, grabado sepia sobre papel envejecido y sin texto ni marco. Revisión visual por bloque; las dos imágenes de Adele se corrigieron para representar a la artista. [arte-siete-retos-ampliacion-2026-10-05.json](../arte-siete-retos-ampliacion-2026-10-05.json) registra el prompt y SHA-256 de cada imagen, también incorporados al inventario de arte.
 
 Las nuevas ilustraciones suman 5.361.922 bytes; todas se precargan para jugar sin conexión. Se reserva margen de 6 MB para imágenes y datos. Caché actualizada a continuum-v588.
 

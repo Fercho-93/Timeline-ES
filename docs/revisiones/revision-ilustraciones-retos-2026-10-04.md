@@ -72,4 +72,4 @@ Las nueve manos tienen cinco cartas visibles y combinaciones verificadas. Se uti
 - El Hormiguero: https://www.antena3.com/temas/trancas_y_barrancas-1
 - Póker: https://www.pokerstars.com/poker/games/rules/hand-rankings/
 
-Los prompts exactos, rutas finales y huellas de las imágenes sustituidas y nuevas quedan en `arte-revision-retos-2026-10-04.json`; el inventario de arte conserva la procedencia vigente de cada archivo.
+Los prompts exactos, rutas finales y huellas de las imágenes sustituidas y nuevas quedan en `docs/arte-revision-retos-2026-10-04.json`; el inventario de arte conserva la procedencia vigente de cada archivo.

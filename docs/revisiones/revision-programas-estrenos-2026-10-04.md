@@ -26,8 +26,8 @@ El orden interno usa `YYYYMM`, del menor al mayor. Dos estrenos del mismo mes y 
 | ¡Ahora caigo! | julio de 2011 | [Fuente oficial](https://www.antena3.com/programas/ahora-caigo/noticias/ahora-caigo-despide-primera-temporada-como-revelacion-prime-time-martes_20110926571f6ffa6584a8abb5841a19.html) | Primer estreno en julio de 2011; la fuente de septiembre recuerda expresamente ese estreno. |
 | La bola de cristal | octubre de 1984 | [Fuente oficial](https://www.rtve.es/television/la-bola-de-cristal/) | Primera emisión del programa de TVE; no el aniversario ni reposiciones. |
 
-Cada carta conserva una curiosidad y su referencia. Los enlaces y los valores exactos del catálogo se registran en [fuentes-programas-estrenos-2026-10-04.json](fuentes-programas-estrenos-2026-10-04.json).
+Cada carta conserva una curiosidad y su referencia. Los enlaces y los valores exactos del catálogo se registran en [fuentes-programas-estrenos-2026-10-04.json](../fuentes-programas-estrenos-2026-10-04.json).
 
 Se considera el comienzo del mismo programa aunque después cambie de nombre: Informe semanal nació como Semanal Informativo. La ruleta de la suerte es la versión de 2006, no el anterior título La ruleta de la fortuna. Sálvame usa el estreno nocturno de marzo de 2009. Las fechas de La Resistencia y La Revuelta corresponden a los dos títulos diferenciados.
 
-Las diez imágenes nuevas añaden 748.880 bytes. Las 19 láminas se precargan para jugar sin conexión. El registro `arte-programas-estrenos-2026-10-04.json` conserva los prompts y las huellas de los WebP. Se reserva 0,9 MB adicional en el paquete y 0,8 MB en la precarga.
+Las diez imágenes nuevas añaden 748.880 bytes. Las 19 láminas se precargan para jugar sin conexión. El registro `docs/arte-programas-estrenos-2026-10-04.json` conserva los prompts y las huellas de los WebP. Se reserva 0,9 MB adicional en el paquete y 0,8 MB en la precarga.

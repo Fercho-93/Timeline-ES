@@ -13,7 +13,7 @@ la prueba falla si vuelve a aparecer una sin ella y sin aviso. Los títulos dist
 sexo, ejemplares, rangos, cautividad o fases adultas cuando corresponde: los datos aproximados no
 deben presentarse como récords exactos ni compararse como si fueran medidas homogéneas. Las
 cartas de Retos rápidos llevan fuente y curiosidad en `mazos/quick-challenges-data.js`, y sus revisiones
-y fuentes ampliadas están en `docs/revision-*.md` y `docs/fuentes-*.json`.
+y fuentes ampliadas están en `docs/revisiones/` y `docs/fuentes-*.json`.
 
 El estado de la revisión carta por carta está en [docs/AUDITORIA_MAZOS.md](AUDITORIA_MAZOS.md):
 que una carta tenga URL no la convierte en verificada. Antes de un lanzamiento educativo o

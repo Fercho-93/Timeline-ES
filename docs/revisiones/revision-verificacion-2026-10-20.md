@@ -1,6 +1,6 @@
 # Verificación de fechas y cifras de las 14 Grandes colecciones — 20 de octubre de 2026
 
-Pasada de comprobación sobre las 1.272 cartas de las Grandes colecciones (más las 567 de los Retos rápidos revisadas por muestreo). No cierra carta a carta cada afirmación (eso sigue en `AUDITORIA_MAZOS.md`): busca los datos que estén **mal** o que **admitan dos respuestas correctas**, que son los que hacen que un jugador sienta que el juego le engaña.
+Pasada de comprobación sobre las 1.272 cartas de las Grandes colecciones (más las 567 de los Retos rápidos revisadas por muestreo). No cierra carta a carta cada afirmación (eso sigue en [AUDITORIA_MAZOS.md](../AUDITORIA_MAZOS.md)): busca los datos que estén **mal** o que **admitan dos respuestas correctas**, que son los que hacen que un jugador sienta que el juego le engaña.
 
 ## Método
 

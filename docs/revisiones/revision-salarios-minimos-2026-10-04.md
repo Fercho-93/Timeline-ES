@@ -2,7 +2,7 @@
 
 Se amplía el mazo de 10 a 22 países: los miembros de la UE con salario mínimo nacional. Fecha común: **1 de julio de 2026**. Se preservan los identificadores de las diez cartas anteriores.
 
-Se utilizan directamente los valores de Eurostat `earn_mw_cur`, periodo `2026-S2`, moneda `EUR`, publicados redondeados al euro. Cada carta enlaza su consulta específica y una fuente nacional que explica el mínimo o su funcionamiento. Se conservan las respuestas originales en EUR y moneda nacional, con sus huellas SHA-256, en [el registro de fuentes](fuentes-salarios-minimos-2026-07.json).
+Se utilizan directamente los valores de Eurostat `earn_mw_cur`, periodo `2026-S2`, moneda `EUR`, publicados redondeados al euro. Cada carta enlaza su consulta específica y una fuente nacional que explica el mínimo o su funcionamiento. Se conservan las respuestas originales en EUR y moneda nacional, con sus huellas SHA-256, en [el registro de fuentes](../fuentes-salarios-minimos-2026-07.json).
 
 [Tabla y método de Eurostat](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Minimum_wage_statistics) · [Metadatos](https://ec.europa.eu/eurostat/cache/metadata/en/earn_minw_esms.htm).
 
@@ -52,6 +52,6 @@ Las diferencias incluyen correcciones sustantivas (Rumanía, Polonia y Bélgica)
 
 ## Ilustraciones
 
-Se sustituyen las diez escenas genéricas y se añaden doce láminas propias. Cada país se reconoce por un monumento o paisaje, con un pequeño sobre de pago y monedas como contexto salarial. Grabado sepia sobre pergamino, sin valores salariales dibujados, a 512 × 768 px. Los originales generados no forman parte del paquete; se registra el prompt y la huella de cada WebP en `arte-salarios-minimos-2026-10-04.json`.
+Se sustituyen las diez escenas genéricas y se añaden doce láminas propias. Cada país se reconoce por un monumento o paisaje, con un pequeño sobre de pago y monedas como contexto salarial. Grabado sepia sobre pergamino, sin valores salariales dibujados, a 512 × 768 px. Los originales generados no forman parte del paquete; se registra el prompt y la huella de cada WebP en `docs/arte-salarios-minimos-2026-10-04.json`.
 
 Las 22 láminas de este mazo se precargan para jugar sin conexión. El cambio añade 1.287.658 bytes netos de arte (doce imágenes nuevas y sustitución de diez). Los límites del paquete y la precarga se ajustan en 0,5 MB y 1,2 MB respectivamente; cada WebP nuevo o renovado pesa menos de 80 KB.
