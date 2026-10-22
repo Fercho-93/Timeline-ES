@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 781,
+  "cache": 792,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Denunciar y bloquear en cada nombre ajeno, diseño adaptable a iPad, enlaces legales que abren en Safari, permiso de Fotos, botón de Apple con logotipo, SDK de Firebase dentro de la app, aviso previo de la cámara en salas Wi-Fi, sonido que respeta el modo silencio, copias y comentarios por la hoja de compartir, «Jugar sin conexión» si falla la cuenta y sin menciones a Android ni herramientas de prueba en iPhone"
+  "reason": "Pulido de la portada: texto mínimo legible en la galería y el ranking, sin flechas ni destello decorativos, eslogan «Ordena. Compara. Acierta.» y CTA «Ver las tres formas de jugar»"
 }
