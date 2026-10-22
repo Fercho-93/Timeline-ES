@@ -3,7 +3,10 @@
 (function () {
   'use strict';
   const CT = window.CONTINUUM;
-  const units = {time:'años', mass:'kg', lifespan:'años', speed:'km/h', area:'km²', population:'habitantes', distance:'km'};
+  // La unidad sale del eje del mazo, la misma con la que responde el duelo de cifras: una
+  // tabla propia aquí se quedó sin Idiomas («Tu cifra secreta (undefined)»). Solo las
+  // fechas cambian de forma, porque la pregunta va en plural: «¿Cuál es su cifra en años?».
+  const unit = mode => CT.mode(mode).axis === 'time' ? 'años' : CT.axis(mode).cifra.unidad;
   function factor(mode) {
     const axis = CT.mode(mode).axis;
     return ['time','population'].includes(axis) ? 1 : axis === 'mass' ? 1e9 : 1e6;
@@ -50,14 +53,14 @@
     return {rows, winners:rows.filter(row => row.distance === best).map(row => row.uid)};
   }
   function value(mode, scaled) {
-    return `${new Intl.NumberFormat('es-ES', {maximumFractionDigits:9}).format(scaled / factor(mode))} ${units[CT.mode(mode).axis]}`;
+    return `${new Intl.NumberFormat('es-ES', {maximumFractionDigits:9}).format(scaled / factor(mode))} ${unit(mode)}`;
   }
   function question(mode, final) {
     const card = CT.cards(mode).find(card => card.id === final.cardId);
-    return `<article class="panel final-card"><small>Carta neutral · Final ${final.round}</small>${CT.animalArt(mode, card)}<h2>${CT.escapeHtml(card.title)}</h2><p>¿Cuál es su cifra en ${units[CT.mode(mode).axis]}?</p></article>`;
+    return `<article class="panel final-card"><small>Carta neutral · Final ${final.round}</small>${CT.animalArt(mode, card)}<h2>${CT.escapeHtml(card.title)}</h2><p>¿Cuál es su cifra en ${unit(mode)}?</p></article>`;
   }
   function form(mode, attribute) {
-    return `<form ${attribute} class="panel final-form"><div class="field"><label for="final-guess">Tu cifra secreta (${units[CT.mode(mode).axis]})</label><input id="final-guess" name="guess" inputmode="decimal" type="text" autocomplete="off" required aria-describedby="final-number-hint"></div>
+    return `<form ${attribute} class="panel final-form"><div class="field"><label for="final-guess">Tu cifra secreta (${unit(mode)})</label><input id="final-guess" name="guess" inputmode="decimal" type="text" autocomplete="off" required aria-describedby="final-number-hint"></div>
       ${CT.mode(mode).axis === 'time' ? '<div class="field"><label for="final-era">Era</label><select id="final-era" name="era"><option value="ad">d. C.</option><option value="bc">a. C.</option></select></div>' : ''}
       <p id="final-number-hint" class="hint">Sin separadores de miles. Admite coma decimal. Tras enviarla no podrás cambiarla.</p><button class="btn btn-primary btn-block" type="submit">Guardar respuesta secreta</button></form>`;
   }

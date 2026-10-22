@@ -39,7 +39,12 @@ for (const mode of Object.keys(w.CONTINUUM.MODES)) {
   assert.notEqual(next.cardId,final.cardId);
   assert.equal(next.round,2);
   assert.equal(next.players.length,2);
+  // Cada mazo dice en qué unidad se responde: Idiomas se quedaba en «(undefined)».
+  assert.doesNotMatch(F.form(mode,'data-x') + F.question(mode,final) + F.value(mode,final.target), /undefined/, `unidad de ${mode}`);
 }
+assert.match(F.form('languages','data-x'), /Tu cifra secreta \(hablantes\)/);
+assert.match(F.form('history','data-x'), /Tu cifra secreta \(años\)/);
+assert.equal(F.value('animals', F.parse('animals','0,3')), '0,3 kg');
 function click(sel) { const el=w.document.querySelector(sel); assert.ok(el,sel); el.click(); }
 w.CONTINUUM.ModeHubs.open('hub-solo');w.document.querySelector('[data-inline-route]').click();w.sessionStorage.removeItem('continuum-entry-route');click('[data-block="historia"]');click('[data-mode="history"]');w.CONTINUUM.openDeckAs('local');
 w.document.querySelector('#hand-size').value='1';click('[data-action="start"]');
