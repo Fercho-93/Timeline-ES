@@ -13,8 +13,8 @@
   "use strict";
 
   const CT = window.CONTINUUM;
-  // Las cartas de un duelo. Las mismas quince del reto diario: bastantes para que el
-  // resultado signifique algo y pocas para jugarlo de una sentada.
+  // Las cartas de un duelo: quince, bastantes para que el resultado signifique algo y pocas
+  // para jugarlo de una sentada. (El reto diario es de diez.)
   const CARTAS = 15;
   // Un tope por encima de lo que genera la aplicación, para que un enlace manipulado no
   // pueda pedir un reparto desmesurado.
@@ -371,7 +371,7 @@
   // Ocho campos separados por barras. Compacto a propósito: el enlace entero cabe de
   // sobra en un mensaje, que es por donde va a viajar.
   //
-  //   4 | mazo | semilla | cartas | aciertos | secuencia | huella | nombre
+  //   versión | mazo | semilla | cartas | aciertos | secuencia | huella | nombre
   //
   // El primer campo es la versión de las reglas —véase `REGLAS`—, no la del formato. Una
   // aplicación que no la conozca pide actualizar en vez de comparar dos partidas que se
@@ -389,7 +389,7 @@
   // El duelo de cifras usa los mismos ocho campos y cambia los dos del medio: en vez de
   // aciertos y cuadrícula lleva los puntos y una jugada por carta.
   //
-  //   2 | mazo | semilla | cartas | puntos | respuesta:ms:salida,… | huella | nombre
+  //   versión | mazo | semilla | cartas | puntos | respuesta:ms:salida,… | huella | nombre
   function codificarCifras({ mode, seed, total, jugadas, nombre, deck, ms = CIFRAS_MS }) {
     const datos = jugadas.map(jugada => [
       textoCifra(mode, jugada.respuesta),

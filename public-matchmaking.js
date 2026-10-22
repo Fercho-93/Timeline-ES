@@ -1,6 +1,8 @@
-// Continuum — matchmaking público (MVP)
-// Capa pequeña y aislada: decide qué mesa pública puede aceptar a un jugador.
-// La persistencia y la atomicidad real se realizan con una transacción Firestore desde online.js.
+// Mesas públicas, la parte que no toca la red: clave de la cola, plazas, si una mesa admite a alguien
+// más y su código, y la versión y la caducidad que comparten la partida rápida
+// (public-matchmaking-online.js, que hace las transacciones en Firestore), las salas (online.js), el
+// tablón (public-tables.js) y Retos rápidos (quick-online.js). Sin Firebase, se prueba en Node
+// (tests/public-matchmaking.mjs).
 
 // Versión de las salas de Grandes colecciones (privadas y públicas): cada plaza la apunta
 // (`clientVersion`) y forma parte de la clave de la cola pública. `startRoom` (online.js) no

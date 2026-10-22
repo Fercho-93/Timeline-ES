@@ -1,10 +1,13 @@
-// Cómo viaja la señal WebRTC (oferta/respuesta de `local-transport.js`) de un móvil a
-// otro sin internet: no por QR —pesa varios cientos de bytes, más de lo que admite el
-// generador de QR pequeño que ya usa `online.js` para los enlaces de sala—, sino por el
-// "compartir" propio del móvil. `navigator.share` en modo avión sigue ofreciendo Bluetooth,
-// AirDrop o Nearby Share: son transportes locales del sistema operativo, no de internet.
-// Si el sistema no ofrece compartir, se cae a copiar al portapapeles; si eso tampoco está,
-// queda el texto a la vista para copiarlo a mano.
+// Pasar un texto de un móvil a otro: la hoja de «Compartir» del sistema (`shareSignal`), pegar
+// (`pasteSignal`) y las ventanas que enseñan un QR (`showQr`, con `qr-encode.js`) o lo leen con la
+// cámara (`scanQr`, con `qr-scanner.js`). Nació para la señal WebRTC del modo sin conexión
+// (`local-transport.js`), pero también lo usan las salas online, Retos rápidos y «Unirme».
+//
+// La señal pesa varios cientos de bytes y se comparte primero con el "compartir" propio del
+// móvil: `navigator.share` en modo avión sigue ofreciendo Bluetooth, AirDrop o Nearby Share, que
+// son transportes locales del sistema operativo, no de internet. Si el sistema no ofrece
+// compartir, se cae a copiar al portapapeles; si eso tampoco está, queda el texto a la vista
+// para copiarlo a mano.
 (function () {
   "use strict";
   window.CONTINUUM = window.CONTINUUM || {};
@@ -57,8 +60,8 @@
     return true;
   }
 
-  // Abre la cámara en una ventana y entrega el primer texto leído a `onText`. Vale para leer
-  // invitaciones y respuestas entre móviles sin internet (el texto no cabe en un enlace).
+  // Abre la cámara en una ventana y entrega el primer texto leído a `onText`. Vale para cualquier
+  // QR del juego: enlaces de sala y, entre móviles sin internet, invitaciones y respuestas.
   async function scanQr({ title = "Escanear QR", hint = "Encuadra el código QR del otro móvil.", onText } = {}) {
     if (!CT.QrScanner?.isSupported()) throw new Error("CAMERA_UNAVAILABLE");
     const layer = document.createElement("div");

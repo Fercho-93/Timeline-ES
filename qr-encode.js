@@ -1,7 +1,7 @@
-// Genera el código QR del modo "Sin conexión" con `qrcode-generator` (vendorizado sin
-// modificar en `qrcode-generator.js`, ver su cabecera) en vez del generador hecho a mano
-// que traía esta primera versión, fijado a un único tamaño pequeño (106 bytes, pensado
-// solo para el código corto de sala de `online.js`). Una invitación completa —la señal
+// Genera los códigos QR del juego (salas online, Retos rápidos y modo "Sin conexión") con
+// `qrcode-generator` (vendorizado sin modificar en `qrcode-generator.js`, ver su cabecera). Sustituye
+// al generador hecho a mano de las primeras versiones, fijo en un único tamaño pequeño (106 bytes,
+// solo daba para el enlace de sala de `online.js`). Una invitación del modo sin conexión —la señal
 // WebRTC más los datos de la sala— pesa varios cientos de bytes: con las 40 versiones del
 // estándar QR que soporta esta librería, cabe siempre en un único código, sin trocear en
 // varios ni tener que enseñarlos y leerlos uno a uno.

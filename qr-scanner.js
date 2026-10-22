@@ -1,7 +1,7 @@
-// Lee códigos QR con la cámara del móvil, para el modo "Sin conexión": la alternativa a
-// pegar a mano el código de invitación o de respuesta cuando no hay ningún canal común
-// entre los dos móviles (por ejemplo, Android e iPhone en modo avión, sin Bluetooth
-// emparejado ni AirDrop compatible).
+// Lee códigos QR con la cámara del móvil: los enlaces de las salas online y de Retos rápidos y,
+// sobre todo, los del modo "Sin conexión", donde es la alternativa a pegar a mano el código de
+// invitación o de respuesta cuando no hay ningún canal común entre los dos móviles (por ejemplo,
+// Android e iPhone en modo avión, sin Bluetooth emparejado ni AirDrop compatible).
 //
 // `jsqr.js` (decodificador, vendorizado sin modificar — ver su cabecera) pesa unos 250 KB
 // sin comprimir: no se carga con el resto de la aplicación, solo la primera vez que se abre

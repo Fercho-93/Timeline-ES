@@ -657,7 +657,7 @@
   // Pone las jugadas pendientes sobre la sala que acaba de llegar. Las que el servidor ya tiene se descuentan.
   function withOutbox(next,id,code) {
     const o=readOutbox();if(!o||o.code!==(code||connection?.code)||o.uid!==id)return next;
-    // Only confirmed commands acknowledge a pending move. A join also increments revision.
+    // Solo un comando confirmado da por recibida una jugada pendiente: una entrada en la sala también sube la revisión.
     if(!Array.isArray(o.commands)){
       if(next.revision!==o.base){setTimeout(()=>errorNotice(Error('Hay una jugada pendiente de una versión anterior. Revisa el duelo antes de continuar.')),0);return next;}
       o.commands=next.commands.slice();CT.Storage.setItem(OUTBOX,JSON.stringify(o));
@@ -677,7 +677,7 @@
   async function flushOutbox() {
     if(flushing)return;
     let o=readOutbox();if(!o)return;
-    // Never send pending commands using another player's current account.
+    // Nunca se mandan jugadas pendientes con la cuenta de otra persona que haya entrado en este móvil.
     const uid=CT.Accounts?.user?.uid;
     if(uid!==o.uid)return;
     if(!Array.isArray(o.commands))return;
@@ -688,7 +688,7 @@
         await CT.QuickNetwork.actOnce(o.code,sent,{commands:base,uid:o.uid});
         const current=readOutbox();
         if(!current||current.code!==o.code||current.uid!==o.uid)break;
-        // A snapshot may have already acknowledged this move while the transaction awaited.
+        // Mientras la transacción esperaba, una instantánea pudo dar ya por recibida esta jugada.
         if(JSON.stringify(current.commands)===JSON.stringify(base)){
           current.actions.shift();current.commands.push(CT.QuickRoom.sign(sent,o.uid));current.base++;
           if(current.actions.length)CT.Storage.setItem(OUTBOX,JSON.stringify(current));else CT.Storage.removeItem(OUTBOX);
@@ -705,7 +705,6 @@
   function showQrOrExplain(options) {
     if(!CT.LocalShare.showQr(options))throw Error('Este contenido es demasiado largo para un código QR. Usa «Compartir».');
   }
-  // Abre la cámara y, al leer un código, sigue con `next`. Sin cámara lo explica.
   // Enlace de invitación: en la app nativa location.href es capacitor://localhost, inútil para otro móvil.
   function roomUrl(code){return new URL(CT.Links.invitation({quickRoom:code}));}
   // Vale el enlace (con #quick-room=, ?quick-room= o cualquier texto con el código) o el código suelto.
@@ -715,6 +714,7 @@
     const match=raw.match(/quick-room=([^&#\s]+)/);
     return match?decodeURIComponent(match[1]):raw;
   }
+  // Abre la cámara y, al leer un código, sigue con `next`. Sin cámara lo explica.
   async function scanQrInto(title,hint,next) {
     if(!CT.QrScanner?.isSupported())throw Error('Este navegador no permite usar la cámara aquí.');
     await CT.LocalShare.scanQr({title,hint,onText:text=>{Promise.resolve(next(text)).catch(errorNotice);}});

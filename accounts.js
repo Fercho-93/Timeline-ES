@@ -239,8 +239,6 @@ function reportDialog({ uid, alias, context }) {
 function editNameScreen() {
   accountDialog(`<div class="overlay"><section class="modal"><h2>Cambiar nombre</h2><p>Este nombre será público en el ranking. No uses datos personales.</p><label>Nombre<input id="account-alias" minlength="2" maxlength="24" autocomplete="nickname" value="${esc(profile.alias)}"></label><p id="account-delete-message" role="status"></p><button class="btn btn-primary" data-account-action="rename">Guardar nombre</button><button class="btn btn-secondary" data-account-action="close">Cancelar</button></section></div>`,true);
 }
-// Sin argumento lee el diálogo de la tarjeta; con él, lo llama la identidad del juego
-// (bienvenida y Atlas) con el nombre ya elegido.
 // Las filas de hoy y de esta semana que ya tiene quien juega, para cambiarles el nombre o el avatar en la
 // misma transacción que el perfil. Solo las que corresponden al progreso guardado: las reglas comprueban
 // que la fila coincide con él.
@@ -257,6 +255,8 @@ async function scoreRows(tx, uid) {
   if (found.exists() && data.found === found.data().cards && data.foundCollections === found.data().collections && data.foundQuick === found.data().quick) rows.push([foundScore(uid), found.data()]);
   return rows;
 }
+// Sin argumento lee el diálogo de `editNameScreen`; con él, lo llama la identidad del juego
+// (bienvenida y Atlas) con el nombre ya elegido.
 async function rename(aliasArg) {
   const desdeDialogo = typeof aliasArg !== 'string';
   const alias = (desdeDialogo ? document.getElementById('account-alias').value : aliasArg).trim();
@@ -285,8 +285,8 @@ async function rename(aliasArg) {
   if (desdeDialogo) CT.closeDialog();
 }
 // El avatar que se ve en el ranking es el que cada persona eligió, no uno calculado. Se guarda en
-// el perfil (y en su fila del ranking, si la hay) cada vez que cambia. Si las reglas aún no
-// admiten el avatar nuevo, falla en silencio y se reintenta en la próxima apertura.
+// el perfil (y en su fila del ranking, si la hay) cada vez que cambia. Si no se puede guardar
+// (sin conexión, por ejemplo), falla en silencio y se reintenta en la próxima apertura.
 async function syncAvatar() {
   const wanted = CT.Avatares?.ownId?.();
   if (!identity || !profile || !wanted || wanted === profile.avatar || !CT.Avatares.ids.includes(wanted)) return;
@@ -300,7 +300,7 @@ async function syncAvatar() {
       for (const [ref, row] of tablas) tx.set(ref, {...row, avatar: wanted, updatedAt: serverTimestamp()});
     });
     profile = {...profile, avatar: wanted};
-  } catch { /* sin conexión o reglas sin actualizar: se reintenta al entrar */ }
+  } catch { /* sin conexión o rechazado: se reintenta al entrar */ }
 }
 // Solo consulta datos públicos ya permitidos por las reglas; los perfiles son privados.
 // Si el rival no tiene fila pública o estamos sin conexión, Avatares conserva el UID.
@@ -595,8 +595,6 @@ async function enter() {
     feedback(message(error));button('account-load',enter);if(sinCuenta)button('account-offline',offlineFallback);
   }
 }
-// Aparecer o dejar de aparecer en el ranking. Al dejarlo se borran las filas de hoy y de esta semana (y la
-// antigua tabla única); si no hay conexión, se reintenta al volver a abrir el juego.
 // Todas las filas que pudo publicar: una por día y una por semana desde que existe la cuenta (el
 // historial de retos solo guarda 60 días, así que no basta con los días que recuerda). Borrar una
 // fila que no existe no falla, así que no hace falta saber cuáles llegaron a publicarse.
@@ -652,6 +650,8 @@ async function removeRankingRows() {
   const uid = identity.uid;
   await deleteAll([...rankingRows(uid), refs(uid).ranking, foundScore(uid)]);
 }
+// Aparecer o dejar de aparecer en el ranking. Al dejarlo se borran las filas de hoy y de esta semana (y la
+// antigua tabla única); si no hay conexión, se reintenta al volver a abrir el juego.
 async function setRanking(value) {
   if (value === true && CT.Edad && !CT.Edad.permiteOnline()) { CT.Storage.notice('Con menos de 14 años necesitas el permiso de tu madre, padre o tutor para aparecer en el ranking.', [['Entendido', () => document.getElementById('storage-notice')?.remove()]]); refreshCard(); return; }
   const records = readRecords();

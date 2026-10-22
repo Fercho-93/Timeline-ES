@@ -39,7 +39,8 @@
     peer.peerConnection.addEventListener('connectionstatechange',()=>{if(!closed && ['disconnected','failed','closed'].includes(peer.peerConnection.connectionState))fail(Error('Se ha perdido la conexión con quien creó la sala. Comprobad la red Wi-Fi.'));});
     return {kind:'local',host:false, answer:peer.answerSignal, act(action){if(!room||!peer.isReady())throw Error('Se ha perdido la conexión con quien creó la sala.');peer.send('quick-action',{catalog:fingerprint(),action,revision:room.revision});},close(){closed=true;peer.close();}};
   }
-  // Presentation changes do not alter the cards/rules required to resume a game.
+  // La huella solo cuenta lo que hace falta para reanudar una partida (cartas, valores y sentido de cada
+  // reto): los cambios de presentación (textos, imágenes) no la alteran.
   function fingerprint(){return CT.seedFrom(JSON.stringify({version:CT.QuickCatalog.version,challenges:CT.QuickCatalog.challenges.map(c=>({id:c.id,direction:c.direction,cards:c.cards.map(x=>({id:x.id,value:x.value}))}))}));}
   function compatible(value){return value===fingerprint();}
   async function internet(options) {return (await import('./quick-online.js')).connect(options);}

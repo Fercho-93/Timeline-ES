@@ -4,7 +4,9 @@ import { auth, db } from './firebase-client.js';
 import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, runTransaction, serverTimestamp, setDoc, Timestamp, where } from './vendor/firebase/firebase-firestore.js';
 
 const CT = window.CONTINUUM;
-const TURN_SECONDS = 15; // Ya no hay reloj por turno; solo el tope que se guardaba en `ms` y que usan las partidas antiguas.
+// Sin plazo por turno (`seconds` = 0), tope del tiempo que se apunta en `ms`; y plazo con el que se
+// puntúan las partidas de cifras antiguas, de cuando cada carta sumaba hasta 100 puntos.
+const TURN_SECONDS = 15;
 const INACTIVE_DAYS = 7;
 // Quien crea el duelo juega su primera carta antes de que entre el rival (salvo en una revancha que empieza el otro).
 const firstTurnOf = game => game?.status === 'waiting' && game.playersOrder?.length === 1 && game.playersOrder[0] === uid() && !game.turnIndex && !game.starter;
@@ -232,7 +234,7 @@ async function sendPending(move) {
   let result;
   try {
     result = await runTransaction(db, async tx => {
-      // Never use mutable current here: snapshots, navigation and retries may change it.
+      // Aquí no se usa `current`: una instantánea, la navegación o un reintento pueden cambiarlo.
       const ref = doc(db, 'turnDuels', move.gameId), game = (await tx.get(ref)).data();
       if (game?.plays?.[move.turnIndex]?.operationId === move.operationId) return 'confirmed';
       const first = firstTurnOf(game) && game.playersOrder[0] === move.uid;
@@ -257,7 +259,7 @@ async function sendPending(move) {
       tx.update(ref, { plays: [...(game.plays || []), play], timeline: line, scores: { ...game.scores, [move.uid]: (game.scores?.[move.uid] || 0) + points }, turnIndex: nextIndex, turnUid: first || finished ? null : game.playersOrder[(nextIndex + (game.starter || 0)) % 2], status: first ? 'waiting' : finished ? 'finished' : 'playing', updatedAt: serverTimestamp(), resultText: finished ? 'Los dos jugadores han completado la partida.' : null });
       return 'confirmed';
     });
-    // Do not delete a newer operation saved by another tab/account.
+    // No se borra una jugada más nueva guardada desde otra pestaña u otra cuenta.
     if (move.uid === uid() && pendingMove(move.gameId)?.operationId === move.operationId) savePending(move.gameId, null);
     if (current?.id === move.gameId) delivery = result === 'confirmed' ? 'Jugada confirmada' : 'La partida ya cambió o terminó. No se ha repetido la jugada.';
   } catch (error) {
@@ -313,7 +315,9 @@ async function join(gameId, back, accept = false) {
   });
   subscribe(gameId);
 }
-// Cada turno se juega sin reloj: se abre la carta cuando entras y la respuesta espera lo que haga falta.
+// Al entrar en tu turno se anota cuándo empezó (`enteredAt`). Si el duelo tiene plazo (`seconds`), esa
+// hora se guarda en el móvil para que salir y volver no reinicie el reloj; sin plazo, la carta espera lo
+// que haga falta y `ms` es solo un dato.
 function prepareTurn() {
   if (!firstTurnOf(current) && (current?.status !== 'playing' || current.turnUid !== uid())) return;
   const key = `${current.id}-${current.turnIndex}`;
@@ -520,8 +524,8 @@ async function challenge(sourceId, back = onBack) {
     if (existing) { open({ gameId: existing.id, back }); return; }
     let round = 0, gameId;
     const seed = CT.Duelo.crearSemilla(), total = compModes(source) ? source.total : source.kind === 'cifras' ? CT.Duelo.Cifras.CARTAS : TOTAL;
-    // A bounded identifier avoids ever-growing rematch links. An ended invitation
-    // gets another round; simultaneous/repeated taps still address the same document.
+    // Un identificador acotado evita que los enlaces de revancha crezcan sin fin. Una invitación
+    // terminada pasa a la ronda siguiente; dos toques seguidos siguen apuntando al mismo documento.
     const previous = games.filter(g => g.sourceDuel === sourceId && g.playersOrder[0] === uid() && Number.isInteger(g.invitationRound));
     if (previous.length) round = Math.max(...previous.map(g => g.invitationRound)) + 1;
     let available = false;
