@@ -99,11 +99,10 @@ Un presupuesto no es un corte automático.
 
 ## Al publicar reglas
 
-El workflow `reglas-firestore.yml` publica en producción en cuanto llega a `main` un cambio de
-`firestore.rules`, después de pasar las pruebas del emulador. Antes de subirlo, ejecutar
-`npm run test:reglas` y comprobar que los clientes ya instalados siguen funcionando con las reglas
-nuevas. Ante una duda, comparar el contenido activo (consola o Firebase Rules API) con el archivo
-del repositorio, y comprobar una sala desde dos dispositivos.
+Cómo se publican (en producción, en cuanto llega a `main` un cambio de `firestore.rules`) y qué
+comprobar antes está en [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#reglas-de-firestore).
+Ante una duda, comparar el contenido activo (consola o Firebase Rules API) con el archivo del
+repositorio, y comprobar una sala desde dos dispositivos.
 
 ## Arquitectura para una futura competición pública
 

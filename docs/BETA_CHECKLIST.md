@@ -1,9 +1,12 @@
-# Continuum — beta: pruebas, testers y lanzamiento
+# Continuum — beta: pruebas a mano y testers
 
-Lista de comprobación de la beta y guía para trabajar con testers. El estado general vive en
-[ROADMAP.md](ROADMAP.md); la ficha y las declaraciones de las tiendas, en
-[TIENDAS.md](TIENDAS.md); cómo se publica cada pieza, en la sección «Despliegue» de
-[CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#despliegue).
+Lo que necesita una persona y un móvil: las pruebas del juego y en dispositivos reales, y cómo
+trabajar con testers. Las comprobaciones automáticas (pruebas, reglas, build móvil y
+`npx cap sync`) las pasa la integración continua en cada subida (ver
+[tests/README.md](../tests/README.md)). El estado y los pendientes viven en
+[ROADMAP.md](ROADMAP.md); la ficha, las declaraciones de las tiendas y el criterio de
+publicación, en [TIENDAS.md](TIENDAS.md); cómo se publica cada pieza, en la sección «Despliegue»
+de [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#despliegue).
 
 ## Público y propuesta
 
@@ -12,19 +15,7 @@ hechos, sin estudiar reglas largas. Propuesta: colocar una carta, descubrir su e
 compartir una partida breve en el mismo móvil, en una sala o en un duelo. No se considera
 validada hasta observar uso real y repetición voluntaria.
 
-## A. Comprobación automática
-
-- [ ] `npm ci`
-- [ ] `npm test`
-- [ ] `npm run test:reglas`
-- [ ] `npm run build`
-- [ ] `npx cap sync`
-- [ ] Sin referencias visibles a la marca anterior (lo vigila `tests/marca.mjs`).
-- [ ] Las imágenes referenciadas existen en `dist/` (`tests/build-movil.mjs`).
-- [ ] El service worker sirve la versión actual: `CACHE`, `CT.APP_VERSION` y `css/edition.css?v=`
-      subidos juntos (ver `CLAUDE.md`).
-
-## B. Pruebas del juego
+## Pruebas del juego
 
 - [ ] Partida en un solo móvil completa.
 - [ ] Competición completa (solo, un solo móvil y cada uno en su móvil).
@@ -43,7 +34,7 @@ validada hasta observar uso real y repetición voluntaria.
 - [ ] Reanudación de partida guardada y actualización sin perder progreso.
 - [ ] Entrada por enlace, por QR y por código.
 
-## C. Pruebas físicas
+## Pruebas físicas
 
 Registrar dispositivo, sistema, versión de Continuum (Ajustes → «Versión y conexión») y
 resultado. No registrar nombres reales salvo que sea imprescindible. Las comprobaciones
@@ -64,7 +55,7 @@ automáticas no sustituyen estas pruebas.
 - [ ] Gesto Atrás de Android.
 - [ ] Actualización conservando una partida y con una sala pendiente.
 
-## D. Testers
+## Testers
 
 ### Cómo elegir el grupo
 
@@ -136,45 +127,27 @@ recomienda? Solo después, cómo se monetiza. Las preguntas de pago ayudan ahí,
 condicionar el diseño antes de comprobar que el juego funciona. No se han recogido testimonios:
 no inventar resultados de testers.
 
-## E. Criterios para ampliar la beta
+## Criterios para ampliar la beta
 
-- [ ] Al menos 8 de cada 10 testers empiezan y colocan una carta sin ayuda.
-- [ ] Ninguna pérdida de partida conocida.
-- [ ] Ningún bloqueo P0 o P1 abierto.
-- [ ] Invitaciones funcionando entre iPhone y Android.
-- [ ] Evidencia de repetición voluntaria.
-- [x] Correo de comentarios configurado (`feedbackcontinuum@gmail.com`).
-- [ ] Privacidad revisada para el alcance de la beta.
+Se amplía la beta cuando:
 
-Mientras no se cumplan, mantener una beta pequeña.
+- Al menos 8 de cada 10 testers empiezan y colocan una carta sin ayuda.
+- No se conoce ninguna pérdida de partida.
+- No hay ningún bloqueo P0 o P1 abierto.
+- Las invitaciones funcionan entre iPhone y Android.
+- Hay evidencia de repetición voluntaria.
+- El correo de comentarios está configurado (lo está: `feedbackcontinuum@gmail.com`).
+- La privacidad está revisada para el alcance de la beta.
 
-## F. Requisitos previos a las tiendas
-
-Detalle en [TIENDAS.md](TIENDAS.md).
-
-- [ ] Nombre Continuum revisado (OEPM/EUIPO y tiendas).
-- [x] Procedencia del arte documentada.
-- [x] Cartas de Naturaleza con fuente.
-- [ ] Política de privacidad revisada profesionalmente.
-- [x] Responsable y soporte: nombre y correo. Juego gratuito y sin ingresos: declararse «no comerciante» en App Store y Google Play (ver `docs/TIENDAS.md`).
-- [ ] Condiciones de uso, aviso legal, soporte y página de borrado (borradores publicados; no son asesoramiento jurídico): revisión por un abogado antes del lanzamiento.
-- [ ] «Privacidad de la app» (App Store) y «Seguridad de los datos» (Google Play): copiar las respuestas de `docs/TIENDAS.md`.
-- [ ] Clasificación de edad y público objetivo: respuestas en `docs/TIENDAS.md`.
-- [ ] Capturas reales e icono definitivo.
-- [ ] Descripción de tienda revisada.
-- [x] Certificados y secretos fuera del repositorio (secretos de GitHub Actions).
-- [x] Subida a TestFlight probada.
-- [ ] TestFlight con testers externos.
-- [ ] Google Play Closed Testing.
-- [ ] Prueba de actualización completada.
+Mientras no se cumplan, mantener una beta pequeña. Lo que falta para las tiendas está en
+[ROADMAP.md](ROADMAP.md#8-lanzamiento) y el criterio de publicación, en
+[TIENDAS.md](TIENDAS.md#criterio-de-publicación).
 
 ## Registro de incidencias
 
-Usar la plantilla de GitHub (`.github/ISSUE_TEMPLATE/incidencia.yml`) o una fila de esta tabla.
-
-| Fecha | Versión | Dispositivo/sistema | Modalidad y mazo | Pasos | Esperado | Ocurrido | Frecuencia | Prioridad | Estado |
-|---|---|---|---|---|---|---|---|---|---|
-| — | — | — | — | — | — | — | — | — | — |
+Usar la plantilla de GitHub (`.github/ISSUE_TEMPLATE/incidencia.yml`). Cada incidencia registra
+fecha, versión, dispositivo y sistema, modalidad y mazo, pasos, resultado esperado y ocurrido,
+frecuencia, prioridad y estado.
 
 Prioridades: **P0** pérdida de datos o acceso indebido; **P1** impide entrar o terminar una
 partida; **P2** confusión o dificultad frecuente; **P3** mejora menor. Estados: nueva,

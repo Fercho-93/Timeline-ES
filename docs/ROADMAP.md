@@ -1,12 +1,13 @@
 # Continuum — hoja de ruta
 
-Estado revisado: 11 de octubre de 2026.
+Estado revisado el 11 de octubre de 2026; los pendientes de la beta y de las tiendas se reunieron
+aquí el 22 de octubre de 2026.
 
-Este documento es la referencia única del estado del proyecto: distingue lo que está
-implementado en el repositorio de lo que requiere pruebas reales, credenciales, configuración
-externa o una decisión del titular. Las listas de comprobación de la beta están en
-[BETA_CHECKLIST.md](BETA_CHECKLIST.md) y lo relativo a las tiendas en
-[TIENDAS.md](TIENDAS.md).
+Este documento es la referencia única del estado del proyecto y el único sitio con la lista de
+pendientes: distingue lo que está implementado en el repositorio de lo que requiere pruebas
+reales, credenciales, configuración externa o una decisión del titular. Cómo se prueba a mano
+y con testers está en [BETA_CHECKLIST.md](BETA_CHECKLIST.md); las fichas, las declaraciones y el
+criterio de publicación, en [TIENDAS.md](TIENDAS.md#criterio-de-publicación).
 
 ## Estado resumido
 
@@ -70,9 +71,12 @@ externa o una decisión del titular. Las listas de comprobación de la beta est�
       (ver [SEGURIDAD_Y_OPERACION.md](SEGURIDAD_Y_OPERACION.md#app-check)).
 - [ ] Alertas de presupuesto y observación de lecturas, escrituras y altas.
 - [ ] Probar en un Android físico.
-- [ ] Repetir en iPhone y Android: reconexión, bloqueo, pérdida de red, enlaces, actualización,
-      orientación y áreas seguras.
-- [ ] Reclutar testers y registrar resultados sin datos personales innecesarios.
+- [ ] Repetir en iPhone y Android las pruebas físicas de
+      [BETA_CHECKLIST.md](BETA_CHECKLIST.md#pruebas-físicas): reconexión, bloqueo, pérdida de
+      red, enlaces, actualización, orientación, áreas seguras y tabletas.
+- [ ] Reclutar testers y registrar resultados sin datos personales innecesarios
+      ([BETA_CHECKLIST.md](BETA_CHECKLIST.md#testers)); ampliar la beta solo cuando se cumplan
+      sus [criterios](BETA_CHECKLIST.md#criterios-para-ampliar-la-beta).
 
 ## 3. Contenido y derechos
 
@@ -91,7 +95,7 @@ externa o una decisión del titular. Las listas de comprobación de la beta est�
 - [x] Borrado explícito de los datos de cada cuenta.
 - [x] App Check en web e iPhone.
 - [ ] App Check en Android: Play Integrity exige que la app esté en Google Play.
-- [ ] Aplicar el *enforcement* de App Check.
+- [ ] Aplicar el *enforcement* de App Check (ver §2).
 - [ ] Límites, alertas y procedimiento de cierre ante abuso o costes anómalos.
 - [x] Moderación de alias: filtro de nombres ofensivos y reservados, botón «Denunciar» y colección `reports` (ver [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#denuncias-de-nombres)). El botón «Denunciar o bloquear» sirve también para bloquear (ranking, mesas, tablón, sala y duelos).
 - [ ] Mantener fuera la competición pública arbitrada: exigiría un servidor autoritativo.
@@ -122,8 +126,8 @@ externa o una decisión del titular. Las listas de comprobación de la beta est�
 
 ## 7. Servidor de competición pública
 
-Hubo un prototipo de servidor autoritativo (en el historial de git hasta octubre de 2026), retirado
-porque no se desplegó. Si algún día se quiere competición pública arbitrada, el diseño está en
+Fuera de alcance mientras no haga falta: si algún día se quiere competición pública arbitrada, el
+diseño (y el prototipo retirado que sigue en el historial de git) está en
 [SEGURIDAD_Y_OPERACION.md](SEGURIDAD_Y_OPERACION.md#arquitectura-para-una-futura-competición-pública).
 
 ## 8. Lanzamiento
@@ -134,10 +138,14 @@ porque no se desplegó. Si algún día se quiere competición pública arbitrada
       [TIENDAS.md](TIENDAS.md#decisión-del-titular-21-de-octubre-de-2026-gratis-al-lanzar-ventas-más-adelante)).
 - [ ] Play Console: declararse «no comerciante» al crear la ficha.
 - [ ] (Futuro, solo si compensa) Lanzar las compras (colecciones y mazos): condiciones de venta, política de privacidad sin «no hay compras» y con una sección «Compras» (cobran Apple o Google; el juego no ve datos de pago; qué se guarda para desbloquear y restaurar), restauración de compras, reglas de menores de las tiendas. Antes: ser comerciante, NIF y dirección física públicos y gestoría (ver `docs/TIENDAS.md`).
-- [ ] Revisión legal de la política de privacidad, las condiciones de uso, el aviso legal, la conservación y el borrado.
+- [ ] Revisión legal (por un abogado: los textos publicados son borradores, no asesoramiento
+      jurídico) de la política de privacidad, las condiciones de uso, el aviso legal, la página de
+      soporte, la de borrado de cuenta, los plazos de conservación y las declaraciones de cada
+      tienda.
 - [ ] Rellenar los cuestionarios de edad, público objetivo, «Privacidad de la app» y «Seguridad de los
       datos» con las respuestas de [TIENDAS.md](TIENDAS.md) al crear las fichas.
-- [ ] Capturas reales desde una compilación final.
+- [ ] Capturas reales desde una compilación final e icono definitivo.
+- [ ] Revisar la descripción de la ficha de cada tienda.
 - [ ] Validar comprensión, repetición y disposición a pagar con testers.
 - [ ] Decidir la monetización después de la beta; si se venden mazos, compras oficiales,
       restauración, reembolsos y validación en servidor.
@@ -209,11 +217,8 @@ No se consideran completados por existir código o documentación:
 - La seguridad frente a clientes modificados.
 - La preparación comercial de la competición pública.
 
-## Criterio para declarar la beta preparada
+## Cuándo se da algo por listo
 
-1. Las suites automáticas están verdes.
-2. Las reglas, las Functions y App Check activos en Firebase están verificados.
-3. Existe una compilación móvil instalable en cada plataforma.
-4. Se ha probado al menos un iPhone y un Android reales.
-5. No hay bloqueos P0/P1 conocidos.
-6. El canal de comentarios y la política de privacidad están disponibles.
+El criterio para dar por buena una compilación de tienda está en
+[TIENDAS.md](TIENDAS.md#criterio-de-publicación); el de ampliar la beta, en
+[BETA_CHECKLIST.md](BETA_CHECKLIST.md#criterios-para-ampliar-la-beta).

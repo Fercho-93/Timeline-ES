@@ -1,14 +1,13 @@
 # Continuum en las tiendas
 
-Ficha, notas de revisión, declaraciones de privacidad y preparación comercial para App Store
-y Google Play. El estado general está en [ROADMAP.md](ROADMAP.md); la beta y sus pruebas, en
-[BETA_CHECKLIST.md](BETA_CHECKLIST.md); la firma y la subida de compilaciones, en
-[DISTRIBUCION_MOVIL.md](DISTRIBUCION_MOVIL.md).
+Ficha, notas de revisión, declaraciones de privacidad, preparación comercial y criterio de
+publicación para App Store y Google Play. El estado y la lista de pendientes están en
+[ROADMAP.md](ROADMAP.md); la beta y sus pruebas, en [BETA_CHECKLIST.md](BETA_CHECKLIST.md); la
+firma y la subida de compilaciones, en [DISTRIBUCION_MOVIL.md](DISTRIBUCION_MOVIL.md).
 
-Estado a 11 de octubre de 2026: la app de iPhone se distribuye por TestFlight; Google Play
-todavía no tiene ficha. Nada de este documento se ha enviado aún a revisión. Todo lo que se
-envíe a una tienda debe describir exactamente la compilación enviada: si una función cambia,
-se revisa aquí antes de enviarla.
+Nada de este documento se ha enviado aún a revisión. Todo lo que se envíe a una tienda debe
+describir exactamente la compilación enviada: si una función cambia, se revisa aquí antes de
+enviarla.
 
 ## Identidad
 
@@ -37,7 +36,8 @@ No se prometerá «gratis para siempre» en ninguna ficha ni texto (hoy no figur
 
 **Estado a 21 de octubre de 2026 (Apple):** declaración de comerciante completada como «no comerciante»,
 contrato del Apple Developer Program aceptado y tarjeta de la membresía anual actualizada (si caduca, Apple
-puede retirar las apps). Pendiente: la ficha de Google Play con «no comerciante».
+puede retirar las apps). En Google Play se declarará igual al crear la ficha (pendiente en
+[ROADMAP.md](ROADMAP.md#8-lanzamiento)).
 
 **Fase 2, cuando el juego tenga tráfico: ventas de colecciones y mazos dentro del juego.** Antes de la primera
 venta, en este orden:
@@ -354,23 +354,23 @@ EUIPO y las propias tiendas. Conservar la procedencia del arte
 fuente factual no da licencia para copiar su texto o sus imágenes. Decidir la licencia definitiva
 del código.
 
-**Pendiente externo:**
-
-- Google Play Console y la primera ficha de Android.
-- Dirección postal del responsable.
-- Revisión legal de la política de privacidad y de las declaraciones de cada tienda.
-- Búsqueda de marca.
-- Pruebas en Android real y con testers externos de TestFlight.
-- Capturas finales.
+Lo que falta antes de publicar (Google Play Console, revisión legal, marca, pruebas en Android y
+con testers externos, capturas) está en [ROADMAP.md](ROADMAP.md#8-lanzamiento).
 
 ## Criterio de publicación
 
-No enviar una compilación como definitiva hasta que:
+Es el único criterio para dar por buena una compilación: no se declara preparada la beta ni se
+envía una compilación como definitiva hasta que:
 
-1. Se haya probado en un iPhone y un Android reales.
-2. No queden bloqueos P0/P1 (ver [BETA_CHECKLIST.md](BETA_CHECKLIST.md)).
-3. La política de privacidad tenga responsable, contacto y URL definitivos (sin domicilio mientras el juego sea
-   gratuito: ver «Decisión del titular» arriba).
-4. La ficha y las declaraciones describan exactamente las funciones de la versión enviada.
-5. Firebase (reglas, Functions y App Check) esté activo y verificado para la revisión.
-6. Se hayan guardado la compilación enviada, su número, su hash y sus notas de cambios.
+1. Las suites automáticas estén en verde.
+2. Exista una compilación instalable en cada plataforma y se haya probado en un iPhone y un
+   Android reales ([pruebas físicas](BETA_CHECKLIST.md#pruebas-físicas)).
+3. No queden bloqueos P0/P1 (ver [BETA_CHECKLIST.md](BETA_CHECKLIST.md#registro-de-incidencias)).
+4. La política de privacidad tenga responsable, contacto y URL definitivos (sin domicilio mientras el juego sea
+   gratuito: ver «Decisión del titular» arriba), y el canal de comentarios funcione.
+5. La ficha y las declaraciones describan exactamente las funciones de la versión enviada.
+6. Firebase (reglas, Functions y App Check) esté activo y verificado para la revisión.
+7. Se hayan guardado la compilación enviada, su número, su hash y sus notas de cambios.
+
+Ampliar la beta a más testers tiene sus propios criterios, en
+[BETA_CHECKLIST.md](BETA_CHECKLIST.md#criterios-para-ampliar-la-beta).
