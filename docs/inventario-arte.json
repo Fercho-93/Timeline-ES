@@ -3520,20 +3520,6 @@
       }
     },
     {
-      "path": "assets/continuum-splash-clean-v3.webp",
-      "sha256": "aa6f600e0a9ee0717d11ea182fe1754e450557762a27a1d2fad21c6880a59267",
-      "rightsEvidence": {
-        "status": "ai-generated-with-recorded-prompt",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": "Eliminar solo las cinco cartas flotantes periféricas de la portada y reconstruir de forma natural el pergamino, las nubes, el polvo dorado y las líneas del astrolabio situadas detrás, conservando sin cambios la composición, la luz, los planetas y el globo.",
-        "generatedAt": "2026-09-19",
-        "referenceImage": "assets/continuum-splash-v2.webp",
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
       "path": "assets/country-cards/2001.webp",
       "sha256": "8474b3d00dcaf01bfa125549d1ea39e06646afed94c78a6d707c8d51ca47a76e",
       "rightsEvidence": {
@@ -22577,6 +22563,20 @@
     {
       "path": "assets/splash-card-vesuvius.webp",
       "sha256": "690443c3e24a3ad8b0da8909e42aee6006c6dd969d58c76a7fa984f58228d5ed",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/splash-clouds-mask.svg",
+      "sha256": "db5efd74230b8931ec1ef570f12664f9865102cd23e6b6bd2ff59e638b52bd03",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
