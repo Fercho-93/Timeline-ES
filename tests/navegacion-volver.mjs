@@ -141,13 +141,6 @@ await expectBack('hub-friends-online');
 await expectBack('hub-friends');
 await expectBack('home');
 
-// Las pantallas de antes de juntarlo todo llevan a Cada uno en su móvil.
-w.CONTINUUM.ModeHubs.open('hub-friends-wifi');
-assert.equal(screen(), 'hub-friends-online');
-w.CONTINUUM.ModeHubs.open('hub-friends-duel');
-assert.equal(screen(), 'hub-friends-online');
-await expectBack('home');
-
 // Jugar online → Grandes colecciones: vuelve a Jugar online, no al inicio.
 await click('[data-action="home-top"]');
 await click('[data-action="online-hub"]');

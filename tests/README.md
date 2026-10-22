@@ -153,7 +153,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `quick-room.mjs` | test | Sala de Retos rápidos: capacidad, identidad, turnos, revisiones y quién empieza. |
 | `ranking-inicio.mjs` | test | El marcador del inicio y lo que suma cada reto diario al ranking. |
 | `readme-pruebas.mjs` | test | Cada archivo de `tests/` tiene su fila en este README y ninguna fila apunta a un archivo que ya no existe. |
-| `recarga.mjs` | test | Una vista guardada por una versión anterior se abre en la pantalla correcta. |
+| `recarga.mjs` | test | Recargar vuelve al Inicio; la partida en solitario guardada se sigue sin repartir otra carta. |
 | `referencias-animales.mjs` | test | Empates reales y cifras próximas de los mazos de animales sobre el DOM. |
 | `referencias-idiomas.mjs` | test | Las 50 cartas de idiomas tienen su lámina WebP vertical, ligera y bien enlazada. |
 | `referencias-paises.mjs` | test | Huellas de las láminas de países revisadas a mano. |

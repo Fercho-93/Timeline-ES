@@ -293,7 +293,6 @@
       <div id="mode-create-list" class="mode-create-list"${createRoomOpen ? '' : ' hidden'}>${inlineCollections(route)}${modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: los mismos retos para todos.', false, `data-friend-quick="${route}"`, 'Preparar partida')}</div></div>`;
   }
   function openFriendHub(route) {
-    // `wifi` y `duel` eran puertas propias: quien vuelva a ellas llega a Cada uno en su móvil.
     if (!FRIEND_HUBS[route]) route = 'online';
     const [screen, title, eyebrow, art] = FRIEND_HUBS[route];
     app.dataset.pendingHub = screen;
@@ -447,7 +446,6 @@
     if(routed){
       const route=routed.dataset.soloRoute;
       sessionStorage.setItem('continuum-entry-route',route);
-      if(route==='mixed') try{localStorage.setItem('hilo-selected-mode-v1','mixed');}catch{}
     }
     const target = event.target.closest('[data-action]');
     if (!target) return;
@@ -488,7 +486,7 @@
     if (pill || event.target.id === 'public-create-mode') saveCreateChoice();
   });
 
-  const hubs = {'hub-online': openOnlineHub, 'hub-online-create': openPublicCreate, 'hub-online-collections': openOnlineCollections, 'hub-solo': openSoloHub, 'hub-friends-local': openLocalHub, 'hub-friends-online': () => openFriendHub('online'), 'hub-friends-wifi': () => openFriendHub('wifi'), 'hub-friends-duel': () => openFriendHub('duel'), 'hub-friends': openFriendsHub};
+  const hubs = {'hub-online': openOnlineHub, 'hub-online-create': openPublicCreate, 'hub-online-collections': openOnlineCollections, 'hub-solo': openSoloHub, 'hub-friends-local': openLocalHub, 'hub-friends-online': () => openFriendHub('online'), 'hub-friends': openFriendsHub};
   if (window.CONTINUUM) window.CONTINUUM.ModeHubs = { open(screen) { (hubs[screen] || openSoloHub)(); }, refreshHome() { restructureHome(); } };
 
   // El resumen del inicio habla el mismo idioma que el ranking: aciertos de hoy, de esta semana y la racha.

@@ -8,7 +8,6 @@
   app.dataset.device = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1) ? "ios" : app.dataset.platform;
   const toast = document.getElementById("toast");
   const MODE_STORAGE_KEY = "hilo-selected-mode-v1";
-  const VIEW_STORAGE_KEY = "continuum-tab-view-v1";
   // Las modalidades, sus ejes y los ayudantes que comparte con el modo de varios
   // móviles están en modes.js, para declararlos una sola vez.
   const CT = window.CONTINUUM;
@@ -49,51 +48,16 @@
     navigatingBack = false;
     previousView = {screen, mode: selectedModeKey, block: selectedBlockKey, html, tournament: pendingTournament, collectionOpen, collectionDetails, collectionIndexExpanded, jugarSection, homeDestination, profileReturn};
     lastPaintedScreen = screen;
-    rememberView();
     const sceneMode = screen === "enciclopedia" && encMode !== "all" ? encMode : selectedModeKey;
     CT.Scene.apply(sceneMode, screen);
     CT.paint(app, html, screen);
   };
-  // Solo una ruta y preferencias de navegación, nunca HTML ni estado de una jugada.
-  // sessionStorage mantiene independiente cada pestaña y sobrevive a una recarga.
+  // Desplegar o plegar una colección no repinta la pantalla, así que se apunta en la vista
+  // actual: si luego se sale de ella, «Volver» la recupera tal como quedó.
   function rememberView() {
     if ((screen === "jugar" || screen.startsWith("hub-")) && previousView?.screen === screen) {
       Object.assign(previousView, {mode: selectedModeKey, block: selectedBlockKey, collectionOpen, collectionDetails, collectionIndexExpanded, jugarSection});
     }
-    try {
-      sessionStorage.setItem(VIEW_STORAGE_KEY, JSON.stringify({screen, mode: selectedModeKey,
-        block: selectedBlockKey, collectionOpen, collectionDetails, collectionIndexExpanded, jugarSection,
-        homeDestination, profileReturn, soloKind: solo?.kind}));
-    } catch { /* El bloqueo del almacenamiento no impide jugar. */ }
-  }
-  function restoreView() {
-    let view;
-    try { view = JSON.parse(sessionStorage.getItem(VIEW_STORAGE_KEY)); } catch { return false; }
-    // Una vista guardada de un mazo que ya no es suyo no se recupera: se empieza en la
-    // portada. Pintar la puerta cerrada aquí no valdría, porque la ruta guardada pintaría
-    // encima justo después.
-    if (!view || !CT.has(view.mode) || !CT.Cartera.tiene(view.mode)) return false;
-    const routes = {'home': home, 'jugar': jugarView, 'duelos': duelsView, 'play-menu': soloHome, 'solo-home': soloHome, 'duel-home': duelHome,
-      'competition-menu': competitionMenu, 'quick-challenges': quickChallenges, 'quick-game': quickChallenges, 'quick-lobby': quickChallenges, 'perfil': perfilView};
-    if (view.screen?.startsWith('hub-') && CT.ModeHubs) routes[view.screen] = () => CT.ModeHubs.open(view.screen);
-    // Los turnos se recuperan desde sus guardados validados, nunca desde la ruta.
-    if (view.screen === 'solo' && view.soloKind === 'daily') routes.solo = () => resumeSolo('daily');
-    else if (view.screen === 'solo' && view.soloKind !== 'comp') routes.solo = resumeSolo;
-    // Y el duelo de cifras se recupera con su reloj puesto en hora: recargar durante una
-    // carta no devuelve el plazo entero, cierra esa carta.
-    routes.cifras = resumeCifras;
-    if (!routes[view.screen]) return false;
-    setMode(view.mode);
-    if (CT.hasBlock(view.block)) selectedBlockKey = view.block;
-    collectionOpen = view.collectionOpen === true;
-    collectionDetails = view.collectionDetails === true;
-    collectionIndexExpanded = view.collectionIndexExpanded === true;
-    jugarSection = view.jugarSection === "collections" ? "collections" : null;
-    homeDestination = view.homeDestination === 'collection' ? 'collection' : 'home';
-    profileReturn = ['play-menu','solo-home'].includes(view.profileReturn) ? 'solo-home' : 'home';
-    if (view.screen === 'perfil') screen = 'perfil';
-    routes[view.screen]();
-    return true;
   }
   function resumeSolo(kind = "mode") {
     solo = kind === "daily" ? loadDaily() : loadSolo();
@@ -526,11 +490,7 @@
     // Sin rastro (por ejemplo, tras recargar) se vuelve al menú que contiene esta pantalla.
     if (screen !== 'enciclopedia') navigatingBack = true;
     if (screen === 'setup' && pendingTournament) { pendingTournament=null;if (sessionStorage.getItem('continuum-competition-audience') === 'local') CT.ModeHubs.open('hub-friends-local'); else competitionMenu();return; }
-    if (["setup", "solo-home", "duel-home", "online-loading", "online-error"].includes(screen)) {
-      const entry = sessionStorage.getItem('continuum-entry-route');
-      if (entry === 'mixed') CT.ModeHubs.open('hub-solo');
-      else jugarView();
-    }
+    if (["setup", "solo-home", "duel-home", "online-loading", "online-error"].includes(screen)) jugarView();
     else if (screen === "duelo-intro") duelHome();
     else if (screen === "friends-join" || screen === "competition-friends") CT.ModeHubs?.open('hub-friends-online');
     else if (screen === "competition-menu") CT.ModeHubs.open({ local: 'hub-friends-local', online: 'hub-friends-online', friends: 'hub-friends' }[sessionStorage.getItem('continuum-competition-audience')] || 'hub-solo');
@@ -552,9 +512,8 @@
     else if (target?.quickRoom || target?.quickDuel) CT.Quick.open(render, target);
     else if(sessionStorage.getItem('continuum-entry-route')==='quick') CT.Quick.openSolo(render);
     else if(sessionStorage.getItem('continuum-entry-route')==='local-quick') CT.Quick.openLocal(render);
-    else if(sessionStorage.getItem('continuum-entry-route')==='wifi-quick') CT.Quick.openNetwork(render, 'local', 4);
     else if(sessionStorage.getItem('continuum-entry-route')==='wifi-join-quick') CT.Quick.openNetwork(render, 'local', 4, 'join');
-    else if(['online-quick','duel-quick'].includes(sessionStorage.getItem('continuum-entry-route'))) CT.Quick.openDuel(render);
+    else if(sessionStorage.getItem('continuum-entry-route')==='online-quick') CT.Quick.openDuel(render);
     else CT.Quick.open(render);
   }
 
@@ -764,9 +723,10 @@
   // desde la que se tocó.
   function duelsRefresh() { screen === "duelos" ? duelsView() : perfilView(); }
 
-  // La antigua pantalla «¿Qué te apetece jugar?» ya no existe: cualquier camino que llevaba a
-  // ella abre ahora la pantalla de la modalidad de la que se viene (Jugar solo, Un solo móvil…).
-  const HUB_FOR_ROUTE = { local: 'hub-friends-local', wifi: 'hub-friends-online', online: 'hub-friends-online', duel: 'hub-friends-online', 'wifi-join': 'hub-friends-online' };
+  // «Jugar» lleva a la pantalla de la modalidad de la que se viene (Jugar solo, Un solo
+  // móvil…). Las rutas de Retos rápidos (`local-quick`, `wifi-join-quick`…) cuentan como
+  // la suya sin el sufijo.
+  const HUB_FOR_ROUTE = { local: 'hub-friends-local', wifi: 'hub-friends-online', online: 'hub-friends-online', 'wifi-join': 'hub-friends-online' };
   function jugarView() {
     CT.Quick.leave();
     pendingTournament = null;
@@ -786,11 +746,11 @@
     // Inicio ya determinó el formato. Tras elegir mazo se pasa a los ajustes
     // o a la sala sin volver a preguntar cómo jugar.
     const entry = sessionStorage.getItem('continuum-entry-route');
-    if (entry === 'collections' || entry === 'mixed') { soloHome(); return; }
+    if (entry === 'collections') { soloHome(); return; }
     if (entry === 'local') { setup(); return; }
-    // Cada uno en su móvil: con el mazo elegido se decide el ritmo. `wifi` y `duel` son las
-    // rutas de antes de juntarlo todo, que aún pueden venir de una sesión guardada.
-    if (entry === 'online' || entry === 'wifi' || entry === 'duel') { duelHome(); return; }
+    // Cada uno en su móvil (por internet o, si se llegó desde «Unirme» por Wi-Fi, `wifi`):
+    // con el mazo elegido se decide el ritmo.
+    if (entry === 'online' || entry === 'wifi') { duelHome(); return; }
     // Sin ruta, o con una que no elige mazo (Retos rápidos y similares), el mazo se juega en
     // solitario: el formato se decide siempre antes de elegir mazo, nunca después.
     soloHome();
@@ -3998,7 +3958,7 @@
   // de fuera (ni Firebase ni ninguna CDN), así que se carga siempre con el resto de la
   // aplicación, igual que `duelo.js`. `launchLocalMultiplayer` solo entrega el control.
   function launchLocalMultiplayer() {
-    const fromFriends = ['online', 'wifi', 'duel'].includes(sessionStorage.getItem('continuum-entry-route'));
+    const fromFriends = ['online', 'wifi'].includes(sessionStorage.getItem('continuum-entry-route'));
     CT.LocalMultiplayer.open({ modeKey: selectedModeKey, createOnly: fromFriends, onBack: fromFriends ? duelHome : jugarView });
   }
 
@@ -4199,8 +4159,7 @@
     else if (action === "collection-back") backMenu();
     else if (action === "jugar") {
       const entry = sessionStorage.getItem('continuum-entry-route');
-      if (entry === 'mixed') { if (setMode('mixed')) soloHome(); }
-      else { jugarSection = entry ? 'collections' : null; collectionOpen = false; collectionDetails = false; collectionIndexExpanded = !!jugarSection; jugarView(); }
+      jugarSection = entry ? 'collections' : null; collectionOpen = false; collectionDetails = false; collectionIndexExpanded = !!jugarSection; jugarView();
       window.scrollTo(0, 0);
     }
     else if (action === "duels-open") openPendingDuels();
@@ -4587,6 +4546,8 @@
     if (leido.ok) { pendingDuel = leido.duelo; duelIntro(); }
     else duelInvalido(leido.motivo, leido.mode);
   } else if (!CT.Identidad.reconoce()) bienvenida();
-  else if (!restoreView()) home();
+  // Abrir el juego (pulsando «Jugar» en la portada) lleva siempre al Inicio: la pantalla
+  // que dejó la pestaña no se restaura. Una partida a medias se sigue desde su «Continuar».
+  else home();
   sincronizaNombrePendiente();
 })();

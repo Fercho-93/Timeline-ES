@@ -28,9 +28,6 @@
     try {
       // Entrar es un acto de quien juega, no del reloj.
       await window.CONTINUUM_SPLASH?.gate();
-      // Pulsar «Jugar» en la intro lleva siempre al Inicio: la pantalla que dejó la pestaña
-      // (recarga, vuelta a la app) no se restaura por encima.
-      try { sessionStorage.removeItem('continuum-tab-view-v1'); } catch { /* sin almacenamiento */ }
       window.CONTINUUM_SPLASH?.entering();
       const { startAccounts } = await accounts;
       await startAccounts(loadApp);
