@@ -15,7 +15,17 @@
     try { return TRUSTED.find(base => location.href.startsWith(base)) || PUBLIC_URL; } catch { return PUBLIC_URL; }
   };
   const LEGAL_PAGES = ['privacidad.html', 'terminos.html', 'aviso-legal.html', 'soporte.html', 'borrar-cuenta.html', 'licencias.html'];
+  // Alfabeto de los códigos de sala: letras y cifras sin las que se confunden al dictarlas o
+  // copiarlas (I, O, 0 y 1). Es el mismo `[A-HJ-NP-Z2-9]` con el que `parse` y `fromText` los leen.
+  const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   CT.Links = {
+    // Un código de sala nuevo al azar: 8 caracteres para las salas online (online.js) y sin
+    // conexión (local-multiplayer.js). 2³² es múltiplo de 32: todas las letras salen igual.
+    roomCode(length = 8) {
+      const values = new Uint32Array(length);
+      crypto.getRandomValues(values);
+      return [...values].map(value => CODE_CHARS[value % CODE_CHARS.length]).join('');
+    },
     base() { return window.Capacitor?.isNativePlatform?.() ? PUBLIC_URL : location.origin + location.pathname; },
     parse(value) {
       try {

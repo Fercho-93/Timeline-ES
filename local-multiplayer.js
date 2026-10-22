@@ -16,7 +16,6 @@
   const CT = window.CONTINUUM;
   const { escapeHtml } = CT;
   const appEl = document.getElementById("app");
-  const ROOM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   const BACK_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 5-7 7 7 7M7 12h14"/></svg>';
   const SHARE_ICON = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.6" x2="15.4" y2="6.4"/><line x1="8.6" y1="13.4" x2="15.4" y2="17.6"/></svg>';
   const WIFI_ICON = '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5a11 11 0 0 1 14 0"/><path d="M8.5 16a6 6 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1"/></svg>';
@@ -157,12 +156,6 @@
       console.error(error);
       showToast("No se pudo activar la cámara. Revisa los permisos del navegador o del sistema.");
     }
-  }
-
-  function createRoomCode() {
-    const values = new Uint32Array(8);
-    crypto.getRandomValues(values);
-    return [...values].map(value => ROOM_CHARS[value % ROOM_CHARS.length]).join("");
   }
 
   function randomPlayerId() {
@@ -363,7 +356,7 @@
     role = "host";
     myName = name;
     myPlayerId = CT.LocalSession.HOST_ID;
-    const roomCode = createRoomCode();
+    const roomCode = CT.Links.roomCode(8);
     const tournament = competition ? CT.Tournament.create(competition.rounds, competition.cards) : null;
     if (tournament) modeKey = tournament.queue[0];
     try {

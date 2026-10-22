@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import './conexion-nativa.mjs';
 import './confirmacion-extremos.mjs';
 const CT = {shuffle: cards => [...cards].reverse()};
-const context = vm.createContext({window:{CONTINUUM:CT},location:{origin:'https://local.test',pathname:'/'},URL,URLSearchParams});
+const context = vm.createContext({window:{CONTINUUM:CT},location:{origin:'https://local.test',pathname:'/'},URL,URLSearchParams,crypto});
 for(const file of ['engine.js','links.js']) vm.runInContext(fs.readFileSync(new URL('../'+file,import.meta.url),'utf8'),context);
 const plain = x => JSON.parse(JSON.stringify(x));
 assert.deepEqual(plain(CT.Engine.draw([1,2],[3])),{cardId:1,deck:[2],discard:[3]});
@@ -26,6 +26,11 @@ assert.equal(CT.Links.parse('https://continuumjuego.es.evil.test/#room=ABCD2345'
 assert.deepEqual(plain(CT.Links.parse(CT.Links.base()+'?room=ABCD2345')),{room:'ABCD2345'});
 for(const link of ['https://evil.test/?room=ABCD2345','javascript:alert(1)','https://fercho-93.github.io/otro/?room=ABCD2345']) assert.equal(CT.Links.parse(link),null);
 assert.deepEqual(plain(CT.Links.parse(CT.Links.base()+'#duelo=abc')),{duelo:'abc'});
+// Los códigos de sala nuevos (online y sin conexión) se leen con las mismas reglas que las invitaciones.
+const codigos = Array.from({length:300},()=>CT.Links.roomCode(8));
+assert.ok(codigos.every(code=>/^[A-HJ-NP-Z2-9]{8}$/.test(code)));
+assert.ok(codigos.every(code=>plain(CT.Links.fromText(code)).room===code));
+assert.ok(new Set(codigos.join('')).size>28,'salen todas las letras del alfabeto');
 console.log('Motor puro, agotamiento de 2 a 9 jugadores y enlaces nativos: OK');
 // En la web, las invitaciones salen con la dirección desde la que se juega: al activar el dominio
 // propio pasan solas a él. Desde otra dirección, o en la app nativa, se usa la pública fija.

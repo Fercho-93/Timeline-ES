@@ -14,7 +14,6 @@ const { escapeHtml, shuffle, announce } = CT;
 // como diálogos de verdad. Está en `a11y.js`, compartido por los dos motores.
 const paint = (html, pantalla) => { if (CT.Accounts && !CT.Accounts.ready) return; CT.Scene.apply(modeKey(), pantalla); CT.paint(appEl, html, pantalla); queueMicrotask(renderPresence); };
 const abreCapa = (capa, cerrable) => CT.openDialog(capa, cerrable);
-const ROOM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 let user = null;
 let returnToMenu = null;
@@ -361,11 +360,7 @@ function showGuide() {
   abreCapa(appEl.querySelector("[data-online-guide]"), true);
 }
 
-function createRoomCode() {
-  const values = new Uint32Array(8);
-  crypto.getRandomValues(values);
-  return [...values].map(value => ROOM_CHARS[value % ROOM_CHARS.length]).join("");
-}
+function createRoomCode() { return CT.Links.roomCode(8); }
 
 function cleanCode(value) {
   return String(value || "").toUpperCase().replace(/[^A-Z2-9]/g, "").slice(0, 8);
