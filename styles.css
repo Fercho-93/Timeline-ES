@@ -82,7 +82,6 @@ button { touch-action: manipulation; color: inherit; }
 #app { min-height: calc(100 * var(--dvh)); overflow-x: clip; }
 /* Las entradas de pantalla tienen un único propietario en a11y.js. */
 .screen-enter { animation: none; }
-@keyframes section-in { from { opacity: .25; transform: translateY(6px); } }
 .shell { width: min(100%, 1080px); margin: 0 auto; padding: max(18px, var(--safe-top)) max(18px, var(--safe-right)) max(26px, var(--safe-bottom)) max(18px, var(--safe-left)); position: relative; z-index: 1; }
 /* `align-items: center` importa más de lo que parece: en móvil esta barra pasa a columna
    (ver el bloque de 620 px) y entonces `align-items` es lo que decide la alineación
@@ -231,7 +230,6 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
 .starter-winner-crown { color: var(--accent); animation: starter-crown-pop 640ms cubic-bezier(.34,1.56,.64,1) both; }
 .starter-winner-banner b { font-family: var(--font-display); font-size: 1.25rem; margin-top: 2px; animation: starter-name-in 520ms ease-out 120ms both; }
 .starter-winner-banner span { font-size: .74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .09em; font-weight: 700; }
-@keyframes starter-crown-pop { from { transform: scale(.3) rotate(-12deg); opacity: 0; } 65% { transform: scale(1.12) rotate(4deg); opacity: 1; } to { transform: scale(1) rotate(0); opacity: 1; } }
 @keyframes starter-name-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes starter-shine { from { background-position: 120% 0; } to { background-position: -20% 0; } }
 .starter-draw-list { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 6px; }
@@ -599,30 +597,6 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   color: var(--muted);
   font-size: .83rem;
   line-height: 1.45;
-}
-/* La carta colocada es papel, como en la mesa; la que está por jugar, cuero. Son los dos
-   mismos materiales de la partida, para que la demostración no invente un tercero. */
-@keyframes gd-fly {
-  0%, 4% { opacity: 0; transform: translateY(92px) scale(.94); }
-  10% { opacity: 1; transform: translateY(92px) scale(1); }
-  30%, 78% { opacity: 1; transform: translateY(0) scale(1); }
-  86%, 100% { opacity: 0; transform: translateY(0) scale(1); }
-}
-@keyframes gd-turn {
-  0%, 34% { transform: rotateY(0deg); }
-  46%, 87% { transform: rotateY(180deg); }
-  88%, 100% { transform: rotateY(0deg); }
-}
-@keyframes gd-gap {
-  0%, 8% { opacity: 1; border-color: var(--borde-suave); transform: scale(1); }
-  18% { opacity: 1; border-color: var(--accent); transform: scale(1.05); }
-  28%, 84% { opacity: 0; transform: scale(1); }
-  93%, 100% { opacity: 1; border-color: var(--borde-suave); }
-}
-@keyframes gd-tick {
-  0%, 46% { opacity: 0; transform: translateX(-50%) scale(.6); }
-  56%, 78% { opacity: 1; transform: translateX(-50%) scale(1); }
-  84%, 100% { opacity: 0; transform: translateX(-50%) scale(1); }
 }
 
 /* Las fichas de la guía entran con un leve desplazamiento. Solo al abrir la guía, no en cada repintado. */
@@ -1891,7 +1865,6 @@ body::before {
 @property --fit-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
 @keyframes fitting-gold { 0% { --fit-angle: -90deg; opacity: 0; } 35% { opacity: 1; } 85% { opacity: 1; } 100% { --fit-angle: 270deg; opacity: 0; } }
 .date-ink { transform-origin: center; animation: date-ink-stamp 650ms 160ms both; }
-@keyframes date-ink-stamp { 0% { opacity: 0; filter: blur(5px); clip-path: inset(0 100% 0 0); transform: scale(1.12); } 65% { opacity: .8; filter: blur(.5px); clip-path: inset(0); transform: scale(1.06); } 82% { opacity: 1; filter: blur(0); transform: scale(.97); } 100% { clip-path: inset(0); transform: scale(1); } }
 .atlas-final-page { position: relative; overflow: hidden; border: 1px solid #c9ae77; background: radial-gradient(ellipse at 50% 0, #fff9e9, transparent 70%), repeating-linear-gradient(0deg, #98764605 0 1px, transparent 1px 5px), #f4ecdc; box-shadow: 0 18px 60px #48311724, inset 0 0 0 7px #fcf7eb, inset 0 0 0 8px #c9ae7755; }
 .atlas-final-fan { position: relative; height: 210px; margin: 10px auto 22px; width: min(100%, 380px); }
 .atlas-final-fan > .timeline-card { position: absolute; left: calc(50% - 55px); top: 18px; width: 110px; min-width: 110px; height: 166px; min-height: 0; overflow: hidden; font-size: 8px; transform-origin: center 145%; transform: translateX(var(--fan-x)) rotate(var(--fan-angle)); box-shadow: 0 7px 15px #33210e33; animation: atlas-gather 950ms cubic-bezier(.2,.7,.2,1) both; }

@@ -927,7 +927,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .timeline-zoom [hidden] { display: none !important; }
 #app .timeline-zoom [data-zoom-level] { min-width: 62px; width: auto; height: 40px; border: 0; border-radius: 9px; font: 600 .78rem system-ui; color: #766447; }
 #app .timeline-zoom [aria-pressed="true"] { color: #fff8e7; background: #79613b; box-shadow: 0 2px 6px #4a341a22; }
-@keyframes board-hito { 40% { background: #e6c67566; box-shadow: 0 0 16px #d2ad4b33; } }
 /* El resultado ocupa su lugar en la página y permite seguir viendo y moviendo la línea. */
 #app .overlay.board-result-layer { position: relative; inset: auto; display: block; padding: 0 12px max(16px,var(--safe-bottom)); background: none; backdrop-filter: none; -webkit-backdrop-filter: none; z-index: 6; animation: none; }
 #app:has(.board-result-layer) .atlas-hand-section, #app:has(.board-result-layer) .placement-dock { display: none; }
@@ -1239,7 +1238,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   .guide-chapter[open] .guide-chapter-body { animation: guide-chapter-enter 260ms ease-out; }
   .guide-chapter[open] .guide-drawing { animation: guide-ink-enter 450ms ease-out; }
 }
-@keyframes guide-value-stamp { from { opacity: 0; transform: scale(1.12); } to { opacity: 1; transform: scale(1); } }
 @keyframes guide-chapter-enter { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
 @keyframes guide-ink-enter { from { opacity: .15; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .guide-chapter summary i { transition: none; } }
@@ -1698,7 +1696,6 @@ html #app .home-nav.atlas-nav::before {
 }
 /* Sellos y marcadores llegan una vez a su tamaño final, sin sobrepasarlo. */
 @keyframes starter-crown-pop { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
-@keyframes cuenta-late { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
 @keyframes date-ink-stamp { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
   #app .motion-managed, #app .motion-managed * { animation: none !important; transition: none !important; }
@@ -1911,7 +1908,6 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .daily-splash-rule { margin: -12px 0 22px; color: var(--edition-muted); font: .85rem/1.5 var(--ui-font); }
 #app .daily-splash .comp-splash-start { background: var(--edition-ink); color: var(--edition-surface); }
 @keyframes daily-art-in { from { opacity: 0; } }
-@keyframes daily-reel-land { from { opacity: .3; transform: translateY(6px); } }
 @media (prefers-reduced-motion: reduce) { #app .daily-splash-art.is-revealed, #app .daily-reel.is-revealed { animation: none; } }
 #app .daily-splash-art.is-revealed { display: block; }
 #app .daily-splash-art.is-revealed img { display: block; width: 100%; height: 100%; object-fit: cover; }
