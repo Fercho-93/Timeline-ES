@@ -4,10 +4,11 @@
 // dónde entrar. La sala sigue siendo la fuente de verdad: la ficha solo sirve para verla.
 import { db } from './firebase-client.js';
 import { collection, deleteDoc, doc, getDoc, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc } from './vendor/firebase/firebase-firestore.js';
+import { STALE_MS } from './public-matchmaking.js';
 
-// Quien lleva la mesa renueva la ficha cada 45 s; sin renovar en dos minutos, la mesa
-// está abandonada y deja de enseñarse (las reglas permiten entonces borrarla a cualquiera).
-export const TABLE_STALE_MS = 120000;
+// Quien lleva la mesa renueva la ficha cada 45 s; sin renovar en `STALE_MS` (dos minutos), la
+// mesa está abandonada y deja de enseñarse (las reglas permiten entonces borrarla a cualquiera).
+// Una ficha idéntica a la última que se escribió no se reescribe hasta pasados `RENEW_MS`.
 const RENEW_MS = 40000;
 const written = new Map();
 
@@ -15,7 +16,7 @@ export function tableFresh(table, now = Date.now()) {
   const at = table?.updatedAt?.toMillis?.();
   // Una ficha recién escrita desde este móvil aún no tiene la hora del servidor.
   if (table?.updatedAt == null) return true;
-  return Number.isFinite(at) && now - at < TABLE_STALE_MS;
+  return Number.isFinite(at) && now - at < STALE_MS;
 }
 
 // Publica o pone al día la ficha. Si nada ha cambiado, solo se reescribe para renovarla.

@@ -1,14 +1,15 @@
 // Retos rápidos por internet: salas y duelos guardados en Firestore, con cada jugada firmada por su autor.
 import {auth, db} from './firebase-client.js';
 import {collection, doc, getDoc, getDocs, query, where, runTransaction, onSnapshot, serverTimestamp} from './vendor/firebase/firebase-firestore.js';
+import {queueFresh} from './public-matchmaking.js';
 const CT=window.CONTINUUM, R=CT.QuickRoom;
 export const PUBLIC_VERSION=1;
 function publicKey(capacity){return 'quick:'+capacity+':v'+PUBLIC_VERSION+':'+CT.QuickNetwork.fingerprint();}
 // Solo quien abre una mesa pública puede empezarla, así que la mesa vive mientras esa
 // persona siga esperando: su móvil renueva la cola cada 45 s. Una cola sin renovar en dos
-// minutos es una mesa abandonada: la búsqueda no entra y abre otra en su lugar.
-const STALE_QUEUE_MS=120000, PUBLIC_WAIT_MS=30000;
-const queueFresh=q=>{const at=q?.updatedAt?.toMillis?.();return Number.isFinite(at)&&Date.now()-at<STALE_QUEUE_MS;};
+// minutos es una mesa abandonada (`queueFresh`, public-matchmaking.js): la búsqueda no entra y
+// abre otra en su lugar.
+const PUBLIC_WAIT_MS=30000;
 // El tablón de mesas abiertas (`public-tables.js`): quien lleva la mesa mantiene su ficha.
 // Se carga aparte y sin bloquear: si no está, la mesa funciona igual por la cola.
 let tablesModule=null;

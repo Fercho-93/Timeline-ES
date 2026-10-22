@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import {
+  STALE_MS,
+  queueFresh,
   normalizePublicCapacity,
   publicQueueKey,
   isJoinablePublicRoom,
@@ -34,6 +37,15 @@ const player = publicPlayer({ uid: 'u1', name: 'Fernando-123456789012345', avata
 assert.equal(player.uid, 'u1');
 assert.equal(player.name.length, 18);
 assert.equal(player.joinedAt, 1);
+
+// Una cola sin renovar en dos minutos es de una mesa abandonada, con el mismo plazo que las
+// reglas usan para dejar sustituir las colas y borrar las fichas del tablón.
+const renovada = ms => ({ updatedAt: { toMillis: () => ms } });
+assert.equal(queueFresh(renovada(1000), 1000 + STALE_MS - 1), true);
+assert.equal(queueFresh(renovada(1000), 1000 + STALE_MS), false);
+assert.equal(queueFresh({ updatedAt: null }, 0), false, 'sin hora del servidor la cola no cuenta como viva');
+const reglas = fs.readFileSync(new URL('../firestore.rules', import.meta.url), 'utf8');
+assert.equal(reglas.split(`duration.value(${STALE_MS / 1000}, 's')`).length - 1, 3, 'las reglas de las dos colas y del tablón usan el mismo plazo');
 
 console.log('public matchmaking core: ok');
 

@@ -3,6 +3,7 @@ import {gameHtml} from './game-fixture.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
+import { CLIENT_VERSION } from '../public-matchmaking.js';
 import { initializeTestEnvironment, assertFails } from '@firebase/rules-unit-testing';
 import { doc, getDoc, setDoc, updateDoc, runTransaction, serverTimestamp } from 'firebase/firestore';
 const read = name => fs.readFileSync(new URL('../'+name,import.meta.url),'utf8');
@@ -24,7 +25,7 @@ function client(uid){
  // no lo reconoce como marca de hora del servidor.
  w.__sdk={initializeApp:()=>({}),getAuth:()=>({}),getFirestore:()=>db(uid),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),set:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.set(ref,limpio);},update:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.update(ref,limpio);}})),serverTimestamp};
  const src=read('online.js').replace(/^import .+;\n/gm,'').replace('export async function','async function');
- w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;const firebaseApp=initializeApp(),auth=getAuth(),db=getFirestore();${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,continueTie,skipTurn,removePlayer,navigateOnline,startPulse:(objetivo,regalo)=>startPulse(objetivo,regalo??roomState.players[user.uid].hand[0]),placePulse,defendPulse,renderGame,renderLobby,renderOnlineFinal,nextOnlineFinal,nextTournamentRound};})();`);
+ w.eval(`(()=>{const CLIENT_VERSION=${CLIENT_VERSION};const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;const firebaseApp=initializeApp(),auth=getAuth(),db=getFirestore();${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,continueTie,skipTurn,removePlayer,navigateOnline,startPulse:(objetivo,regalo)=>startPulse(objetivo,regalo??roomState.players[user.uid].hand[0]),placePulse,defendPulse,renderGame,renderLobby,renderOnlineFinal,nextOnlineFinal,nextTournamentRound};})();`);
  return {w,api:w.onlineTest,errors,async load(){this.api.set(await snapshot());},async call(name,...args){await this.load();await this.api[name](...args);assert.equal(errors.length,0,errors.map(String).join('\n'));}};
 }
 const clients=[client(A),client(B),client(C)];

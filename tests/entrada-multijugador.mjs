@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
+import { CLIENT_VERSION } from "../public-matchmaking.js";
 
 const source = fs.readFileSync(new URL("../online.js", import.meta.url), "utf8");
 const appSource = fs.readFileSync(new URL("../app.js", import.meta.url), "utf8");
@@ -11,7 +12,9 @@ assert.ok(joinAt >= 0, "el formulario para entrar debe existir");
 assert.ok(createAt >= 0, "el formulario para crear debe existir");
 assert.ok(joinAt < createAt, "entrar en una sala debe aparecer antes que crear una sala");
 assert.match(source, /online-entry-invited/, "las invitaciones deben tener un estado visual propio");
-assert.match(source, /const CLIENT_VERSION = 42/, "la versión mínima debe estar centralizada");
+assert.equal(CLIENT_VERSION, 42, "la versión mínima debe estar centralizada en public-matchmaking.js");
+assert.match(source, /^import \{ CLIENT_VERSION \} from '\.\/public-matchmaking\.js';$/m, "online.js usa la versión de public-matchmaking.js");
+assert.doesNotMatch(fs.readFileSync(new URL("../public-matchmaking-online.js", import.meta.url), "utf8"), /const CLIENT_VERSION\b/, "la partida rápida no declara su propia versión");
 assert.equal((source.match(/clientVersion: CLIENT_VERSION/g) || []).length, 2, "crear y unirse deben registrar la misma versión");
 assert.doesNotMatch(source, /Para usar esta sala, actualizad todos los móviles a v39/, "el aviso no debe seguir mostrando la versión antigua");
 assert.match(source, /paint\(`<div class="shell">\$\{header\(\x27<button class="icon-btn" data-online-action="room"/, "la partida debe mostrar un menú de controles de sala");
@@ -71,6 +74,7 @@ assert.match(source, /autoCreate[\s\S]*?createRoom\(profileName\)/, "desde «Cre
     scripts.forEach(file => win.eval(read(file)));
     const online = read("online.js").replace(/^import .*;$/gm, "").replace("export async function", "async function");
     win.eval(`(() => {
+      const CLIENT_VERSION = ${CLIENT_VERSION};
       const db = {}, doc = (...parts) => parts.slice(1).join('/'), serverTimestamp = () => 0;
       const getDoc = async () => ({ exists: () => false, data: () => undefined }), setDoc = async () => {};
       const onSnapshot = () => () => {}, deleteDoc = async () => {}, writeBatch = () => ({ set() {}, async commit() {} });

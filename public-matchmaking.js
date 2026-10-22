@@ -2,6 +2,23 @@
 // Capa pequeña y aislada: decide qué mesa pública puede aceptar a un jugador.
 // La persistencia y la atomicidad real se realizan con una transacción Firestore desde online.js.
 
+// Versión de las salas de Grandes colecciones (privadas y públicas): cada plaza la apunta
+// (`clientVersion`) y forma parte de la clave de la cola pública. `startRoom` (online.js) no
+// reparte si alguien de la mesa lleva una anterior. Se sube cuando cambia algo que un móvil sin
+// actualizar no sabría jugar; la última vez, la competición con cambio de mazo entre rondas.
+export const CLIENT_VERSION = 42;
+
+// Quien lleva una mesa pública renueva su cola y su ficha del tablón cada 45 s; si llevan dos
+// minutos sin renovarse, la mesa está abandonada. Es el mismo plazo que usan las reglas
+// (firestore.rules) para dejar sustituir la cola o borrar la ficha.
+export const STALE_MS = 120000;
+
+// ¿Sigue viva la cola? `updatedAt` es la hora del servidor de su última renovación.
+export function queueFresh(queue, now = Date.now()) {
+  const at = queue?.updatedAt?.toMillis?.();
+  return Number.isFinite(at) && now - at < STALE_MS;
+}
+
 const MIN_PLAYERS = 2;
 const MAX_PLAYERS = 4;
 const PUBLIC_ROOM_PREFIX = 'P';

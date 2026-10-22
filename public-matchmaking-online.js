@@ -1,10 +1,9 @@
 // Partida rápida con desconocidos: busca una mesa pública libre y entra en ella a través de Firestore.
 import { auth, db } from './firebase-client.js';
 import { doc, getDoc, runTransaction, serverTimestamp } from './vendor/firebase/firebase-firestore.js';
-import { publicQueueKey, isJoinablePublicRoom, makePublicRoomCode, normalizePublicCapacity } from './public-matchmaking.js';
+import { publicQueueKey, isJoinablePublicRoom, makePublicRoomCode, normalizePublicCapacity, queueFresh, CLIENT_VERSION } from './public-matchmaking.js';
 
 const CT = window.CONTINUUM;
-const CLIENT_VERSION = 42;
 
 // El nombre que se ve en la mesa es el de este móvil (el de la bienvenida); el alias de
 // la cuenta queda como respaldo.
@@ -25,13 +24,8 @@ function roomData(code, mode, capacity, uid, seconds = 30, handSize = 4) {
 }
 
 // Una mesa que espera jugadores renueva su cola cada 45 s mientras alguien sigue en ella
-// (online.js). Si la cola lleva más de dos minutos sin renovarse, la mesa está abandonada
-// y no se entra: se abre una nueva en su lugar.
-const STALE_QUEUE_MS = 120000;
-const queueFresh = queue => {
-  const at = queue?.updatedAt?.toMillis?.();
-  return Number.isFinite(at) && Date.now() - at < STALE_QUEUE_MS;
-};
+// (`keepPublicQueueAlive`, online.js). Una cola caducada (`queueFresh`, public-matchmaking.js)
+// es de una mesa abandonada: no se entra y se abre una nueva en su lugar.
 
 async function findOrCreate(mode, capacityInput, { allowStale = false } = {}) {
   const capacity=normalizePublicCapacity(capacityInput);

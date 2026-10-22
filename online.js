@@ -2,6 +2,7 @@
 // final, todo guardado en Firestore.
 import { auth, db } from './firebase-client.js';
 import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, onSnapshot, runTransaction, serverTimestamp, setDoc, writeBatch } from "./vendor/firebase/firebase-firestore.js";
+import { CLIENT_VERSION } from './public-matchmaking.js';
 
 const appEl = document.getElementById("app");
 const toastEl = document.getElementById("toast");
@@ -41,7 +42,6 @@ let turnTimerHandle = null;
 // jugador. `turnStartedAt` es la marca del servidor, así que la cuenta atrás se ve igual
 // en todos los móviles aunque sus relojes no coincidan.
 const TURN_SECONDS = 20; // Valor de las salas antiguas; las nuevas guardan su ajuste.
-const CLIENT_VERSION = 42; // Competición con cambio de mazo entre rondas.
 const turnSeconds = () => roomState?.turnSeconds ?? TURN_SECONDS;
 let presenceRoom = "", presenceTimer = null, presenceBusy = false, relayTimer = null, relayKick = null, queueTimer = null;
 // Temporizadores y marcas de la sala de espera pública (ver `renderPublicLobby`).

@@ -5,6 +5,7 @@ import { gameHtml } from './game-fixture.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
+import { CLIENT_VERSION } from '../public-matchmaking.js';
 import { initializeTestEnvironment } from '@firebase/rules-unit-testing';
 import { doc, getDoc, setDoc, runTransaction, serverTimestamp, Timestamp } from 'firebase/firestore';
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
@@ -29,7 +30,7 @@ function client(uid) {
     runTransaction: (d, callback) => runTransaction(d, tx => callback({ get: ref => tx.get(ref), set: (ref, data) => tx.set(ref, limpia(data)), update: (ref, data) => tx.update(ref, limpia(data)) }))
   };
   const src = read('online.js').replace(/^import .+;\n/gm, '').replace('export async function', 'async function');
-  w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,setDoc,runTransaction,serverTimestamp}=window.__sdk;const firebaseApp=initializeApp(),auth=getAuth(),db=getFirestore();${src}
+  w.eval(`(()=>{const CLIENT_VERSION=${CLIENT_VERSION};const {initializeApp,getAuth,getFirestore,doc,getDoc,setDoc,runTransaction,serverTimestamp}=window.__sdk;const firebaseApp=initializeApp(),auth=getAuth(),db=getFirestore();${src}
   window.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},
     starterRecords, presenceRecords, startRoom, claimHost, removePlayer, starterRanking, keepPublicQueueAlive, relayKick:()=>relayKick};})();`);
   return { w, api: w.onlineTest, errors, async load() { this.api.set(await roomData()); } };
