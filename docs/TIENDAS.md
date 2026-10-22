@@ -369,7 +369,8 @@ No enviar una compilación como definitiva hasta que:
 
 1. Se haya probado en un iPhone y un Android reales.
 2. No queden bloqueos P0/P1 (ver [BETA_CHECKLIST.md](BETA_CHECKLIST.md)).
-3. La política de privacidad tenga responsable, contacto, dirección y URL definitivos.
+3. La política de privacidad tenga responsable, contacto y URL definitivos (sin domicilio mientras el juego sea
+   gratuito: ver «Decisión del titular» arriba).
 4. La ficha y las declaraciones describan exactamente las funciones de la versión enviada.
 5. Firebase (reglas, Functions y App Check) esté activo y verificado para la revisión.
 6. Se hayan guardado la compilación enviada, su número, su hash y sus notas de cambios.

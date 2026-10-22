@@ -1,6 +1,6 @@
 // Comprueba que todos los archivos del juego parsean. Parece poca cosa, pero es la
-// única red que cubre `js/online/online.js`: no se puede importar desde Node porque carga Firebase
-// desde una CDN, así que ninguna otra suite lo ejecuta. Un nombre repetido o una llave
+// única red que cubre `js/online/online.js`: no se puede importar desde Node porque carga el SDK
+// de Firebase como módulo de navegador (vendor/firebase/), así que ninguna otra suite lo ejecuta. Un nombre repetido o una llave
 // suelta ahí llegaría al móvil sin que nada avisara.
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";

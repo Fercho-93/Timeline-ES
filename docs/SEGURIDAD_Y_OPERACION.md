@@ -3,7 +3,7 @@
 Cómo se publica cada pieza (web, reglas, Functions, beta) está en
 [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#despliegue); los plazos de conservación,
 en la sección «Conservación y limpieza de datos» del mismo documento; el mapa de colecciones, en
-[docs/MODELO_DE_DATOS.md](MODELO_DE_DATOS.md).
+[MODELO_DE_DATOS.md](MODELO_DE_DATOS.md).
 
 ## Modelo de confianza
 

@@ -783,9 +783,8 @@ El service worker mantiene una caché estable por versión. Avisa de una actuali
 la aplica mediante «Actualizar ahora», fuera de una partida y sin guardados pendientes.
 Hay que cerrar las otras pestañas de Continuum antes de aplicarla. Los errores del modo
 sin conexión muestran un aviso y permiten seguir jugando. Al publicar un cambio visible hay que
-subir la versión a la vez en tres sitios —`CACHE` en `service-worker-258.js`,
-`CT.APP_VERSION` en `js/arranque/updates.js` y `css/edition.css?v=` en `index.html`— con el formato
-`continuum-vNNN` (ver `CLAUDE.md`). Si alguien se queda atascado en una versión vieja,
+subir la versión de caché (`continuum-vNNN`) con `npm run version:bump`, que la cambia a la vez
+en todos los sitios donde vive; el procedimiento está en [CLAUDE.md](CLAUDE.md). Si alguien se queda atascado en una versión vieja,
 `actualizar.html` descarta el service worker y su caché sin borrar su progreso.
 
 ## Salas online: reloj, presencia y relevo

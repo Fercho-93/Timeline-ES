@@ -6,7 +6,7 @@ Este documento es la referencia única del estado del proyecto: distingue lo que
 implementado en el repositorio de lo que requiere pruebas reales, credenciales, configuración
 externa o una decisión del titular. Las listas de comprobación de la beta están en
 [BETA_CHECKLIST.md](BETA_CHECKLIST.md) y lo relativo a las tiendas en
-[docs/TIENDAS.md](TIENDAS.md).
+[TIENDAS.md](TIENDAS.md).
 
 ## Estado resumido
 
@@ -79,7 +79,7 @@ externa o una decisión del titular. Las listas de comprobación de la beta est�
 - [x] Fuente en todas las cartas de Naturaleza.
 - [x] Procedencia declarada del arte, icono y splash; procedencia por carta del arte de Retos
       rápidos (`docs/arte-*.json`).
-- [ ] Cerrar la auditoría factual carta por carta ([docs/AUDITORIA_MAZOS.md](AUDITORIA_MAZOS.md)).
+- [ ] Cerrar la auditoría factual carta por carta ([AUDITORIA_MAZOS.md](AUDITORIA_MAZOS.md)).
 - [ ] Conservar la evidencia privada de generación del arte y los términos comerciales del
       servicio usado.
 - [ ] Revisar textos, fuentes y dependencias de terceros.
@@ -130,11 +130,13 @@ porque no se desplegó. Si algún día se quiere competición pública arbitrada
 
 - [ ] Comprobar la disponibilidad de Continuum en OEPM/EUIPO y tiendas.
 - [ ] Decidir la licencia definitiva del proyecto.
-- [ ] Declararse «no comerciante» en App Store Connect y Play Console al crear las fichas (juego gratuito, sin ingresos).
+- [x] App Store Connect: declarado «no comerciante» el 21 de octubre de 2026 (juego gratuito, sin ingresos; ver
+      [TIENDAS.md](TIENDAS.md#decisión-del-titular-21-de-octubre-de-2026-gratis-al-lanzar-ventas-más-adelante)).
+- [ ] Play Console: declararse «no comerciante» al crear la ficha.
 - [ ] (Futuro, solo si compensa) Lanzar las compras (colecciones y mazos): condiciones de venta, política de privacidad sin «no hay compras» y con una sección «Compras» (cobran Apple o Google; el juego no ve datos de pago; qué se guarda para desbloquear y restaurar), restauración de compras, reglas de menores de las tiendas. Antes: ser comerciante, NIF y dirección física públicos y gestoría (ver `docs/TIENDAS.md`).
 - [ ] Revisión legal de la política de privacidad, las condiciones de uso, el aviso legal, la conservación y el borrado.
 - [ ] Rellenar los cuestionarios de edad, público objetivo, «Privacidad de la app» y «Seguridad de los
-      datos» con las respuestas de [docs/TIENDAS.md](TIENDAS.md) al crear las fichas.
+      datos» con las respuestas de [TIENDAS.md](TIENDAS.md) al crear las fichas.
 - [ ] Capturas reales desde una compilación final.
 - [ ] Validar comprensión, repetición y disposición a pagar con testers.
 - [ ] Decidir la monetización después de la beta; si se venden mazos, compras oficiales,

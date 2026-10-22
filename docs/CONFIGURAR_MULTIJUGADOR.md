@@ -4,7 +4,7 @@ El juego online usa el proyecto de Firebase `timeline-es` (el identificador cons
 antiguo; ver «Nombre del proyecto» más abajo): Authentication para el invitado y la cuenta de
 Apple, Firestore para salas, duelos, mesas, progreso y ranking, Cloud Functions para avisos y
 limpieza, y App Check. La configuración pública está en `js/nube/firebase-client.js` y `js/nube/deployment.js`.
-El mapa de colecciones está en [docs/MODELO_DE_DATOS.md](MODELO_DE_DATOS.md).
+El mapa de colecciones está en [MODELO_DE_DATOS.md](MODELO_DE_DATOS.md).
 
 ## Despliegue
 
@@ -21,16 +21,12 @@ repetirlo.
 ### Web
 
 GitHub Pages publica `main` sin compilar nada. Lo que cambie lo que ve el jugador (JS, CSS,
-HTML, recursos) tiene que subir a la vez la versión en tres sitios, o el service worker seguirá
-sirviendo la anterior:
-
-- `service-worker-258.js`: `const CACHE = "continuum-vNNN";`
-- `js/arranque/updates.js`: `CT.APP_VERSION = "continuum-vNNN";`
-- `index.html`: `css/edition.css?v=NNN`
-
-Las reglas para hacerlo sin pisar a otras sesiones están en `CLAUDE.md`. Ajustes → «Versión y
-conexión» enseña la versión que tiene guardada cada móvil, que es la forma rápida de comprobar
-si un cambio ha llegado.
+HTML, recursos) tiene que subir la versión de caché, o el service worker seguirá sirviendo la
+anterior. `npm run version:bump` la sube a la vez en todos los sitios donde vive (el service
+worker, `js/arranque/updates.js` y los `?v=` de `index.html`) y `tests/version-cache.mjs` falla
+si no coinciden; cuándo hacerlo y cómo no pisar a otras sesiones está en [CLAUDE.md](../CLAUDE.md).
+Ajustes → «Versión y conexión» enseña la versión que tiene guardada cada móvil, que es la forma
+rápida de comprobar si un cambio ha llegado.
 
 ### Reglas de Firestore
 
@@ -65,10 +61,9 @@ Corren en **`europe-southwest1`** (Madrid), junto a la base de datos, para que l
 España al procesarse y los avisos de Firestore no crucen de región (`setGlobalOptions` en `functions/index.js`).
 Las dos programadas (`maintainTurnDuels` y `purgeExpiredData`) van en **`europe-west1`** (Bélgica, también en la
 UE): Cloud Scheduler no está disponible en Madrid y publicarlas allí falla (`SCHEDULED_REGION`).
-Historia: hasta octubre de 2026 la mayoría estaba en `us-central1` y los avisos de duelos en Madrid; el 20 de
-octubre pasaron todas a `europe-west1` (Bélgica) y después a Madrid. Cada publicación crea las nuevas en su región
-y borra las de las demás (por el `--force` del workflow). El juego llama a `deleteMyAccount` primero en Madrid y,
-si no responde, en Bélgica; si tampoco, borra desde el móvil.
+Cada publicación crea las Functions en su región y retira las que queden en otras (por el `--force` del
+workflow). El juego llama a `deleteMyAccount` primero en Madrid y, si no responde, en Bélgica
+(`FUNCTIONS_REGIONS` en `js/nube/accounts.js`); si tampoco, borra desde el móvil.
 
 Se publican solo a mano, con el workflow **Publicar Cloud Functions**: GitHub → Actions →
 «Publicar Cloud Functions» → «Run workflow». Funciona desde el móvil y usa el mismo secreto
@@ -132,8 +127,7 @@ Cada documento se llama `{denunciante}_{denunciado}` y lleva:
 | `createdAt` | Cuándo |
 
 Una persona solo puede denunciar a otra una vez. La limpieza diaria (`purgeExpiredData`) las borra a los
-90 días, como dice la política de privacidad; **esa función se publica a mano** (ver «Cloud Functions»
-arriba): hasta publicarla con este cambio, las denuncias no caducan.
+90 días, como dice la política de privacidad (ver «Conservación y limpieza de datos» abajo).
 
 Qué hacer con una denuncia: en Authentication busca el UID de `target` y pulsa «Inhabilitar cuenta» para que
 no pueda volver a entrar, o bórrala del todo con el workflow **Borrar cuenta de un jugador** (ver abajo);
@@ -145,9 +139,8 @@ en Firestore, `playerProfiles/{UID}` tiene su nombre (`alias`, `aliasKey`). Appl
 Dos caminos, que borran lo mismo (`functions/account-purge.js`):
 
 - **El propio jugador**, desde el Atlas → «Tu cuenta y tus datos» → «Eliminar». El móvil llama a la función
-  `deleteMyAccount`; si no está publicada o no responde, borra desde el móvil como hacían las versiones
-  anteriores. Por eso **la función hay que publicarla a mano** (workflow «Publicar Cloud Functions»): hasta
-  entonces el borrado sigue funcionando por el camino antiguo.
+  `deleteMyAccount`; si no responde, borra desde el móvil lo que las reglas le dejan borrar
+  (`purgeServerData` en `js/nube/accounts.js`).
 - **El titular**, por moderación o porque alguien lo pide por correo: GitHub → Actions → **Borrar cuenta de un
   jugador** → «Run workflow», con el nombre del jugador (o su UID) y el motivo. Antes de borrar por petición de
   correo, comprueba que quien escribe es la persona de la cuenta (por ejemplo, que pueda decir su nombre en el
@@ -200,6 +193,7 @@ y se borran con sus subcolecciones (una sala se lleva su presencia, su minijuego
 | Registros de la cuota de altas (`creationQuota`, `roomCreation`) | 7 días |
 | Registros técnicos de avisos (`duelNotificationEvents`, `duelReminderBudgets`) | 30 días |
 | Tablas del ranking (`dailyScores`, `weeklyScores`, por fecha) | 90 días |
+| Denuncias de nombres (`reports`) | 90 días |
 | Invitados anónimos sin vincular que no abren el juego | 1 año (se borran con sus datos) |
 
 Estos plazos los cuenta también la política de privacidad: si cambian en `retention.js`, hay
