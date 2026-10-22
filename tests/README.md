@@ -110,6 +110,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `invitaciones-app.mjs` | test | «Unirme» acepta el enlace entero, su parte final o el código suelto. |
 | `jugadores-recientes.mjs` | test | Un solo móvil recuerda los nombres de los jugadores recientes. |
 | `legal.mjs` | test | Condiciones de uso, aviso legal, soporte y página de borrado: enlaces y anclas, caché, app móvil, coherencia con la política y lista de huecos `[PENDIENTE: …]` por rellenar. |
+| `limpieza-tope.mjs` | test | La limpieza diaria del servidor tiene plazo mínimo de un día y tope de borrados por ejecución, y reanuda al día siguiente. |
 | `mano-carrusel-browser.mjs` | navegador | La mano en abanico gira como un carrusel con gestos táctiles reales y siempre deja una carta elegida en el centro. |
 | `marca.mjs` | test | Nombre Continuum en la web, iOS, manifiesto, paquete, documentación y pantallas, sin la marca antigua. |
 | `mazos.mjs` | test | Integridad de todos los mazos: repeticiones, huecos, espaciado y cifras que el redondeo no confunda. |
@@ -152,6 +153,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `referencias-paises.mjs` | test | Huellas de las láminas de países revisadas a mano. |
 | `referencias-poblacion.mjs` | test | Referencias y láminas del mazo de población. |
 | `reglas-firestore.mjs` | reglas | Quién puede escribir en una sala y qué: entrar, empezar, colocar, saltar, expulsar y trampas. |
+| `reglas-superficie.mjs` | test | Lee `firestore.rules` sin emulador: nada público, ningún `write` abierto, ninguna escritura sin sesión y la lista exacta de borrados que un cliente puede hacer. |
 | `result-preview.mjs` | test | La pantalla de resultado: acierto, corrección del fallo, foco y movimiento reducido. |
 | `retencion.mjs` | test | Los plazos de `functions/retention.js` coinciden con la política, y `PRIVACIDAD.md` y `privacidad.html` tienen las mismas secciones. |
 | `revancha-local.mjs` | test | La revancha en un solo móvil recupera la mesa anterior. |

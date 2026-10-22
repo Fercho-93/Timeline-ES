@@ -22,7 +22,14 @@ const ACTIVITY = Object.freeze({
   publicQueues: 'updatedAt', quickPublicQueues: 'updatedAt', creationQuota: 'lastCreatedAt',
   roomCreation: 'lastCreatedAt', duelNotificationEvents: 'claimedAt', duelReminderBudgets: 'lastSentAt', reports: 'createdAt'
 });
-const cutoff = (collection, now) => new Date(now - RETENTION[collection]);
+// Ningún plazo puede bajar de un día: un valor mal escrito (0, un número negativo, un texto) dejaría el límite en
+// «ahora» y la limpieza diaria borraría datos recientes. Mejor que falle antes de borrar nada.
+const MIN_RETENTION = DAY;
+function cutoff(collection, now, table = RETENTION) {
+  const span = table[collection];
+  if (!Number.isFinite(span) || span < MIN_RETENTION) throw new Error(`Plazo de conservación no válido para ${collection}`);
+  return new Date(now - span);
+}
 // Las tablas del ranking van por fecha (`dailyScores/2026-10-09`, `weeklyScores/2026-10-05`): se
 // borra la tabla entera cuando su fecha queda fuera del plazo.
 function expiredRankingKey(key, now) {
@@ -35,4 +42,4 @@ function staleAnonymous(user, now) {
   const last = Date.parse(user.metadata?.lastRefreshTime || user.metadata?.lastSignInTime || user.metadata?.creationTime || '');
   return Number.isFinite(last) && now - last > RETENTION.anonymousAccounts;
 }
-module.exports = { DAY, RETENTION, ACTIVITY, cutoff, expiredRankingKey, staleAnonymous };
+module.exports = { DAY, MIN_RETENTION, RETENTION, ACTIVITY, cutoff, expiredRankingKey, staleAnonymous };

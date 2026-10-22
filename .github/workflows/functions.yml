@@ -31,6 +31,7 @@ jobs:
       - name: Probar los plazos de conservación y la sintaxis
         run: |
           node tests/retencion.mjs
+          node tests/limpieza-tope.mjs
           node tests/borrado-cuenta.mjs
           node tests/duelo-policy.cjs
           node --check functions/index.js

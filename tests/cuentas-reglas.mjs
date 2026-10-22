@@ -103,6 +103,9 @@ try {
  await assertFails(setDoc(doc(db,'playerProfiles','account-a'),{...data,season:'other'}));
  await assertFails(deleteDoc(doc(db,'playerNames','fulanito')));
  await assertFails(setDoc(doc(other,'playerNames','fulanito'),{uid:'account-b'}));
+ // El progreso no se borra suelto (ni por su dueño): solo junto con el perfil, al borrar la cuenta.
+ await assertFails(deleteDoc(doc(db,'playerProgress','account-a')));
+ await assertFails(deleteDoc(doc(other,'playerProgress','account-a')));
  batch=writeBatch(db);batch.delete(doc(db,'playerNames','fulanito'));for(const name of ['playerProfiles','playerProgress','dailyRanking'])batch.delete(doc(db,name,'account-a'));await assertSucceeds(batch.commit());
  const race=await Promise.allSettled(['race-a','race-b'].map(async uid=>{
    const client=env.authenticatedContext(uid,verified).firestore(), claim=writeBatch(client);

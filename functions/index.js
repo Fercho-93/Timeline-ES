@@ -10,8 +10,9 @@ const { onCall, HttpsError } = require('firebase-functions/v2/https');
 const { setGlobalOptions } = require('firebase-functions/v2');
 const { DAY, millis, lifecycle, movementMessage } = require('./duel-policy');
 const { getAuth } = require('firebase-admin/auth');
-const { ACTIVITY, cutoff, expiredRankingKey, staleAnonymous } = require('./retention');
+const { ACTIVITY, expiredRankingKey, staleAnonymous } = require('./retention');
 const { deleteAccount } = require('./account-purge');
+const { purgeCollection } = require('./purge');
 
 // En Madrid, junto a la base de datos: los datos no salen de España para procesarse y los avisos
 // de Firestore no cruzan de región. El juego llama a `deleteMyAccount` aquí (accounts.js, FUNCTIONS_REGIONS).
@@ -113,16 +114,8 @@ exports.maintainTurnDuels = onSchedule({ region: SCHEDULED_REGION, schedule: 'ev
   } while (cursor);
 });
 
-// Limpieza diaria según los plazos de retention.js (los mismos que cuenta la política de
-// privacidad). Borra con sus subcolecciones: una sala se lleva su presencia y su final.
-async function purgeCollection(name, now) {
-  let removed = 0;
-  for (;;) {
-    const page = await db.collection(name).where(ACTIVITY[name], '<', cutoff(name, now)).limit(200).get();
-    for (const snapshot of page.docs) { await db.recursiveDelete(snapshot.ref); removed++; }
-    if (page.size < 200) return removed;
-  }
-}
+// Limpieza diaria según los plazos de retention.js (los mismos que cuenta la política de privacidad). Borra con
+// sus subcolecciones: una sala se lleva su presencia y su final. La lógica y el tope por ejecución, en purge.js.
 async function purgeRanking(collection, now) {
   let removed = 0;
   for (const ref of await db.collection(collection).listDocuments()) {
@@ -155,10 +148,15 @@ exports.deleteMyAccount = onCall({ timeoutSeconds: 120, maxInstances: 10 }, asyn
   return { deleted: true };
 });
 exports.purgeExpiredData = onSchedule({ region: SCHEDULED_REGION, schedule: 'every day 04:17', timeZone: 'Europe/Madrid', timeoutSeconds: 540, maxInstances: 1 }, async () => {
-  const now = Date.now(), summary = {};
+  const now = Date.now(), summary = {}, capped = [];
   for (const name of Object.keys(ACTIVITY)) {
-    try { summary[name] = await purgeCollection(name, now); } catch (error) { console.warn('Purge failed', name, error.code || error.message); }
+    try {
+      const result = await purgeCollection(db, name, now);
+      summary[name] = result.removed;
+      if (result.capped) capped.push(name);
+    } catch (error) { console.warn('Purge failed', name, error.code || error.message); }
   }
+  if (capped.length) console.warn('Purge capped: se ha llegado al tope por ejecución en', capped.join(', '));
   for (const name of ['dailyScores', 'weeklyScores']) {
     try { summary[name] = await purgeRanking(name, now); } catch (error) { console.warn('Purge failed', name, error.code || error.message); }
   }

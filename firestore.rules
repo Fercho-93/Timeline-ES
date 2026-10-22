@@ -494,7 +494,9 @@ service cloud.firestore {
       allow list: if false;
       allow create: if owner(uid) && valid() && request.resource.data.revision == 1;
       allow update: if owner(uid) && valid() && request.resource.data.revision == resource.data.revision + 1;
-      allow delete: if owner(uid);
+      // El progreso solo se borra al borrar la cuenta (el perfil desaparece en la misma operación, como hace
+      // `purgeServerData` en accounts.js): un borrado suelto, por un fallo del cliente o a propósito, ya no lo pierde.
+      allow delete: if owner(uid) && !existsAfter(/databases/$(database)/documents/playerProfiles/$(uid));
     }
     // Marcador social: datos declarados por cliente, nunca resultados competitivos certificados.
     match /socialRanking/{uid} {
