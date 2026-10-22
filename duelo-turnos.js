@@ -12,12 +12,12 @@ const ended = game => ['finished', 'cancelled', 'expired', 'resigned'].includes(
 const inactive = game => !ended(game) && game.updatedAt?.seconds && Date.now() - game.updatedAt.seconds * 1000 >= INACTIVE_DAYS * 86400000;
 const asVisible = game => inactive(game) ? { ...game, status: 'expired', turnUid: null, resultText: 'Duelo caducado tras siete días sin actividad.' } : game;
 let cachedGames = [], busy = false;
-let prepareUntil = 0, preparingTurn = null, awaitingReady = false;
+let preparingTurn = null;
 let archivedIds = new Set(), blockedPlayers = new Map();
 const sending = new Set();
 let retryTimer = null, delivery = '';
 const TOTAL = CT.Duelo.CARTAS;
-let stop = null, current = null, onBack = null, timer = null, enteredAt = 0, shareLink = '', pendingIndex = null;
+let stop = null, current = null, onBack = null, enteredAt = 0, shareLink = '', pendingIndex = null;
 
 const safe = value => CT.escapeHtml(String(value ?? ''));
 const uid = () => auth.currentUser?.uid || CT.Accounts?.user?.uid;
@@ -222,7 +222,6 @@ async function queueMove(extra) {
   const move = { ...extra, ms: Math.min(ms, tope), timeout: !!extra.timeout, gameId: current.id, turnIndex: current.turnIndex, uid: uid(), operationId: id() };
   try { savePending(current.id, move); }
   catch { return notify('No hay espacio para proteger el envío. Libera almacenamiento antes de continuar.'); }
-  clearInterval(timer);
   delivery = '';
   return sendPending(move);
 }
@@ -316,7 +315,6 @@ async function join(gameId, back, accept = false) {
 }
 // Cada turno se juega sin reloj: se abre la carta cuando entras y la respuesta espera lo que haga falta.
 function prepareTurn() {
-  awaitingReady = false; prepareUntil = 0;
   if (!firstTurnOf(current) && (current?.status !== 'playing' || current.turnUid !== uid())) return;
   const key = `${current.id}-${current.turnIndex}`;
   if (preparingTurn !== key) {
@@ -556,8 +554,8 @@ async function next(back = onBack) {
   if (!target) return notify('No tienes más duelos pendientes de jugar.');
   open({ gameId: target.id, back });
 }
-function open({ mode = 'history', kind = 'orden', gameId = '', back, competition = null } = {}) { stop?.(); clearInterval(timer); current = null; prepareUntil = 0; preparingTurn = null; awaitingReady = false; enteredAt = 0; delivery = ''; pendingIndex = null; onBack = back; shareLink = ''; retryPending(); if (gameId) join(gameId, back).catch(() => notify('No se pudo abrir este duelo.')); else create(mode, kind, back, competition).catch(() => notify('No se pudo crear el duelo.')); }
-function leave() { stop?.(); stop = null; clearInterval(timer); turnClock?.stop(); turnClock = null; current = null; }
+function open({ mode = 'history', kind = 'orden', gameId = '', back, competition = null } = {}) { stop?.(); current = null; preparingTurn = null; enteredAt = 0; delivery = ''; pendingIndex = null; onBack = back; shareLink = ''; retryPending(); if (gameId) join(gameId, back).catch(() => notify('No se pudo abrir este duelo.')); else create(mode, kind, back, competition).catch(() => notify('No se pudo crear el duelo.')); }
+function leave() { stop?.(); stop = null; turnClock?.stop(); turnClock = null; current = null; }
 function close() { leave(); onBack?.(); }
 document.addEventListener('click', e => { const target = e.target.closest('[data-turn-action]'), action = target?.dataset.turnAction; if (action === 'select-slot') { CT.Effects?.tap(); pendingIndex = Number(target.dataset.index); render(); } if (action === 'confirm-place') { CT.Effects?.stamp(); place(pendingIndex); } if (action === 'cancel-place') { pendingIndex = null; render(); } if (action === 'submit-cifra') submitCifra(); if (action === 'share') share(); if (action === 'back') close(); });
 CT.TurnDuel = { open, close, leave, list, cancel, standings };

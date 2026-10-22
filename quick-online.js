@@ -1,6 +1,6 @@
 // Retos rápidos por internet: salas y duelos guardados en Firestore, con cada jugada firmada por su autor.
 import {auth, db} from './firebase-client.js';
-import {collection, deleteDoc, doc, getDoc, getDocs, query, where, runTransaction, onSnapshot, serverTimestamp} from './vendor/firebase/firebase-firestore.js';
+import {collection, doc, getDoc, getDocs, query, where, runTransaction, onSnapshot, serverTimestamp} from './vendor/firebase/firebase-firestore.js';
 const CT=window.CONTINUUM, R=CT.QuickRoom;
 export const PUBLIC_VERSION=1;
 function publicKey(capacity){return 'quick:'+capacity+':v'+PUBLIC_VERSION+':'+CT.QuickNetwork.fingerprint();}
@@ -42,7 +42,7 @@ async function claimTable({uid,name,create,code,capacity}){
   return code;
 }
 async function publicConnect(options) {
-  const {name,capacity=4,onChange,onError,allowStale=false}=options;
+  const {name,capacity=4,allowStale=false}=options;
   await auth.authStateReady(); const uid=auth.currentUser?.uid;
   if(!uid)throw Error('Espera a que se prepare tu perfil e inténtalo de nuevo.');
   if(options.create||options.code){

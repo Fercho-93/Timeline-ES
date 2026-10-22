@@ -37,7 +37,7 @@ w.__deps = {
 w.eval(`const {auth,db,doc,Timestamp,serverTimestamp,runTransaction}=window.__deps;\n${source}\nwindow.testDuel={
   show: game=>{current=game;preparingTurn=null;prepareTurn();render();}, ready:()=>{prepareTurn(true);render();}, refresh:()=>render(),
   place, queueMove, retryPending, outbox, pendingMove, cancel,
-  deadline:()=>enteredAt, awaiting:()=>awaitingReady,
+  deadline:()=>enteredAt,
   snapshot:game=>{current=game;prepareTurn();render();},
   restore:game=>{current=game;preparingTurn=null;enteredAt=0;prepareTurn();render();}
 };`);
@@ -47,7 +47,6 @@ try {
   games.set('one', game('one'));
   t.show(clone(games.get('one')));
   // Sin reloj: la carta está lista nada más entrar, sin pantalla de «Estoy listo» ni cuenta atrás.
-  assert.equal(t.awaiting(), false);
   assert.ok(w.document.querySelector('.hand-card'), 'la carta se ve al entrar');
   assert.equal(w.document.querySelector('.turn-duel-clock'), null, 'no hay reloj');
   assert.equal(w.document.querySelector('.turn-duel-ready'), null);

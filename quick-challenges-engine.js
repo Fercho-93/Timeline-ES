@@ -15,13 +15,11 @@
     if (config.first !== undefined && !(Number.isInteger(config.first) && config.first >= 0 && config.first < config.names.length)) throw Error('INVALID_CONFIG');
     // `seconds`: plazo por jugada (0 = sin tiempo). Al agotarse se juega `timeoutPlacement`.
     if (config.seconds !== undefined && ![0, 15, 20, 30].includes(config.seconds)) throw Error('INVALID_CONFIG');
-    const ids = new Set();
     for (const round of config.rounds) {
       const c = challenge(round.id);
       // El reto diario juega un recorte fijo del mazo (ver DAILY_QUICK_CARDS en quick-challenges.js); el resto, el mazo entero.
       if (!c || !Array.isArray(round.order) || round.order.length < 2 || round.order.length > c.cards.length ||
           new Set(round.order).size !== round.order.length || round.order.some(id => !c.cards.some(card => card.id === id))) throw Error('INVALID_DECK');
-      ids.add(c.id);
     }
     const s = {config: clone(config), index: 0, players: config.names.map(name => ({name: name.trim(), score: 0, points: 0, status: 'active'}))};
     startRound(s);

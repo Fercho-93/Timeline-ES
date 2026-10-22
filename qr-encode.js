@@ -20,15 +20,13 @@
   const MAX_TYPE_NUMBER = 40;
 
   function build(text) {
-    const bytes = [...new TextEncoder().encode(text)];
-    let lastError;
     for (let typeNumber = 1; typeNumber <= MAX_TYPE_NUMBER; typeNumber++) {
       try {
         const code = qrcode(typeNumber, ECC_LEVEL);
         code.addData(text);
         code.make();
         return code;
-      } catch (error) { lastError = error; }
+      } catch { /* No cabe en esta versión: se prueba la siguiente. */ }
     }
     throw new Error("QR_TEXT_TOO_LONG");
   }

@@ -82,8 +82,8 @@
   let publicClock=null;
   // Una sala de duelo por turnos (la crea quien abre «Duelo con un amigo → Por turnos») no enseña mesa: se manda el enlace y
   // empieza sola cuando entra el amigo.
-  let previewCode=null, serverRoom=null, duelRoom=false, duelStarting=false, duelFirst=0, justJoined=false, backTo=null, pendingInvite=null;
-  function stopNetwork() {quickClock?.stop();quickClock=null;clearInterval(publicClock);publicClock=null;networkEpoch++;connection?.close();connection=null;room=null;serverRoom=null;myId=null;busy=false;invite=null;duelRoom=false;duelStarting=false;justJoined=false;}
+  let previewCode=null, serverRoom=null, duelRoom=false, duelStarting=false, duelFirst=0, backTo=null, pendingInvite=null;
+  function stopNetwork() {quickClock?.stop();quickClock=null;clearInterval(publicClock);publicClock=null;networkEpoch++;connection?.close();connection=null;room=null;serverRoom=null;myId=null;busy=false;invite=null;duelRoom=false;duelStarting=false;}
   function errorNotice(e) {busy=false;const message=e?.code==='permission-denied'||/missing or insufficient permissions/i.test(e?.message||'')?'No se pudo guardar el cambio en el duelo. Vuelve a abrirlo e inténtalo de nuevo.':e.message || String(e);let el=app().querySelector('#quick-error');if(!el){el=document.createElement('p');el.id='quick-error';el.setAttribute('role','alert');(app().querySelector('.modal') || app().querySelector('.quick-shell'))?.append(el);}if(el)el.textContent=message;CT.announce(message);}
   function rounds(count=3, selectedId=null, seed=null, limit=0) {
     const random=seed===null?Math.random:CT.seededRandom(CT.seedFrom(seed)), deal=c=>{const ids=CT.shuffleWith(c.cards.map(x=>x.id),random);return limit?ids.slice(0,limit):ids;};
@@ -551,7 +551,6 @@
     const input=app().querySelector('#quick-net-name-join');if(input&&!input.value)input.value=known();
     if(!known()){app().querySelector('#quick-link-name')?.removeAttribute('hidden');app().querySelector('#quick-link-go')?.removeAttribute('hidden');}
     else{
-      justJoined=true;
       try{await connectRoom(false);}
       catch(e){errorNotice(e);app().querySelector('#quick-link-name')?.removeAttribute('hidden');app().querySelector('#quick-link-go')?.removeAttribute('hidden');}
     }
@@ -726,7 +725,7 @@
     if(action==='leave-public'){const leaving=connection;connection=null;clearInterval(publicClock);await leaving?.leave?.();toEntry();return true;}
     if(action==='share-duel'){await CT.LocalShare.shareSignal(duelLink());return true;}
     if(action==='live-room'){const net=app().querySelector('input[name="quick-live-net"]:checked')?.value||liveNet();netKind=net==='wifi'?'local':'internet';await connectRoom(true);return true;}
-    if(action==='create-room'||action==='join-room'){justJoined=action==='join-room';await connectRoom(action==='create-room');return true;}
+    if(action==='create-room'||action==='join-room'){await connectRoom(action==='create-room');return true;}
     if(action==='start-room'){const count=Number(app().querySelector('#quick-net-length')?.value)||roomLength||3;await networkAction({type:'start',rounds:rounds(count,null,null,E.MULTI_CARDS),kind:(room?.capacity||roomCapacity)===2?'duel':'network',historyId:historyId(),keep:duelKeep(),seconds:CT.Tiempo.get('amigos',15),...((room?.capacity||roomCapacity)===2?{first:duelFirst}:(()=>{const order=room?CT.QuickRoom.starterOrder(room):null;return Number.isInteger(order?.[0])?{first:order[0]}:{};})())});return true;}
     if(action==='rematch-room'){
       const cfg=state.config, me=state.players[room.members.indexOf(myId)].name, other=room.members.find(m=>m!==myId);
@@ -1234,7 +1233,7 @@
       paint=renderPage;backTo=null;entry='network';networkSetup('local',4,'join');
       app().querySelector('#quick-net-code').value=signal;
       const name=app().querySelector('#quick-net-name-join');
-      if(name?.value.trim()){justJoined=true;connectRoom(false).catch(errorNotice);}else name?.focus();
+      if(name?.value.trim()){connectRoom(false).catch(errorNotice);}else name?.focus();
     },
     // El mazo y la regla del reto rápido de un día, para enseñarlos en la guía sin empezar la partida.
     dailyChallenge(dayValue) {const c=E.challenge(dailyQuick(dayValue).rounds[0].id);return {id:c.id,title:c.title,rule:c.rule,asOf:c.asOf,cards:dailyQuick(dayValue).rounds[0].order.length};},

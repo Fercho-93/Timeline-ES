@@ -185,7 +185,7 @@ function renderPresence() {
   // partida no se muestra: la pantalla debe quedar centrada en el juego.
   // En una mesa pública el estado de cada persona ya se ve en la lista de jugadores: la
   // caja de conexión solo aparece si hay un problema de verdad.
-  const publicOk = roomState.matchmaking === "public" && navigator.onLine && !/Sin confirmación|requiere/.test(connectionMessage);
+  const publicOk = roomState.matchmaking === "public" && navigator.onLine && !/Sin confirmación/.test(connectionMessage);
   if (roomState.status === "playing" || publicOk) {
     appEl.querySelector("#room-connection")?.remove();
     return;
@@ -758,17 +758,17 @@ function seatSilent(uid) {
   return record.visible === false || now - record.seenAt > 90000;
 }
 
-// Los ajustes del anfitrión viven aquí y no en el formulario: la sala de espera se repinta con
-// cada persona que entra o sale y con cada respuesta del minijuego, y sin esto volverían a los
-// valores de serie. Se reinician al cambiar de sala.
-const LOBBY_DEFAULTS = { preset: "simple", turnSeconds: "30", handSize: "4", pulse: false, ghost: false };
+// Los ajustes con los que el anfitrión abre la sala (tiempo, cartas iniciales y poderes) salen de
+// lo que eligió en «Partida con amigos» y se leen una vez por sala: la sala de espera se repinta con
+// cada persona que entra o sale y con cada respuesta del minijuego, y solo los enseña. `startRoom`
+// los recoge de los campos ocultos que pinta `renderLobby`.
+const LOBBY_DEFAULTS = { turnSeconds: "30", handSize: "4", pulse: false, ghost: false };
 const lobbySettings = { room: "", ...LOBBY_DEFAULTS };
-function presetFor(pulse, ghost) { return pulse && ghost ? "advanced" : !pulse && !ghost ? "simple" : "custom"; }
 
 function renderLobby() {
   clearTurnTimer();
-  // La sala privada arranca con el tiempo elegido en «Partida con amigos»; el anfitrión aún puede cambiarlo aquí.
-  if (lobbySettings.room !== roomCode) Object.assign(lobbySettings, LOBBY_DEFAULTS, { room: roomCode, turnSeconds: String((CT.Tiempo?.get?.("amigos", 15) ?? 15)), handSize: String(CT.ManoInicial?.get?.() ?? 4), ...(() => { const p = CT.ManoInicial?.poderes?.() ?? {}; return { pulse: !!p.pulse, ghost: !!p.ghost, preset: p.pulse && p.ghost ? "advanced" : !p.pulse && !p.ghost ? "simple" : "custom" }; })() });
+  // La sala privada arranca con el tiempo, las cartas y los poderes elegidos en «Partida con amigos».
+  if (lobbySettings.room !== roomCode) Object.assign(lobbySettings, LOBBY_DEFAULTS, { room: roomCode, turnSeconds: String((CT.Tiempo?.get?.("amigos", 15) ?? 15)), handSize: String(CT.ManoInicial?.get?.() ?? 4), ...(() => { const p = CT.ManoInicial?.poderes?.() ?? {}; return { pulse: !!p.pulse, ghost: !!p.ghost }; })() });
   if (roomState.matchmaking === "public") return renderPublicLobby();
   // Cada respuesta ajena repinta la sala de espera: lo que se estaba escribiendo en el
   // minijuego no se pierde por eso.
@@ -878,7 +878,6 @@ function publicStarterMarkup() {
 }
 
 function renderPublicLobby() {
-  const isHost = roomState.hostUid === user.uid;
   const draft = document.getElementById("starter-guess-input")?.value || "";
   const mode = CT.mode(modeKey());
   const count = roomState.playerOrder.length;
@@ -1932,28 +1931,6 @@ document.addEventListener("submit", event => {
   }
 });
 
-document.addEventListener("change", event => {
-  const id = event.target.id;
-  if (!["online-preset", "online-hand-size", "online-pulse", "online-ghost"].includes(id)) return;
-  const pulseBox = document.getElementById("online-pulse"), ghostBox = document.getElementById("online-ghost");
-  if (id === "online-preset") {
-    if (event.target.value === "custom") return;
-    const advanced = event.target.value === "advanced";
-    lobbySettings.pulse = lobbySettings.ghost = advanced;
-    if (pulseBox) pulseBox.checked = advanced;
-    if (ghostBox) ghostBox.checked = advanced;
-  } else if (id === "online-hand-size") lobbySettings.handSize = event.target.value;
-  else {
-    if (id === "online-pulse") lobbySettings.pulse = event.target.checked; else lobbySettings.ghost = event.target.checked;
-  }
-  // El desplegable siempre dice lo que hacen las casillas: si solo hay un poder, es «Personalizada».
-  lobbySettings.preset = presetFor(lobbySettings.pulse, lobbySettings.ghost);
-  const preset = document.getElementById("online-preset");
-  if (preset) {
-    if (lobbySettings.preset === "custom" && !preset.querySelector('option[value="custom"]')) preset.insertAdjacentHTML("beforeend", '<option value="custom">Personalizada</option>');
-    preset.value = lobbySettings.preset;
-  }
-});
 document.addEventListener("input", event => {
   if (event.target.matches(".room-code-input")) event.target.value = cleanCode(event.target.value);
 });

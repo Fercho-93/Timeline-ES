@@ -14,7 +14,7 @@
 (function () {
   "use strict";
   const CT = window.CONTINUUM;
-  const { escapeHtml, shuffle } = CT;
+  const { escapeHtml } = CT;
   const appEl = document.getElementById("app");
   const ROOM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   const BACK_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 5-7 7 7 7M7 12h14"/></svg>';
@@ -313,7 +313,7 @@
     competition = options.competition || null;
     createOnly = !!options.createOnly;
     lobbySettings.handSize = String(CT.ManoInicial?.get?.() ?? 4);
-    { const p = CT.ManoInicial?.poderes?.() ?? {}; lobbySettings.pulse = !!p.pulse; lobbySettings.ghost = !!p.ghost; lobbySettings.preset = p.pulse && p.ghost ? "advanced" : !p.pulse && !p.ghost ? "simple" : "custom"; }
+    { const p = CT.ManoInicial?.poderes?.() ?? {}; lobbySettings.pulse = !!p.pulse; lobbySettings.ghost = !!p.ghost; }
     role = null; hostSession = null; guestSession = null; roomState = null; myPlayerId = "";
     pendingInvite = null; pendingAnswerText = ""; selectedCardId = null; pendingIndex = null;
     cardsByIdCache = new Map();
@@ -668,10 +668,10 @@
     { left: "10%", top: "50%" }, { left: "20%", top: "24%" }
   ];
 
-  // Los ajustes del anfitrión se guardan aquí y no en el propio formulario: la sala de
-  // espera se repinta con cada respuesta del minijuego y, si no, volverían a los de serie.
-  // El tiempo de partida sale de lo elegido en «Partida con amigos»; el anfitrión aún puede cambiarlo.
-  const lobbySettings = { preset: "simple", handSize: "4", pulse: false, ghost: false };
+  // Las cartas iniciales y los poderes con los que el anfitrión abre la sala salen de lo que eligió
+  // en «Partida con amigos» (se leen al abrir esta pantalla) y se guardan aquí: la sala de espera
+  // se repinta con cada respuesta del minijuego y solo los enseña. El tiempo, igual, de `CT.Tiempo`.
+  const lobbySettings = { handSize: "4", pulse: false, ghost: false };
 
   // El minijuego de quién empieza, el mismo que en la sala online y en un solo móvil:
   // el anfitrión reparte una carta, cada persona escribe su cifra en su móvil, empieza
@@ -728,7 +728,6 @@
       const puedeExpulsar = isHost && uid !== roomState.hostId;
       return `<div class="table-seat" style="left:${pos.left};top:${pos.top};"><span class="seat-avatar">${CT.Avatares.markup(player.name, { size: 44, seed: 'room:' + uid, id: esMio(uid) ? CT.Avatares.ownId() : player.avatarId })}</span><strong>${escapeHtml(player.name)}${uid === myPlayerId ? " · tú" : ""}</strong><small>${uid === roomState.hostId ? "Anfitrión" : `Plaza ${index + 1}`}</small><i class="ready-seal">Listo</i>${puedeExpulsar ? `<button class="kick-btn" data-local-action="kick" data-uid="${escapeHtml(uid)}" aria-label="Expulsar a ${escapeHtml(player.name)}">×</button>` : ""}</div>`;
     }).join("");
-    const opcion = (value, label, current) => `<option value="${value}"${String(current) === String(value) ? " selected" : ""}>${label}</option>`;
     const settings = isHost
       ? `<div class="section-label">Ajustes</div>
         <div class="field"><span class="field-label">Tiempo por carta</span><p class="hint">${CT.Tiempo.texto(CT.Tiempo.get("amigos", 15))} (lo elegiste al crear la partida).</p></div>
@@ -1178,27 +1177,6 @@
       const answer = String(values.get("answer") || "").trim();
       if (!answer) return showToast("Pega primero la respuesta");
       void acceptPendingAnswer(answer);
-    }
-  });
-
-  document.addEventListener("change", event => {
-    const id = event.target.id;
-    if (!["wifi-preset", "wifi-hand-size", "wifi-pulse", "wifi-ghost"].includes(id)) return;
-    const pulseBox = document.getElementById("wifi-pulse"), ghostBox = document.getElementById("wifi-ghost");
-    if (id === "wifi-preset") {
-      if (event.target.value === "custom") return;
-      lobbySettings.pulse = lobbySettings.ghost = event.target.value === "advanced";
-      if (pulseBox) pulseBox.checked = lobbySettings.pulse;
-      if (ghostBox) ghostBox.checked = lobbySettings.ghost;
-    } else if (id === "wifi-hand-size") lobbySettings.handSize = event.target.value;
-    else if (id === "wifi-pulse") lobbySettings.pulse = event.target.checked;
-    else if (id === "wifi-ghost") lobbySettings.ghost = event.target.checked;
-    // El desplegable siempre dice lo que hacen las casillas: con un solo poder es «Personalizada».
-    lobbySettings.preset = lobbySettings.pulse && lobbySettings.ghost ? "advanced" : !lobbySettings.pulse && !lobbySettings.ghost ? "simple" : "custom";
-    const preset = document.getElementById("wifi-preset");
-    if (preset) {
-      if (lobbySettings.preset === "custom" && !preset.querySelector('option[value="custom"]')) preset.insertAdjacentHTML("beforeend", '<option value="custom">Personalizada</option>');
-      preset.value = lobbySettings.preset;
     }
   });
 
