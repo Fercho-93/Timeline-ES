@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import {initializeTestEnvironment,assertSucceeds,assertFails} from '@firebase/rules-unit-testing';
 import {collection,deleteDoc,getDocs,query,where,doc,getDoc,setDoc,updateDoc,serverTimestamp,runTransaction,onSnapshot,writeBatch} from 'firebase/firestore';
+import {queueFresh} from '../public-matchmaking.js';
 const env=await initializeTestEnvironment({projectId:'demo-hilo',firestore:{rules:fs.readFileSync('firestore.rules','utf8'),host:'127.0.0.1',port:8080}});
 const w={};for(const p of ['cards.js','movies.js','music.js','videogames.js','animals.js','lifespan.js','speed.js','inventos.js','mundo.js','astronomy.js','medicine.js','countries.js','population.js','idiomas.js','distances.js','modes.js','engine.js','quick-challenges-data.js','quick-challenges-engine.js','cartera.js','tournament.js','final.js','quick-room.js'])vm.runInNewContext(fs.readFileSync(p,'utf8'),{window:w});
 const R=w.CONTINUUM.QuickRoom, E=w.CONTINUUM.QuickEngine;
@@ -103,8 +104,8 @@ try {
   assert.deepEqual(failures,[]);hk.close();gk.close();
   // La primera persona crea sala y cola en una transacción; la segunda ocupa la
   // última plaza y cierra la cola antes de que una tercera pueda unirse.
-  const publicAdapter=(uid,db)=>new Function('auth','db','doc','getDoc','runTransaction','onSnapshot','serverTimestamp','window',source+'\nreturn connectPublic;')(
-    {currentUser:{uid},authStateReady:async()=>{}},db,doc,getDoc,runTransaction,onSnapshot,serverTimestamp,w);
+  const publicAdapter=(uid,db)=>new Function('auth','db','doc','getDoc','runTransaction','onSnapshot','serverTimestamp','queueFresh','window',source+'\nreturn connectPublic;')(
+    {currentUser:{uid},authStateReady:async()=>{}},db,doc,getDoc,runTransaction,onSnapshot,serverTimestamp,queueFresh,w);
   const publicRooms={};
   const first=await publicAdapter('host',host)({name:'Ana',capacity:2,onChange:r=>publicRooms.host=r,onError:e=>failures.push(e)});
   const second=await publicAdapter('guest',guest)({name:'Bea',capacity:2,onChange:r=>publicRooms.guest=r,onError:e=>failures.push(e)});
