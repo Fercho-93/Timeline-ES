@@ -157,7 +157,7 @@ async function drawStarterCard() {
     const cardId = shuffle(modeCards(roomState.mode).map(card => card.id))[0];
     await setDoc(doc(db, "rooms", roomCode, "starter", user.uid), { cardId, value: null, guessedAt: null });
     return true;
-  } catch { showToast("No se pudo repartir la carta. Actualiza firestore.rules para el sorteo de quién empieza."); return false; }
+  } catch { showToast("No se pudo repartir la carta. Inténtalo de nuevo."); return false; }
   finally { starterBusy = false; }
 }
 
@@ -487,11 +487,7 @@ async function createRoom(name) {
   try {
     await ensureAuth();
     const tournament = competitionOptions ? CT.Tournament.create(competitionOptions.rounds,competitionOptions.cards) : null;
-    if (tournament) {
-      try { await getDoc(doc(db,'capabilities','multiCompetition')); }
-      catch { showToast('Falta actualizar el servicio de salas para Competición multijugador.'); return; }
-      selectedModeKey=tournament.queue[0];
-    }
+    if (tournament) selectedModeKey=tournament.queue[0];
     const code = createRoomCode();
     const reference = doc(db, "rooms", code);
     const batch = writeBatch(db);
@@ -962,10 +958,7 @@ async function nextTournamentRound() {
   finally {busy=false;}
 }
 
-// `keepOrder` es el camino de las reglas anteriores a poder reordenar la mesa al empezar:
-// si el servicio de salas todavía no se ha actualizado, se empieza igual, con quien ganó
-// el minijuego pero en el orden de entrada.
-async function startRoom(withGhost = true, keepOrder = false) {
+async function startRoom(withGhost = true) {
   if (busy || roomState.hostUid !== user.uid) return;
   const handSize = roomState.tournament?.handSize || Number(document.getElementById("online-hand-size")?.value || 4);
   const isPublic = roomState.matchmaking === "public";
@@ -982,11 +975,6 @@ async function startRoom(withGhost = true, keepOrder = false) {
   const enableGhost = withGhost && !!document.getElementById("online-ghost")?.checked;
   busy = true;
   try {
-    try { await getDoc(doc(db, 'capabilities', 'secretFinal')); }
-    catch (error) {
-      if (error.code === 'permission-denied') throw Error('FINAL_RULES_REQUIRED');
-      throw error;
-    }
     await runTransaction(db, async transaction => {
       const snapshot = await transaction.get(roomRef);
       const data = snapshot.data();
@@ -1007,7 +995,7 @@ async function startRoom(withGhost = true, keepOrder = false) {
       // La mesa se sienta por orden de cercanía, si el minijuego sigue siendo de estas
       // mismas personas (alguien pudo entrar o salir mientras tanto).
       const sameTable = ranking && ranking.length === data.playerOrder.length && data.playerOrder.every(uid => ranking.includes(uid));
-      const reorder = !keepOrder && sameTable && ranking.some((uid, i) => uid !== data.playerOrder[i]);
+      const reorder = sameTable && ranking.some((uid, i) => uid !== data.playerOrder[i]);
       const order = reorder ? ranking : data.playerOrder;
       const startUid = order.includes(starterUid) ? starterUid : order[0];
       transaction.update(roomRef, {
@@ -1020,14 +1008,8 @@ async function startRoom(withGhost = true, keepOrder = false) {
       });
     });
   } catch (error) {
-    if (!keepOrder && error.code === "permission-denied" && starterRanking(isPublic)) {
-      // Reglas sin actualizar: no admiten reordenar la mesa. Se reintenta sin hacerlo.
-      busy = false;
-      return await startRoom(withGhost, true);
-    }
     console.error(error);
-    if (error.message === 'FINAL_RULES_REQUIRED') { showToast('El servicio de salas necesita actualizarse para la final secreta. Inténtalo de nuevo más tarde.'); return; }
-    showToast(error.message === "DECK_MISMATCH" ? "Alguien de la sala lleva una versión distinta del juego. Actualizad todos los móviles y cread una sala nueva." : error.message === "UPDATE_CLIENTS" ? `Para usar esta sala, actualizad todos los móviles a v${CLIENT_VERSION} y cread una sala nueva.` : (enableGhost || pulse) && error.code === "permission-denied" ? "Actualiza firestore.rules a v39 para usar Fantasma o Pulso." : "No se pudo iniciar la partida");
+    showToast(error.message === "DECK_MISMATCH" ? "Alguien de la sala lleva una versión distinta del juego. Actualizad todos los móviles y cread una sala nueva." : error.message === "UPDATE_CLIENTS" ? `Para usar esta sala, actualizad todos los móviles a v${CLIENT_VERSION} y cread una sala nueva.` : "No se pudo iniciar la partida");
   } finally { busy = false; }
 }
 
