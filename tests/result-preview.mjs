@@ -7,7 +7,7 @@ let reduced=false, now=0, cancelled=0, revealed=0;
 w.matchMedia=()=>({matches:reduced});
 Object.defineProperty(w.performance,'now',{value:()=>now});
 w.HTMLElement.prototype.animate=()=>({cancel(){cancelled++;},finished:Promise.resolve()});
-w.CONTINUUM={UI:{mount(){},openSurface(){},reveal(){revealed++;}}};
+w.CONTINUUM={UI:{mount(){},openSurface(){},reveal(){revealed++;}},escapeHtml: value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))};
 w.eval(fs.readFileSync(new URL('../a11y.js',import.meta.url),'utf8'));
 const html=id=>`<div class="timeline-wrap"><article class="timeline-card" data-id="${id}"></article></div><div class="overlay" data-result-card="${id}"><div class="modal"><h2>Acierto</h2><button data-dialog-focus>Continuar</button></div></div>`;
 const open=id=>{w.CONTINUUM.paint(app,html(id),'online-game');const el=app.querySelector('.overlay');w.CONTINUUM.openDialog(el,false);return el;};

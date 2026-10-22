@@ -372,10 +372,7 @@
   // Aviso breve (el mismo cartel de toda la aplicación) para lo que pasa fuera de la pantalla en la que se está.
   function notice(message) {
     CT.announce?.(message);
-    const toast=document.getElementById('toast');if(!toast)return;
-    CT.Effects?.transition?.('notice');
-    toast.textContent=message;toast.classList.add('show');
-    clearTimeout(notice.timer);notice.timer=setTimeout(()=>toast.classList.remove('show'),3500);
+    CT.toast(message, 3500);
   }
   // Quien lleva la sala te ha echado de la sala de espera: no queda sala que enseñar ni a la que volver sola.
   function kickedOut() {

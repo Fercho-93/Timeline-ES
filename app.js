@@ -39,7 +39,6 @@
   const app = document.getElementById("app");
   app.dataset.platform = /Android/i.test(navigator.userAgent) ? "android" : "other";
   app.dataset.device = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1) ? "ios" : app.dataset.platform;
-  const toast = document.getElementById("toast");
   const MODE_STORAGE_KEY = "hilo-selected-mode-v1";
   // Las modalidades, sus ejes y los ayudantes que comparte con el modo de varios
   // móviles están en modes.js, para declararlos una sola vez.
@@ -3953,13 +3952,7 @@
     overlay(`<div class="overlay"><div class="modal"><h2>Opciones de la partida</h2><div class="actions" style="display:grid"><button class="btn btn-primary" data-action="close-menu">Seguir jugando</button><button class="btn btn-secondary" data-action="rules">Guía</button>${CT.settingsButton()}<button class="btn btn-secondary" data-action="ui-back">Guardar y salir</button><button class="btn btn-ghost" data-action="abandon">Salir sin guardar</button></div></div></div>`, true);
   }
 
-  function showToast(message) {
-    if (!toast.classList.contains('show') || toast.textContent !== message) CT.Effects.transition('notice');
-    toast.textContent = message;
-    toast.classList.add("show");
-    clearTimeout(showToast.timer);
-    showToast.timer = setTimeout(() => toast.classList.remove("show"), 2500);
-  }
+  const showToast = message => CT.toast(message);
 
   // Un logro puede caer a mitad de partida, y ahí no hay pantalla donde ponerlo: se avisa
   // y se sigue jugando. En una pantalla de fin, en cambio, hay sitio para enseñarlo

@@ -49,7 +49,7 @@
     return null;
   }
 
-  const escapa = texto => String(texto ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const escapa = texto => CT.escapeHtml(texto);
   // El botón que se pone junto al nombre de otra persona: abre un menú con «Denunciar» y «Bloquear». Lo
   // atiende accounts.js (que es quien tiene la conexión con el servidor): `contexto` es dónde se ve el
   // nombre (ranking, mesa, duelo o sala).

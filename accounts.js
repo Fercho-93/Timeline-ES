@@ -368,7 +368,6 @@ function askConfirm(message,title,confirmLabel,proceed) {
   if (CT.UI?.confirmDialog) { CT.UI.confirmDialog(message,proceed,{title,confirmLabel,cancelLabel:'Cancelar'}); return; }
   if (app.querySelector('[data-exit-dialog]')) return;
   const layer=document.createElement('div');layer.className='overlay';layer.dataset.exitDialog='';
-  const esc=text=>String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   layer.innerHTML=`<div class="modal" role="alertdialog" aria-modal="true"><h2>${esc(title)}</h2><p>${esc(message)}</p><div class="actions exit-actions"><button class="btn btn-primary btn-block" data-ask-stay>Cancelar</button><button class="btn btn-secondary btn-block" data-ask-ok>${esc(confirmLabel)}</button></div></div>`;
   layer.querySelector('[data-ask-stay]').addEventListener('click',()=>layer.remove());
   layer.querySelector('[data-ask-ok]').addEventListener('click',()=>{layer.remove();proceed();});

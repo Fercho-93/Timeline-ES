@@ -154,15 +154,7 @@
     </div></div>`;
   }
 
-  function showToast(message) {
-    const toast = document.getElementById("toast");
-    if (!toast) return;
-    if (!toast.classList.contains('show') || toast.textContent !== message) CT.Effects?.transition?.('notice');
-    toast.textContent = message;
-    toast.classList.add("show");
-    clearTimeout(showToast.timer);
-    showToast.timer = setTimeout(() => toast.classList.remove("show"), 2500);
-  }
+  const showToast = message => CT.toast(message);
 
   async function testHaptics() {
     const accepted = await CT.Effects?.testHaptics?.();

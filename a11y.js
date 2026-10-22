@@ -210,7 +210,7 @@
     return () => { clearTimeout(timer); wave.remove(); };
   }
 
-  const CT_escape = value => String(value).replace(/[&<>"']/g, char => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[char]));
+  const CT_escape = value => window.CONTINUUM.escapeHtml(value);
 
   // El rastro de tinta que deja la carta fallada al viajar hasta su sitio: una curva de
   // trazos terracota que se dibuja a la vez que la carta avanza y luego se seca.
@@ -533,6 +533,21 @@
     // Repetir el mismo texto no dispara el anuncio; se vacía primero.
     region.textContent = "";
     setTimeout(() => { region.textContent = text; }, 50);
+  }
+
+  // El aviso breve de la franja inferior (#toast, que ya es región viva en index.html). Uno
+  // solo para todo el juego: con un único temporizador, un aviso nuevo sustituye al anterior
+  // y alarga su tiempo, en vez de que el reloj de otro módulo lo esconda antes de hora.
+  // Suena `notice` salvo si ese mismo texto ya está a la vista.
+  let toastTimer = null;
+  function toast(message, ms = 2500) {
+    const el = document.getElementById("toast");
+    if (!el) return;
+    if (!el.classList.contains("show") || el.textContent !== message) window.CONTINUUM.Effects?.transition?.("notice");
+    el.textContent = message;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove("show"), ms);
   }
 
   // Las capas del juego son diálogos de verdad, no adornos: se anuncian como tales, el
@@ -929,6 +944,7 @@
   window.CONTINUUM.unrollCollection = sheet => unrollSheet(sheet?.closest('.collection-entry') || sheet, true);
   window.CONTINUUM.resizeContent = resizeContent;
   window.CONTINUUM.announce = announce;
+  window.CONTINUUM.toast = toast;
   window.CONTINUUM.openDialog = openDialog;
   window.CONTINUUM.closeDialog = closeDialog;
   window.CONTINUUM.backPressed = backPressed;

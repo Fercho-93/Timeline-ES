@@ -42,7 +42,7 @@
     return text;
   }
 
-  const escape = value => String(value).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const escape = value => CT.escapeHtml(value);
 
   // Enseña un texto (un enlace de sala, una invitación…) como código QR en una ventana. Sirve
   // para cualquier modo multijugador: el otro móvil lo lee con su cámara o con «Escanear QR».

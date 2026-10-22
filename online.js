@@ -31,7 +31,6 @@ import { CLIENT_VERSION } from './public-matchmaking.js';
 
 // ==== Estado de la sala ==========================================================================
 const appEl = document.getElementById("app");
-const toastEl = document.getElementById("toast");
 // Las modalidades, sus ejes y estos ayudantes están en modes.js, que ya está cargado
 // cuando este módulo se descarga: se pide al entrar en el modo de varios móviles.
 const CT = window.CONTINUUM;
@@ -380,13 +379,7 @@ function header(extra = "") {
   return CT.UI.header('data-online-action="back"', playing || roomRef ? 'data-online-action="room"' : '', !!playing);
 }
 
-function showToast(message) {
-  if (!toastEl.classList.contains('show') || toastEl.textContent !== message) CT.Effects.transition('notice');
-  toastEl.textContent = message;
-  toastEl.classList.add("show");
-  clearTimeout(showToast.timer);
-  showToast.timer = setTimeout(() => toastEl.classList.remove("show"), 3000);
-}
+const showToast = message => CT.toast(message, 3000);
 
 function showGuide() {
   const mode = modeKey();

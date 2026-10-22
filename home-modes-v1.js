@@ -12,7 +12,7 @@
   let playExpanded = false;
   let revealAnimations = [];
 
-  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const escapeHtml = value => window.CONTINUUM.escapeHtml(value);
 
   const modeArt = {
     'online-hub': 'menu-online.webp',

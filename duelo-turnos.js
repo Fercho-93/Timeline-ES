@@ -29,8 +29,7 @@ const id = () => crypto.randomUUID().replaceAll('-', '');
 // cuando tiene sentido, y no al abrir cualquiera.
 function askTurnAlerts() { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(() => {}); }
 function notify(text) {
-  const toast = document.getElementById('toast');
-  if (toast) { toast.textContent = text; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2800); }
+  CT.toast?.(text, 2800);
   if (document.visibilityState === 'hidden' && 'Notification' in window && Notification.permission === 'granted') new Notification('Continuum', { body: text });
 }
 // Competición por turnos: varios temas al azar en una misma partida, con las mismas cartas

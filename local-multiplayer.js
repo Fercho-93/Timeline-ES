@@ -57,14 +57,7 @@
     if (reason) showToast(reason);
     return !!reason;
   }
-  function showToast(message) {
-    const toastEl = document.getElementById("toast");
-    if (!toastEl) return;
-    toastEl.textContent = message;
-    toastEl.classList.add("show");
-    clearTimeout(showToast.timer);
-    showToast.timer = setTimeout(() => toastEl.classList.remove("show"), 2500);
-  }
+  const showToast = message => CT.toast(message);
 
   function stopCamera() { cameraHandle?.stop(); cameraHandle = null; }
 
