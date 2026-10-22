@@ -22,7 +22,6 @@
   --accent: #ae5537;
   --accent-dark: #843b28;
   --accent-soft: #f2d8ce;
-  --teal: #245b66;
   --green: #356b50;
   --accent-solid: #a94f32;
   --green-solid: #356b50;
@@ -1056,7 +1055,6 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   --accent: #9b411d;
   --accent-dark: #6f2c13;
   --accent-soft: #d6ad69;
-  --teal: #526c65;
   --green: #5e6f3a;
   --accent-solid: #98401d;
   --green-solid: #667642;
@@ -1086,10 +1084,6 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   --fila-activa: rgba(216,174,104,.62);
   --reja: rgba(130,81,35,.3);
   --estante: rgba(242,216,164,.64);
-  --formato: linear-gradient(100deg, rgba(208,163,93,.7), rgba(235,204,145,.72));
-  --formato-luz: rgba(255,241,205,.38);
-  --formato-detalle: #76583a;
-  --promo: rgba(230,196,133,.72);
   /* La carta de la línea temporal es papel en los dos temas: es un objeto de la mesa,
      no una superficie de la interfaz, igual que la carta de la mano es cuero oscuro de
      día y de noche. Por eso su tinta tampoco cambia. */
@@ -1592,7 +1586,6 @@ body::before {
   --accent: #dc8250;
   --accent-dark: #f2b078;
   --accent-soft: #5b351b;
-  --teal: #80c4c2;
   --green: #8bc195;
   --ink-solid: #c36032;
   --ink-solid-contrast: #fff5df;
@@ -1615,10 +1608,6 @@ body::before {
   --fila-activa: rgba(82,55,29,.96);
   --reja: rgba(151,109,57,.42);
   --estante: rgba(35,23,14,.9);
-  --formato: linear-gradient(100deg, rgba(67,46,27,.96), rgba(42,28,17,.98));
-  --formato-luz: rgba(255,228,172,.09);
-  --formato-detalle: #cbb68d;
-  --promo: rgba(54,36,21,.96);
 }
 :root[data-theme="dark"] body { background: radial-gradient(circle at 50% -10%, #3b2817, #18110b 58%, #100b07 100%); }
 :root[data-theme="dark"] .home-nav { background: rgba(35,23,14,.98); border-color: #80613a; }

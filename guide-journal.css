@@ -43,9 +43,9 @@
 }
 
 /* Cada capítulo tiene su propia tinta, como las escalas del Atlas. */
-#app .guide-handbook .guide-chapter { --chapter-tone: #476c71; --chapter-wash: #e4edef; }
-#app .guide-handbook .guide-chapter:nth-of-type(3n+2) { --chapter-tone: #64704a; --chapter-wash: #e9eddf; }
-#app .guide-handbook .guide-chapter:nth-of-type(3n) { --chapter-tone: #966738; --chapter-wash: #f2e5ce; }
+#app .guide-handbook .guide-chapter { --chapter-tone: #476c71; }
+#app .guide-handbook .guide-chapter:nth-of-type(3n+2) { --chapter-tone: #64704a; }
+#app .guide-handbook .guide-chapter:nth-of-type(3n) { --chapter-tone: #966738; }
 #app .guide-handbook .guide-chapter {
   border-color: color-mix(in srgb, var(--chapter-tone) 35%, var(--edition-line));
   background: linear-gradient(135deg, color-mix(in srgb, var(--chapter-tone) 8%, var(--edition-surface)), var(--edition-surface));
