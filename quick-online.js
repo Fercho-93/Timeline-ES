@@ -13,7 +13,8 @@ const queueFresh=q=>{const at=q?.updatedAt?.toMillis?.();return Number.isFinite(
 // Se carga aparte y sin bloquear: si no está, la mesa funciona igual por la cola.
 let tablesModule=null;
 const tables=()=>(tablesModule??=import('./public-tables.js'));
-const freshCode=()=>Array.from(crypto.getRandomValues(new Uint8Array(10)),n=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[n%31]).join('');
+// Código de sala de diez caracteres. 256 es múltiplo de 32, así que cada letra sale con la misma probabilidad.
+const freshCode=()=>Array.from(crypto.getRandomValues(new Uint8Array(10)),n=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[n%32]).join('');
 // «Crear mesa» abre una mesa nueva con su configuración, sin pasar por la cola de la
 // partida rápida; «Unirme» desde el tablón entra en esa mesa concreta.
 async function claimTable({uid,name,create,code,capacity}){
@@ -233,7 +234,7 @@ export async function connect({code, name, create=false, capacity=4, invite=null
   await auth.authStateReady();
   const uid=auth.currentUser?.uid;
   if(!uid) throw Error('Espera a que se prepare tu perfil e inténtalo de nuevo.');
-  if(create) code=Array.from(crypto.getRandomValues(new Uint8Array(10)),n=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[n%31]).join('');
+  if(create) code=freshCode();
   code=String(code||'').trim().toUpperCase();
   if(!/^[A-Z2-9]{10}$/.test(code))throw Error('Escribe el código de diez caracteres de la sala.');
   const ref=doc(db,'quickRooms',code);
