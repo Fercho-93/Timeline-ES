@@ -1093,12 +1093,8 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   width: 46px;
   height: 46px;
   padding: 0;
-  /* Safari de algunas versiones descarta la declaración completa si no entiende
-     `color-mix()`. Estas dos bases conservan el botón circular en esos móviles. */
-  border: 1px solid var(--edition-line);
   border: 1px solid color-mix(in srgb,var(--edition-brass) 55%,var(--edition-line));
   border-radius: 50%;
-  background: var(--edition-surface);
   background: color-mix(in srgb,var(--edition-surface) 94%,transparent);
   color: var(--edition-ink);
   box-shadow: 0 5px 16px #3425162e;
@@ -2968,7 +2964,6 @@ html body::before {
   left: 0;
   right: 0;
   /* Viewport grande: cubre también la franja que deja libre la barra de Safari al plegarse. */
-  height: calc(100 * var(--vh));
   height: calc(100 * var(--lvh));
   pointer-events: none;
   opacity: 1;
@@ -3158,7 +3153,6 @@ html:has(#app[data-screen="home"]) body { height: 100%; min-height: 0; overflow:
   min-height: 0;
   overflow: hidden auto;
   overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
 }
 
 /* Jugar con un punto más de color: el color lo ponen las láminas, que recuperan su

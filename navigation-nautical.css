@@ -21,7 +21,7 @@ html #app[data-screen][data-screen] .home-nav.atlas-nav {
   /* Centrada con márgenes automáticos y no con `left: 50%` + `translate(-50%)`: en anchos impares eso
      la dejaba a medio píxel y, en iPhone, vibraba al desplazar. Capa propia para el compositor, sin
      desplazamiento, para que el iPhone no la recoloque mientras la pantalla se mueve. */
-  transform: translateZ(0); -webkit-transform: translateZ(0);
+  transform: translateZ(0);
   will-change: transform; backface-visibility: hidden; -webkit-backface-visibility: hidden;
   contain: layout style; isolation: isolate;
   z-index: 15;
