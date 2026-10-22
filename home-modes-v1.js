@@ -57,7 +57,7 @@
     play.setAttribute('aria-expanded', String(playExpanded));
     play.querySelector('.home-door-copy b').textContent = 'Jugar';
     play.querySelector('.home-door-copy small').textContent = 'Elige cómo quieres vivir la partida.';
-    play.querySelector('.home-door-cta').innerHTML = '<span class="mode-play-cta-label">Elegir modalidad</span> <span class="mode-play-chevron" aria-hidden="true">⌄</span>';
+    play.querySelector('.home-door-cta').innerHTML = '<span class="mode-play-cta-label">Ver las tres formas de jugar</span> <span class="mode-play-chevron" aria-hidden="true">⌄</span>';
 
     const choices = document.createElement('section');
     choices.className = 'mode-entry-grid';
@@ -83,7 +83,7 @@
     // Misma tarjeta que «Jugar» y el reto diario (ilustración, título y enlace), más baja.
     join.className = 'home-door mode-join-shortcut';
     join.dataset.action = 'friends-join';
-    join.innerHTML = '<span class="home-door-art" aria-hidden="true"><img src="assets/menu-private.webp" alt="" decoding="async"></span><span class="home-door-copy"><b>Unirme a una partida</b><small>¿Te han invitado? Escanea el QR o pega el código.</small><span class="home-door-cta" aria-hidden="true">Unirme →</span></span>';
+    join.innerHTML = '<span class="home-door-art" aria-hidden="true"><img src="assets/menu-private.webp" alt="" decoding="async"></span><span class="home-door-copy"><b>Unirme a una partida</b><small>¿Te han invitado? Escanea el QR o pega el código.</small><span class="home-door-cta" aria-hidden="true">Unirme</span></span>';
     playWrap.append(play, reveal, join);
 
     doors.replaceChildren(playWrap, dailyWrap);
@@ -517,7 +517,7 @@
     box.className='mode-ranking-summary';
     box.setAttribute('aria-label','Tus retos diarios');
     const trophy='<img src="assets/ranking-trophy-v1.webp" alt="" aria-hidden="true" width="80" height="80" decoding="async">';
-    box.innerHTML=`<div class="mode-ranking-head"><span class="mode-ranking-medallion">${trophy}</span><div class="mode-ranking-copy"><span class="mode-ranking-kicker">El reto de cada día</span><h3>Ranking</h3><p>Cada acierto deja huella.</p></div><span class="mode-ranking-star" aria-hidden="true">✦</span></div><div class="mode-ranking-stats"><span><b>${r.day===null?'–':`${r.day}/10`}</b><small>Hoy</small></span><span><b>${r.weekHits}</b><small>Esta semana</small></span><span><b>${r.streak}</b><small>${r.streak===1?'Día seguido':'Días seguidos'}</small></span></div>${window.CONTINUUM?.Accounts?.ready?'<button type="button" class="btn btn-secondary mode-ranking-link" data-account-action="ranking">Ver ranking <span aria-hidden="true">→</span></button>':''}`;
+    box.innerHTML=`<div class="mode-ranking-head"><span class="mode-ranking-medallion">${trophy}</span><div class="mode-ranking-copy"><span class="mode-ranking-kicker">El reto de cada día</span><h3>Ranking</h3><p>Cada acierto deja huella.</p></div></div><div class="mode-ranking-stats"><span><b>${r.day===null?'–':`${r.day}/10`}</b><small>Hoy</small></span><span><b>${r.weekHits}</b><small>Esta semana</small></span><span><b>${r.streak}</b><small>${r.streak===1?'Día seguido':'Días seguidos'}</small></span></div>${window.CONTINUUM?.Accounts?.ready?'<button type="button" class="btn btn-secondary mode-ranking-link" data-account-action="ranking">Ver ranking</button>':''}`;
     doors.append(box);
   }
 

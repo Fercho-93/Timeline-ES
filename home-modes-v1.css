@@ -1,7 +1,8 @@
 /* Entradas de Inicio: las mismas láminas ilustradas que el resto del atlas. */
 #app .mode-daily-zone { display: grid; gap: 8px; }
 #app .mode-daily-zone::before,
-#app .mode-entry-grid::before { color: #805b37; font: 700 .7rem/1.2 var(--ui-font); letter-spacing: .19em; padding-left: 4px; }
+/* Los rótulos en versalitas ordenan la portada en bloques («el reto de hoy» / «elige tu camino») y comparten tinta con el resto de rótulos de sección: marcan jerarquía, no decoran. */
+#app .mode-entry-grid::before { color: #805b37; font: 700 .7rem/1.2 var(--ui-font); letter-spacing: .14em; padding-left: 4px; }
 #app .mode-daily-zone::before { content: "EL RETO DE HOY"; }
 #app .mode-entry-grid::before { content: "ELIGE TU CAMINO"; grid-column: 1 / -1; }
 #app .mode-daily-family { margin: -2px 4px 2px; color: #665442; font: .8rem/1.4 var(--ui-font); }
@@ -93,7 +94,7 @@
 #app .public-board { display: grid; gap: 8px; }
 /* Títulos de sección de «Jugar online»: versalitas doradas con una línea fina, como «EL RETO DE HOY»
    y los epígrafes de las pantallas de configuración. */
-#app .mode-section-title { display: flex; align-items: center; gap: 10px; margin: 0; padding-left: 4px; color: #805b37; font: 700 .7rem/1.2 var(--ui-font); letter-spacing: .19em; text-transform: uppercase; }
+#app .mode-section-title { display: flex; align-items: center; gap: 10px; margin: 0; padding-left: 4px; color: #805b37; font: 700 .7rem/1.2 var(--ui-font); letter-spacing: .14em; text-transform: uppercase; }
 #app .mode-section-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, #b8935a80, transparent); }
 #app .mode-section-title small { order: 2; color: #805b37; font: 700 .7rem/1.2 var(--ui-font); letter-spacing: 0; }
 #app .public-quick-label { margin-top: 10px; }
@@ -175,8 +176,8 @@ html #app .public-create-segmented .segmented-option::after { content: none !imp
 #app .mode-inline-drawer .gallery-panel,
 #app .mode-inline-drawer .gallery-panel.active { height: 116px; min-height: 116px; }
 #app .mode-inline-drawer .gallery-panel .panel-label strong { font-size: 1.25rem; }
-#app .mode-inline-drawer .gallery-panel .panel-label small { font-size: .68rem; }
-#app .mode-inline-drawer .gallery-panel .collection-index { top: 9px; left: 12px; min-height: 22px; padding: 2px 9px; font-size: .55rem; }
+#app .mode-inline-drawer .gallery-panel .panel-label small { font-size: .75rem; }
+#app .mode-inline-drawer .gallery-panel .collection-index { top: 9px; left: 12px; min-height: 22px; padding: 2px 9px; font-size: .7rem; }
 #app .mode-inline-drawer .gallery-panel .collection-open { width: 28px; height: 28px; right: 12px; }
 
 /* La tarjeta «Jugar» no se mueve al tocarla (el :hover pegado del móvil y el giro de :active la hacían bailar mientras se despliega). */
@@ -185,7 +186,7 @@ html #app button.mode-play-card:hover, html #app button.mode-play-card:active { 
 #app .mode-ranking-summary .mode-ranking-link { margin-top: 10px; width: 100%; }
 #app .mode-ranking-summary .mode-ranking-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
 #app .mode-ranking-summary .mode-ranking-stats span { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
-#app .mode-ranking-summary .mode-ranking-stats small { font: 700 .66rem var(--ui-font); letter-spacing: .1em; text-transform: uppercase; }
+#app .mode-ranking-summary .mode-ranking-stats small { font: 700 .72rem var(--ui-font); letter-spacing: .08em; text-transform: uppercase; }
 
 /* Retos rápidos: en tema claro se aclara la lámina sin borrar sus tintas suaves. */
 :root:not([data-theme="dark"]) #app .mode-entry:is([data-action="quick-challenges"], [data-action="quick-public"]) .mode-entry-art img { filter: sepia(.05) saturate(.82) brightness(1.35) contrast(.82); }

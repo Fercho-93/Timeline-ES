@@ -4703,7 +4703,6 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 #app[data-screen="home"] .mode-ranking-kicker { display: block; color: #75552c; font: 700 .58rem/1.4 var(--ui-font); letter-spacing: .13em; text-transform: uppercase; }
 #app[data-screen="home"] .mode-ranking-copy h3 { margin: 2px 0 3px; color: inherit; font: 600 clamp(1.65rem, calc(6 * var(--vw)), 2rem)/1.05 var(--font-display); }
 #app[data-screen="home"] .mode-ranking-copy p { color: #665039; font: .78rem/1.4 var(--ui-font); }
-#app[data-screen="home"] .mode-ranking-star { margin-left: auto; align-self: flex-start; color: #957036; font-size: 1.2rem; }
 #app[data-screen="home"] .mode-ranking-summary .mode-ranking-stats { gap: 0; padding: 12px 0; border-block: 1px solid #b8955a45; background: linear-gradient(90deg, transparent, #fffaf070, transparent); }
 #app[data-screen="home"] .mode-ranking-stats > span { padding: 0 5px; gap: 5px; }
 #app[data-screen="home"] .mode-ranking-stats > span + span { border-left: 1px solid #b8955a45; }
@@ -4729,11 +4728,9 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
   #app[data-screen="home"] .mode-ranking-head { gap: 10px; }
   #app[data-screen="home"] .mode-ranking-medallion { flex-basis: 58px; width: 58px; height: 58px; }
   #app[data-screen="home"] .mode-ranking-medallion img { width: 54px; height: 54px; }
-  #app[data-screen="home"] .mode-ranking-star { display: none; }
 }
 :root[data-theme="dark"] #app[data-screen="home"] .mode-ranking-summary { border-color: #8c6f45; background: radial-gradient(ellipse at 0% 0%, #b68c3c33, transparent 65%), linear-gradient(145deg, #3a3024, #251b11); box-shadow: 0 3px 0 #8c6f4560, 0 12px 26px #0006, inset 0 0 0 5px #f1e1bf08, inset 0 0 0 6px #c8a26a30; color: #f1e1bf; }
-:root[data-theme="dark"] #app[data-screen="home"] .mode-ranking-kicker,
-:root[data-theme="dark"] #app[data-screen="home"] .mode-ranking-star { color: #d9b77a; }
+:root[data-theme="dark"] #app[data-screen="home"] .mode-ranking-kicker { color: #d9b77a; }
 :root[data-theme="dark"] #app[data-screen="home"] .mode-ranking-copy p { color: #d0bfa3; }
 :root[data-theme="dark"] #app[data-screen="home"] .mode-ranking-summary .mode-ranking-stats { background: linear-gradient(90deg, transparent, #f1e1bf08, transparent); }
 :root[data-theme="dark"] #app[data-screen="home"] .mode-ranking-summary .mode-ranking-stats b { color: #f1e1bf; }
