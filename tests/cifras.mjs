@@ -421,6 +421,42 @@ console.log("\nNi recargar ni cerrar la aplicación devuelven el plazo entero");
   ok("volver enseguida deja seguir con la carta", !existe(rapida, ".overlay") && estado(rapida, "population").jugadas.length === 0);
 }
 
+console.log("\nSalir del duelo de cifras no toca la partida local del mismo mazo");
+{
+  // El duelo guarda `cifras`, no `game`. Su salida es la suya: la general de la partida
+  // borraba con «Salir sin guardar» la partida en un solo móvil de este mazo y dejaba el
+  // duelo a medias.
+  const w = boot();
+  abreMazo(w, "geografia", "population");
+  w.CONTINUUM.openDeckAs("local");
+  click(w, '[data-action="draw-starter"]');
+  for (let i = 0; i < 12 && existe(w, "#starter-guess-input"); i++) {
+    w.document.getElementById("starter-guess-input").value = "1000000";
+    click(w, '[data-action="starter-guess-submit"]');
+  }
+  click(w, '[data-action="starter-start"]');
+  const local = () => w.localStorage.getItem("hilo-game-population-v1");
+  ok("hay una partida local guardada en el mazo", !!local());
+
+  await abreDuelo(w);
+  ok("se juega el duelo de cifras", w.document.querySelector("#app").dataset.screen === "cifras");
+  // «Guardar y salir» por la flecha: el duelo queda guardado con su carta abierta.
+  click(w, '[data-action="ui-back"]');
+  ok("la flecha pregunta con el aviso del reloj", /el reloj no se para/.test(texto(w)) && existe(w, "[data-exit-discard]"));
+  click(w, "[data-exit-confirm]");
+  ok("guardar y salir conserva el duelo", Number.isFinite(estado(w, "population")?.empezadaEn));
+  ok("y la partida local", !!local());
+
+  click(w, '[data-action="resume-cifras"]');
+  ok("el duelo se retoma", w.document.querySelector("#app").dataset.screen === "cifras");
+  // «Salir sin guardar» desde el menú de la partida: se borra el duelo, no la partida local.
+  click(w, '[data-action="game-menu"]');
+  click(w, '[data-action="abandon"]');
+  click(w, "[data-exit-discard]");
+  ok("salir sin guardar borra el duelo", estado(w, "population") === null);
+  ok("y deja intacta la partida local del mismo mazo", !!local());
+}
+
 console.log("\nSe acaba el plazo");
 {
   const w = boot();

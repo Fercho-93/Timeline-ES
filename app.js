@@ -3459,6 +3459,16 @@
     if (!cerrada && cifrasConReloj()) arrancaReloj();
   }
 
+  // Salir del duelo de cifras, por la flecha, por «Guardar y salir» o por «Salir sin
+  // guardar» del menú de la partida. Tiene su propia salida porque lo que hay guardado es
+  // `cifras`, no `game`: la salida general de la partida descartaría la partida local del
+  // mismo mazo y dejaría el duelo a medias. Guardar deja la carta abierta como está, y al
+  // volver se cierra si ha pasado el margen de gracia (`resumeCifras`).
+  function salirDeCifras() {
+    CT.UI.confirmExit("La carta que tengas abierta se cerrará: el reloj no se para.",
+      () => { paraReloj(); if (cifras) { guardaCifras(); cifras = null; } duelHome(); }, undefined, undefined,
+      { label: "Salir sin guardar", proceed: () => { paraReloj(); cifras = null; guardaCifras(); duelHome(); } });
+  }
 
   // El resultado de una carta: lo que valía, lo que se respondió y lo que suma. Aquí ya
   // se puede enseñar el detalle de la carta, que antes de responder muchas veces lleva la
@@ -3930,6 +3940,7 @@
   // pero también aquí, en la flecha de volver: es la salida que de verdad se usa más a
   // menudo, así que no debería hacer falta abrir otro menú para encontrarla.
   function requestPlayExit() {
+    if (screen === "cifras") { salirDeCifras(); return; }
     const discard = screen === 'solo' && solo && solo.kind !== 'comp'
       ? { label: 'Salir sin guardar', proceed: abandonSolo }
       : (screen === 'solo' && solo?.kind === 'comp') || screen === 'comp-intro'
@@ -4407,7 +4418,6 @@
     else if (action === "resume-cifras") resumeCifras();
     else if (action === "cifra-answer") cierraCarta("respuesta");
     else if (action === "cifras-next") cifrasNext();
-    else if (action === "cifras-exit") CT.UI.confirmExit("La carta que tengas abierta se cerrará: el reloj no se para.", () => { paraReloj(); if (cifras) { guardaCifras(); cifras = null; } duelHome(); }, undefined, undefined, { label: 'Salir sin guardar', proceed: () => { paraReloj(); cifras = null; guardaCifras(); duelHome(); } });
     else if (action === "accept-duel") acceptDuel();
     else if (action === "share-duel") compartir(lastDuelShare, "Enlace copiado");
     else if (action === "resume-solo") resumeSolo();
@@ -4427,6 +4437,7 @@
     else if (action === "game-menu") gameMenu();
     else if (action === "close-menu") CT.closeDialog();
     else if (action === "starter-start") { CT.closeDialog(); startGame(); }
+    else if (action === "abandon" && screen === "cifras") salirDeCifras();
     else if (action === "abandon") CT.UI.confirmExit('Se borrará la partida actual y no contará nada de ella: ni cartas, ni aciertos, ni láminas. Esta acción no se puede deshacer.', game?.tournament ? discardMultiCompetition : () => { game = null; saveGame(); home(); }, '¿Salir sin guardar?', 'Salir sin guardar');
     else if (action === "abandon-solo" && solo?.kind === "comp") CT.UI.confirmExit('Se borrará la competición en curso, con todas sus rondas, y no podrás continuarla después. Esta acción no se puede deshacer.', discardCompetition, '¿Salir sin guardar?', 'Salir sin guardar');
     else if (action === "abandon-solo") CT.UI.confirmExit('Se borrará el intento actual y no contará nada de él: ni cartas, ni aciertos, ni láminas, ni la racha. Esta acción no se puede deshacer.', abandonSolo, '¿Salir sin guardar?', 'Salir sin guardar');
