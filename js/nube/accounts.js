@@ -40,7 +40,7 @@ function discoveries(progress) {
   return { found: collections + quick, foundCollections: collections, foundQuick: quick };
 }
 const shiftKey = (key, days) => { const d = new Date(`${key}T12:00:00`); d.setDate(d.getDate() + days); return dateKey(d); };
-const dateKey = date => date.toLocaleDateString('sv-SE');
+const dateKey = date => CT.RetoDiario.clave(date);
 // Aciertos de hoy y de esta semana, leídos de los retos diarios guardados. Solo se suman aciertos:
 // un reto vale de 0 a 10 y la semana, como mucho, 70.
 function periods(records, now = new Date()) {

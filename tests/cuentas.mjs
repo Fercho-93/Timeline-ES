@@ -9,6 +9,7 @@ function setup(user=null,seed={}){
  w.eval(read('js/interfaz/a11y.js'));
  w.eval(read('js/jugador/account-storage.js'));
  w.eval(read('js/jugador/avatares.js'));
+ w.eval(read('js/jugador/reto-diario.js'));
  const auth={currentUser:user,authStateReady:async()=>{}};w.auth=auth;w.db={};
  const snap=key=>({exists:()=>data.has(key),data:()=>data.get(key)});
  Object.assign(w,{collection:(_,...parts)=>parts.join('/'),query:(...args)=>args,orderBy:()=>null,limit:()=>null,getDocsFromServer:async q=>{const base=typeof q==='string'?q:(typeof q[0]==='string'?q[0]:'dailyRanking');return {docs:[...data].filter(([k])=>k.startsWith(base+'/')&&k.split('/').length===base.split('/').length+1).map(([k,v])=>({id:k.split('/').pop(),data:()=>v}))};},browserLocalPersistence:{},setPersistence:async()=>{},signInAnonymously:async()=>{auth.currentUser={uid:'guest',isAnonymous:true,getIdToken:async()=>''};return {user:auth.currentUser};},doc:(_,...parts)=>parts.join('/'),getDocFromServer:async key=>snap(key),serverTimestamp:()=>123,onAuthStateChanged:()=>{},runTransaction:async(_,fn)=>{

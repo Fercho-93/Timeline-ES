@@ -90,6 +90,7 @@ export const SUITES = {
     "tests/final.mjs",
     "tests/tournament.mjs",
     "tests/tiempo.mjs",
+    "tests/reto-diario.mjs",
     "tests/moderacion.mjs",
     "tests/edad.mjs",
     "tests/retencion.mjs",

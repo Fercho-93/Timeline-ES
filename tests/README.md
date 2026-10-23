@@ -161,6 +161,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `reglas-firestore.mjs` | reglas | Quién puede escribir en una sala y qué: entrar, empezar, colocar, saltar, expulsar y trampas. |
 | `reglas-superficie.mjs` | test | Lee `firestore.rules` sin emulador: nada público, ningún `write` abierto, ninguna escritura sin sesión y la lista exacta de borrados que un cliente puede hacer. |
 | `result-preview.mjs` | test | La pantalla de resultado: acierto, corrección del fallo, foco y movimiento reducido. |
+| `reto-diario.mjs` | test | La marca del reto diario compartida por colecciones y Retos rápidos: racha, día repetido, saltos de día, recorte a 60 días y cruce de medianoche. |
 | `retencion.mjs` | test | Los plazos de `functions/retention.js` coinciden con la política, y `PRIVACIDAD.md` y `privacidad.html` tienen las mismas secciones. |
 | `revancha-local.mjs` | test | La revancha en un solo móvil recupera la mesa anterior. |
 | `reverso-mano.mjs` | test | La mano enseña el reverso de la colección en todos los modos. |

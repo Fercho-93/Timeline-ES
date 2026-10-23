@@ -19,7 +19,7 @@
   // basta para lo que enseña la pantalla, y el almacenamiento de un móvil no es infinito.
   const MAX_MISSES = 300;
 
-  function today() { return new Date().toLocaleDateString("sv-SE"); }
+  function today() { return CT.RetoDiario.clave(); }
 
   function emptyProfile() {
     return {

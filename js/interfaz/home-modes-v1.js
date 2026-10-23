@@ -34,8 +34,7 @@
   }
 
   function dailyFamily() {
-    const d=new Date(), stamp=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-    const n=Number(stamp);
+    const n=Number(window.CONTINUUM.RetoDiario.clave().replaceAll('-',''));
     return n%2===0?'Grandes colecciones':'Retos rápidos';
   }
 
@@ -496,7 +495,7 @@
 
   // El resumen del inicio habla el mismo idioma que el ranking: aciertos de hoy, de esta semana y la racha.
   function rankingSummary() {
-    const key = d => d.toLocaleDateString('sv-SE');
+    const key = d => window.CONTINUUM.RetoDiario.clave(d);
     const now = new Date(), monday = new Date(now), yesterday = new Date(now);
     monday.setHours(12,0,0,0); monday.setDate(monday.getDate() - (monday.getDay() + 6) % 7);
     yesterday.setDate(yesterday.getDate() - 1);

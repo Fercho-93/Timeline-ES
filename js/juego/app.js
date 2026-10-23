@@ -2150,23 +2150,12 @@
   let soloSlot = "mode";
   function soloKey() { return soloSlot === "daily" ? DAILY_SAVE_KEY : `hilo-solo-${selectedModeKey}-v1`; }
 
-  function today() { return new Date().toLocaleDateString("sv-SE"); }
+  function today() { return CT.RetoDiario.clave(); }
 
-  function yesterday() {
-    const date = new Date();
-    date.setDate(date.getDate() - 1);
-    return date.toLocaleDateString("sv-SE");
-  }
-
-  // El día anterior a una fecha dada (formato sv-SE, AAAA-MM-DD), para calcular la racha
-  // del reto diario contra el día en que se empezó a jugar y no contra el de hoy: un reto
-  // empezado antes de medianoche y acabado después sigue contando como el día en que
-  // empezó.
-  function previousDay(dateKey) {
-    const date = new Date(`${dateKey}T00:00:00`);
-    date.setDate(date.getDate() - 1);
-    return date.toLocaleDateString("sv-SE");
-  }
+  function yesterday() { return CT.RetoDiario.anterior(today()); }
+  // El día anterior a una fecha: la racha del reto diario se calcula contra el día en que se empezó
+  // a jugar (ver js/jugador/reto-diario.js).
+  const previousDay = dateKey => CT.RetoDiario.anterior(dateKey);
 
   function readRecords() {
     try { return JSON.parse(CT.Storage.getItem(RECORDS_KEY)) || {}; } catch { return {}; }
@@ -2403,7 +2392,7 @@
       const fecha = new Date();
       fecha.setDate(fecha.getDate() - i);
       if (celdas.length < 7) cabecera += `<span>${iniciales[fecha.getDay()]}</span>`;
-      const clave = fecha.toLocaleDateString("sv-SE");
+      const clave = CT.RetoDiario.clave(fecha);
       const entrada = days[clave];
       if (entrada) jugados += 1;
       const ratio = entrada ? entrada.hits / entrada.total : null;
@@ -3082,16 +3071,9 @@
     const dia = solo.day || today();
     const esReto = solo.kind === "daily" && !(records.days && records.days[dia]);
     if (esReto) {
-      records.days = records.days || {};
       // `sequence` (aciertos y fallos en orden) la usa «Compartir resultado» desde Inicio, y
       // `finishedAt` viaja con el progreso de la cuenta (accounts.js).
-      records.days[dia] = { hits: solo.hits, total, sequence: solo.sequence || [], finishedAt: new Date().toISOString(), ms: solo.empezadoEn ? Math.max(0, Date.now() - solo.empezadoEn) : null };
-      records.streak = records.lastDay === previousDay(dia) ? (records.streak || 0) + 1 : 1;
-      records.lastDay = dia;
-      // No hace falta guardar el histórico entero: basta con los últimos días.
-      const dias = Object.keys(records.days).sort().slice(-60);
-      records.days = Object.fromEntries(dias.map(clave => [clave, records.days[clave]]));
-      records.best = Math.max(records.best || 0, solo.hits);
+      CT.RetoDiario.registrar(records, dia, { hits: solo.hits, total, sequence: solo.sequence || [], ms: solo.empezadoEn ? Math.max(0, Date.now() - solo.empezadoEn) : null });
       saveDailyRecords(records);
     } else if (solo.kind === "free") {
       // La ronda se califica por las vidas que quedan al acabarla; sin acabarla, cero estrellas.

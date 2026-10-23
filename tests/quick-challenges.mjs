@@ -448,6 +448,31 @@ assert.equal(daily.days[dailyDate].total,10);
 assert.match(w.document.querySelector('#app').textContent, new RegExp(`${aciertos} de 10`));
 assert.equal(daily.streak,1);
 w.close();
+// Un reto diario empezado ayer y terminado hoy (pasada la medianoche) cuenta en el día en que se EMPEZÓ,
+// igual que en Grandes colecciones: se apunta en ayer, no se pierde ni cuenta como el de hoy.
+w=boot();CT=w.CONTINUUM;
+{
+  const hoy=new Date().toLocaleDateString('sv-SE'), ayer=CT.RetoDiario.anterior(hoy);
+  CT.Quick.startDaily(ayer,(markup,playing)=>{const app=w.document.getElementById('app');app.innerHTML=markup;app.dataset.screen=playing?'quick-game':'quick-challenges';});
+  click('[data-quick="ready"]');
+  for (let n = 0; n < 12; n++) {
+    const st = E.restore(JSON.parse(w.localStorage.getItem(key)));
+    if (st.phase === 'round-end') break;
+    const c = E.challenge(st.config.rounds[0].id), cardId = st.remaining[0];
+    const val = id => c.cards.find(card => card.id === id).value * c.direction;
+    const right = st.timeline.findIndex(id => val(id) > val(cardId));
+    click(`[data-quick="select"][data-id="${cardId}"]`);
+    click(`[data-quick="slot"][data-index="${right < 0 ? st.timeline.length : right}"]`);
+    click('[data-quick="confirm"]');
+    click('[data-quick="ack"]');
+  }
+  const registro=JSON.parse(w.localStorage.getItem('hilo-retos-v1')).retoDiario;
+  assert.ok(registro.days[ayer], 'el reto empezado ayer se apunta en ayer');
+  assert.equal(registro.days[hoy], undefined, 'y no se apunta en hoy');
+  assert.equal(registro.lastDay, ayer);
+  assert.equal(registro.streak, 1);
+}
+w.close();
 // El motor: solo y sin ser duelo, un fallo cuenta y se sigue; en duelo o con más gente, se queda fuera.
 {
   const cfg = {names: ['Tú'], kind: 'free', rounds: [round('poker')]};

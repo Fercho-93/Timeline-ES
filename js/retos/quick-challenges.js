@@ -30,7 +30,7 @@
   let quickClock = null;
   let entry = 'menu', format = 'local', page = 'menu', connection = null, room = null, myId = null, busy = false, invite = null, netKind = 'internet', networkEpoch = 0, roomCapacity = 4, roomLength = 3, pendingConfig = null;
   const BEST = 'continuum-quick-best-v1', NET = 'continuum-quick-room-v1', HISTORY = 'continuum-quick-history-v1';
-  const day = () => {const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
+  const day = () => CT.RetoDiario.clave();
   function readJSON(key, fallback=null) {try{return JSON.parse(CT.Storage.getItem(key)) || fallback;}catch{return fallback;}}
   function historyId() {return globalThis.crypto?.randomUUID?.() || `quick-${Date.now()}-${Math.random().toString(36).slice(2)}`;}
   function quickHistory() {return readJSON(HISTORY, []);}
@@ -44,18 +44,16 @@
       history.unshift({id:key,date:day(),kind:record.config.kind || 'network',rounds:record.config.rounds.length,score:Math.max(...state.players.map(p=>p.score)),players:state.players.map(p=>p.name)});
       CT.Storage.setItem(HISTORY, JSON.stringify(history.slice(0, 50)));
     }
-    if(record.config.kind==='daily' && record.config.day===day()){
+    // Cuenta en el día en que se empezó (`config.day`), igual que en Grandes colecciones: uno empezado
+    // antes de medianoche y acabado después sigue siendo el reto de ese día.
+    if(record.config.kind==='daily' && record.config.day){
       const key='hilo-retos-v1', all=readJSON(key,{}) || {};
-      const daily=all.retoDiario || {best:0,streak:0,lastDay:'',days:{}};
-      daily.days ||= {};
-      if(!daily.days[day()]){
-        const hits=state.players[0].score;
-        const total=record.config.rounds[0].order.length-1;
-        const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
-        const previous=`${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
-        daily.streak=daily.lastDay===previous?(daily.streak||0)+1:1;
-        daily.lastDay=day();daily.best=Math.max(daily.best||0,hits);
-        daily.days[day()]={hits,total,family:'quick',challenge:record.config.rounds[0].id,finishedAt:new Date().toISOString(),ms:record.startedAt?Math.max(0,Date.now()-record.startedAt):null};
+      const daily=all.retoDiario || CT.RetoDiario.vacio();
+      const hits=state.players[0].score;
+      const total=record.config.rounds[0].order.length-1;
+      const ms=record.startedAt?Math.max(0,Date.now()-record.startedAt):null;
+      // `registrar` devuelve null si ese día ya estaba jugado: entonces no hay nada que anotar ni que anunciar.
+      if(CT.RetoDiario.registrar(daily,record.config.day,{hits,total,family:'quick',challenge:record.config.rounds[0].id,ms})){
         all.retoDiario=daily;CT.Storage.setItem(key,JSON.stringify(all));
         // Los logros del reto diario (reto perfecto, rachas) se anuncian como en las colecciones.
         const logros=CT.Progreso?.finishQuickDaily?.({hits,total,streak:daily.streak}) || [];

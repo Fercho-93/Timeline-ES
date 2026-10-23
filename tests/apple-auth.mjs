@@ -6,7 +6,7 @@ function setup({enabled = true, ios = true, apple = false} = {}) {
   const dom = new JSDOM('<main id="app"></main>', {url:'https://example.com', runScripts:'outside-only', virtualConsole:new VirtualConsole()});
   const w = dom.window, data = new Map();
   w.CONTINUUM = {escapeHtml:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),Storage:{getItem:k=>w.localStorage.getItem(k),setItem:(k,v)=>w.localStorage.setItem(k,v),removeItem:k=>w.localStorage.removeItem(k)},isSessionActive:()=>false,Scene:{apply(){}}};
-  for (const file of ['js/interfaz/a11y.js','js/jugador/account-storage.js','js/jugador/avatares.js']) w.eval(read(file));
+  for (const file of ['js/interfaz/a11y.js','js/jugador/reto-diario.js','js/jugador/account-storage.js','js/jugador/avatares.js']) w.eval(read(file));
   const u = {uid:'guest',isAnonymous:!apple,providerData:apple?[{providerId:'apple.com'}]:[],getIdToken:async()=>''};
   const auth = {currentUser:u,authStateReady:async()=>{}};
   let listener;
