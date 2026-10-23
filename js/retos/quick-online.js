@@ -152,7 +152,16 @@ async function watchPublic({uid,code,seconds,length,keep,queueRef:qref=null,onCh
       syncTable();
       if(!qref)return;
       try{await runTransaction(db,async tx=>{const q=await tx.get(qref);if(!q.exists()||q.data().code!==code||q.data().status!=='waiting')return;tx.update(qref,{updatedAt:serverTimestamp()});});}
-      catch(error){console.warn('QUICK_QUEUE_KEEPALIVE',error?.code||error);}
+      catch(error){
+        // Si la partida arranca entre la lectura y la escritura, las reglas ya no dejan tocar la cola (se
+        // cierra al empezar): no es un fallo, la mesa ya no necesita que se renueve. Se confirma mirando
+        // la cola, porque `latest` puede ir un instante por detrás del servidor.
+        if(error?.code==='permission-denied'){
+          const closed=await getDoc(qref).then(q=>!q.exists()||q.data().code!==code||q.data().status!=='waiting',()=>false);
+          if(closed)return;
+        }
+        console.warn('QUICK_QUEUE_KEEPALIVE',error?.code||error);
+      }
       return;
     }
     // Nadie más puede empezar la mesa: si quien la abrió ya no la mantiene (ni su cola ni

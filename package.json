@@ -14,7 +14,6 @@
     "test:todo": "npm test && npm run test:reglas",
     "test:online-e2e": "firebase emulators:exec --project timeline-es --only auth,firestore --config firebase-e2e.json \"node scripts/run-tests.mjs --grupo e2e --serie\"",
     "test:navegador": "node scripts/run-tests.mjs --grupo navegador --serie",
-    "test:navegador-manual": "node scripts/run-tests.mjs --grupo manual --serie",
     "dev": "vite",
     "build": "node scripts/build.mjs",
     "icons": "node scripts/icons.mjs",

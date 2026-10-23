@@ -73,10 +73,13 @@ try {
   };
   const swipe = async (from, to, {steps = 10, pause = 16} = {}) => {
     const box = await page.locator('.hand-fan').boundingBox(), y = box.y + box.height / 2;
-    const send = (type, x) => cdp.send('Input.dispatchTouchEvent', {type, touchPoints: type === 'touchEnd' ? [] : [{x, y, id: 1}]});
-    await send('touchStart', from);
-    for (let i = 1; i <= steps; i++) {await send('touchMove', from + (to - from) * i / steps); await page.waitForTimeout(pause);}
-    await send('touchEnd', to);
+    // Cada toque lleva su marca de tiempo: la velocidad del gesto (que decide la inercia) sale de `pause`
+    // y no de lo despacio que vaya el equipo que ejecuta la prueba.
+    const t0 = Date.now() / 1000;
+    const send = (type, x, ms) => cdp.send('Input.dispatchTouchEvent', {type, touchPoints: type === 'touchEnd' ? [] : [{x, y, id: 1}], timestamp: t0 + ms / 1000});
+    await send('touchStart', from, 0);
+    for (let i = 1; i <= steps; i++) {await send('touchMove', from + (to - from) * i / steps, i * pause); await page.waitForTimeout(8);}
+    await send('touchEnd', to, steps * pause);
   };
   const shift = (before, after) => { // cuántas cartas se movió el centro, con vuelta
     const n = before.total, d = ((after.ids.indexOf(after.center) - before.ids.indexOf(before.center)) % n + n) % n;
@@ -99,7 +102,8 @@ try {
   assert.equal(shift(before, after), 1, 'arrastrar a la izquierda trae la siguiente');
   before = after;
   await swipe(100, 290, {steps: 19, pause: 30}); after = await settled('tres cartas');
-  assert.ok(shift(before, after) <= -2, `un arrastre largo a la derecha recorre varias cartas (${shift(before, after)})`);
+  // Valor absoluto: en una mano de 9, recorrer 5 cartas hacia un lado se mide como 4 hacia el otro (`shift` toma el camino corto).
+  assert.ok(Math.abs(shift(before, after)) >= 2, `un arrastre largo a la derecha recorre varias cartas (${shift(before, after)})`);
   before = after;
   await swipe(340, 110, {steps: 6, pause: 10}); after = await settled('flick');
   assert.ok(Math.abs(shift(before, after)) >= 3, `un gesto rápido sigue girando por inercia (${shift(before, after)})`);
@@ -120,7 +124,9 @@ try {
       const cardId = state.remaining[0];
       for (let index = 0; index <= state.timeline.length; index++) if (CT.Engine.fits(state.timeline, cardId, index, value)) return {cardId, index};
     });
-    await page.locator(`[data-quick="select"][data-id="${card.cardId}"]`).click();
+    // En el abanico, una carta del borde puede quedar bajo su vecina: este ayudante solo vacía la mano, así que
+    // la elige por código en vez de por el punto donde la tocaría un dedo.
+    await page.locator(`[data-quick="select"][data-id="${card.cardId}"]`).evaluate(el => el.click());
     await page.locator(`[data-quick="slot"][data-index="${card.index}"]`).click();
     await page.locator('[data-quick="confirm"]').click();
     await page.locator('[data-quick="ack"]').click();
@@ -129,7 +135,7 @@ try {
   for (const total of [5, 3]) {
     while (await page.locator('.hand-fan .hand-card').count() > total) await play();
     before = await settled(`${total} cartas`);
-    await swipe(250, 150); after = await settled(`${total} cartas, deslizar`);
+    await swipe(250, 150, {pause: 40}); after = await settled(`${total} cartas, deslizar`);
     assert.notEqual(shift(before, after), 0);
     before = after;
     await swipe(80, 330, {steps: 6, pause: 10}); after = await settled(`${total} cartas, gesto rápido`);

@@ -139,11 +139,6 @@ export const SUITES = {
     "tests/quick-challenges-browser.mjs",
     "tests/quick-formats-browser.mjs",
     "tests/tablet-browser.mjs",
-  ],
-  // De navegador, pero a mano: el gesto de inercia de la mano en abanico depende de la velocidad real
-  // del equipo y falló en GitHub Actions (cuenta -2 cartas donde espera 3 o más) aunque pasa en local.
-  // Hasta medir el gesto con marcas de tiempo propias no entra en el workflow. `npm run test:navegador-manual`.
-  manual: [
     "tests/mano-carrusel-browser.mjs",
   ],
   // `npm run test:online-e2e`: «Jugar online» en Chromium contra los emuladores de Auth y Firestore.
