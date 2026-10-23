@@ -1,22 +1,10 @@
 // Recorre en Chromium, a ancho de móvil y de escritorio, cada pantalla a la que se puede
 // avanzar: comprueba que se ve la flecha de volver y que lleva a la pantalla anterior.
 // Uso: PLAYWRIGHT_MODULE=/ruta/a/playwright/index.mjs node tests/navegacion-volver-browser.mjs
-import {createServer} from 'node:http';
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import {fileURLToPath, pathToFileURL} from 'node:url';
-import {gameHtml} from './game-fixture.mjs';
-const {chromium} = await import(process.env.PLAYWRIGHT_MODULE ? pathToFileURL(process.env.PLAYWRIGHT_MODULE).href : 'playwright');
-const root = fileURLToPath(new URL('..', import.meta.url));
-const html = gameHtml(await fs.readFile(root + '/index.html', 'utf8'));
-const server = createServer(async (req, res) => {
-  try { const p = new URL(req.url, 'http://x').pathname; const f = path.join(root, p); const body = p === '/' ? html : await fs.readFile(f);
-    res.setHeader('Content-Type', {'.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.webp':'image/webp','.svg':'image/svg+xml','.json':'application/json'}[path.extname(f)] || 'text/html'); res.end(body);
-  } catch { res.writeHead(404); res.end(); }
-});
-await new Promise(r => server.listen(0, '127.0.0.1', r));
+import { servirJuego, chromium, opcionesLanzamiento } from './lib/navegador.mjs';
+const server = await servirJuego();
 const url = `http://127.0.0.1:${server.address().port}/`;
-const browser = await chromium.launch(process.env.CHROMIUM_PATH ? {executablePath: process.env.CHROMIUM_PATH} : {});
+const browser = await chromium.launch(opcionesLanzamiento());
 const problems = [];
 const ARROW = '#app .atlas-back, #app .topbar [data-local-action][aria-label="Volver"], #app .turn-duel-back';
 

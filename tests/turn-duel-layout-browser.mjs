@@ -1,22 +1,15 @@
 // Vista de un turno activo: mide la maquetación del duelo que depende de una segunda cuenta.
-import {createServer} from 'node:http';
+import { servirJuego, motores, opcionesLanzamiento } from './lib/navegador.mjs';
+import { REPO as root } from './lib/comun.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import {fileURLToPath,pathToFileURL} from 'node:url';
-import {gameHtml} from './game-fixture.mjs';
 // ENGINES=chromium limita la prueba a Chromium donde no hay WebKit instalado (por defecto, los dos).
-const {webkit,chromium}=await import(process.env.PLAYWRIGHT_MODULE?pathToFileURL(process.env.PLAYWRIGHT_MODULE).href:'playwright');
-const root=path.resolve(fileURLToPath(new URL('..',import.meta.url)));
-const html=gameHtml(await fs.readFile(path.join(root,'index.html'),'utf8'));
-const server=createServer(async(req,res)=>{try{const p=new URL(req.url,'http://localhost').pathname,f=path.resolve(root,'.'+p);
-  if(!f.startsWith(root+path.sep)&&p!=='/')throw Error('path');res.writeHead(200,{'Content-Type':{'.js':'text/javascript','.css':'text/css','.webp':'image/webp','.svg':'image/svg+xml'}[path.extname(f)]||'text/html'});res.end(p==='/'?html:await fs.readFile(f));
-}catch{res.writeHead(404);res.end();}});
-await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+const server = await servirJuego();
 const errors=[];
 await fs.mkdir(path.join(root,'test-results/zoom'),{recursive:true});
 try{
- for(const [name,engine] of [['webkit',webkit],['chromium',chromium]].filter(([name])=>(process.env.ENGINES||'webkit,chromium').split(',').includes(name))){
-  const browser=await engine.launch(name==='chromium'&&process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{});
+ for(const [name,engine] of motores()){
+  const browser=await engine.launch(opcionesLanzamiento(name));
   try{
    for(const [width,height] of [[320,568],[375,667]]){
     const page=await browser.newPage({viewport:{width,height},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});

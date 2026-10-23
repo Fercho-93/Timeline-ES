@@ -1,25 +1,11 @@
 // Tabletas en un navegador de verdad: en horizontal la partida usa dos columnas con las medidas reales;
 // en vertical y en el móvil sigue la mesa a escala. Se lanza con Playwright (ver zoom-visual.yml).
-import {createServer} from 'node:http';
+import { servirJuego, motores, opcionesLanzamiento } from './lib/navegador.mjs';
+import { REPO as root } from './lib/comun.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import {fileURLToPath, pathToFileURL} from 'node:url';
-const {webkit, chromium} = await import(process.env.PLAYWRIGHT_MODULE ? pathToFileURL(process.env.PLAYWRIGHT_MODULE).href : 'playwright');
-import {gameHtml} from './game-fixture.mjs';
-const root = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
-const html = gameHtml(await fs.readFile(path.join(root, 'index.html'), 'utf8'));
-const server = createServer(async (req, res) => {
-  try {
-    const pathname = new URL(req.url, 'http://localhost').pathname;
-    const file = path.resolve(root, '.' + pathname);
-    if (!file.startsWith(root + path.sep) && pathname !== '/') throw Error('path');
-    const body = pathname === '/' ? html : await fs.readFile(file);
-    res.writeHead(200, {'Content-Type': {'.js': 'text/javascript', '.css': 'text/css', '.webp': 'image/webp', '.svg': 'image/svg+xml'}[path.extname(file)] || 'text/html'});
-    res.end(body);
-  } catch { res.writeHead(404); res.end(); }
-});
-await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+const server = await servirJuego();
 const url = `http://127.0.0.1:${server.address().port}/`;
 const destination = path.join(root, 'test-results/zoom');
 await fs.mkdir(destination, {recursive: true});
@@ -28,8 +14,8 @@ await fs.mkdir(destination, {recursive: true});
 const casos = [[390, 844, 'mesa'], [834, 1194, 'mesa'], [1194, 834, 'columnas'], [1376, 1032, 'columnas'], [1024, 768, 'columnas']];
 let browser;
 try {
-  for (const [engine, type] of [['webkit', webkit], ['chromium', chromium]].filter(([name]) => (process.env.ENGINES || 'webkit,chromium').split(',').includes(name))) {
-    browser = await type.launch(engine === 'chromium' && process.env.CHROME_PATH ? {executablePath: process.env.CHROME_PATH} : {});
+  for (const [engine, type] of motores()) {
+    browser = await type.launch(opcionesLanzamiento(engine));
     for (const [width, height, modo] of casos) {
       const page = await browser.newPage({viewport: {width, height}, isMobile: true, hasTouch: true, deviceScaleFactor: 1, reducedMotion: 'reduce'});
       page.setDefaultTimeout(12000);

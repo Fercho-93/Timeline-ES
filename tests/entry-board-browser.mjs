@@ -1,21 +1,7 @@
 // Recorre las puertas de Inicio hasta la mesa jugable o la sala que espera a otro móvil.
-import {createServer} from 'node:http';
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import {fileURLToPath, pathToFileURL} from 'node:url';
-import {gameHtml} from './game-fixture.mjs';
-const {chromium} = await import(process.env.PLAYWRIGHT_MODULE ? pathToFileURL(process.env.PLAYWRIGHT_MODULE).href : 'playwright');
-const root=path.resolve(fileURLToPath(new URL('..',import.meta.url)));
-const html=gameHtml(await fs.readFile(path.join(root,'index.html'),'utf8'));
-const server=createServer(async(req,res)=>{
-  try {const name=new URL(req.url,'http://localhost').pathname,file=path.resolve(root,'.'+name);
-    if(!file.startsWith(root+path.sep)&&name!=='/')throw Error('path');
-    const body=name==='/'?html:await fs.readFile(file);
-    res.writeHead(200,{'Content-Type':{'.js':'text/javascript','.css':'text/css','.webp':'image/webp','.svg':'image/svg+xml'}[path.extname(file)]||'text/html'});res.end(body);
-  }catch{res.writeHead(404);res.end();}
-});
-await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
-const browser=await chromium.launch();
+import { servirJuego, chromium, opcionesLanzamiento } from './lib/navegador.mjs';
+const server = await servirJuego();
+const browser=await chromium.launch(opcionesLanzamiento());
 const findings=[];
 const scenarios={
   collections:async({click,deck})=>{await click('[data-action="solo-hub"]');await click('[data-solo-route="collections"]');await deck();await click('[data-action="start-free"]');},

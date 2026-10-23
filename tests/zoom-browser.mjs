@@ -1,26 +1,10 @@
 // Prueba de maquetación real: JSDOM no puede detectar que una imagen se encoge.
 // Ejecutar con Playwright instalado; el workflow instala Chromium y WebKit.
-import {fileURLToPath, pathToFileURL} from 'node:url';
 // ENGINES=chromium limita la prueba a Chromium donde no hay WebKit instalado (por defecto, los dos).
-const {chromium, webkit} = await import(process.env.PLAYWRIGHT_MODULE ? pathToFileURL(process.env.PLAYWRIGHT_MODULE).href : 'playwright');
+import { servirJuego, chromium, motores, opcionesLanzamiento } from './lib/navegador.mjs';
 import assert from 'node:assert/strict';
-import {createServer} from 'node:http';
 import fs from 'node:fs/promises';
-import path from 'node:path';
-import {gameHtml} from './game-fixture.mjs';
-const root=path.resolve(fileURLToPath(new URL('..',import.meta.url)));
-const html=gameHtml(await fs.readFile(path.join(root,'index.html'),'utf8'));
-const server=createServer(async(req,res)=>{
-  try {
-    const pathname=new URL(req.url,'http://localhost').pathname;
-    const file=path.resolve(root,'.'+pathname);
-    if(!file.startsWith(root+path.sep)&&pathname!=='/')throw Error('path');
-    const body=pathname==='/'?html:await fs.readFile(file);
-    const ext=path.extname(file),mime={'.js':'text/javascript','.css':'text/css','.webp':'image/webp','.svg':'image/svg+xml','.woff2':'font/woff2'}[ext]||'text/html';
-    res.writeHead(200,{'Content-Type':mime});res.end(body);
-  } catch {res.writeHead(404);res.end();}
-});
-await new Promise(r=>server.listen(0,'127.0.0.1',r));
+const server = await servirJuego();
 const url=`http://127.0.0.1:${server.address().port}/`;
 await fs.mkdir('test-results/zoom',{recursive:true});
 const records=[];
@@ -31,9 +15,9 @@ async function openCollections(page){
   if(await page.locator('#mode-inline-drawer[hidden]').count())await page.locator('[data-inline-route="collections"]').click();
 }
 try {
- for(const [engine,type] of [['webkit',webkit],['chromium',chromium]].filter(([name])=>(process.env.ENGINES||'webkit,chromium').split(',').includes(name))) {
+ for(const [engine,type] of motores()) {
   if (process.env.BROWSER_ENGINE && process.env.BROWSER_ENGINE !== engine) continue;
-  const browser=await type.launch(engine === 'chromium' && process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {});
+  const browser=await type.launch(opcionesLanzamiento(engine));
   const newPage = async options => {
     const page = await browser.newPage(options);
     await page.addInitScript(() => localStorage.setItem('continuum-splash-seen-v2', '1'));

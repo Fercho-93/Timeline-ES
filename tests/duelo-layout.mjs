@@ -1,25 +1,11 @@
 // Real browser layout regression; Firebase is replaced by deterministic snapshots.
 // PLAYWRIGHT_MODULE can point to a locally installed Playwright entry point.
 import assert from 'node:assert/strict';
-import fs from 'node:fs/promises';
-import http from 'node:http';
-import path from 'node:path';
-import { pathToFileURL, fileURLToPath } from 'node:url';
-const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ? pathToFileURL(process.env.PLAYWRIGHT_MODULE).href : 'playwright');
-const root = fileURLToPath(new URL('../', import.meta.url));
-const source = (await fs.readFile(path.join(root, 'js/online/duelo-turnos.js'), 'utf8')).replace(/^import .*;\r?\n/gm, '');
-const server = http.createServer(async (req, res) => {
-  try {
-    if (req.url === '/') { res.setHeader('Content-Type', 'text/html'); res.end('<html><body></body></html>'); return; }
-    const relative = decodeURIComponent(new URL(req.url, 'http://localhost').pathname).slice(1);
-    const target = path.resolve(root, relative);
-    if (!target.startsWith(root)) { res.writeHead(403).end(); return; }
-    res.setHeader('Content-Type', relative.endsWith('.css') ? 'text/css' : relative.endsWith('.js') ? 'text/javascript' : 'application/octet-stream');
-    res.end(await fs.readFile(target));
-  } catch { res.writeHead(404).end(); }
-});
-await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-const browser = await chromium.launch(process.env.BROWSER_EXECUTABLE ? { executablePath: process.env.BROWSER_EXECUTABLE } : {});
+import { chromium, servirJuego, opcionesLanzamiento } from './lib/navegador.mjs';
+import { read } from './lib/comun.mjs';
+const source = read('js/online/duelo-turnos.js').replace(/^import .*;\r?\n/gm, '');
+const server = await servirJuego({ inicio: '<html><body></body></html>' });
+const browser = await chromium.launch(opcionesLanzamiento());
 try {
   for (const width of [320, 390, 430, 820, 1280]) {
     const page = await browser.newPage({ viewport: { width, height: 844 }, isMobile: width < 600, hasTouch: true });

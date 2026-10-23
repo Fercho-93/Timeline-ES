@@ -2,29 +2,12 @@
 // va rápido), da la vuelta sin extremos, deja ver las cartas del fondo y, al soltar, siempre queda una carta en el
 // centro y es la elegida. Con gestos táctiles reales (CDP), de 8 o 9 cartas a 3 para probar también la vuelta de las
 // manos pequeñas. PLAYWRIGHT_MODULE y CHROME_PATH como en el resto de pruebas con navegador.
-import {createServer} from 'node:http';
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import {fileURLToPath, pathToFileURL} from 'node:url';
+import { servirJuego, chromium, opcionesLanzamiento } from './lib/navegador.mjs';
 import assert from 'node:assert/strict';
-import {gameHtml} from './game-fixture.mjs';
-const {chromium} = await import(process.env.PLAYWRIGHT_MODULE ? pathToFileURL(process.env.PLAYWRIGHT_MODULE).href : 'playwright');
-const root = fileURLToPath(new URL('..', import.meta.url));
-const html = gameHtml(await fs.readFile(path.join(root, 'index.html'), 'utf8'));
-const server = createServer(async (req, res) => {
-  try {
-    const pathname = new URL(req.url, 'http://localhost').pathname;
-    const file = path.resolve(root, '.' + pathname);
-    if (!file.startsWith(path.resolve(root) + path.sep) && pathname !== '/') throw Error('path');
-    const body = pathname === '/' ? html : await fs.readFile(file);
-    res.setHeader('Content-Type', {'.js': 'text/javascript', '.css': 'text/css', '.webp': 'image/webp', '.svg': 'image/svg+xml'}[path.extname(file)] || 'text/html');
-    res.end(body);
-  } catch {res.writeHead(404); res.end();}
-});
-await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+const server = await servirJuego();
 let browser;
 try {
-  browser = await chromium.launch(process.env.CHROME_PATH ? {executablePath: process.env.CHROME_PATH} : {});
+  browser = await chromium.launch(opcionesLanzamiento());
   const page = await browser.newPage({viewport: {width: 390, height: 850}, isMobile: true, hasTouch: true, deviceScaleFactor: 2, reducedMotion: 'no-preference'});
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));

@@ -1,26 +1,10 @@
-import {createServer} from 'node:http';
+import { servirJuego, chromium, opcionesLanzamiento } from './lib/navegador.mjs';
 import fs from 'node:fs/promises';
-import path from 'node:path';
-import {fileURLToPath, pathToFileURL} from 'node:url';
 import assert from 'node:assert/strict';
-import {gameHtml} from './game-fixture.mjs';
-const {chromium} = await import(process.env.PLAYWRIGHT_MODULE ? pathToFileURL(process.env.PLAYWRIGHT_MODULE).href : 'playwright');
-const root = fileURLToPath(new URL('..', import.meta.url));
-const html = gameHtml(await fs.readFile(path.join(root, 'index.html'), 'utf8'));
-const server = createServer(async (req, res) => {
-  try {
-    const pathname = new URL(req.url, 'http://localhost').pathname;
-    const file = path.resolve(root, '.' + pathname);
-    if (!file.startsWith(path.resolve(root) + path.sep) && pathname !== '/') throw Error('path');
-    const body = pathname === '/' ? html : await fs.readFile(file);
-    res.setHeader('Content-Type', {'.js': 'text/javascript', '.css': 'text/css', '.webp': 'image/webp', '.svg': 'image/svg+xml'}[path.extname(file)] || 'text/html');
-    res.end(body);
-  } catch {res.writeHead(404); res.end();}
-});
-await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+const server = await servirJuego();
 let browser;
 try {
-  browser = await chromium.launch(process.env.CHROME_PATH ? {executablePath: process.env.CHROME_PATH} : {});
+  browser = await chromium.launch(opcionesLanzamiento());
   await fs.mkdir('test-results/quick-challenges', {recursive: true});
   for (const width of [360, 390, 1280]) {
     const page = await browser.newPage({viewport: {width, height: 850}, reducedMotion: 'reduce'});

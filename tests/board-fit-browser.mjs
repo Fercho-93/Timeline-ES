@@ -1,33 +1,19 @@
 // Recorre los formatos jugables y mide la mesa al 100 % en móviles de distinto tamaño.
-import {createServer} from 'node:http';
+import { servirJuego, motores, opcionesLanzamiento } from './lib/navegador.mjs';
+import { REPO as root } from './lib/comun.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import {fileURLToPath, pathToFileURL} from 'node:url';
 // ENGINES=chromium limita la prueba a Chromium donde no hay WebKit instalado (por defecto, los dos).
-const {webkit, chromium} = await import(process.env.PLAYWRIGHT_MODULE ? pathToFileURL(process.env.PLAYWRIGHT_MODULE).href : 'playwright');
-import {gameHtml} from './game-fixture.mjs';
-const root=path.resolve(fileURLToPath(new URL('..',import.meta.url)));
-const html=gameHtml(await fs.readFile(path.join(root,'index.html'),'utf8'));
-const server=createServer(async(req,res)=>{
-  try {
-    const pathname=new URL(req.url,'http://localhost').pathname;
-    const file=path.resolve(root,'.'+pathname);
-    if(!file.startsWith(root+path.sep)&&pathname!=='/')throw Error('path');
-    const body=pathname==='/'?html:await fs.readFile(file);
-    res.writeHead(200,{'Content-Type':{'.js':'text/javascript','.css':'text/css','.webp':'image/webp','.svg':'image/svg+xml','.woff2':'font/woff2'}[path.extname(file)]||'text/html'});
-    res.end(body);
-  }catch{res.writeHead(404);res.end();}
-});
-await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+const server = await servirJuego();
 const url=`http://127.0.0.1:${server.address().port}/`;
 const destination=path.join(root,'test-results/zoom');
 await fs.mkdir(destination,{recursive:true});
 const records=[];
 let browser;
 try {
-  for(const [engine,type] of [['webkit',webkit],['chromium',chromium]].filter(([name])=>(process.env.ENGINES||'webkit,chromium').split(',').includes(name))) {
+  for(const [engine,type] of motores()) {
     if(process.env.BROWSER_ENGINE && process.env.BROWSER_ENGINE!==engine)continue;
-    browser=await type.launch(engine === 'chromium' && process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {});
+    browser=await type.launch(opcionesLanzamiento(engine));
     for(const {width,height} of [{width:320,height:568},{width:375,height:667},{width:390,height:640},{width:390,height:844},{width:430,height:932},{width:600,height:800}]) {
       // local-anim: la partida local con movimiento. Al pasar el móvil, las cartas de la mano entran
       // volando desde abajo y la mesa no puede medirse con ellas a medio camino.
