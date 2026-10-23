@@ -1,10 +1,7 @@
-import {gameHtml} from './game-fixture.mjs';
 // Cuatro mazos representativos: nadie debe quedarse bloqueado y las cartas no se crean ni se pierden.
-import { JSDOM } from "jsdom";
 import { finishLocalFinal } from './final-helper.mjs';
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import {  } from "./lib/comun.mjs";
+import { arrancarJuego } from "./lib/dom.mjs";
 // La colección y la competición viven ahora en «Jugar», no en la portada: desde la
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
@@ -14,15 +11,8 @@ function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]'
 function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 
-const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
 // La lista de scripts sale de index.html, para no repetirla en cada prueba.
-const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
-const boot = () => {
-  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
-  guiones().forEach(archivo => dom.window.eval(read(archivo)));
-  return dom.window;
-};
+const boot = () => arrancarJuego();
 const fire = (w, el) => el.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
 let problems = 0, games = 0, sharedWins = 0, returns = 0;
 

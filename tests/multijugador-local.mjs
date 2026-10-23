@@ -1,14 +1,11 @@
+import { ok, fail } from "./lib/comun.mjs";
+import { arrancarJuego } from "./lib/dom.mjs";
 // Humo del modo "Sin conexión" sobre el DOM real de index.html: entra por el menú de
 // verdad, crea una sala, comprueba el vestíbulo y confirma que lo que sí necesita WebRTC
 // falla con un aviso claro en vez de romper la pantalla. No hay RTCPeerConnection en
 // Node, así que la partida completa de dos personas se juega con un transporte de
 // mentira que pasa los mensajes de una ventana a otra: todo lo demás (sesión, sala,
 // pantallas) es el código real.
-import { gameHtml } from "./game-fixture.mjs";
-import { JSDOM } from "jsdom";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 // Se entra como en la aplicación: Inicio → Jugar con amigos → Cada uno en su móvil → Crear
 // partida → mazo → En directo, sin internet → Crear sala.
 // `unirse`: quien se une no pasa por «Crear partida» (que ya no ofrece unirse), sino por la entrada completa.
@@ -25,18 +22,9 @@ async function entrarWifi(w, { unirse = false } = {}) {
   return w.document;
 }
 
-const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
-let fail = 0;
-const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
-function guiones() { return [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]); }
 function boot() {
-  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
-  const { window } = dom;
-  window.scrollTo = () => {}; window.Element.prototype.scrollIntoView = () => {};
-  guiones().forEach(archivo => window.eval(read(archivo)));
-  return window;
+  return arrancarJuego({ antes: w => { w.scrollTo = () => {}; w.Element.prototype.scrollIntoView = () => {}; } });
 }
 const click = (w, sel) => { const el = w.document.querySelector(sel); if (!el) throw new Error(`no existe ${sel}`); el.dispatchEvent(new w.MouseEvent("click", { bubbles: true })); };
 const submit = (w, sel) => { const el = w.document.querySelector(sel); if (!el) throw new Error(`no existe ${sel}`); el.dispatchEvent(new w.Event("submit", { bubbles: true, cancelable: true })); };

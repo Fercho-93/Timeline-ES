@@ -1,19 +1,11 @@
+import { ok, fail } from "./lib/comun.mjs";
+import { arrancarJuego } from "./lib/dom.mjs";
 // Multijugador Wi-Fi local entre iPhones con MultipeerConnectivity (`js/sin-conexion/local-peer.js`): no hay
 // plugin nativo en Node, así que dos ventanas se hablan a través de un "sistema operativo"
 // de mentira (anuncio, búsqueda, invitación, mensajes). Todo lo demás —sesión, sala,
 // pantallas— es el código real.
-import { gameHtml } from "./game-fixture.mjs";
-import { JSDOM } from "jsdom";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 
-const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
-let fail = 0;
-const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 const pausa = (ms = 0) => new Promise(resolve => setTimeout(resolve, ms));
-const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
 
 // El sistema operativo de mentira: qué móviles anuncian sala, quién busca y quién está conectado.
 const so = { moviles: new Map(), anuncios: new Map() };
@@ -45,12 +37,10 @@ function movil(id) {
 }
 
 function boot(id, ios = true) {
-  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
-  const { window } = dom;
-  window.scrollTo = () => {}; window.Element.prototype.scrollIntoView = () => {};
-  if (ios) window.Capacitor = { getPlatform: () => "ios", isNativePlatform: () => true, Plugins: { LocalPeer: movil(id) } };
-  guiones().forEach(archivo => window.eval(read(archivo)));
-  return window;
+  return arrancarJuego({ antes: w => {
+    w.scrollTo = () => {}; w.Element.prototype.scrollIntoView = () => {};
+    if (ios) w.Capacitor = { getPlatform: () => "ios", isNativePlatform: () => true, Plugins: { LocalPeer: movil(id) } };
+  } });
 }
 const click = (w, sel) => { const el = w.document.querySelector(sel); if (!el) throw new Error(`no existe ${sel}`); el.dispatchEvent(new w.MouseEvent("click", { bubbles: true })); };
 const submit = (w, sel) => { const el = w.document.querySelector(sel); if (!el) throw new Error(`no existe ${sel}`); el.dispatchEvent(new w.Event("submit", { bubbles: true, cancelable: true })); };

@@ -1,12 +1,9 @@
-import {gameHtml} from './game-fixture.mjs';
+import { ok, fail } from "./lib/comun.mjs";
+import { arrancarJuego } from "./lib/dom.mjs";
 // El duelo de cifras: que puntúe por lo cerca que se queda uno y por lo rápido que
 // responde, que la carga útil dé la vuelta entera sin creerse los puntos que trae, y
 // —lo que sostiene el modo entero— que el reloj no se pueda parar. Irse de la
 // aplicación, recargar la página o cerrarla no devuelven el plazo entero.
-import { JSDOM } from "jsdom";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 // La colección y la competición viven ahora en «Jugar», no en la portada: desde la
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
@@ -16,26 +13,20 @@ function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]'
 function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 
-const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
-const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
-let fail = 0;
-const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
 // El reloj de la partida es el del móvil, así que para probarlo hay que poder moverlo.
 // `reloj.ahora` sustituye a `Date.now()` dentro de la ventana: avanzarlo es exactamente
 // lo que ocurre cuando alguien se va a otra aplicación y vuelve.
 function boot({ url = "https://hilo.test/", almacen = {} } = {}) {
-  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url });
-  const { window } = dom;
-  window.Element.prototype.scrollIntoView = function () {};
   const reloj = { ahora: Date.now() };
-  window.Date.now = () => reloj.ahora;
   let oculto = false;
-  Object.defineProperty(window.document, "hidden", { configurable: true, get: () => oculto });
-  Object.defineProperty(window.document, "visibilityState", { configurable: true, get: () => (oculto ? "hidden" : "visible") });
-  Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));
-  guiones().forEach(archivo => window.eval(read(archivo)));
+  const window = arrancarJuego({ url, almacen, antes:
+    w => {
+      w.Element.prototype.scrollIntoView = function () {};
+      w.Date.now = () => reloj.ahora;
+      Object.defineProperty(w.document, "hidden", { configurable: true, get: () => oculto });
+      Object.defineProperty(w.document, "visibilityState", { configurable: true, get: () => (oculto ? "hidden" : "visible") });
+    } });
   // Salirse de la aplicación y volver `ms` milisegundos después.
   window.seVaYVuelve = ms => {
     oculto = true;

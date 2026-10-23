@@ -1,4 +1,5 @@
-import {gameHtml} from './game-fixture.mjs';
+import { ok, fail, read } from "./lib/comun.mjs";
+import { arrancarJuego } from "./lib/dom.mjs";
 // La cartera: el único sitio que responde «¿tiene derecho este jugador a este mazo?».
 //
 // Mientras dure la simulación hay un mazo cerrado de verdad —«Gran mezcla temporal»—, así
@@ -6,10 +7,6 @@ import {gameHtml} from './game-fixture.mjs';
 // abierto y qué se le cuenta a quien se encuentra la puerta. La segunda cierra otros
 // mazos a mano y recorre el juego entero para ver que todos los rincones lo respetan.
 // Sin ella, la cartera sería una función que nadie llama.
-import { JSDOM } from "jsdom";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 // La colección y la competición viven ahora en «Jugar», no en la portada: desde la
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
 // La enciclopedia se abre ahora desde el Atlas: si el botón no está a la vista, se
@@ -22,11 +19,6 @@ function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]'
 function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 
-const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
-const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
-let fail = 0;
-const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
 // La beta sale con todo abierto (`SIMULACION` vacía). Estas pruebas encienden la
 // maqueta de la puerta cerrada con un mazo suelto y una colección entera, que es justo lo
@@ -37,13 +29,7 @@ const conSimulacion = (archivo, codigo) => archivo === "js/jugador/cartera.js"
   : codigo;
 
 function boot({ url = "https://hilo.test/", almacen = {}, sesion = {}, simulacion = true } = {}) {
-  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url });
-  const { window } = dom;
-  window.Element.prototype.scrollIntoView = function () {};
-  Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));
-  Object.entries(sesion).forEach(([clave, valor]) => window.sessionStorage.setItem(clave, valor));
-  guiones().forEach(archivo => window.eval(simulacion ? conSimulacion(archivo, read(archivo)) : read(archivo)));
-  return window;
+  return arrancarJuego({ url, almacen, sesion, antes: w => { w.Element.prototype.scrollIntoView = function () {}; }, transformar: simulacion ? conSimulacion : undefined });
 }
 const click = (w, sel) => {
   const el = w.document.querySelector(sel);

@@ -1,9 +1,6 @@
-import {gameHtml} from './game-fixture.mjs';
+import { ok, fail } from "./lib/comun.mjs";
+import { arrancarJuego } from "./lib/dom.mjs";
 // Modo solitario, reto diario y confirmación antes de colocar, sobre el DOM real.
-import { JSDOM } from "jsdom";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 // El reto diario alterna cada día entre Grandes colecciones (días pares) y Retos rápidos
 // (impares). Esta prueba recorre el de colecciones: en un día impar se adelanta el reloj
 // un día, en la prueba y en la ventana, para que el resultado no dependa de la fecha.
@@ -20,21 +17,9 @@ function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]'
 function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 
-const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
-const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
-let fail = 0;
-const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
 function boot(almacen = {}) {
-  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
-  const { window } = dom;
-  if (DESFASE) window.Date = relojDesfasado(window.Date);
-  Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));
-  // Los scripts se toman de index.html, que es la única lista de verdad: así un mazo
-  // nuevo no obliga a tocar cada prueba (y no se olvida, que ya pasó).
-  guiones().forEach(archivo => window.eval(read(archivo)));
-  return window;
+  return arrancarJuego({ almacen, antes: w => { if (DESFASE) w.Date = relojDesfasado(w.Date); } });
 }
 const click = (w, sel) => {
   const el = w.document.querySelector(sel);

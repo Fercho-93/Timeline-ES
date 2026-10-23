@@ -1,10 +1,7 @@
-import {gameHtml} from './game-fixture.mjs';
 // Juega partidas completas del modo de un solo móvil sobre el DOM real de index.html.
-import { JSDOM } from "jsdom";
 import { finishLocalFinal } from './final-helper.mjs';
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { ok, fail } from "./lib/comun.mjs";
+import { arrancarJuego } from "./lib/dom.mjs";
 // Antes de repartir se juega el minijuego de quién empieza: todos dicen la misma cifra.
 function jugarQuienEmpieza(w) { const d = w.document; const tap = el => el?.dispatchEvent(new w.MouseEvent('click', { bubbles: true })); for (let i = 0; i < 12 && d.getElementById('starter-guess-input'); i++) { d.getElementById('starter-guess-input').value = '1900'; tap(d.querySelector('[data-action="starter-guess-submit"]')); } tap(d.querySelector('[data-action="starter-start"]')); return w; }
 
@@ -17,20 +14,10 @@ function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]'
 function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 
-const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
-const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
-let fail = 0;
-const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
 function boot() {
-  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
-  const { window } = dom;
-  // Los scripts se toman de index.html, que es la única lista de verdad: así un mazo
-  // nuevo no obliga a tocar cada prueba (y no se olvida, que ya pasó).
-  guiones().forEach(archivo => window.eval(read(archivo)));
-  return window;
+  return arrancarJuego();
 }
 const click = (w, sel) => { const el = w.document.querySelector(sel); if (!el) throw new Error(`no existe ${sel}`); el.dispatchEvent(new w.MouseEvent("click", { bubbles: true })); };
 

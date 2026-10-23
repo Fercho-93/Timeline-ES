@@ -1,13 +1,10 @@
-import {gameHtml} from './game-fixture.mjs';
+import { ok, fail } from "./lib/comun.mjs";
+import { arrancarJuego } from "./lib/dom.mjs";
 // El Pulso: la jugada de una vez por partida que sustituye al turno y enfrenta a dos
 // personas con la misma carta. Es la única jugada del juego que toca la mano de otra
 // persona —y la única que se juega en dos mitades, una por cabeza—, así que lo que más se
 // comprueba aquí son las cuatro salidas del duelo y que las cartas ni se creen ni se
 // pierdan por el camino.
-import { JSDOM } from "jsdom";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 // La colección y la competición viven ahora en «Jugar», no en la portada: desde la
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
@@ -17,18 +14,9 @@ function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]'
 function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 
-const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
-const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
-let fail = 0;
-const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
 function boot(almacen = {}) {
-  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
-  const { window } = dom;
-  Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));
-  guiones().forEach(archivo => window.eval(read(archivo)));
-  return window;
+  return arrancarJuego({ almacen });
 }
 const click = (w, sel) => {
   const el = w.document.querySelector(sel);

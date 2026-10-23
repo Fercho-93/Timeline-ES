@@ -1,4 +1,5 @@
-import {gameHtml} from './game-fixture.mjs';
+import { ok, fail, read } from "./lib/comun.mjs";
+import { arrancarJuego } from "./lib/dom.mjs";
 // Que la partida se pueda seguir con teclado y con lector de pantalla. Son dos cosas
 // distintas y las dos se rompen solas en cuanto alguien añade una pantalla nueva:
 //
@@ -9,10 +10,6 @@ import {gameHtml} from './game-fixture.mjs';
 //
 // Y al final, el contraste de las bandas de época, que es puro dato y no cuesta nada
 // comprobar: texto blanco sobre color, mínimo 4,5 a 1.
-import { JSDOM } from "jsdom";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 // Antes de repartir se juega el minijuego de quién empieza: todos dicen la misma cifra.
 function jugarQuienEmpieza(w) { const d = w.document; const tap = el => el?.dispatchEvent(new w.MouseEvent('click', { bubbles: true })); for (let i = 0; i < 12 && d.getElementById('starter-guess-input'); i++) { d.getElementById('starter-guess-input').value = '1900'; tap(d.querySelector('[data-action="starter-guess-submit"]')); } tap(d.querySelector('[data-action="starter-start"]')); return w; }
 
@@ -25,21 +22,11 @@ function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]'
 function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 
-const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
-const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
-let fail = 0;
-const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
 function boot(mode = null) {
-  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://continuum.test/" });
-  const { window } = dom;
   // jsdom no maquetiza, así que no tiene scrollIntoView; y al pulsar tampoco enfoca, que
   // es lo que hace un navegador de verdad con un botón. Las dos cosas se suplen aquí.
-  window.Element.prototype.scrollIntoView = function () {};
-  if (mode) window.localStorage.setItem("hilo-selected-mode-v1", mode);
-  guiones().forEach(archivo => window.eval(read(archivo)));
-  return window;
+  return arrancarJuego({ url: "https://continuum.test/", almacen: mode ? { "hilo-selected-mode-v1": mode } : {}, antes: w => { w.Element.prototype.scrollIntoView = function () {}; } });
 }
 const el = (w, sel) => { const nodo = w.document.querySelector(sel); if (!nodo) throw new Error(`no existe ${sel}`); return nodo; };
 const click = (w, sel) => {

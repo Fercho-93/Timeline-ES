@@ -1,11 +1,8 @@
-import {gameHtml} from './game-fixture.mjs';
+import { ok, fail } from "./lib/comun.mjs";
+import { arrancarJuego } from "./lib/dom.mjs";
 // El duelo por enlace: que dos móviles independientes reciban las mismas cartas, que la
 // carga útil dé la vuelta entera, que un enlace manipulado o de otra versión del mazo se
 // rechace sin romper nada, y que la partida se juegue con el motor del solitario.
-import { JSDOM } from "jsdom";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 // Antes de repartir se juega el minijuego de quién empieza: todos dicen la misma cifra.
 function jugarQuienEmpieza(w) { const d = w.document; const tap = el => el?.dispatchEvent(new w.MouseEvent('click', { bubbles: true })); for (let i = 0; i < 12 && d.getElementById('starter-guess-input'); i++) { d.getElementById('starter-guess-input').value = '1900'; tap(d.querySelector('[data-action="starter-guess-submit"]')); } tap(d.querySelector('[data-action="starter-start"]')); return w; }
 
@@ -18,25 +15,19 @@ function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]'
 function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 
-const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
-const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
-let fail = 0;
-const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
 // `url` permite arrancar un «móvil» directamente sobre un enlace de duelo, que es como
 // llega de verdad: alguien abre la dirección que le han mandado.
 function boot({ url = "https://hilo.test/", almacen = {} } = {}) {
-  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url });
-  const { window } = dom;
-  window.Element.prototype.scrollIntoView = function () {};
   const reloj = { ahora: Date.now() };
-  window.Date.now = () => reloj.ahora;
   let oculto = false;
-  Object.defineProperty(window.document, "hidden", { configurable: true, get: () => oculto });
-  Object.defineProperty(window.document, "visibilityState", { configurable: true, get: () => (oculto ? "hidden" : "visible") });
-  Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));
-  guiones().forEach(archivo => window.eval(read(archivo)));
+  const window = arrancarJuego({ url, almacen, antes:
+    w => {
+      w.Element.prototype.scrollIntoView = function () {};
+      w.Date.now = () => reloj.ahora;
+      Object.defineProperty(w.document, "hidden", { configurable: true, get: () => oculto });
+      Object.defineProperty(w.document, "visibilityState", { configurable: true, get: () => (oculto ? "hidden" : "visible") });
+    } });
   // Salirse de la aplicación y volver `ms` milisegundos después.
   window.seVaYVuelve = ms => {
     oculto = true;

@@ -190,6 +190,22 @@ Además, `npm test` ejecuta `scripts/check-assets.mjs` (dimensiones, decodificac
 de peso de las imágenes) y `scripts/audit-content.mjs` (inventario de fuentes; ver
 `docs/CONTENIDO_Y_DERECHOS.md`).
 
+## Módulos comunes: `tests/lib/`
+
+Lo que se repetía en muchas suites vive en tres módulos (no son suites ni auxiliares de la lista de
+arriba, así que no llevan fila):
+
+- `lib/comun.mjs`: `REPO`, `read(archivo)` y el contador `ok` / `fail` (`fail` se lee al final con
+  `process.exit(fail ? 1 : 0)`).
+- `lib/dom.mjs`: `arrancarJuego({ url, bienvenida, almacen, sesion, antes, transformar })` abre `index.html` en jsdom
+  (sin la bienvenida, salvo `bienvenida: true`) y ejecuta sus scripts en orden; `guiones()` da esa lista.
+- `lib/navegador.mjs`: Playwright (`PLAYWRIGHT_MODULE`, `CHROME_PATH`, `ENGINES`) y `servirJuego()`, el servidor
+  estático de las suites con navegador.
+
+Las suites no migradas siguen con sus propios ayudantes; las que necesiten algo de esto, que lo importen de aquí.
+`game-fixture.mjs`, `final-helper.mjs`, `identidad-fixture.js` y `online-e2e-harness.mjs` se quedan en `tests/`
+(`game-fixture.mjs` inyecta la ruta `tests/identidad-fixture.js` en el HTML).
+
 ## Notas sobre algunas suites
 
 `reglas-firestore.mjs` cubre entrar, empezar, colocar carta, cerrar turno, saltar turno,

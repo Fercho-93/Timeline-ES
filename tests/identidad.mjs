@@ -1,28 +1,16 @@
-import { gameHtml } from "./game-fixture.mjs";
 // La identidad del invitado fija el avatar; el nombre se puede cambiar sin perderlo.
-import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { ok, fail, read, REPO } from "./lib/comun.mjs";
+import { arrancarJuego } from "./lib/dom.mjs";
 // Antes de repartir se juega el minijuego de quién empieza: todos dicen la misma cifra.
 function jugarQuienEmpieza(w) { const d = w.document; const tap = el => el?.dispatchEvent(new w.MouseEvent('click', { bubbles: true })); for (let i = 0; i < 12 && d.getElementById('starter-guess-input'); i++) { d.getElementById('starter-guess-input').value = '1900'; tap(d.querySelector('[data-action="starter-guess-submit"]')); } tap(d.querySelector('[data-action="starter-start"]')); return w; }
 
 
-const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
 // Sin la identidad de las pruebas: aquí se arranca como la primera vez.
-const html = gameHtml(read("index.html"), { bienvenida: true });
-const guiones = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
-let fail = 0;
-const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
 function boot(almacen = {}) {
-  const { window } = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
-  window.scrollTo = () => {};
-  window.Element.prototype.scrollIntoView = function () {};
-  Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));
-  guiones.forEach(archivo => window.eval(read(archivo)));
-  return window;
+  return arrancarJuego({ bienvenida: true, almacen, antes: w => { w.scrollTo = () => {}; w.Element.prototype.scrollIntoView = function () {}; } });
 }
 const click = (w, sel) => {
   const el = w.document.querySelector(sel);
