@@ -124,6 +124,17 @@ try {
     await swipe(80, 330, {steps: 6, pause: 10}); after = await settled(`${total} cartas, gesto rápido`);
     assert.equal(after.total, total);
   }
+  // Fuera de turno las cartas están desactivadas: se puede hojear igualmente y un repintado de la sala no
+  // devuelve el abanico a la primera carta.
+  await page.evaluate(() => { document.querySelectorAll('.hand-fan .hand-card').forEach(card => { card.disabled = true; }); });
+  await page.evaluate(() => { const app = document.getElementById('app'); window.CONTINUUM.UI.mount(app, app.dataset.screen); });
+  await page.waitForTimeout(300);
+  await rest(); const idle = await hand();
+  await page.locator('[data-fan-step="1"]').click();
+  await rest(); const browsed = await hand();
+  assert.notEqual(browsed.center, idle.center, 'fuera de turno la flecha hojea las cartas');
+  await page.evaluate(() => { const app = document.getElementById('app'); window.CONTINUUM.UI.mount(app, app.dataset.screen); });
+  await rest(); assert.equal((await hand()).center, browsed.center, 'un repintado conserva la carta que se mira');
   assert.deepEqual(errors, [], 'sin errores en la página');
   console.log('Mano en abanico: carrusel con fondo visible, arrastre, inercia, flechas y manos pequeñas: OK');
 } finally {

@@ -256,6 +256,9 @@
     });
   }
   let previousFan = null;
+  // Fuera de turno las cartas no se pueden elegir, pero sí hojear: la carta que se está mirando se recuerda
+  // aquí para que los repintados de la sala (cada instantánea) no devuelvan el abanico a la primera.
+  let lookingAt = null;
   const cardTextSelector = '.hand-card > strong, .timeline-card h3, .timeline-card .card-content p, .slot-confirm-card strong, .card-category';
   function fitCardText(container) {
     if (!container) return;
@@ -310,9 +313,16 @@
     hand.setAttribute('role', 'group');
     hand.setAttribute('aria-label', cards.length === 1 ? 'Última carta en mano.' : 'Cartas en mano. Desliza a los lados para elegir.');
     const chosen = cards.findIndex(card => card.classList.contains('selected'));
-    const center = Math.max(0, chosen);
     const enabled = cards.some(card => !card.disabled);
     const key = cards.map(card => card.dataset.id).join('|');
+    const looked = !enabled && lookingAt?.key === key ? cards.findIndex(card => card.dataset.id === lookingAt.id) : -1;
+    const center = Math.max(0, looked >= 0 ? looked : chosen);
+    // Un repintado sobre la misma mano (hojeando fuera de turno) vuelve a montar el abanico: se sueltan los
+    // oyentes y los botones de la montura anterior.
+    hand.fanAbort?.abort();
+    const abort = new AbortController();
+    hand.fanAbort = abort;
+    if (hand.nextElementSibling?.classList.contains('hand-fan-controls')) hand.nextElementSibling.remove();
     // Un carrusel: las cartas dan la vuelta, así que no hay un extremo. Cada una se coloca por su posición
     // respecto a la del centro, en «cartas»: entera en reposo y con decimales mientras el dedo arrastra o el giro
     // se asienta. `lo` es donde empieza la vuelta, siempre entre dos posiciones de reposo, para que ninguna carta
@@ -372,7 +382,7 @@
       const offset = distance(index, center);
       card.style.setProperty('--fan-offset', offset);
       card.style.setProperty('--fan-depth', Math.abs(offset));
-      card.tabIndex = index === center && enabled ? 0 : -1;
+      card.tabIndex = index === center ? 0 : -1;
       card.setAttribute('aria-label', `${card.querySelector('strong')?.textContent || 'Carta'}. ${index + 1} de ${cards.length}`);
       offsets.set(card.dataset.id, offset);
     });
@@ -413,15 +423,19 @@
     // Mueve el centro `steps` cartas (con signo): se elige la que quede en el centro. Si es la misma
     // carta (una vuelta entera) no hay nada que elegir. Devuelve si se eligió otra.
     const select = steps => {
-      if (!enabled || !hand.isConnected) return false;
+      if (!hand.isConnected) return false;
       const target = (((center + steps) % total) + total) % total;
       if (target === center) return false;
       if (previousFan) previousFan.steps = steps;
-      cards[target].click();
+      if (enabled) cards[target].click();
+      else {
+        lookingAt = {key, id: cards[target].dataset.id};
+        mountHandFan(hand);
+        hand.querySelector('.fan-center')?.focus?.({preventScroll: true});
+      }
       return true;
     };
     controls.querySelectorAll('button').forEach(button => {
-      button.disabled = !enabled;
       button.addEventListener('click', () => select(Number(button.dataset.fanStep)));
     });
     hand.addEventListener('keydown', event => {
@@ -429,7 +443,7 @@
       event.preventDefault();
       select(event.key === 'ArrowLeft' ? -1 : 1);
       document.querySelector('.hand-fan .fan-center')?.focus({preventScroll: true});
-    });
+    }, {signal: abort.signal});
     let gesture = null;
     // Mientras el dedo arrastra en horizontal, el abanico entero lo sigue 1 a 1: cada carta recorre su
     // arco y pasa a la posición de al lado, sin tope. `drag` son cartas, con el signo del dedo.
@@ -449,9 +463,9 @@
       cards.forEach(card => travel(card, offsets.get(card.dataset.id) + from, offsets.get(card.dataset.id) + target, duration));
     };
     // Las flechas están encima de las cartas de los lados: deslizar empezando en una también gira el abanico.
-    const onFan = (type, handler, options) => { hand.addEventListener(type, handler, options); controls.addEventListener(type, handler, options); };
+    const onFan = (type, handler, options) => { hand.addEventListener(type, handler, {...options, signal: abort.signal}); controls.addEventListener(type, handler, {...options, signal: abort.signal}); };
     onFan('pointerdown', event => {
-      if (!enabled || event.pointerType === 'mouse' || event.isPrimary === false) return;
+      if (event.pointerType === 'mouse' || event.isPrimary === false) return;
       gesture = {id: event.pointerId, x: event.clientX, y: event.clientY, horizontal: false, samples: [{t: event.timeStamp, x: event.clientX}]};
       hand.classList.add('fan-touch');
     });
