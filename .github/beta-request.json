@@ -1,9 +1,9 @@
 {
-  "version": "0.1.1",
-  "cache": 798,
+  "version": "0.1.2",
+  "cache": 799,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Limpieza y reorganización del código sin cambios visibles, y tres arreglos: «Salir sin guardar» del duelo de cifras ya no borra otra partida guardada, el desempate de Idiomas ya no pide «cifra secreta (undefined)» y las mesas públicas reparten las cartas que eligió quien las abre. Además, un reto diario de Retos rápidos empezado antes de medianoche ya cuenta para la racha"
+  "reason": "En las mesas públicas online, el minijuego de quién empieza deja ver el resultado 8 segundos y anuncia con una frase quién lleva el primer turno, antes de que arranque la partida"
 }
