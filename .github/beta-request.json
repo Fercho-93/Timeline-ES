@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 799,
+  "cache": 802,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "En las mesas públicas online, el minijuego de quién empieza deja ver el resultado 8 segundos y anuncia con una frase quién lleva el primer turno, antes de que arranque la partida"
+  "reason": "Menos calor y batería en iPhone (los adornos animados de la portada y la lámpara se detienen tras unas repeticiones y no aparecen jugando), la mano en abanico se puede hojear fuera de turno sin volver a la primera carta, y en las mesas públicas online el minijuego de quién empieza deja ver el resultado 8 segundos con una frase que anuncia quién lleva el primer turno"
 }
