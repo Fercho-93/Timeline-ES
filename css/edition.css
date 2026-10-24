@@ -4569,12 +4569,14 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
   }
   #app.atlas-board .slot-confirm.has-preview-card { position: relative; }
 
+  /* Para no tener la GPU trabajando sin parar (en iPhone se calentaba y gastaba batería), estos adornos
+     de la portada se repiten unas pocas veces y se quedan quietos. */
   /* Las láminas de las puertas respiran: un acercamiento lento que va y vuelve, cada una
      a su ritmo, y un reflejo de luz que las cruza de vez en cuando. */
   #app .home-door-art img,
   #app .mode-entry-art img,
   #app .mode-hub-head > img {
-    animation: lamina-viva 13s ease-in-out infinite alternate both;
+    animation: lamina-viva 13s ease-in-out 4 alternate both;
   }
   #app .mode-entry:nth-child(2n) .mode-entry-art img { animation-duration: 15s; animation-delay: -6s; }
   #app .mode-entry:nth-child(3n) .mode-entry-art img { animation-duration: 11s; animation-delay: -3s; animation-direction: alternate-reverse; }
@@ -4586,7 +4588,7 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
   #app :is(.home-door-art, .mode-entry-art)::after {
     content: ''; position: absolute; top: 0; bottom: 0; left: -180%; width: 250%; pointer-events: none;
     background: linear-gradient(105deg, transparent 38%, #fff3d455 45%, #fffaeccc 50%, #fff3d455 55%, transparent 62%);
-    animation: lamina-reflejo 9s ease-in-out infinite;
+    animation: lamina-reflejo 9s ease-in-out 3;
     mix-blend-mode: screen;
     will-change: transform;
   }
@@ -4604,7 +4606,7 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
     -webkit-mask: radial-gradient(ellipse 48% 62% at 50% 12%, #000 25%, transparent 78%);
     mask: radial-gradient(ellipse 48% 62% at 50% 12%, #000 25%, transparent 78%);
     transform-origin: 50% 12%;
-    animation: lampara-haz 11s ease-in-out infinite alternate, lampara 6s ease-in-out infinite;
+    animation: lampara-haz 11s ease-in-out 3 alternate, lampara 6s ease-in-out 6;
   }
   :root[data-theme="dark"]::after { opacity: .5; }
   /* Jugando no hay lámpara: aunque estuviera en pausa, la mezcla «screen» a pantalla completa obliga a
@@ -4620,7 +4622,7 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
   background: radial-gradient(circle, #fffdf3 0 30%, #e8b14f 58%, #c98a2a00 72%);
   box-shadow: 0 0 7px 2px #f0b9529e;
   opacity: 0;
-  animation: mota-sube var(--d) linear var(--delay) infinite;
+  animation: mota-sube var(--d) linear var(--delay) 4;
 }
 .motas i:nth-child(3n) { animation-name: mota-sube-b; }
 :root[data-theme="dark"] .motas { opacity: .55; }
