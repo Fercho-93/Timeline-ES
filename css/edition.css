@@ -4607,7 +4607,9 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
     animation: lampara-haz 11s ease-in-out infinite alternate, lampara 6s ease-in-out infinite;
   }
   :root[data-theme="dark"]::after { opacity: .5; }
-  html:has(#app.atlas-board)::after { animation-play-state: paused; opacity: .45; }
+  /* Jugando no hay lámpara: aunque estuviera en pausa, la mezcla «screen» a pantalla completa obliga a
+     recomponer toda la página y gasta batería. */
+  html:has(#app.atlas-playing)::after { display: none; }
 }
 
 /* Las motas de polvo en la luz son elementos sueltos (effects.js · motas), cada una con
@@ -4622,7 +4624,7 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 }
 .motas i:nth-child(3n) { animation-name: mota-sube-b; }
 :root[data-theme="dark"] .motas { opacity: .55; }
-html:has(#app.atlas-board) .motas { display: none; }
+html:has(#app.atlas-playing) .motas { display: none; }
 @media (prefers-reduced-motion: reduce) { .motas { display: none; } }
 
 @keyframes vista-cae {
