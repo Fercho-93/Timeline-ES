@@ -70,6 +70,8 @@ const TURN_SECONDS = 20; // Salas sin `turnSeconds`: el mismo valor por omisión
 const turnSeconds = () => roomState?.turnSeconds ?? TURN_SECONDS;
 let presenceRoom = "", presenceTimer = null, presenceBusy = false, relayTimer = null, relayKick = null, queueTimer = null;
 // Temporizadores y marcas de la sala de espera pública (ver `renderPublicLobby`).
+// Tiempo que se deja ver quién empieza antes de arrancar la mesa pública.
+const STARTER_RESULT_MS = 8000;
 let publicStarterTimer = null, publicClock = null, publicDrawFor = "", publicStartFor = "";
 const presenceListeners = new Map(), presenceRecords = new Map();
 let connectionMessage = "Conectando con la sala…";
@@ -888,7 +890,7 @@ function publicStarterMarkup() {
   const head = `<div class="section-label">¿Quién empieza?</div><p class="hint">Escribe la cifra de esta carta. Empieza quien más se acerque y el resto juega por orden de cercanía.</p>`;
   if (starterEveryoneAnswered()) {
     const ranking = starterRanking();
-    return `${head}${cardMarkup(`El valor real era ${escapeHtml(CT.formatValue(modeKey(), card))}`)}<ol class="starter-draw-list">${ranking.map((uid, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ''}><span>${i + 1}.º ${escapeHtml(roomState.players[uid].name)}${uid === user.uid ? " · tú" : ""}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), starterRecords.get(uid)?.value))}</span></li>`).join("")}</ol>`;
+    return `${head}${cardMarkup(`El valor real era ${escapeHtml(CT.formatValue(modeKey(), card))}`)}<ol class="starter-draw-list">${ranking.map((uid, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ''}><span>${i + 1}.º ${escapeHtml(roomState.players[uid].name)}${uid === user.uid ? " · tú" : ""}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), starterRecords.get(uid)?.value))}</span></li>`).join("")}</ol><p class="public-answered"><b>${escapeHtml(roomState.players[ranking[0]].name)}${ranking[0] === user.uid ? " (tú)" : ""}</b> acertó más cerca y empieza. La partida arranca en unos segundos.</p>`;
   }
   if (answeredStarter(user.uid)) {
     return `${head}${cardMarkup(escapeHtml(regla.pregunta || ""))}<p class="public-answered">Tu respuesta: <b>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), starterRecords.get(user.uid).value))}</b>. Las cifras se enseñan cuando empieza la partida.</p>`;
@@ -942,7 +944,7 @@ function managePublicStarter() {
     publicStarterTimer = setTimeout(() => {
       if (roomState?.status !== "lobby" || roomState.hostUid !== user.uid) return;
       void startRoom().finally(() => { if (roomState?.status === "lobby") setTimeout(() => { publicStartFor = ""; }, 2000); });
-    }, left === 0 ? 0 : 2500);
+    }, STARTER_RESULT_MS);
   };
   tick();
   publicClock = setInterval(tick, 500);
