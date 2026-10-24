@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 792,
+  "cache": 798,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Pulido de la portada: texto mínimo legible en la galería y el ranking, sin flechas ni destello decorativos, eslogan «Ordena. Compara. Acierta.» y CTA «Ver las tres formas de jugar»"
+  "reason": "Limpieza y reorganización del código sin cambios visibles, y tres arreglos: «Salir sin guardar» del duelo de cifras ya no borra otra partida guardada, el desempate de Idiomas ya no pide «cifra secreta (undefined)» y las mesas públicas reparten las cartas que eligió quien las abre. Además, un reto diario de Retos rápidos empezado antes de medianoche ya cuenta para la racha"
 }
