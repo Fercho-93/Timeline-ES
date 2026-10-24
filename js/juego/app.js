@@ -3245,7 +3245,7 @@
 
   function arrancaReloj() {
     paraReloj();
-    cifrasReloj = setInterval(tictac, 100);
+    cifrasReloj = setInterval(tictac, 250);
     tictac();
   }
 

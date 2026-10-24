@@ -81,6 +81,7 @@ let connectionMessage = "Conectando con la sala…";
 let starterRoom = "";
 const starterListeners = new Map(), starterRecords = new Map();
 let starterBusy = false;
+let lastGameSignature = "";
 
 // ==== Presencia y conexión =======================================================================
 function stopPresence() {
@@ -111,7 +112,7 @@ function ensurePresence() {
     stopPresence(); presenceRoom = roomCode;
     void heartbeat();
     presenceTimer = setInterval(() => { if (document.visibilityState === "visible") void heartbeat(); }, 45000);
-    relayTimer = setInterval(maybeAutoRelay, 5000);
+    relayTimer = setInterval(() => { if (document.visibilityState === "visible") maybeAutoRelay(); }, 5000);
     queueTimer = setInterval(keepPublicQueueAlive, 45000);
     void keepPublicQueueAlive();
   }
@@ -649,7 +650,12 @@ function connectToRoom(code) {
         renderCompetitionIntro();
         return;
       }
-      renderGame();
+      // Una instantánea idéntica a la ya pintada (solo cambian los metadatos de Firestore: caché → servidor,
+      // escritura confirmada) no cambia nada que se vea: repintar toda la mesa gasta batería sin motivo.
+      const firma = `${roomCode}|${JSON.stringify(roomState)}`;
+      const igual = firma === lastGameSignature && appEl.dataset.screen === "online-game" && !turnChanged;
+      lastGameSignature = firma;
+      if (!igual) renderGame();
       if (turnChanged) showTurnChangeSplash(observedTurnUid, previousState);
     }
   }, error => {
@@ -947,7 +953,7 @@ function managePublicStarter() {
     }, STARTER_RESULT_MS);
   };
   tick();
-  publicClock = setInterval(tick, 500);
+  publicClock = setInterval(tick, 1000);
 }
 
 // ==== Competición ================================================================================
@@ -1072,7 +1078,7 @@ function manageTurnTimer() {
     if (remaining !== null && remaining <= 3 && remaining !== lastClockSecond && roomState.playerOrder[roomState.current] === user.uid) { lastClockSecond = remaining; CT.Effects.clock?.(remaining); }
     if (remaining === 0 && roomState.hostUid === user.uid && navigator.onLine) { clearTurnTimer(); skipTurn(roomState.version); }
   };
-  tick(); turnTimerHandle = setInterval(tick, 250);
+  tick(); turnTimerHandle = setInterval(tick, 500);
 }
 
 function renderGame() {
