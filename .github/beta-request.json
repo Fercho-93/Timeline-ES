@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 805,
+  "cache": 806,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Mesas públicas: el minijuego de quién empieza deja responder con tiempo (la carta queda al menos 20 s a la vista), enseña el resultado 8 segundos antes de arrancar y el arranque ya no se pierde con los repintados; también en las mesas públicas de Retos rápidos. Incluye lo anterior: menos calor y batería en iPhone y la mano en abanico que se puede hojear fuera de turno"
+  "reason": "Mesas públicas: el minijuego de quién empieza deja responder con tiempo (la carta queda al menos 20 s a la vista), enseña el resultado 8 segundos antes de arrancar y el arranque ya no se pierde con los repintados; también en las mesas públicas de Retos rápidos. Incluye lo anterior: menos calor y batería en iPhone y la mano en abanico que se puede hojear fuera de turno. Además, en las salas de Retos rápidos las cartas se pueden hojear fuera de turno"
 }
