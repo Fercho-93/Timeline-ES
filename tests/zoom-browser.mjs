@@ -26,6 +26,47 @@ try {
     return page;
   };
   try {
+   // Una lámina vertical debe llenar la franja horizontal, sin bandas laterales ni
+   // deformación. Probamos los contenedores compartidos: los finales también tenían
+   // márgenes y un max-height propios que dejaban huecos aunque se cambiara object-fit.
+   const openingPage=await newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
+   await openingPage.goto(url);
+   await openingPage.evaluate(()=>window.CONTINUUM_SPLASH?.finish());
+   for(const [width,height] of [[320,667],[390,844],[820,1180]]) {
+    await openingPage.setViewportSize({width,height});
+    for(const theme of ['light','dark']) {
+     for(const mode of ['history','animals']) {
+      for(const context of ['local','quick','room','public','duel','turn','final','revealed']) {
+       await openingPage.evaluate(({theme,mode,context})=>{
+        document.documentElement.dataset.theme=theme;
+        const CT=window.CONTINUUM,app=document.getElementById('app');
+        const card=mode==='history'?CT.cards(mode).find(card=>card.id===100):CT.cards(mode)[0];
+        const plate=CT.StarterPresentation.plate(mode,card,context==='revealed');
+        app.className='';app.dataset.screen='opening-preview';
+        if(context==='local'||context==='quick') app.innerHTML=`<div class="overlay" data-starter-dialog ${context==='quick'?'data-quick-starter':''}><div class="modal">${CT.StarterPresentation.heading('Fer',0,2)}${plate}</div></div>`;
+        else if(context==='final') app.innerHTML=`<div class="shell">${CT.Final.question(mode,{cardId:card.id,round:1})}</div>`;
+        else {
+         const parent=context==='room'?'panel lobby-settings':context==='public'?'panel public-starter':context==='turn'?'turn-duel-shell':'shell';
+         const panel=context==='duel'?'cifra-panel starter-presentation cifra-presentation':context==='turn'?'turn-duel-answer starter-presentation cifra-presentation':'starter-presentation starter-inline';
+         app.innerHTML=`<div class="${parent}"><section class="${panel}">${plate}</section></div>`;
+        }
+       },{theme,mode,context});
+       const art=openingPage.locator('.starter-card-art img');
+       await art.evaluate(img=>img.decode());
+       const fit=await art.evaluate(img=>{
+        const box=img.getBoundingClientRect(),frame=img.parentElement,outer=frame.getBoundingClientRect(),style=getComputedStyle(img),edge=getComputedStyle(frame);
+        const left=outer.left+parseFloat(edge.borderLeftWidth),top=outer.top+parseFloat(edge.borderTopWidth);
+        const right=outer.right-parseFloat(edge.borderRightWidth),bottom=outer.bottom-parseFloat(edge.borderBottomWidth);
+        return {loaded:img.naturalWidth>0,fit:style.objectFit,filled:Math.abs(box.left-left)<1&&Math.abs(box.right-right)<1&&Math.abs(box.top-top)<1&&Math.abs(box.bottom-bottom)<1};
+       });
+       assert.ok(fit.loaded&&fit.filled&&fit.fit==='cover',`${width}px ${theme} ${mode} ${context}: el grabado llena el recuadro sin bandas ni deformación (${JSON.stringify(fit)})`);
+       assert.ok(await openingPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${context}: sin desbordamiento horizontal`);
+       if(width===390&&theme==='light'&&mode==='history'&&['local','final','revealed'].includes(context)) await openingPage.screenshot({path:`test-results/zoom/${engine}-lamina-${context}.png`,fullPage:true});
+      }
+     }
+    }
+   }
+   await openingPage.close();
    // La lámina completa termina antes de la placa; el toque amplía imagen y datos.
    const illustratedPage=await newPage({viewport:{width:390,height:844},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
    await illustratedPage.goto(url);

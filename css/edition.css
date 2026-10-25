@@ -5662,12 +5662,15 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
   background: transparent; box-shadow: none; color: var(--opening-ink);
 }
 #app :is([data-starter-dialog], .starter-presentation) .starter-card-art {
-  position: relative; isolation: isolate; margin: 0; padding: 10px; overflow: hidden;
+  position: relative; isolation: isolate; margin: 0; padding: 0; overflow: hidden;
   height: clamp(190px, calc(26 * var(--dvh)), 265px); border: 0; border-block: 1px solid var(--opening-edge); border-radius: 0;
   background: var(--opening-wash);
 }
 #app :is([data-starter-dialog], .starter-presentation) .starter-card-art .animal-card-art {
-  display: block; width: 100%; height: 100%; object-fit: contain; object-position: center;
+  /* El grabado llena la lámina, también en los finales que antes heredaban márgenes. */
+  position: absolute; inset: 0; display: block; width: 100%; height: 100%;
+  max-width: none; max-height: none; margin: 0; border-radius: 0;
+  object-fit: cover; object-position: center 35%;
   filter: sepia(.25) saturate(.75) contrast(1.04);
 }
 #app :is([data-starter-dialog], .starter-presentation) .starter-card-art::after {
@@ -5724,7 +5727,7 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
 #app :is([data-starter-dialog], .starter-presentation) .starter-winner-banner > span:last-child { font: italic .9rem/1.4 var(--font-display); text-transform: none; letter-spacing: 0; color: var(--opening-muted); }
 #app :is([data-starter-dialog], .starter-presentation) .starter-card-revealed { display: grid; grid-template-columns: 100px minmax(0, 1fr); align-items: stretch; gap: 0; margin: 0 0 22px; padding: 6px; border: 1px solid var(--opening-edge); background: var(--opening-wash); }
 #app :is([data-starter-dialog], .starter-presentation) .starter-card-revealed .starter-card-art { height: 100%; min-height: 132px; border: 0; }
-#app .starter-card-revealed .starter-card-copy { align-self: center; padding: 10px 12px; text-align: left; }
+#app :is([data-starter-dialog], .starter-presentation) .starter-card-revealed .starter-card-copy { align-self: center; padding: 10px 12px; text-align: left; }
 #app :is([data-starter-dialog], .starter-presentation) .starter-card-revealed :is(strong, .starter-card-title) { font-size: 1rem; }
 #app .starter-card-revealed .starter-plate-mark { display: none; }
 #app :is([data-starter-dialog], .starter-presentation) .starter-real-value { display: block; color: var(--opening-accent); font: 500 1.65rem/1.1 var(--font-display); }
