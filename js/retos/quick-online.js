@@ -126,7 +126,8 @@ async function watchPublic({uid,code,seconds,length,keep,queueRef:qref=null,onCh
   // PUBLIC_WAIT_MS sin que entre nadie (la hora es la de la última entrada, del
   // servidor). La arranca quien la lleva; si las reglas aún no lo permiten, se reintenta.
   const secondsLeft=()=>{const last=latest?.updatedAt?.toMillis?.();return Number.isFinite(last)?Math.max(0,Math.ceil((last+PUBLIC_WAIT_MS-Date.now())/1000)):PUBLIC_WAIT_MS/1000;};
-  let drawingStarter=false;
+  let drawingStarter=false,starterShownCard=null,starterShownAt=0;
+  const STARTER_RESULT_MS=8000,STARTER_ANSWER_MS=20000;
   const tryStart=()=>{
     if(!latest||latest.config||latest.phase!=='lobby'||latest.host!==uid||latest.members.length<2||started)return;
     // Con dos personas se sortea la carta de «quién empieza», como en las colecciones.
@@ -135,12 +136,19 @@ async function watchPublic({uid,code,seconds,length,keep,queueRef:qref=null,onCh
       return;
     }
     // Empieza al completarse la mesa con todas las respuestas o, con al menos dos personas, al agotarse la espera.
-    const ready=latest.members.length>=latest.capacity&&R.starterComplete(latest);
-    if(!ready&&secondsLeft()>0)return;
+    // Con todas las respuestas, o agotada la espera tras dejar la carta un mínimo a la vista, se espera un momento
+    // para ver quién empieza antes de arrancar.
+    const complete=R.starterComplete(latest);
+    if(starterShownCard!==latest.starter.cardId){starterShownCard=latest.starter.cardId;starterShownAt=Date.now();}
+    const ready=(latest.members.length>=latest.capacity&&complete)||(secondsLeft()===0&&(complete||Date.now()-starterShownAt>=STARTER_ANSWER_MS));
+    if(!ready||started)return;
     started=true;
-    const catalog=CT.shuffle(CT.QuickCatalog.challenges).slice(0,tableLength);
-    const first=R.starterOrder(latest)?.[0];
-    api.act({type:'start',rounds:catalog.map(x=>({id:x.id,order:CT.shuffle(x.cards.map(c=>c.id)).slice(0,CT.QuickEngine.MULTI_CARDS)})),kind:'public',historyId:'public-'+code,keep:tableKeep,...(tableSeconds?{seconds:tableSeconds}:{}),...(Number.isInteger(first)?{first}:{})}).catch(e=>{setTimeout(()=>{started=false;},2000);});
+    setTimeout(()=>{
+      if(!latest||latest.phase!=='lobby'){started=false;return;}
+      const catalog=CT.shuffle(CT.QuickCatalog.challenges).slice(0,tableLength);
+      const first=R.starterOrder(latest)?.[0];
+      api.act({type:'start',rounds:catalog.map(x=>({id:x.id,order:CT.shuffle(x.cards.map(c=>c.id)).slice(0,CT.QuickEngine.MULTI_CARDS)})),kind:'public',historyId:'public-'+code,keep:tableKeep,...(tableSeconds?{seconds:tableSeconds}:{}),...(Number.isInteger(first)?{first}:{})}).catch(e=>{setTimeout(()=>{started=false;},2000);});
+    },STARTER_RESULT_MS);
   };
   const stop=onSnapshot(ref,snap=>{try{if(!snap.exists())throw Error('La mesa ya no existe.');latest=R.validate(snap.data());onChange(latest,uid,code);syncTable();tryStart();
   }catch(e){onError(e);}},onError);
