@@ -315,6 +315,7 @@
     const chosen = cards.findIndex(card => card.classList.contains('selected'));
     const enabled = cards.some(card => !card.disabled);
     const key = cards.map(card => card.dataset.id).join('|');
+    if (enabled) lookingAt = null;
     const looked = !enabled && lookingAt?.key === key ? cards.findIndex(card => card.dataset.id === lookingAt.id) : -1;
     const center = Math.max(0, looked >= 0 ? looked : chosen);
     // Un repintado sobre la misma mano (hojeando fuera de turno) vuelve a montar el abanico: se sueltan los
