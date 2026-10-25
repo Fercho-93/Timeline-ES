@@ -935,11 +935,11 @@
   function starterFieldMarkup() {
     const names = playerNames();
     if (!starterDraw || starterDraw.winner === null || starterDraw.names.length !== names.length) {
-      return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-block starter-draw-cta" data-action="draw-starter"><span class="starter-draw-icon" aria-hidden="true">${CT.StarterPresentation.cardsIcon()}</span><span class="starter-draw-copy"><span class="starter-draw-kicker">El primer turno se gana</span><b>Adivinar ${CT.starterNoun(selectedModeKey)}</b><small>Cada uno prueba con una carta y gana quien más se acerque</small></span><span class="starter-draw-arrow" aria-hidden="true">→</span></button>`;
+      return `<span class="field-label">Quién empieza</span>${CT.StarterPresentation.drawButton('data-action="draw-starter"', CT.starterNoun(selectedModeKey))}`;
     }
     const ganador = escapeHtml(names[starterDraw.winner] ?? `Jugador ${starterDraw.winner + 1}`);
     const orden = (starterDraw.order || [starterDraw.winner]).map(i => escapeHtml(names[i] ?? `Jugador ${i + 1}`)).join(" → ");
-    return `<span class="field-label">Quién empieza</span><p class="starter-result"><span class="starter-result-crown" aria-hidden="true">${crownIcon()}</span><strong>${ganador}</strong> ha acertado más cerca y empieza.</p><p class="hint">Orden de juego: ${orden}</p><button type="button" class="btn btn-ghost" data-action="draw-starter"><span aria-hidden="true">↻</span> Repetir el minijuego</button>`;
+    return `<span class="field-label">Quién empieza</span><p class="starter-result"><span class="starter-result-crown" aria-hidden="true">${crownIcon()}</span><strong>${ganador}</strong> ha acertado más cerca y empieza.</p><p class="hint">Orden de juego: ${orden}</p>${CT.StarterPresentation.repeatButton('data-action="draw-starter"')}`;
   }
   const crownIcon = () => '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l4 3 5-6 5 6 4-3-2 10H5L3 8Z"/><path d="M5 21h14"/></svg>';
 
@@ -3394,10 +3394,10 @@
       <h1 class="solo-lectores" data-focus tabindex="-1">Carta ${indice + 1} de ${cifras.total}. ${escapeHtml(regla.pregunta)} ${escapeHtml(card.title)}.${cifrasConReloj() ? ` Tienes ${Math.round(plazoCifras() / 1000)} segundos.` : ""}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">Duelo de cifras</div><div class="turn-name" aria-hidden="true">${aciertos} ${aciertos === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${cifras.total - indice}</strong><span>por responder</span></div></div>
       ${marcaRival ? `<div class="solo-stats cifra-rival">${marcaRival}</div>` : ""}
-      <section class="cifra-panel">
+      <section class="cifra-panel starter-presentation cifra-presentation">
         ${cifrasConReloj() ? relojMarkup(restante, plazoCifras()) : ""}
-        <div class="cifra-card" id="cifra-pregunta">${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta)}</span></div>
-        ${CT.Duelo.Cifras.campo(cifras.mode, "cifra-input", { attrs: `aria-describedby="cifra-pregunta cifra-unidades" placeholder="${escapeHtml(regla.unidad || "")}" ${cerrada ? "disabled" : "data-autofocus"}`, hintId: "cifra-unidades" })}
+        ${CT.StarterPresentation.plate(cifras.mode, card, false, { kicker: "Duelo de cifras", id: "cifra-pregunta" })}
+        ${CT.StarterPresentation.answer(cifras.mode, "cifra-input", { attrs: cerrada ? "disabled" : "data-autofocus", hintId: "cifra-unidades", describedBy: "cifra-pregunta cifra-unidades" })}
         <button class="btn btn-primary btn-block" data-action="cifra-answer" ${cerrada ? "disabled" : ""}>Responder <span>→</span></button>
         ${cifrasConReloj() ? '<p class="hint cifra-aviso">El reloj no se para. Si sales de la aplicación, la carta se cierra.</p>' : '<p class="hint cifra-aviso">Sin tiempo: la rapidez solo desempata.</p>'}
       </section>

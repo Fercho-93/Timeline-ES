@@ -413,13 +413,13 @@
     const host=myId===room.host, count=room.members.length, s=room.starter, head='<div class="section-label">Quién empieza</div>';
     if(count<2)return `${head}<p class="hint">Cuando haya dos personas se sortea una carta y empieza quien más se acerque a su cifra.</p>`;
     if(!s)return host&&!auto
-      ? `${head}<button type="button" class="btn btn-secondary btn-block" data-quick="room-starter-draw">🂠 Jugar el minijuego de quién empieza</button>`
+      ? `${head}${CT.StarterPresentation.drawButton('data-quick="room-starter-draw"')}`
       : `${head}<p class="hint">${auto?'Sorteando la carta…':'El anfitrión sorteará una carta para decidir quién empieza.'}</p>`;
     const card=CT.cards(s.modeKey).find(c=>c.id===s.cardId);
     if(!card)return `${head}<p class="hint">Preparando la carta…</p>`;
     const regla=CT.axis(s.modeKey).cifra||{}, mine=Number.isFinite(s.guesses[myId]), done=CT.QuickRoom.starterComplete(room);
     const cardBox=(revealed=false)=>CT.StarterPresentation.plate(s.modeKey,card,revealed);
-    const redo=host&&!auto?`<button type="button" class="btn btn-ghost btn-block" data-quick="room-starter-draw">🂠 Repetir el minijuego</button>`:'';
+    const redo=host&&!auto?`${CT.StarterPresentation.repeatButton('data-quick="room-starter-draw"')}`:'';
     if(!mine)return `${head}${cardBox()}${CT.StarterPresentation.answer(s.modeKey,'quick-room-starter-input')}<button type="button" class="btn btn-primary btn-block" data-quick="room-starter-guess">Adivinar <span>→</span></button>${redo}`;
     if(!done){
       const faltan=room.members.filter(who=>!Number.isFinite(s.guesses[who])).map(who=>esc(room.names[room.members.indexOf(who)]));
@@ -427,8 +427,8 @@
     }
     const order=CT.QuickRoom.starterOrder(room);
     CT.Effects?.starterResult?.(`quick:${connection?.code||''}:${s.cardId}:${Object.keys(s.guesses).join(',')}`);
-    const list=order.map((i,n)=>`<li${n===0?' class="starter-draw-winner"':''}><span>${n+1}.º ${esc(room.names[i])}</span><span>${esc(CT.Duelo.Cifras.formato(s.modeKey,s.guesses[room.members[i]]))}</span></li>`).join('');
-    return `${head}${cardBox(true)}<div class="starter-winner-banner"><b>${esc(room.names[order[0]])}</b><span>Empieza la partida</span></div><ol class="starter-draw-list">${list}</ol>${redo}`;
+    const list=CT.StarterPresentation.order(order.map(i=>({name:room.names[i],value:CT.Duelo.Cifras.formato(s.modeKey,s.guesses[room.members[i]])})));
+    return `${head}${cardBox(true)}${CT.StarterPresentation.winner(room.names[order[0]])}${list}${redo}`;
   }
   async function roomStarterAction(action) {
     if(action==='room-starter-draw'){await networkAction({type:'starter-draw',...CT.QuickRoom.starterPick()});return true;}
@@ -769,9 +769,9 @@
   function starterFieldMarkup(names) {
     if (starter && starter.key === names.join('|')) {
       const order = starter.order.map(i => esc(names[i])).join(' → ');
-      return `<span class="field-label">Quién empieza</span><p class="starter-result"><strong>${esc(names[starter.order[0]])}</strong> ha acertado más cerca y empieza.</p><p class="hint">Orden de juego: ${order}</p><button type="button" class="btn btn-ghost" data-quick="draw-starter">Repetir el minijuego</button>`;
+      return `<span class="field-label">Quién empieza</span><p class="starter-result"><strong>${esc(names[starter.order[0]])}</strong> ha acertado más cerca y empieza.</p><p class="hint">Orden de juego: ${order}</p>${CT.StarterPresentation.repeatButton('data-quick="draw-starter"')}`;
     }
-    return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-block starter-draw-cta" data-quick="draw-starter"><span class="starter-draw-icon" aria-hidden="true">${CT.StarterPresentation.cardsIcon()}</span><span class="starter-draw-copy"><b>Adivinar la cifra</b><small>Cada uno prueba con una carta y gana quien más se acerque</small></span><span class="starter-draw-arrow" aria-hidden="true">→</span></button>`;
+    return `<span class="field-label">Quién empieza</span>${CT.StarterPresentation.drawButton('data-quick="draw-starter"')}`;
   }
   const quickNames = () => [...app().querySelectorAll('[data-quick-name]')].map(el => el.value.trim());
   function refreshStarterField() {const box = app().querySelector('.quick-starter-field'); if (box) box.innerHTML = starterFieldMarkup(quickNames());}
@@ -810,7 +810,7 @@
     shell(`<section class="setup-section quick-local-setup"><h2 data-focus tabindex="-1">Retos rápidos</h2><p class="lead">${solo ? "Juega a tu ritmo: cada carta bien colocada suma un acierto y un fallo no te echa del reto." : "De 2 a 8 jugadores o equipos en un solo móvil."}</p><div class="panel">
       <div class="setup-block"><div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Jugadores</span></div>
       <div id="quick-names">${nameFields(solo ? 1 : 2, solo ? ["Tú"] : [CT.Identidad?.propio?.() || "Jugador 1"])}</div>
-      ${solo ? '' : button('add-player', '＋ Añadir participante', 'btn btn-ghost')}</div>
+      ${solo ? '' : button('add-player', '<span aria-hidden="true">+</span> Añadir participante', 'btn btn-ghost')}</div>
       <div class="setup-block"><div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Cómo empezar</span></div>
       <div class="setup-grid">${solo ? '' : `<div class="field starter-field quick-starter-field">${starterFieldMarkup(['Jugador 1','Jugador 2'])}</div>`}</div>
       ${lengthChips('quick-length',[...LONG_LENGTHS.filter(([n])=>n<CT.QuickCatalog.challenges.length),[CT.QuickCatalog.challenges.length,'Todo el catálogo']],'Duración de la partida')}

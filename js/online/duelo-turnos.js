@@ -117,7 +117,9 @@ function orderBoard(game, card) {
   const hand = card ? `<section class="turn-duel-hand"><div class="hand-title"><h3>Tu carta</h3><small>${safe(CT.hiddenLabel(modeAt(game)))}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}">${CT.categoryBadge(modeAt(game), card)}<span class="hidden-date">${safe(CT.hiddenLabel(modeAt(game)))}</span>${CT.cardBack(modeAt(game))}<strong>${safe(card.title)}</strong></div></div><p class="hint">${pendingIndex === null ? 'Toca el hueco donde quieres colocar la carta.' : 'Confirma el hueco elegido o toca otro.'}</p></section>` : '';
   return `${hand}<section class="turn-duel-board"><div class="hand-title"><h3>${safe(CT.timelineTitle(modeAt(game)))}</h3></div>${CT.timelineEnds(modeAt(game))}${CT.timelineMap?.(modeAt(game), line) || ''}<div class="timeline-wrap" tabindex="0" role="region" aria-label="Mesa de cartas, desplaza para ver más"><div class="timeline">${slots.join('')}</div></div><p class="hint">Desliza la línea para ver todas las cartas.</p></section>`;
 }
-function cifraBoard(game, card) { return `<section class="turn-duel-answer"><div class="cifra-card">${CT.categoryBadge(modeAt(game), card)}<strong>${safe(card.title)}</strong><span>${safe(CT.Duelo.Cifras.regla(modeAt(game))?.pregunta || 'Escribe la cifra')}</span></div>${CT.Duelo.Cifras.campo(modeAt(game), 'turn-cifra-input')}<button class="btn btn-primary btn-block" data-turn-action="submit-cifra">Enviar cifra</button></section>`; }
+function cifraBoard(game, card) {
+  return `<section class="turn-duel-answer starter-presentation cifra-presentation">${CT.StarterPresentation.plate(modeAt(game), card, false, {kicker: 'Duelo por turnos'})}${CT.StarterPresentation.answer(modeAt(game), 'turn-cifra-input')}<button class="btn btn-primary btn-block" data-turn-action="submit-cifra">Enviar cifra</button></section>`;
+}
 async function share() {
   if (!current) return;
   const link = shareLink || CT.Links.invitation({turnDuel:current.id});

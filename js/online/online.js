@@ -761,7 +761,7 @@ function starterPanelMarkupContent(isHost) {
   const cardId = starterCardId();
   if (cardId == null) {
     return isHost
-      ? `<button type="button" class="btn btn-secondary btn-block" data-online-action="starter-draw">🂠 Jugar el minijuego de quién empieza</button>`
+      ? `${CT.StarterPresentation.drawButton('data-online-action="starter-draw"', CT.starterNoun(modeKey()))}`
       : `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>Va a repartir una carta para decidir quién empieza.</p>`;
   }
   const card = getCard(cardId);
@@ -769,7 +769,7 @@ function starterPanelMarkupContent(isHost) {
   const mine = starterRecords.get(user.uid);
   const answered = mine && mine.cardId === cardId && mine.value !== null;
   const everyone = starterEveryoneAnswered();
-  const repetir = isHost ? `<button type="button" class="btn btn-ghost btn-block" data-online-action="starter-draw">🂠 Repetir el minijuego</button>` : "";
+  const repetir = isHost ? `${CT.StarterPresentation.repeatButton('data-online-action="starter-draw"')}` : "";
   const cardMarkup = (revealed = false) => CT.StarterPresentation.plate(modeKey(), card, revealed);
   if (!everyone) {
     if (answered) {
@@ -785,8 +785,8 @@ function starterPanelMarkupContent(isHost) {
   const ranking = starterRanking();
   const winner = ranking[0];
   const valueOf = uid => starterRecords.get(uid)?.value;
-  const lista = ranking.map((uid, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ''}><span>${i + 1}.º ${escapeHtml(roomState.players[uid].name)}${uid === user.uid ? " · tú" : ""}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), valueOf(uid)))}</span></li>`).join("");
-  const resultado = `${cardMarkup(true)}<p class="hint">Orden de juego, de quien más se acercó a quien menos:</p><ol class="starter-draw-list">${lista}</ol><p>${escapeHtml(roomState.players[winner].name)} ha acertado más cerca y empieza.</p>`;
+  const lista = CT.StarterPresentation.order(ranking.map(uid => ({name: roomState.players[uid].name + (uid === user.uid ? " · tú" : ""), value: CT.Duelo.Cifras.formato(modeKey(), valueOf(uid))})));
+  const resultado = `${cardMarkup(true)}${lista}<p>${escapeHtml(roomState.players[winner].name)} ha acertado más cerca y empieza.</p>`;
   if (!isHost) return `${resultado}<p class="hint">Esperando al anfitrión para empezar.</p>`;
   return `${resultado}${repetir}<button class="btn btn-primary btn-block" data-online-action="start" ${roomState.playerOrder.length < 2 ? "disabled" : ""}>Empezar <span>→</span></button>`;
 }
@@ -911,7 +911,7 @@ function publicStarterMarkupContent() {
   const head = `<div class="section-label">¿Quién empieza?</div><p class="hint">Escribe la cifra de esta carta. Empieza quien más se acerque y el resto juega por orden de cercanía.</p>`;
   if (starterEveryoneAnswered()) {
     const ranking = starterRanking();
-    return `${head}${cardMarkup(true)}<ol class="starter-draw-list">${ranking.map((uid, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ''}><span>${i + 1}.º ${escapeHtml(roomState.players[uid].name)}${uid === user.uid ? " · tú" : ""}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), starterRecords.get(uid)?.value))}</span></li>`).join("")}</ol><p class="public-answered"><b>${escapeHtml(roomState.players[ranking[0]].name)}${ranking[0] === user.uid ? " (tú)" : ""}</b> acertó más cerca y empieza. La partida arranca en unos segundos.</p>`;
+    return `${head}${cardMarkup(true)}${CT.StarterPresentation.order(ranking.map(uid => ({name: roomState.players[uid].name + (uid === user.uid ? " · tú" : ""), value: CT.Duelo.Cifras.formato(modeKey(), starterRecords.get(uid)?.value)})))}<p class="public-answered"><b>${escapeHtml(roomState.players[ranking[0]].name)}${ranking[0] === user.uid ? " (tú)" : ""}</b> acertó más cerca y empieza. La partida arranca en unos segundos.</p>`;
   }
   if (answeredStarter(user.uid)) {
     return `${head}${cardMarkup()}<p class="public-answered">Tu respuesta: <b>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), starterRecords.get(user.uid).value))}</b>. Las cifras se enseñan cuando empieza la partida.</p>`;

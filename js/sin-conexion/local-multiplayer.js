@@ -673,18 +673,18 @@ function starterPanelMarkupContent(isHost) {
     if (roomState.playerOrder.length < 2) return "";
     if (!draw) {
       return isHost
-        ? `<div class="field starter-field"><span class="field-label">Quién empieza</span><button type="button" class="btn btn-secondary btn-block" data-local-action="starter-draw">🂠 Jugar el minijuego de quién empieza</button><p class="hint">Cada persona escribe la cifra de la misma carta: empieza quien más se acerque y el resto juega por orden de cercanía.</p></div>`
+        ? `<div class="field starter-field"><span class="field-label">Quién empieza</span>${CT.StarterPresentation.drawButton('data-local-action="starter-draw"', CT.starterNoun(modeKey))}<p class="hint">Cada persona escribe la cifra de la misma carta: empieza quien más se acerque y el resto juega por orden de cercanía.</p></div>`
         : `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>Va a repartir una carta para decidir el orden de juego.</p>`;
     }
     const card = getCard(draw.cardId);
     const regla = CT.axis(modeKey).cifra || {};
-    const repetir = isHost ? `<button type="button" class="btn btn-ghost btn-block" data-local-action="starter-draw">🂠 Repetir el minijuego</button>` : "";
+    const repetir = isHost ? `${CT.StarterPresentation.repeatButton('data-local-action="starter-draw"')}` : "";
     const cardMarkup = (revealed = false) => CT.StarterPresentation.plate(modeKey, card, revealed);
     const ranking = starterRanking();
     if (ranking) {
       CT.Effects?.starterResult?.(`wifi:${draw.cardId}:${Object.keys(draw.guesses).join(",")}`);
-      const lista = ranking.map((id, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ""}><span>${i + 1}.º ${escapeHtml(roomState.players[id].name)}${id === myPlayerId ? " · tú" : ""}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey, draw.guesses[id]))}</span></li>`).join("");
-      const resultado = `${cardMarkup(true)}<p class="hint">Orden de juego, de quien más se acercó a quien menos:</p><ol class="starter-draw-list">${lista}</ol>`;
+      const lista = CT.StarterPresentation.order(ranking.map(id => ({name: roomState.players[id].name + (id === myPlayerId ? " · tú" : ""), value: CT.Duelo.Cifras.formato(modeKey, draw.guesses[id])})));
+      const resultado = `${cardMarkup(true)}${lista}`;
       return `<div class="field starter-field"><span class="field-label">Quién empieza</span>${resultado}${isHost ? `${repetir}<button class="btn btn-primary btn-block" data-local-action="start">Empezar <span>→</span></button>` : '<p class="hint">Esperando al anfitrión para empezar.</p>'}</div>`;
     }
     if (myPlayerId in draw.guesses) {

@@ -274,6 +274,12 @@ try {
       await page.locator('#ajuste-texto').selectOption('150');
       assert.equal(await page.locator('[data-look-preview]').getAttribute('data-preview-theme'),'dark');
       assert.equal(await page.locator('html').getAttribute('data-theme'),'light','la muestra no aplica el tema antes de confirmar');
+      const previewContrast=await page.locator('.look-preview-page').evaluate(el=>{
+        const luminance=color=>color.match(/\d+/g).slice(0,3).map(Number).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;}).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);
+        const ink=luminance(getComputedStyle(el.querySelector('h3')).color),paper=luminance(getComputedStyle(el).backgroundColor);
+        return (Math.max(ink,paper)+.05)/(Math.min(ink,paper)+.05);
+      });
+      assert.ok(previewContrast>=4.5,'el título de la muestra oscura de Ajustes se lee con contraste suficiente');
       await page.screenshot({path:`test-results/zoom/${engine}-ajustes-muestra.png`,fullPage:true});
       await page.locator('.settings-close').click();
       await page.locator('[data-action="perfil"]').click();

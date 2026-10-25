@@ -57,10 +57,10 @@
   }
   function question(mode, final) {
     const card = CT.cards(mode).find(card => card.id === final.cardId);
-    return `<article class="panel final-card"><small>Carta neutral · Final ${final.round}</small>${CT.animalArt(mode, card)}<h2>${CT.escapeHtml(card.title)}</h2><p>¿Cuál es su cifra en ${unit(mode)}?</p></article>`;
+    return `<article class="panel final-card starter-presentation cifra-presentation">${CT.StarterPresentation.plate(mode, card, false, {heading: true, kicker: `Carta neutral · Final ${final.round}`, question: `¿Cuál es su cifra en ${unit(mode)}?`})}</article>`;
   }
   function form(mode, attribute) {
-    return `<form ${attribute} class="panel final-form"><div class="field"><label for="final-guess">Tu cifra secreta (${unit(mode)})</label><input id="final-guess" name="guess" inputmode="decimal" type="text" autocomplete="off" required aria-describedby="final-number-hint"></div>
+    return `<form ${attribute} class="panel final-form starter-presentation cifra-presentation"><div class="field starter-answer" data-starter-mode="${CT.escapeHtml(mode)}"><label for="final-guess">Tu cifra secreta (${unit(mode)})</label><input id="final-guess" name="guess" placeholder="Escribe tu cifra" inputmode="decimal" type="text" autocomplete="off" required aria-describedby="final-number-hint"></div>
       ${CT.mode(mode).axis === 'time' ? '<div class="field"><label for="final-era">Era</label><select id="final-era" name="era"><option value="ad">d. C.</option><option value="bc">a. C.</option></select></div>' : ''}
       <p id="final-number-hint" class="hint">Sin separadores de miles. Admite coma decimal. Tras enviarla no podrás cambiarla.</p><button class="btn btn-primary btn-block" type="submit">Guardar respuesta secreta</button></form>`;
   }

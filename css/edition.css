@@ -5684,7 +5684,7 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
 #app .starter-art-empty > svg { height: 80%; color: var(--opening-edge); }
 #app .starter-card-copy { position: relative; padding: 18px 26px 15px; }
 #app .starter-card-kicker { margin: 0 0 8px; color: var(--opening-accent); font: 600 .57rem/1.4 var(--ui-font); letter-spacing: .15em; text-transform: uppercase; }
-#app :is([data-starter-dialog], .starter-presentation) .starter-card strong { display: block; margin: 0 0 7px; color: var(--opening-ink); font: 500 clamp(1.35rem, calc(5.4 * var(--vw)), 1.8rem)/1.12 var(--font-display); text-wrap: balance; }
+#app :is([data-starter-dialog], .starter-presentation) .starter-card :is(strong, .starter-card-title) { display: block; margin: 0 0 7px; color: var(--opening-ink); font: 500 clamp(1.35rem, calc(5.4 * var(--vw)), 1.8rem)/1.12 var(--font-display); text-wrap: balance; }
 #app :is([data-starter-dialog], .starter-presentation) .starter-question { display: block; color: var(--opening-muted); font: italic 1rem/1.3 var(--font-display); }
 #app :is([data-starter-dialog], .starter-presentation) .card-category { margin: 0 auto 7px; width: fit-content; color: var(--opening-muted); background: var(--opening-wash); }
 #app .starter-answer { position: relative; margin-top: 3px; padding-top: 13px; border-top: 1px solid var(--opening-edge); }
@@ -5725,7 +5725,7 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
 #app :is([data-starter-dialog], .starter-presentation) .starter-card-revealed { display: grid; grid-template-columns: 100px minmax(0, 1fr); align-items: stretch; gap: 0; margin: 0 0 22px; padding: 6px; border: 1px solid var(--opening-edge); background: var(--opening-wash); }
 #app :is([data-starter-dialog], .starter-presentation) .starter-card-revealed .starter-card-art { height: 100%; min-height: 132px; border: 0; }
 #app .starter-card-revealed .starter-card-copy { align-self: center; padding: 10px 12px; text-align: left; }
-#app :is([data-starter-dialog], .starter-presentation) .starter-card-revealed strong { font-size: 1rem; }
+#app :is([data-starter-dialog], .starter-presentation) .starter-card-revealed :is(strong, .starter-card-title) { font-size: 1rem; }
 #app .starter-card-revealed .starter-plate-mark { display: none; }
 #app :is([data-starter-dialog], .starter-presentation) .starter-real-value { display: block; color: var(--opening-accent); font: 500 1.65rem/1.1 var(--font-display); }
 #app .starter-real-value > .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
@@ -5739,13 +5739,13 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
 #app :is([data-starter-dialog], .starter-presentation) .starter-draw-winner { color: var(--opening-accent); }
 #app .starter-draw-winner .starter-place { display: grid; place-items: center; width: 26px; height: 30px; background: var(--opening-accent); color: var(--opening-sheet); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 86%, 0 100%); font-size: .8rem; }
 /* La preparación: fichas de asiento, un carnet de habituales y los poderes como cartas. */
-#app .local-setup #players { counter-reset: seat; }
-#app .local-setup .player-row { grid-template-columns: 28px minmax(0, 1fr) 44px; align-items: center; gap: 8px; counter-increment: seat; }
-#app .local-setup .player-row::before { content: counter(seat, decimal-leading-zero); display: grid; place-items: center; flex: none; width: 28px; height: 32px; border-block: 1px solid var(--opening-edge); color: var(--opening-muted); font: 500 1rem var(--font-display); }
+#app :is(.local-setup, .quick-local-setup) :is(#players, #quick-names) { counter-reset: seat; }
+#app :is(.local-setup, .quick-local-setup) .player-row { grid-template-columns: 28px minmax(0, 1fr) 44px; align-items: center; gap: 8px; counter-increment: seat; }
+#app :is(.local-setup, .quick-local-setup) .player-row::before { content: counter(seat, decimal-leading-zero); display: grid; place-items: center; flex: none; width: 28px; height: 32px; border-block: 1px solid var(--opening-edge); color: var(--opening-muted); font: 500 1rem var(--font-display); }
 html #app[data-screen] .local-setup .player-row input { min-width: 0; border: 0; border-bottom: 1px solid var(--opening-edge); border-radius: 0; background: transparent; box-shadow: none; font: 500 1.1rem var(--font-display); }
-#app .local-setup .player-row .remove { width: 44px; height: 44px; border: 0; background: transparent; color: var(--opening-muted); }
-#app .local-setup [data-action="add-player"] { display: flex; align-items: center; gap: 9px; min-height: 44px; margin: 14px 0 4px; padding: 0 6px; background: transparent; color: var(--opening-accent); border: 0; box-shadow: none; font: 600 .78rem var(--ui-font); }
-#app .local-setup [data-action="add-player"] > span { display: grid; place-items: center; width: 26px; height: 30px; margin: 0; border: 1px solid var(--opening-edge); border-radius: 3px; font: 500 1.2rem var(--font-display); transform: rotate(-7deg); }
+#app :is(.local-setup, .quick-local-setup) .player-row .remove { width: 44px; height: 44px; border: 0; background: transparent; color: var(--opening-muted); }
+#app :is(.local-setup, .quick-local-setup) :is([data-action="add-player"], [data-quick="add-player"]) { display: flex; align-items: center; gap: 9px; min-height: 44px; margin: 14px 0 4px; padding: 0 6px; background: transparent; color: var(--opening-accent); border: 0; box-shadow: none; font: 600 .78rem var(--ui-font); }
+#app :is(.local-setup, .quick-local-setup) :is([data-action="add-player"], [data-quick="add-player"]) > span { display: grid; place-items: center; width: 26px; height: 30px; margin: 0; border: 1px solid var(--opening-edge); border-radius: 3px; font: 500 1.2rem var(--font-display); transform: rotate(-7deg); }
 #app .recent-players { position: relative; margin: 20px 0 0; padding: 16px 14px; border: 1px solid var(--opening-edge); border-radius: 3px 12px 12px 3px; border-left: 4px double var(--opening-edge); background: repeating-linear-gradient(0deg, transparent 0 23px, #b79a690e 23px 24px), var(--opening-sheet); color: var(--opening-ink); box-shadow: 2px 3px 0 #b79a691a; }
 #app .recent-players-head { align-items: center; gap: 8px; margin-bottom: 13px; }
 #app .recent-players-kicker { display: block; color: var(--opening-muted); font: 600 .53rem/1.3 var(--ui-font); letter-spacing: .1em; text-transform: uppercase; }
@@ -5815,9 +5815,27 @@ html #app[data-screen] .local-setup #players .player-row::before { grid-column: 
 #app .starter-inline .starter-card, #app .starter-inline .starter-card:not(.starter-card-revealed) { margin: 0; }
 #app .starter-inline .starter-card-art { border-radius: 5px; height: clamp(170px, calc(25 * var(--dvh)), 230px); }
 #app .starter-inline .starter-card-copy { padding-inline: 0; }
-#app .starter-inline .starter-draw-list li { display: flex; }
-#app .starter-inline .starter-draw-list li > :last-child { margin-left: auto; }
 #app .starter-inline > .btn { margin-top: 12px; }
 #app .starter-inline .hint, #app .starter-inline .section-label { color: var(--opening-muted); }
 
 #app :is([data-starter-dialog], .starter-presentation) [data-dialog-focus]:focus { outline: none; }
+
+/* La misma lámina y la misma casilla en duelos de cifras y finales. El reloj y la respuesta
+   conservan su orden; el detalle que revela el dato solo se enseña tras contestar. */
+#app .cifra-presentation { min-width: 0; padding: 18px; border: 1px solid var(--opening-edge); border-radius: 12px; background: var(--opening-sheet); color: var(--opening-ink); }
+#app .cifra-presentation .starter-card, #app .cifra-presentation .starter-card:not(.starter-card-revealed) { margin: 0; }
+#app .cifra-presentation .starter-card-art { height: clamp(150px, calc(22 * var(--dvh)), 200px); border-radius: 5px; }
+#app .cifra-presentation .starter-card-copy { padding: 14px 0 9px; }
+#app .cifra-presentation .starter-answer { margin-top: 0; }
+#app .cifra-presentation .starter-card :is(strong, .starter-card-title) { font-size: clamp(1.15rem, calc(5 * var(--vw)), 1.5rem); }
+#app .cifra-presentation .hint { color: var(--opening-muted); }
+#app .cifra-presentation .starter-answer input { background: var(--opening-input); }
+#app .final-form .starter-answer { padding-top: 0; border: 0; }
+#app .final-form .starter-answer::before { display: none; }
+#app .final-form select { min-height: 44px; border-radius: 9px; background-color: var(--opening-input); color: var(--opening-ink); }
+#app .final-card { max-width: 460px; margin-inline: auto; }
+@media (max-height: 650px) {
+  #app .cifra-panel .starter-card-art { height: 130px; }
+}
+/* La muestra de Ajustes usa el tema elegido, incluso antes de aplicarlo al resto del juego. */
+html:root #app .settings-modal .settings-section .settings-look-preview .look-preview-page h3 { color: var(--preview-ink); }

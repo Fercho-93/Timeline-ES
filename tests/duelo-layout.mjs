@@ -19,11 +19,11 @@ try {
       const cards = Array.from({ length: 20 }, (_, i) => ({ id: i + 1, title: `Acontecimiento histórico número ${i + 1}`, year: 1000 + i, detail: 'Explicación de la carta.' }));
       window.CONTINUUM = {
         escapeHtml: text => String(text).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('"', '&quot;'),
-        cards: () => cards, categoryBadge: () => '', animalArt: () => '', cardBack: () => '<span class="carta-reverso">✦</span>',
+        axis: () => ({cifra:{pregunta:'¿En qué año fue?', unidad:'año', negativos:true}}), cards: () => cards, categoryBadge: () => '', animalArt: () => '', cardBack: () => '<span class="carta-reverso">✦</span>',
         eraForCard: () => ({ key: 'modern', symbol: '✦', name: 'Historia' }), formatValue: (_, c) => String(c.year), sortValue: (_, c) => c.year, mode: () => ({name:'Historia'}), placementHint: () => 'Debía ir después de la carta anterior.',
         hiddenLabel: () => 'Fecha oculta', timelineTitle: () => 'Línea temporal', Accounts: { user: { uid: 'me' } },
         Links: { invitation: () => 'https://continuum.test/#turn-duel=layout' }, Avatares: { markup: () => '', forUser: () => '' }, timelineEnds: () => '', has: () => true,
-        Duelo: { CARTAS: 15, reparto: () => cards.map(c => c.id), Cifras: { reparto: () => cards.map(c => c.id), regla: () => ({ pregunta: '¿En qué año fue?' }), campo: (_, id, { attrs = '', hintId = '' } = {}) => `<div class="field cifra-field"><label for="${id}">Tu respuesta</label><input id="${id}" type="text" inputmode="numeric" autocomplete="off" ${attrs}><p class="hint"${hintId ? ` id="${hintId}"` : ''}></p></div>` } }
+        Duelo: { CARTAS: 15, reparto: () => cards.map(c => c.id), Cifras: { factorDe: () => 1, reparto: () => cards.map(c => c.id), regla: () => ({ pregunta: '¿En qué año fue?' }), campo: (_, id, { attrs = '', hintId = '' } = {}) => `<div class="field cifra-field"><label for="${id}">Tu respuesta</label><input id="${id}" type="text" inputmode="numeric" autocomplete="off" ${attrs}><p class="hint"${hintId ? ` id="${hintId}"` : ''}></p></div>` } }
       };
     });
     await page.addScriptTag({ url: '/js/interfaz/mapa.js' });
@@ -31,6 +31,7 @@ try {
     await page.evaluate(() => { window.__duelStub = CONTINUUM.Duelo; });
     await page.addScriptTag({ url: '/js/online/duelo.js' });
     await page.evaluate(() => { CONTINUUM.Duelo = { ...CONTINUUM.Duelo, ...window.__duelStub }; });
+    await page.addScriptTag({ url: '/js/interfaz/starter-presentation.js' });
     await page.addScriptTag({ content: `const auth={currentUser:{uid:'me'}};\n${source}\nwindow.showDuel=(options={})=>{cachedGames=options.nextGames||[];current={id:'layout',mode:'history',kind:'orden',seed:'test',total:15,turnIndex:0,turnUid:'me',status:'playing',playersOrder:['me','them'],players:{me:{alias:'Explorador'},them:{alias:'Un rival con nombre largo'}},scores:{me:0,them:0},timeline:[1],...options};enteredAt=Date.now();pendingIndex=null;render();}; window.redrawDuel=()=>{render();};` });
     const fits = async label => {
       const sizes = await page.evaluate(() => ({ viewport: innerWidth, page: document.documentElement.scrollWidth, shell: document.querySelector('.turn-duel-shell').getBoundingClientRect().right }));
