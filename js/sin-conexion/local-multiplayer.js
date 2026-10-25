@@ -667,7 +667,8 @@
     if (!draw || !CT.LocalRoom.starterComplete(roomState)) return null;
     return CT.Starter.order(modeKey, draw.cardId, roomState.playerOrder.map(id => ({ id, value: draw.guesses[id] })));
   }
-  function starterPanelMarkup(isHost) {
+  function starterPanelMarkup(isHost) { return `<div class="starter-presentation starter-inline">${starterPanelMarkupContent(isHost)}</div>`; }
+function starterPanelMarkupContent(isHost) {
     const draw = roomState.starterDraw;
     if (roomState.playerOrder.length < 2) return "";
     if (!draw) {
@@ -678,20 +679,20 @@
     const card = getCard(draw.cardId);
     const regla = CT.axis(modeKey).cifra || {};
     const repetir = isHost ? `<button type="button" class="btn btn-ghost btn-block" data-local-action="starter-draw">🂠 Repetir el minijuego</button>` : "";
-    const cardMarkup = detalle => `<div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${detalle}</span></div>`;
+    const cardMarkup = (revealed = false) => CT.StarterPresentation.plate(modeKey, card, revealed);
     const ranking = starterRanking();
     if (ranking) {
       CT.Effects?.starterResult?.(`wifi:${draw.cardId}:${Object.keys(draw.guesses).join(",")}`);
       const lista = ranking.map((id, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ""}><span>${i + 1}.º ${escapeHtml(roomState.players[id].name)}${id === myPlayerId ? " · tú" : ""}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey, draw.guesses[id]))}</span></li>`).join("");
-      const resultado = `${cardMarkup(`El valor real era ${escapeHtml(formatValue(card))}`)}<p class="hint">Orden de juego, de quien más se acercó a quien menos:</p><ol class="starter-draw-list">${lista}</ol>`;
+      const resultado = `${cardMarkup(true)}<p class="hint">Orden de juego, de quien más se acercó a quien menos:</p><ol class="starter-draw-list">${lista}</ol>`;
       return `<div class="field starter-field"><span class="field-label">Quién empieza</span>${resultado}${isHost ? `${repetir}<button class="btn btn-primary btn-block" data-local-action="start">Empezar <span>→</span></button>` : '<p class="hint">Esperando al anfitrión para empezar.</p>'}</div>`;
     }
     if (myPlayerId in draw.guesses) {
       const faltan = roomState.playerOrder.filter(id => !(id in draw.guesses)).map(id => roomState.players[id].name);
-      return `<div class="field starter-field"><span class="field-label">Quién empieza</span>${cardMarkup(escapeHtml(regla.pregunta || ""))}<p class="hint">Ya has respondido. Esperando a ${escapeHtml(faltan.join(", "))}.</p>${repetir}</div>`;
+      return `<div class="field starter-field"><span class="field-label">Quién empieza</span>${cardMarkup()}<p class="hint">Ya has respondido. Esperando a ${escapeHtml(faltan.join(", "))}.</p>${repetir}</div>`;
     }
-    return `<div class="field starter-field"><span class="field-label">Quién empieza</span>${cardMarkup(escapeHtml(regla.pregunta || ""))}
-      ${CT.Duelo.Cifras.campo(modeKey, "starter-guess-input")}
+    return `<div class="field starter-field"><span class="field-label">Quién empieza</span>${cardMarkup()}
+      ${CT.StarterPresentation.answer(modeKey, "starter-guess-input")}
       <button type="button" class="btn btn-primary btn-block" data-local-action="starter-guess">Adivinar <span>→</span></button>${repetir}</div>`;
   }
 
@@ -730,7 +731,7 @@
         <section class="panel lobby-settings">${settings}</section>
       </div>
     </div>`, "local-lobby");
-    if (draft) { const input = document.getElementById("starter-guess-input"); if (input && !input.value) input.value = draft; }
+    if (draft) { const input = document.getElementById("starter-guess-input"); if (input && !input.value) { input.value = draft; CT.StarterPresentation.syncAnswer(input); } }
   }
 
   // Todas las jugadas pasan por aquí: el anfitrión las aplica en su propio móvil y el

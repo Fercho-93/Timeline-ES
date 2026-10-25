@@ -751,7 +751,8 @@ function anotaProgreso() {
 // El panel del minijuego de quién empieza, para el anfitrión y para el resto por igual:
 // mientras no hay carta, solo el anfitrión puede repartirla; en cuanto la hay, cada
 // persona adivina la suya y ve cuándo le toca esperar o ya puede empezar.
-function starterPanelMarkup(isHost) {
+function starterPanelMarkup(isHost) { return `<div class="starter-presentation starter-inline">${starterPanelMarkupContent(isHost)}</div>`; }
+function starterPanelMarkupContent(isHost) {
   if ((roomState.tournament?.index || 0) > 0) {
     const next = roomState.players[roomState.playerOrder[roomState.tournament.index % roomState.playerOrder.length]];
     const aviso = `<p>Empieza <b>${escapeHtml(next?.name || "")}</b>: el orden de la primera ronda se mantiene y el turno de empezar rota en cada ronda.</p>`;
@@ -769,14 +770,14 @@ function starterPanelMarkup(isHost) {
   const answered = mine && mine.cardId === cardId && mine.value !== null;
   const everyone = starterEveryoneAnswered();
   const repetir = isHost ? `<button type="button" class="btn btn-ghost btn-block" data-online-action="starter-draw">🂠 Repetir el minijuego</button>` : "";
-  const cardMarkup = (detalle) => `<div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${detalle}</span></div>`;
+  const cardMarkup = (revealed = false) => CT.StarterPresentation.plate(modeKey(), card, revealed);
   if (!everyone) {
     if (answered) {
       const faltan = roomState.playerOrder.filter(uid => { const r = starterRecords.get(uid); return !(r && r.cardId === cardId && r.value !== null); }).map(uid => roomState.players[uid].name);
-      return `${cardMarkup(escapeHtml(regla.pregunta || ""))}<p class="hint">Ya has respondido. Esperando a ${escapeHtml(faltan.join(", "))}.</p>${repetir}`;
+      return `${cardMarkup()}<p class="hint">Ya has respondido. Esperando a ${escapeHtml(faltan.join(", "))}.</p>${repetir}`;
     }
-    return `${cardMarkup(escapeHtml(regla.pregunta || ""))}
-      ${CT.Duelo.Cifras.campo(modeKey(), "starter-guess-input")}
+    return `${cardMarkup()}
+      ${CT.StarterPresentation.answer(modeKey(), "starter-guess-input")}
       <button type="button" class="btn btn-primary btn-block" data-online-action="starter-guess-submit">Adivinar <span>→</span></button>${repetir}`;
   }
   // Todos han respondido: el orden de juego está decidido.
@@ -785,7 +786,7 @@ function starterPanelMarkup(isHost) {
   const winner = ranking[0];
   const valueOf = uid => starterRecords.get(uid)?.value;
   const lista = ranking.map((uid, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ''}><span>${i + 1}.º ${escapeHtml(roomState.players[uid].name)}${uid === user.uid ? " · tú" : ""}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), valueOf(uid)))}</span></li>`).join("");
-  const resultado = `${cardMarkup(`El valor real era ${escapeHtml(CT.formatValue(modeKey(), card))}`)}<p class="hint">Orden de juego, de quien más se acercó a quien menos:</p><ol class="starter-draw-list">${lista}</ol><p>${escapeHtml(roomState.players[winner].name)} ha acertado más cerca y empieza.</p>`;
+  const resultado = `${cardMarkup(true)}<p class="hint">Orden de juego, de quien más se acercó a quien menos:</p><ol class="starter-draw-list">${lista}</ol><p>${escapeHtml(roomState.players[winner].name)} ha acertado más cerca y empieza.</p>`;
   if (!isHost) return `${resultado}<p class="hint">Esperando al anfitrión para empezar.</p>`;
   return `${resultado}${repetir}<button class="btn btn-primary btn-block" data-online-action="start" ${roomState.playerOrder.length < 2 ? "disabled" : ""}>Empezar <span>→</span></button>`;
 }
@@ -829,7 +830,7 @@ function renderLobby() {
       <section class="panel lobby-settings">${isHost ? `<div class="section-label">Ajustes</div><input type="hidden" id="online-turn-seconds" value="${lobbySettings.turnSeconds}"><div class="field"><span class="field-label">Tiempo por carta</span><p class="hint">${CT.Tiempo?.texto?.(lobbySettings.turnSeconds) ?? lobbySettings.turnSeconds + " s"} (lo elegiste al crear la partida).</p></div><input type="hidden" id="online-hand-size" value="${lobbySettings.handSize}"><div class="field"><span class="field-label">Cartas iniciales</span><p class="hint">${lobbySettings.handSize} por persona (lo elegiste al crear la partida).</p></div><input type="checkbox" hidden id="online-pulse"${lobbySettings.pulse ? " checked" : ""}><input type="checkbox" hidden id="online-ghost"${lobbySettings.ghost ? " checked" : ""}><div class="field"><span class="field-label">Poderes</span><p class="hint">${CT.ManoInicial?.poderesTexto?.({ pulse: lobbySettings.pulse, ghost: lobbySettings.ghost }) ?? "sin poderes"} (lo elegiste al crear la partida).</p></div>${people.length < 2 ? `<p class="hint">Esperando a alguien más…</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(true)}</div>`}` : `${roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(false)}</div>`}`}</section>
     </div>
   </div>`, "online-lobby");
-  if (draft) { const input = document.getElementById("starter-guess-input"); if (input && !input.value) input.value = draft; }
+  if (draft) { const input = document.getElementById("starter-guess-input"); if (input && !input.value) { input.value = draft; CT.StarterPresentation.syncAnswer(input); } }
   if (roomState.tournament) {
     // En la sala de espera no se enseña qué mazos vienen: cada ronda se descubre en su cartel. Solo
     // el resumen de la competición, sin nombres.
@@ -900,22 +901,23 @@ function publicRosterMarkup() {
   }).join("");
 }
 
-function publicStarterMarkup() {
+function publicStarterMarkup() { return `<div class="starter-presentation starter-inline">${publicStarterMarkupContent()}</div>`; }
+function publicStarterMarkupContent() {
   const cardId = starterCardId();
   if (cardId == null) return "";
   const card = getCard(cardId);
   const regla = CT.axis(modeKey()).cifra || {};
-  const cardMarkup = detalle => `<div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${detalle}</span></div>`;
+  const cardMarkup = (revealed = false) => CT.StarterPresentation.plate(modeKey(), card, revealed);
   const head = `<div class="section-label">¿Quién empieza?</div><p class="hint">Escribe la cifra de esta carta. Empieza quien más se acerque y el resto juega por orden de cercanía.</p>`;
   if (starterEveryoneAnswered()) {
     const ranking = starterRanking();
-    return `${head}${cardMarkup(`El valor real era ${escapeHtml(CT.formatValue(modeKey(), card))}`)}<ol class="starter-draw-list">${ranking.map((uid, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ''}><span>${i + 1}.º ${escapeHtml(roomState.players[uid].name)}${uid === user.uid ? " · tú" : ""}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), starterRecords.get(uid)?.value))}</span></li>`).join("")}</ol><p class="public-answered"><b>${escapeHtml(roomState.players[ranking[0]].name)}${ranking[0] === user.uid ? " (tú)" : ""}</b> acertó más cerca y empieza. La partida arranca en unos segundos.</p>`;
+    return `${head}${cardMarkup(true)}<ol class="starter-draw-list">${ranking.map((uid, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ''}><span>${i + 1}.º ${escapeHtml(roomState.players[uid].name)}${uid === user.uid ? " · tú" : ""}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), starterRecords.get(uid)?.value))}</span></li>`).join("")}</ol><p class="public-answered"><b>${escapeHtml(roomState.players[ranking[0]].name)}${ranking[0] === user.uid ? " (tú)" : ""}</b> acertó más cerca y empieza. La partida arranca en unos segundos.</p>`;
   }
   if (answeredStarter(user.uid)) {
-    return `${head}${cardMarkup(escapeHtml(regla.pregunta || ""))}<p class="public-answered">Tu respuesta: <b>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), starterRecords.get(user.uid).value))}</b>. Las cifras se enseñan cuando empieza la partida.</p>`;
+    return `${head}${cardMarkup()}<p class="public-answered">Tu respuesta: <b>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), starterRecords.get(user.uid).value))}</b>. Las cifras se enseñan cuando empieza la partida.</p>`;
   }
-  return `${head}${cardMarkup(escapeHtml(regla.pregunta || ""))}
-    ${CT.Duelo.Cifras.campo(modeKey(), "starter-guess-input")}
+  return `${head}${cardMarkup()}
+    ${CT.StarterPresentation.answer(modeKey(), "starter-guess-input")}
     <button type="button" class="btn btn-primary btn-block" data-online-action="starter-guess-submit">Responder <span>→</span></button>`;
 }
 
@@ -932,7 +934,7 @@ function renderPublicLobby() {
     <input type="hidden" id="online-hand-size" value="${publicHand()}"><input type="hidden" id="online-turn-seconds" value="${publicSeconds()}">
     <button class="btn btn-ghost btn-block public-leave" data-online-action="leave-public">Dejar de buscar</button>
   </div>`, "online-lobby");
-  if (draft) { const input = document.getElementById("starter-guess-input"); if (input && !input.value) input.value = draft; }
+  if (draft) { const input = document.getElementById("starter-guess-input"); if (input && !input.value) { input.value = draft; CT.StarterPresentation.syncAnswer(input); } }
   managePublicStarter();
 }
 

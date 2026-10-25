@@ -408,7 +408,8 @@
   // entre nadie más; se puede dejar de buscar sin dejar la plaza ocupada.
   // Quién empieza en una sala en directo, como en las colecciones: se sortea una carta, cada persona
   // escribe su cifra y empieza quien más se acerca. En una mesa pública se sortea sola.
-  function roomStarterMarkup(auto) {
+  function roomStarterMarkup(auto) { return `<div class="starter-presentation starter-inline">${roomStarterContent(auto)}</div>`; }
+  function roomStarterContent(auto) {
     const host=myId===room.host, count=room.members.length, s=room.starter, head='<div class="section-label">Quién empieza</div>';
     if(count<2)return `${head}<p class="hint">Cuando haya dos personas se sortea una carta y empieza quien más se acerque a su cifra.</p>`;
     if(!s)return host&&!auto
@@ -417,17 +418,17 @@
     const card=CT.cards(s.modeKey).find(c=>c.id===s.cardId);
     if(!card)return `${head}<p class="hint">Preparando la carta…</p>`;
     const regla=CT.axis(s.modeKey).cifra||{}, mine=Number.isFinite(s.guesses[myId]), done=CT.QuickRoom.starterComplete(room);
-    const cardBox=detail=>`<div class="cifra-card starter-card"><strong>${esc(card.title)}</strong><span>${detail}</span></div>`;
+    const cardBox=(revealed=false)=>CT.StarterPresentation.plate(s.modeKey,card,revealed);
     const redo=host&&!auto?`<button type="button" class="btn btn-ghost btn-block" data-quick="room-starter-draw">🂠 Repetir el minijuego</button>`:'';
-    if(!mine)return `${head}${cardBox(esc(regla.pregunta||''))}${CT.Duelo.Cifras.campo(s.modeKey,'quick-room-starter-input')}<button type="button" class="btn btn-primary btn-block" data-quick="room-starter-guess">Adivinar <span>→</span></button>${redo}`;
+    if(!mine)return `${head}${cardBox()}${CT.StarterPresentation.answer(s.modeKey,'quick-room-starter-input')}<button type="button" class="btn btn-primary btn-block" data-quick="room-starter-guess">Adivinar <span>→</span></button>${redo}`;
     if(!done){
       const faltan=room.members.filter(who=>!Number.isFinite(s.guesses[who])).map(who=>esc(room.names[room.members.indexOf(who)]));
-      return `${head}${cardBox(esc(regla.pregunta||''))}<p class="hint">Has respondido. Esperando a: ${faltan.join(', ')}.</p>${redo}`;
+      return `${head}${cardBox()}<p class="hint">Has respondido. Esperando a: ${faltan.join(', ')}.</p>${redo}`;
     }
     const order=CT.QuickRoom.starterOrder(room);
     CT.Effects?.starterResult?.(`quick:${connection?.code||''}:${s.cardId}:${Object.keys(s.guesses).join(',')}`);
     const list=order.map((i,n)=>`<li${n===0?' class="starter-draw-winner"':''}><span>${n+1}.º ${esc(room.names[i])}</span><span>${esc(CT.Duelo.Cifras.formato(s.modeKey,s.guesses[room.members[i]]))}</span></li>`).join('');
-    return `${head}${cardBox(`El valor real era ${esc(CT.formatValue(s.modeKey,card))}`)}<div class="starter-winner-banner"><b>${esc(room.names[order[0]])}</b><span>Empieza la partida</span></div><ol class="starter-draw-list">${list}</ol>${redo}`;
+    return `${head}${cardBox(true)}<div class="starter-winner-banner"><b>${esc(room.names[order[0]])}</b><span>Empieza la partida</span></div><ol class="starter-draw-list">${list}</ol>${redo}`;
   }
   async function roomStarterAction(action) {
     if(action==='room-starter-draw'){await networkAction({type:'starter-draw',...CT.QuickRoom.starterPick()});return true;}
@@ -761,8 +762,8 @@
   const starterClose = () => {app().querySelector('[data-quick-starter]')?.remove(); starterDraw = null;};
   function starterPaint(html) {
     let layer = app().querySelector('[data-quick-starter]');
-    if (layer) {layer.querySelector('.modal').innerHTML = html; return;}
-    layer = document.createElement('div'); layer.className = 'overlay'; layer.dataset.quickStarter = '';
+    if (layer) {layer.querySelector('.modal').innerHTML = html; layer.querySelector('[data-dialog-focus]')?.focus({preventScroll:true}); return;}
+    layer = document.createElement('div'); layer.className = 'overlay'; layer.dataset.quickStarter = ''; layer.dataset.starterDialog = '';
     layer.innerHTML = `<div class="modal">${html}</div>`; app().append(layer); CT.openDialog(layer, true);
   }
   function starterFieldMarkup(names) {
@@ -770,7 +771,7 @@
       const order = starter.order.map(i => esc(names[i])).join(' → ');
       return `<span class="field-label">Quién empieza</span><p class="starter-result"><strong>${esc(names[starter.order[0]])}</strong> ha acertado más cerca y empieza.</p><p class="hint">Orden de juego: ${order}</p><button type="button" class="btn btn-ghost" data-quick="draw-starter">Repetir el minijuego</button>`;
     }
-    return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-block starter-draw-cta" data-quick="draw-starter"><span class="starter-draw-icon" aria-hidden="true">🂠</span><span class="starter-draw-copy"><b>Adivinar la cifra</b><small>Cada uno prueba con una carta y gana quien más se acerque</small></span><span class="starter-draw-arrow" aria-hidden="true">→</span></button>`;
+    return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-block starter-draw-cta" data-quick="draw-starter"><span class="starter-draw-icon" aria-hidden="true">${CT.StarterPresentation.cardsIcon()}</span><span class="starter-draw-copy"><b>Adivinar la cifra</b><small>Cada uno prueba con una carta y gana quien más se acerque</small></span><span class="starter-draw-arrow" aria-hidden="true">→</span></button>`;
   }
   const quickNames = () => [...app().querySelectorAll('[data-quick-name]')].map(el => el.value.trim());
   function refreshStarterField() {const box = app().querySelector('.quick-starter-field'); if (box) box.innerHTML = starterFieldMarkup(quickNames());}
@@ -781,9 +782,9 @@
     starterAsk();
   }
   function starterAsk() {
-    const {modeKey, card, names, step} = starterDraw, regla = CT.axis(modeKey).cifra || {};
-    starterPaint(`<h2 data-dialog-focus tabindex="-1">Pasa el móvil a ${esc(names[step])}</h2><div class="cifra-card starter-card"><strong>${esc(card.title)}</strong><span>${esc(regla.pregunta || '')}</span></div>
-      ${CT.Duelo.Cifras.campo(modeKey, 'quick-starter-input')}
+    const {modeKey, card, names, step} = starterDraw;
+    starterPaint(`${CT.StarterPresentation.heading(names[step], step, names.length)}${CT.StarterPresentation.plate(modeKey, card)}
+      ${CT.StarterPresentation.answer(modeKey, 'quick-starter-input')}
       <div class="actions"><button class="btn btn-primary btn-block" data-quick="starter-guess">Adivinar <span>→</span></button><button class="btn btn-ghost btn-block" data-quick="starter-back">Volver a la preparación</button></div>`);
     const field = app().querySelector('#quick-starter-input');
     field?.addEventListener('keydown', e => {if (e.key === 'Enter') {e.preventDefault(); starterGuess();}});
@@ -796,9 +797,9 @@
     const {modeKey, card, names, guesses} = starterDraw;
     const order = CT.Starter.order(modeKey, card.id, guesses.map((v, id) => ({id, value: v})));
     starter = {key: names.join('|'), order}; refreshStarterField(); CT.Effects?.starterResult?.();
-    starterPaint(`<h2>¿Quién empieza?</h2><div class="starter-winner-banner"><b>${esc(names[order[0]])}</b><span>Empieza la partida</span></div>
-      <div class="cifra-card starter-card"><strong>${esc(card.title)}</strong><span>El valor real era ${esc(CT.formatValue(modeKey, card))}</span></div>
-      <ol class="starter-draw-list">${order.map((i, n) => `<li${n === 0 ? ' class="starter-draw-winner"' : ''}><span>${n + 1}.º ${esc(names[i])}</span><span>${esc(CT.Duelo.Cifras.formato(modeKey, guesses[i]))}</span></li>`).join('')}</ol>
+    starterPaint(`${CT.StarterPresentation.winner(names[order[0]])}
+      ${CT.StarterPresentation.plate(modeKey, card, true)}
+      ${CT.StarterPresentation.order(order.map(i => ({name:names[i], value:CT.Duelo.Cifras.formato(modeKey, guesses[i])})))}
       <div class="actions"><button class="btn btn-primary btn-block" data-quick="starter-go">Empezar <span>→</span></button></div>`);
   }
   const button = (action, text, cls = 'btn btn-primary', attrs = '') => `<button class="${cls}" data-quick="${action}"${attrs ? ` ${attrs}` : ''}>${text}</button>`;
@@ -806,7 +807,7 @@
     stopNetwork();page="setup";const solo=format!=="local";
     state = null; record = null; selected = null; slot = null;
     const saved = load();
-    shell(`<section class="setup-section"><h2 data-focus tabindex="-1">Retos rápidos</h2><p class="lead">${solo ? "Juega a tu ritmo: cada carta bien colocada suma un acierto y un fallo no te echa del reto." : "De 2 a 8 jugadores o equipos en un solo móvil."}</p><div class="panel">
+    shell(`<section class="setup-section quick-local-setup"><h2 data-focus tabindex="-1">Retos rápidos</h2><p class="lead">${solo ? "Juega a tu ritmo: cada carta bien colocada suma un acierto y un fallo no te echa del reto." : "De 2 a 8 jugadores o equipos en un solo móvil."}</p><div class="panel">
       <div class="setup-block"><div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Jugadores</span></div>
       <div id="quick-names">${nameFields(solo ? 1 : 2, solo ? ["Tú"] : [CT.Identidad?.propio?.() || "Jugador 1"])}</div>
       ${solo ? '' : button('add-player', '＋ Añadir participante', 'btn btn-ghost')}</div>

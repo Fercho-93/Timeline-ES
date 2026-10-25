@@ -911,7 +911,7 @@
             <div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Cómo empezar</span></div>
             <div class="setup-grid">
               <div class="field starter-field">${starterFieldMarkup()}</div>
-              <div class="field local-hand-size"><span class="local-hand-art" aria-hidden="true">${openingCardsIcon()}</span><label for="hand-size">Cartas iniciales por persona<small>En la mano de cada jugador</small></label><select id="hand-size">${[1, 2, 3, 4, 5, 6].map(n => `<option${n === (lastLocalSetup?.handSize || 4) ? " selected" : ""}>${n}</option>`).join("")}</select></div>
+              <div class="field local-hand-size"><span class="local-hand-art" aria-hidden="true">${CT.StarterPresentation.cardsIcon()}</span><label for="hand-size">Cartas iniciales por persona<small>En la mano de cada jugador</small></label><select id="hand-size">${[1, 2, 3, 4, 5, 6].map(n => `<option${n === (lastLocalSetup?.handSize || 4) ? " selected" : ""}>${n}</option>`).join("")}</select></div>
             </div>
           </div>
           <div class="setup-block">
@@ -935,7 +935,7 @@
   function starterFieldMarkup() {
     const names = playerNames();
     if (!starterDraw || starterDraw.winner === null || starterDraw.names.length !== names.length) {
-      return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-block starter-draw-cta" data-action="draw-starter"><span class="starter-draw-icon" aria-hidden="true">${openingCardsIcon()}</span><span class="starter-draw-copy"><span class="starter-draw-kicker">El primer turno se gana</span><b>Adivinar ${CT.starterNoun(selectedModeKey)}</b><small>Cada uno prueba con una carta y gana quien más se acerque</small></span><span class="starter-draw-arrow" aria-hidden="true">→</span></button>`;
+      return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-block starter-draw-cta" data-action="draw-starter"><span class="starter-draw-icon" aria-hidden="true">${CT.StarterPresentation.cardsIcon()}</span><span class="starter-draw-copy"><span class="starter-draw-kicker">El primer turno se gana</span><b>Adivinar ${CT.starterNoun(selectedModeKey)}</b><small>Cada uno prueba con una carta y gana quien más se acerque</small></span><span class="starter-draw-arrow" aria-hidden="true">→</span></button>`;
     }
     const ganador = escapeHtml(names[starterDraw.winner] ?? `Jugador ${starterDraw.winner + 1}`);
     const orden = (starterDraw.order || [starterDraw.winner]).map(i => escapeHtml(names[i] ?? `Jugador ${i + 1}`)).join(" → ");
@@ -972,10 +972,6 @@
     overlay(`<div class="overlay" data-starter-dialog><div class="modal">${modalHtml}</div></div>`, true);
   }
 
-  function openingCardsIcon() {
-    return '<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="10" y="17" width="36" height="51" rx="3" transform="rotate(-16 28 43)"/><rect x="28" y="13" width="36" height="51" rx="3" transform="rotate(12 46 39)"/><rect x="21" y="10" width="38" height="56" rx="3" fill="var(--opening-card-fill, #f5e8ce)"/><rect x="25" y="14" width="30" height="48" rx="1"/><path d="M40 23l3.5 11.5L52 38l-8.5 3.5L40 53l-3.5-11.5L28 38l8.5-3.5L40 23Z"/><path d="M40 18v2m0 36v2M28 20l2 2m20 32l2 2M52 20l-2 2M30 54l-2 2"/></svg>';
-  }
-
   function localPowerIcon(kind) {
     const path = kind === "ghost"
       ? '<path d="M10 29V15a10 10 0 0 1 20 0v19l-5-4-5 4-5-4-5 4v-5Z"/><circle cx="16" cy="16" r="1"/><circle cx="24" cy="16" r="1"/>'
@@ -983,42 +979,18 @@
     return `<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round">${path}</svg>`;
   }
 
-  function starterPlate(card, revealed = false) {
-    const art = animalArt(card);
-    return `<div class="cifra-card starter-card${revealed ? " starter-card-revealed" : ""}">
-      <div class="starter-card-art${art ? "" : " starter-art-empty"}" aria-label="Ilustración de ${escapeHtml(card.title)}">${art || openingCardsIcon()}<i class="starter-plate-corners" aria-hidden="true"></i><span class="starter-plate-mark" aria-hidden="true">Continuum</span></div>
-      <div class="starter-card-copy"><p class="starter-card-kicker">${revealed ? "La cifra que buscábamos" : "La carta de apertura"}</p>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong>
-      ${revealed ? `<span class="starter-real-value"><span class="sr-only">El valor real era </span>${escapeHtml(CT.formatValue(selectedModeKey, card))}</span>` : `<span class="starter-question">${escapeHtml(reglaCifra(selectedModeKey).pregunta || "")}</span>`}</div>
-    </div>`;
-  }
-
   function renderStarterGuess() {
     const card = starterCard();
-    const jugador = escapeHtml(starterDraw.names[starterDraw.step]);
-    renderStarterDialog(`<header class="starter-dialog-head"><div class="starter-round-label"><span>Quién empieza</span><span>Turno ${starterDraw.step + 1} de ${starterDraw.names.length}</span></div><h2 id="starter-dialog-title" data-dialog-focus tabindex="-1"><span>Pasa el móvil a </span><strong>${jugador}</strong></h2><div class="starter-turn-track" aria-hidden="true">${starterDraw.names.map((_, i) => `<i class="${i < starterDraw.step ? "is-done" : i === starterDraw.step ? "is-current" : ""}"></i>`).join("")}</div></header>
-      ${starterPlate(card)}
-      <section class="starter-answer">${CT.Duelo.Cifras.campo(selectedModeKey, "starter-guess-input", { attrs: 'placeholder="—"', hintId: "starter-answer-hint" })}</section>
+    renderStarterDialog(`${CT.StarterPresentation.heading(starterDraw.names[starterDraw.step], starterDraw.step, starterDraw.names.length)}
+      ${CT.StarterPresentation.plate(selectedModeKey, card)}
+      ${CT.StarterPresentation.answer(selectedModeKey, "starter-guess-input")}
       <div class="actions"><button class="btn btn-primary btn-block" data-action="starter-guess-submit">Adivinar <span aria-hidden="true">→</span></button></div>
       <p class="starter-footnote">Quien más se acerque abre la partida</p>`);
     const campo = app.querySelector("#starter-guess-input");
-    campo?.setAttribute("aria-describedby", "starter-answer-hint");
-    const syncAnswerChips = () => {
-      const value = campo?.value.trim() || "";
-      const suffix = value.replace(/^[+-]?[\d\s.,]*/, "").trim();
-      const factor = CT.Duelo.Cifras.factorDe(selectedModeKey, suffix);
-      app.querySelectorAll('[data-cifra-para="starter-guess-input"] .cifra-chip').forEach(button => {
-        const pressed = button.hasAttribute("data-cifra-signo") ? value.startsWith("-")
-          : factor !== null && CT.Duelo.Cifras.factorDe(selectedModeKey, button.dataset.cifraUnidad) === factor;
-        button.setAttribute("aria-pressed", String(pressed));
-      });
-    };
-    campo?.addEventListener("input", syncAnswerChips);
-    syncAnswerChips();
     // El teclado no se abre solo: taparía la carta y el botón. Se abre al tocar el campo; mientras tanto el
     // foco se queda en el título del diálogo, que es lo que lee el lector de pantalla.
     // En iOS el teclado tarda un pelín en abrirse y el viewport en recalcularse: sin este
     // empujón el campo puede quedar tapado hasta que el usuario desplace a mano.
-    campo?.addEventListener("focus", () => campo.scrollIntoView({ block: "center", behavior: "smooth" }));
     campo?.addEventListener("keydown", evento => { if (evento.key === "Enter") { evento.preventDefault(); starterGuessSubmit(); } });
   }
 
@@ -1039,16 +1011,14 @@
     document.querySelector(".starter-field").innerHTML = starterFieldMarkup();
     CT.Effects.starterResult?.();
     announce(`${starterDraw.names[winner]} ha acertado más cerca y empieza la partida. Orden de juego: ${order.map(i => starterDraw.names[i]).join(", ")}.`);
-    renderStarterDialog(`<header class="starter-winner-banner"><p class="starter-card-kicker">Ya tenemos quién empieza</p><span class="starter-winner-crown" aria-hidden="true">${crownIcon()}</span><h2 id="starter-dialog-title" data-dialog-focus tabindex="-1">${escapeHtml(starterDraw.names[winner])}</h2><span>La primera carta es tuya</span></header>
-      ${starterPlate(card, true)}
+    renderStarterDialog(`${CT.StarterPresentation.winner(starterDraw.names[winner])}
+      ${CT.StarterPresentation.plate(selectedModeKey, card, true)}
       ${starterOrderList(order.map(i => ({ name: starterDraw.names[i], value: Cifras.formato(selectedModeKey, starterDraw.guesses[i]) })))}
       <div class="actions" style="display:grid"><button class="btn btn-primary btn-block" data-action="starter-start">Empezar la partida <span aria-hidden="true">→</span></button><button class="btn btn-ghost btn-block" data-action="close-menu">Volver a la preparación</button></div>`);
   }
 
   // El resultado del minijuego, ya en orden de juego: la primera fila empieza.
-  function starterOrderList(rows) {
-    return `<div class="starter-order-heading"><strong>Orden de salida</strong><span>Vuestra respuesta</span></div><ol class="starter-draw-list">${rows.map((row, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ''}><span class="starter-place" aria-label="Puesto ${i + 1}">${i + 1}.º</span> <span class="starter-order-name">${escapeHtml(row.name)}</span><span class="starter-order-value">${escapeHtml(row.value)}</span></li>`).join("")}</ol>`;
-  }
+  function starterOrderList(rows) { return CT.StarterPresentation.order(rows); }
 
   function syncStarterOptions() {
     const inputs = [...document.querySelectorAll("#players input")];

@@ -12,6 +12,22 @@ try {
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(`http://127.0.0.1:${server.address().port}/`);
     await page.evaluate(() => window.CONTINUUM_SPLASH?.finish());
+    // Numeración, nombre y cruz deben compartir fila, incluso después de añadir participantes.
+    await page.evaluate(() => {
+      const CT = window.CONTINUUM;
+      CT.ModeHubs.open('hub-solo');
+      if (!document.querySelector('[data-block]')) document.querySelector('[data-inline-route]').click();
+      document.querySelector('[data-block="historia"]').click();
+      document.querySelector('[data-mode="history"]').click();
+      CT.openDeckAs('local');
+    });
+    await page.locator('[data-action="add-player"]').click();
+    const seats = await page.locator('#players .player-row').evaluateAll(rows => rows.map(row => {
+      const box = row.getBoundingClientRect(), input = row.querySelector('input').getBoundingClientRect(), remove = row.querySelector('.remove').getBoundingClientRect();
+      return {sameRow: Math.abs((input.top + input.height / 2) - (remove.top + remove.height / 2)) < 2, fits: input.right <= remove.left && remove.right <= box.right + 1, height: box.height};
+    }));
+    assert.ok(seats.length === 3 && seats.every(row => row.sameRow && row.fits && row.height <= 65), `Jugadores alineados a ${width}px`);
+    await page.evaluate(() => { window.CONTINUUM.localNavigate('home'); window.CONTINUUM.ModeHubs.refreshHome(); });
     // Inicio → Jugar → Jugar con amigos → Un solo móvil → Retos rápidos.
     await page.locator('[data-action="toggle-modes"]').click();
     await page.locator('[data-action="friends-hub"]').click();
@@ -31,6 +47,11 @@ try {
     assert.equal(await page.locator('[data-quick-name]').count(), 2);
     await page.locator('.quick-length-chip[data-length="1"]').click();
     await page.locator('[data-quick="start"]').click();
+    const plate = page.locator('[data-quick-starter][data-starter-dialog] .starter-card-art img');
+    await plate.waitFor();
+    await plate.evaluate(img => img.decode());
+    assert.ok(await plate.evaluate(img => img.naturalWidth > 0 && img.getBoundingClientRect().height >= 150), 'Retos rápidos muestra la lámina ilustrada');
+    assert.equal(await page.locator('[data-quick-starter] #quick-starter-input').getAttribute('aria-describedby'), 'quick-starter-input-hint');
     for (const v of ['1900', '1500']) { await page.locator('#quick-starter-input').fill(v); await page.locator('[data-quick="starter-guess"]').click(); }
     await page.locator('[data-quick="starter-go"]').click();
     const overflow = () => page.evaluate(() => document.documentElement.scrollWidth > innerWidth);

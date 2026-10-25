@@ -319,7 +319,8 @@ assert.match(w.document.querySelector('#app').textContent, /un solo móvil/);
 assert.ok(w.document.querySelector('.quick-starter-field [data-quick="draw-starter"]'), 'el campo de quién empieza es visible en la preparación');
 click('[data-quick="start"]');
 // Un solo móvil: antes de repartir se juega el minijuego de quién empieza (con una carta de Grandes colecciones).
-assert.ok(w.document.querySelector('[data-quick-starter]'), 'se abre el minijuego de quién empieza');
+assert.ok(w.document.querySelector('[data-quick-starter][data-starter-dialog]'), 'se abre el minijuego con la presentación común');
+assert.ok(w.document.querySelector('[data-quick-starter] .starter-card-art img'), 'la carta de apertura de Retos rápidos tiene ilustración');
 for (let i = 0; i < 2; i++) { w.document.getElementById('quick-starter-input').value = i ? '1500' : '1900'; click('[data-quick="starter-guess"]'); }
 assert.match(w.document.querySelector('[data-quick-starter]').textContent, /Empieza la partida/);
 assert.match(w.document.querySelector('.quick-starter-field').textContent, /empieza/, 'el resultado queda a la vista en la preparación');

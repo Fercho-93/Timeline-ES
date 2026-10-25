@@ -5624,12 +5624,12 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
 
 /* ══ 30 · La mesa de siempre y el minijuego de apertura ══ */
 /* Papel, tinta y grabados: una lámina continua, sin encajonar otra vez la carta. */
-#app :is(.local-setup, [data-starter-dialog]) {
+#app :is(.local-setup, .quick-local-setup, [data-starter-dialog], .starter-presentation) {
   --opening-sheet: #faf3e5; --opening-wash: #e9dcc1; --opening-edge: #b79a69;
   --opening-ink: #352a20; --opening-muted: #74634d; --opening-accent: var(--scene-color);
   --opening-card-fill: #f5e8ce;
 }
-:root[data-theme="dark"] #app :is(.local-setup, [data-starter-dialog]) {
+:root[data-theme="dark"] #app :is(.local-setup, .quick-local-setup, [data-starter-dialog], .starter-presentation) {
   --opening-sheet: #2b2016; --opening-wash: #20170f; --opening-edge: #9c8056;
   --opening-ink: #f5e6cc; --opening-muted: #c7b18c; --opening-accent: #d4ad76;
   --opening-card-fill: #382a1b;
@@ -5657,20 +5657,20 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
 #app .starter-turn-track i { width: 5px; height: 5px; border: 1px solid var(--opening-edge); transform: rotate(45deg); }
 #app .starter-turn-track .is-current { width: 7px; height: 7px; background: var(--opening-accent); border-color: var(--opening-accent); }
 #app .starter-turn-track .is-done { background: var(--opening-edge); }
-#app [data-starter-dialog] .starter-card {
+#app :is([data-starter-dialog], .starter-presentation) .starter-card {
   position: relative; margin: 0 -24px; padding: 0; border: 0; border-radius: 0;
   background: transparent; box-shadow: none; color: var(--opening-ink);
 }
-#app [data-starter-dialog] .starter-card-art {
+#app :is([data-starter-dialog], .starter-presentation) .starter-card-art {
   position: relative; isolation: isolate; margin: 0; padding: 0; overflow: hidden;
   height: clamp(190px, calc(26 * var(--dvh)), 265px); border: 0; border-block: 1px solid var(--opening-edge); border-radius: 0;
   background: var(--opening-wash);
 }
-#app [data-starter-dialog] .starter-card-art .animal-card-art {
+#app :is([data-starter-dialog], .starter-presentation) .starter-card-art .animal-card-art {
   display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 28%;
   filter: sepia(.25) saturate(.75) contrast(1.04);
 }
-#app [data-starter-dialog] .starter-card-art::after {
+#app :is([data-starter-dialog], .starter-presentation) .starter-card-art::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(0deg, #21170870, transparent 35%), linear-gradient(90deg, #32241312, transparent 20% 80%, #32241312);
   box-shadow: inset 0 0 25px #40251130;
@@ -5680,13 +5680,13 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
 #app .starter-plate-corners::before { left: -5px; }
 #app .starter-plate-corners::after { right: -5px; }
 #app .starter-plate-mark { position: absolute; z-index: 1; bottom: 14px; left: 20px; color: #fff0d6; font: 500 .57rem/1 var(--font-display); letter-spacing: .24em; text-transform: uppercase; }
-#app [data-starter-dialog] .starter-art-empty { display: grid; place-items: center; background: repeating-linear-gradient(45deg, #b79a6910 0 1px, transparent 1px 8px), var(--opening-wash); }
+#app :is([data-starter-dialog], .starter-presentation) .starter-art-empty { display: grid; place-items: center; background: repeating-linear-gradient(45deg, #b79a6910 0 1px, transparent 1px 8px), var(--opening-wash); }
 #app .starter-art-empty > svg { height: 80%; color: var(--opening-edge); }
 #app .starter-card-copy { position: relative; padding: 18px 26px 15px; }
 #app .starter-card-kicker { margin: 0 0 8px; color: var(--opening-accent); font: 600 .57rem/1.4 var(--ui-font); letter-spacing: .15em; text-transform: uppercase; }
-#app [data-starter-dialog] .starter-card strong { display: block; margin: 0 0 7px; color: var(--opening-ink); font: 500 clamp(1.35rem, calc(5.4 * var(--vw)), 1.8rem)/1.12 var(--font-display); text-wrap: balance; }
-#app [data-starter-dialog] .starter-question { display: block; color: var(--opening-muted); font: italic 1rem/1.3 var(--font-display); }
-#app [data-starter-dialog] .card-category { margin: 0 auto 7px; width: fit-content; color: var(--opening-muted); background: var(--opening-wash); }
+#app :is([data-starter-dialog], .starter-presentation) .starter-card strong { display: block; margin: 0 0 7px; color: var(--opening-ink); font: 500 clamp(1.35rem, calc(5.4 * var(--vw)), 1.8rem)/1.12 var(--font-display); text-wrap: balance; }
+#app :is([data-starter-dialog], .starter-presentation) .starter-question { display: block; color: var(--opening-muted); font: italic 1rem/1.3 var(--font-display); }
+#app :is([data-starter-dialog], .starter-presentation) .card-category { margin: 0 auto 7px; width: fit-content; color: var(--opening-muted); background: var(--opening-wash); }
 #app .starter-answer { position: relative; margin-top: 3px; padding-top: 13px; border-top: 1px solid var(--opening-edge); }
 #app .starter-answer::before { content: "◇"; position: absolute; top: -9px; left: calc(50% - 13px); width: 26px; background: var(--opening-sheet); color: var(--opening-edge); font: 15px/1 var(--font-display); }
 #app .starter-answer .cifra-field { margin: 0; text-align: center; }
@@ -5716,31 +5716,31 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
 #app [data-starter-dialog] .btn-primary > span { display: inline-grid; place-items: center; width: 24px; height: 24px; border: 1px solid #fff4dd55; border-radius: 50%; }
 #app .starter-footnote { margin: 11px 0 0; color: var(--opening-muted); font: italic .74rem/1.4 var(--font-display); }
 /* El resultado conserva la lámina, pero se convierte en una ficha de archivo compacta. */
-#app [data-starter-dialog] .starter-winner-banner { margin: 0 0 18px; padding: 0; gap: 4px; border: 0; border-radius: 0; background: transparent; overflow: visible; }
-#app [data-starter-dialog] .starter-winner-banner::after { display: none; }
-#app [data-starter-dialog] .starter-winner-crown { display: grid; place-items: center; width: 62px; height: 62px; margin: 2px 0 8px; border: 1px solid var(--opening-edge); border-radius: 50%; color: var(--opening-accent); box-shadow: inset 0 0 0 4px var(--opening-sheet), inset 0 0 0 5px var(--opening-edge); }
+#app :is([data-starter-dialog], .starter-presentation) .starter-winner-banner { margin: 0 0 18px; padding: 0; gap: 4px; border: 0; border-radius: 0; background: transparent; overflow: visible; }
+#app :is([data-starter-dialog], .starter-presentation) .starter-winner-banner::after { display: none; }
+#app :is([data-starter-dialog], .starter-presentation) .starter-winner-crown { display: grid; place-items: center; width: 62px; height: 62px; margin: 2px 0 8px; border: 1px solid var(--opening-edge); border-radius: 50%; color: var(--opening-accent); box-shadow: inset 0 0 0 4px var(--opening-sheet), inset 0 0 0 5px var(--opening-edge); }
 #app .starter-winner-crown svg { width: 28px; height: 28px; }
 #app .starter-winner-banner h2 { margin: 0; font: 500 2rem/1.1 var(--font-display); color: var(--opening-ink); overflow-wrap: anywhere; }
-#app [data-starter-dialog] .starter-winner-banner > span:last-child { font: italic .9rem/1.4 var(--font-display); text-transform: none; letter-spacing: 0; color: var(--opening-muted); }
-#app [data-starter-dialog] .starter-card-revealed { display: grid; grid-template-columns: 100px minmax(0, 1fr); align-items: stretch; gap: 0; margin: 0 0 22px; padding: 6px; border: 1px solid var(--opening-edge); background: var(--opening-wash); }
-#app [data-starter-dialog] .starter-card-revealed .starter-card-art { height: 100%; min-height: 132px; border: 0; }
+#app :is([data-starter-dialog], .starter-presentation) .starter-winner-banner > span:last-child { font: italic .9rem/1.4 var(--font-display); text-transform: none; letter-spacing: 0; color: var(--opening-muted); }
+#app :is([data-starter-dialog], .starter-presentation) .starter-card-revealed { display: grid; grid-template-columns: 100px minmax(0, 1fr); align-items: stretch; gap: 0; margin: 0 0 22px; padding: 6px; border: 1px solid var(--opening-edge); background: var(--opening-wash); }
+#app :is([data-starter-dialog], .starter-presentation) .starter-card-revealed .starter-card-art { height: 100%; min-height: 132px; border: 0; }
 #app .starter-card-revealed .starter-card-copy { align-self: center; padding: 10px 12px; text-align: left; }
-#app [data-starter-dialog] .starter-card-revealed strong { font-size: 1rem; }
+#app :is([data-starter-dialog], .starter-presentation) .starter-card-revealed strong { font-size: 1rem; }
 #app .starter-card-revealed .starter-plate-mark { display: none; }
-#app [data-starter-dialog] .starter-real-value { display: block; color: var(--opening-accent); font: 500 1.65rem/1.1 var(--font-display); }
+#app :is([data-starter-dialog], .starter-presentation) .starter-real-value { display: block; color: var(--opening-accent); font: 500 1.65rem/1.1 var(--font-display); }
 #app .starter-real-value > .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 #app .starter-order-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-bottom: 9px; border-bottom: 1px solid var(--opening-edge); text-align: left; color: var(--opening-muted); font: .61rem var(--ui-font); }
 #app .starter-order-heading strong { color: var(--opening-ink); font: 500 1.05rem var(--font-display); }
-#app [data-starter-dialog] .starter-draw-list { gap: 0; margin: 0 0 18px; }
-#app [data-starter-dialog] .starter-draw-list li { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: center; gap: 9px; padding: 11px 0; border: 0; border-bottom: 1px solid #b79a694d; border-radius: 0; background: transparent; color: var(--opening-ink); text-align: left; }
+#app :is([data-starter-dialog], .starter-presentation) .starter-draw-list { gap: 0; margin: 0 0 18px; }
+#app :is([data-starter-dialog], .starter-presentation) .starter-draw-list li { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: center; gap: 9px; padding: 11px 0; border: 0; border-bottom: 1px solid #b79a694d; border-radius: 0; background: transparent; color: var(--opening-ink); text-align: left; }
 #app .starter-place { color: var(--opening-edge); font: 500 1rem var(--font-display); }
 #app .starter-order-name { overflow-wrap: anywhere; font: 500 1rem var(--font-display); }
 #app .starter-order-value { max-width: 120px; overflow-wrap: anywhere; text-align: right; font: .8rem var(--ui-font); color: var(--opening-muted); }
-#app [data-starter-dialog] .starter-draw-winner { color: var(--opening-accent); }
+#app :is([data-starter-dialog], .starter-presentation) .starter-draw-winner { color: var(--opening-accent); }
 #app .starter-draw-winner .starter-place { display: grid; place-items: center; width: 26px; height: 30px; background: var(--opening-accent); color: var(--opening-sheet); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 86%, 0 100%); font-size: .8rem; }
 /* La preparación: fichas de asiento, un carnet de habituales y los poderes como cartas. */
 #app .local-setup #players { counter-reset: seat; }
-#app .local-setup .player-row { align-items: center; gap: 8px; counter-increment: seat; }
+#app .local-setup .player-row { grid-template-columns: 28px minmax(0, 1fr) 44px; align-items: center; gap: 8px; counter-increment: seat; }
 #app .local-setup .player-row::before { content: counter(seat, decimal-leading-zero); display: grid; place-items: center; flex: none; width: 28px; height: 32px; border-block: 1px solid var(--opening-edge); color: var(--opening-muted); font: 500 1rem var(--font-display); }
 html #app[data-screen] .local-setup .player-row input { min-width: 0; border: 0; border-bottom: 1px solid var(--opening-edge); border-radius: 0; background: transparent; box-shadow: none; font: 500 1.1rem var(--font-display); }
 #app .local-setup .player-row .remove { width: 44px; height: 44px; border: 0; background: transparent; color: var(--opening-muted); }
@@ -5788,7 +5788,7 @@ html #app[data-screen] .local-setup .local-hand-size select { height: 54px; padd
 }
 @media (max-width: 360px) {
   #app [data-starter-dialog] .modal { padding-inline: 18px; }
-  #app [data-starter-dialog] .starter-card:not(.starter-card-revealed) { margin-inline: -18px; }
+  #app :is([data-starter-dialog], .starter-presentation) .starter-card:not(.starter-card-revealed) { margin-inline: -18px; }
   #app .starter-round-label { font-size: .53rem; letter-spacing: .08em; }
   #app .starter-draw-cta { padding: 18px 14px; gap: 10px; }
   #app .starter-draw-icon { width: 46px; height: 60px; }
@@ -5801,7 +5801,23 @@ html #app[data-screen] .local-setup .local-hand-size select { height: 54px; padd
   #app .local-power-mark { width: 26px; height: 36px; }
 }
 @media (max-height: 700px) {
-  #app [data-starter-dialog] .starter-card-art { height: 170px; }
+  #app :is([data-starter-dialog], .starter-presentation) .starter-card-art { height: 170px; }
   #app .starter-dialog-head { margin-bottom: 12px; }
   #app .starter-dialog-head h2 { margin-block: 9px; }
 }
+
+/* Numeración, nombre y retirada ocupan siempre una sola fila, también tras añadir o borrar. */
+html #app[data-screen] .local-setup #players .player-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) 44px; }
+html #app[data-screen] .local-setup #players .player-row input { grid-column: 2; grid-row: 1; width: 100%; min-height: 44px; box-sizing: border-box; padding: 10px 12px; border: 1px solid var(--opening-edge); border-radius: 8px; background: var(--opening-sheet); color: var(--opening-ink); font: 500 1.05rem/1.2 var(--font-display); }
+html #app[data-screen] .local-setup #players .player-row .remove { grid-column: 3; grid-row: 1; }
+html #app[data-screen] .local-setup #players .player-row::before { grid-column: 1; grid-row: 1; }
+#app .starter-inline { min-width: 0; padding: 16px; margin: 12px 0; border: 1px solid var(--opening-edge); border-radius: 10px; background: var(--opening-sheet); color: var(--opening-ink); }
+#app .starter-inline .starter-card, #app .starter-inline .starter-card:not(.starter-card-revealed) { margin: 0; }
+#app .starter-inline .starter-card-art { border-radius: 5px; height: clamp(170px, calc(25 * var(--dvh)), 230px); }
+#app .starter-inline .starter-card-copy { padding-inline: 0; }
+#app .starter-inline .starter-draw-list li { display: flex; }
+#app .starter-inline .starter-draw-list li > :last-child { margin-left: auto; }
+#app .starter-inline > .btn { margin-top: 12px; }
+#app .starter-inline .hint, #app .starter-inline .section-label { color: var(--opening-muted); }
+
+#app :is([data-starter-dialog], .starter-presentation) [data-dialog-focus]:focus { outline: none; }
