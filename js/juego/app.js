@@ -898,27 +898,27 @@
     screen = "setup";
     starterDraw = null;
     paint(`<div class="shell">${header("back-menu")}
-      <section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2 data-focus tabindex="-1">Un solo móvil</h2><p class="lead">Añade hasta 9 personas y decidid quién empieza adivinando la cifra de una carta.</p>
+      <section class="setup-section local-setup"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2 data-focus tabindex="-1">Un solo móvil</h2><p class="lead">Añade hasta 9 personas y decidid quién empieza adivinando la cifra de una carta.</p>
         ${game && !game.winners && !pendingTournament && sessionStorage.getItem('continuum-entry-route') === 'local' ? '<button class="btn btn-secondary btn-block" data-action="continue">Continuar partida guardada <span>→</span></button>' : ''}
         <div class="panel">
           <div class="setup-block">
             <div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Jugadores</span></div>
             <div id="players">${(lastLocalSetup?.names || [CT.Identidad.nombre() || "Jugador 1", "Jugador 2"]).map((name, i) => `<div class="player-row"><input aria-label="Nombre del jugador ${i + 1}" value="${escapeHtml(name)}" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div>`).join("")}</div>
-            <button class="btn btn-ghost" data-action="add-player">＋ Añadir participante</button>
+            <button class="btn btn-ghost" data-action="add-player"><span aria-hidden="true">+</span> Añadir participante</button>
             <section id="recent-players" class="recent-players" aria-label="Participantes recientes" hidden></section>
           </div>
           <div class="setup-block">
             <div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Cómo empezar</span></div>
             <div class="setup-grid">
               <div class="field starter-field">${starterFieldMarkup()}</div>
-              <div class="field"><label for="hand-size">Cartas iniciales por persona</label><select id="hand-size">${[1, 2, 3, 4, 5, 6].map(n => `<option${n === (lastLocalSetup?.handSize || 4) ? " selected" : ""}>${n}</option>`).join("")}</select></div>
+              <div class="field local-hand-size"><span class="local-hand-art" aria-hidden="true">${openingCardsIcon()}</span><label for="hand-size">Cartas iniciales por persona<small>En la mano de cada jugador</small></label><select id="hand-size">${[1, 2, 3, 4, 5, 6].map(n => `<option${n === (lastLocalSetup?.handSize || 4) ? " selected" : ""}>${n}</option>`).join("")}</select></div>
             </div>
           </div>
           <div class="setup-block">
             <div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Poderes</span></div>
             <p class="hint">Para una primera partida, mejor sin poderes.</p>
-            <label class="opt-row"><span>Cartas Fantasma <small>Esconde de 1 a 3 Fantasmas según los jugadores. Pueden salir al repartir o robar, o quedarse sin descubrir. Se guardan aparte y no cuentan para ganar.</small></span><input type="checkbox" id="ghost-toggle"${lastLocalSetup?.ghost ? " checked" : ""}></label>
-            <label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="pulse-toggle"${lastLocalSetup?.pulse ? " checked" : ""}></label>
+            <label class="opt-row local-power local-power-ghost"><i class="local-power-mark" aria-hidden="true">${localPowerIcon("ghost")}</i><span>Cartas Fantasma <small>Esconde de 1 a 3 Fantasmas según los jugadores. Pueden salir al repartir o robar, o quedarse sin descubrir. Se guardan aparte y no cuentan para ganar.</small></span><input type="checkbox" id="ghost-toggle"${lastLocalSetup?.ghost ? " checked" : ""}></label>
+            <label class="opt-row local-power local-power-pulse"><i class="local-power-mark" aria-hidden="true">${localPowerIcon("pulse")}</i><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="pulse-toggle"${lastLocalSetup?.pulse ? " checked" : ""}></label>
           </div>
           <div class="setup-block">
             ${CT.Tiempo.field("local")}
@@ -935,11 +935,11 @@
   function starterFieldMarkup() {
     const names = playerNames();
     if (!starterDraw || starterDraw.winner === null || starterDraw.names.length !== names.length) {
-      return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-block starter-draw-cta" data-action="draw-starter"><span class="starter-draw-icon" aria-hidden="true">✦</span><span class="starter-draw-copy"><span class="starter-draw-kicker">El primer turno se gana</span><b>Adivinar ${CT.starterNoun(selectedModeKey)}</b><small>Cada uno prueba con una carta y gana quien más se acerque</small></span><span class="starter-draw-arrow" aria-hidden="true">→</span></button>`;
+      return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-block starter-draw-cta" data-action="draw-starter"><span class="starter-draw-icon" aria-hidden="true">${openingCardsIcon()}</span><span class="starter-draw-copy"><span class="starter-draw-kicker">El primer turno se gana</span><b>Adivinar ${CT.starterNoun(selectedModeKey)}</b><small>Cada uno prueba con una carta y gana quien más se acerque</small></span><span class="starter-draw-arrow" aria-hidden="true">→</span></button>`;
     }
     const ganador = escapeHtml(names[starterDraw.winner] ?? `Jugador ${starterDraw.winner + 1}`);
     const orden = (starterDraw.order || [starterDraw.winner]).map(i => escapeHtml(names[i] ?? `Jugador ${i + 1}`)).join(" → ");
-    return `<span class="field-label">Quién empieza</span><p class="starter-result"><span class="starter-result-crown" aria-hidden="true">${crownIcon()}</span><strong>${ganador}</strong> ha acertado más cerca y empieza.</p><p class="hint">Orden de juego: ${orden}</p><button type="button" class="btn btn-ghost" data-action="draw-starter">🂠 Repetir el minijuego</button>`;
+    return `<span class="field-label">Quién empieza</span><p class="starter-result"><span class="starter-result-crown" aria-hidden="true">${crownIcon()}</span><strong>${ganador}</strong> ha acertado más cerca y empieza.</p><p class="hint">Orden de juego: ${orden}</p><button type="button" class="btn btn-ghost" data-action="draw-starter"><span aria-hidden="true">↻</span> Repetir el minijuego</button>`;
   }
   const crownIcon = () => '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l4 3 5-6 5 6 4-3-2 10H5L3 8Z"/><path d="M5 21h14"/></svg>';
 
@@ -968,19 +968,52 @@
   // retrocede a la pregunta de quien ya contestó.
   function renderStarterDialog(modalHtml) {
     const existing = app.querySelector('[data-starter-dialog] .modal');
-    if (existing) { existing.innerHTML = modalHtml; return; }
+    if (existing) { existing.innerHTML = modalHtml; existing.querySelector("[data-dialog-focus]")?.focus({ preventScroll: true }); return; }
     overlay(`<div class="overlay" data-starter-dialog><div class="modal">${modalHtml}</div></div>`, true);
+  }
+
+  function openingCardsIcon() {
+    return '<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="10" y="17" width="36" height="51" rx="3" transform="rotate(-16 28 43)"/><rect x="28" y="13" width="36" height="51" rx="3" transform="rotate(12 46 39)"/><rect x="21" y="10" width="38" height="56" rx="3" fill="var(--opening-card-fill, #f5e8ce)"/><rect x="25" y="14" width="30" height="48" rx="1"/><path d="M40 23l3.5 11.5L52 38l-8.5 3.5L40 53l-3.5-11.5L28 38l8.5-3.5L40 23Z"/><path d="M40 18v2m0 36v2M28 20l2 2m20 32l2 2M52 20l-2 2M30 54l-2 2"/></svg>';
+  }
+
+  function localPowerIcon(kind) {
+    const path = kind === "ghost"
+      ? '<path d="M10 29V15a10 10 0 0 1 20 0v19l-5-4-5 4-5-4-5 4v-5Z"/><circle cx="16" cy="16" r="1"/><circle cx="24" cy="16" r="1"/>'
+      : '<path d="m23 4-15 20h11l-2 12 15-20H21l2-12Z"/>';
+    return `<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round">${path}</svg>`;
+  }
+
+  function starterPlate(card, revealed = false) {
+    const art = animalArt(card);
+    return `<div class="cifra-card starter-card${revealed ? " starter-card-revealed" : ""}">
+      <div class="starter-card-art${art ? "" : " starter-art-empty"}" aria-label="Ilustración de ${escapeHtml(card.title)}">${art || openingCardsIcon()}<i class="starter-plate-corners" aria-hidden="true"></i><span class="starter-plate-mark" aria-hidden="true">Continuum</span></div>
+      <div class="starter-card-copy"><p class="starter-card-kicker">${revealed ? "La cifra que buscábamos" : "La carta de apertura"}</p>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong>
+      ${revealed ? `<span class="starter-real-value"><span class="sr-only">El valor real era </span>${escapeHtml(CT.formatValue(selectedModeKey, card))}</span>` : `<span class="starter-question">${escapeHtml(reglaCifra(selectedModeKey).pregunta || "")}</span>`}</div>
+    </div>`;
   }
 
   function renderStarterGuess() {
     const card = starterCard();
-    const regla = reglaCifra(selectedModeKey);
     const jugador = escapeHtml(starterDraw.names[starterDraw.step]);
-    renderStarterDialog(`<header class="starter-dialog-head"><p class="starter-eyebrow">Quién empieza <span>·</span> ${starterDraw.step + 1} / ${starterDraw.names.length}</p><h2 data-dialog-focus tabindex="-1">Pasa el móvil a <em>${jugador}</em></h2><div class="starter-turn-track" aria-hidden="true">${starterDraw.names.map((_, i) => `<i class="${i < starterDraw.step ? "is-done" : i === starterDraw.step ? "is-current" : ""}"></i>`).join("")}</div></header>
-      <div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta || "")}</span></div>
-      <section class="starter-answer">${CT.Duelo.Cifras.campo(selectedModeKey, "starter-guess-input")}</section>
-      <div class="actions"><button class="btn btn-primary btn-block" data-action="starter-guess-submit">Adivinar <span>→</span></button></div>`);
+    renderStarterDialog(`<header class="starter-dialog-head"><div class="starter-round-label"><span>Quién empieza</span><span>Turno ${starterDraw.step + 1} de ${starterDraw.names.length}</span></div><h2 id="starter-dialog-title" data-dialog-focus tabindex="-1"><span>Pasa el móvil a </span><strong>${jugador}</strong></h2><div class="starter-turn-track" aria-hidden="true">${starterDraw.names.map((_, i) => `<i class="${i < starterDraw.step ? "is-done" : i === starterDraw.step ? "is-current" : ""}"></i>`).join("")}</div></header>
+      ${starterPlate(card)}
+      <section class="starter-answer">${CT.Duelo.Cifras.campo(selectedModeKey, "starter-guess-input", { attrs: 'placeholder="—"', hintId: "starter-answer-hint" })}</section>
+      <div class="actions"><button class="btn btn-primary btn-block" data-action="starter-guess-submit">Adivinar <span aria-hidden="true">→</span></button></div>
+      <p class="starter-footnote">Quien más se acerque abre la partida</p>`);
     const campo = app.querySelector("#starter-guess-input");
+    campo?.setAttribute("aria-describedby", "starter-answer-hint");
+    const syncAnswerChips = () => {
+      const value = campo?.value.trim() || "";
+      const suffix = value.replace(/^[+-]?[\d\s.,]*/, "").trim();
+      const factor = CT.Duelo.Cifras.factorDe(selectedModeKey, suffix);
+      app.querySelectorAll('[data-cifra-para="starter-guess-input"] .cifra-chip').forEach(button => {
+        const pressed = button.hasAttribute("data-cifra-signo") ? value.startsWith("-")
+          : factor !== null && CT.Duelo.Cifras.factorDe(selectedModeKey, button.dataset.cifraUnidad) === factor;
+        button.setAttribute("aria-pressed", String(pressed));
+      });
+    };
+    campo?.addEventListener("input", syncAnswerChips);
+    syncAnswerChips();
     // El teclado no se abre solo: taparía la carta y el botón. Se abre al tocar el campo; mientras tanto el
     // foco se queda en el título del diálogo, que es lo que lee el lector de pantalla.
     // En iOS el teclado tarda un pelín en abrirse y el viewport en recalcularse: sin este
@@ -1006,16 +1039,15 @@
     document.querySelector(".starter-field").innerHTML = starterFieldMarkup();
     CT.Effects.starterResult?.();
     announce(`${starterDraw.names[winner]} ha acertado más cerca y empieza la partida. Orden de juego: ${order.map(i => starterDraw.names[i]).join(", ")}.`);
-    renderStarterDialog(`<h2>¿Quién empieza?</h2>
-      <div class="starter-winner-banner"><span class="starter-winner-crown" aria-hidden="true">${crownIcon()}</span><b>${escapeHtml(starterDraw.names[winner])}</b><span>Empieza la partida</span></div>
-      <div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>El valor real era ${escapeHtml(CT.formatValue(selectedModeKey, card))}</span></div>
+    renderStarterDialog(`<header class="starter-winner-banner"><p class="starter-card-kicker">Ya tenemos quién empieza</p><span class="starter-winner-crown" aria-hidden="true">${crownIcon()}</span><h2 id="starter-dialog-title" data-dialog-focus tabindex="-1">${escapeHtml(starterDraw.names[winner])}</h2><span>La primera carta es tuya</span></header>
+      ${starterPlate(card, true)}
       ${starterOrderList(order.map(i => ({ name: starterDraw.names[i], value: Cifras.formato(selectedModeKey, starterDraw.guesses[i]) })))}
       <div class="actions" style="display:grid"><button class="btn btn-primary btn-block" data-action="starter-start">Empezar la partida <span aria-hidden="true">→</span></button><button class="btn btn-ghost btn-block" data-action="close-menu">Volver a la preparación</button></div>`);
   }
 
   // El resultado del minijuego, ya en orden de juego: la primera fila empieza.
   function starterOrderList(rows) {
-    return `<p class="hint">Orden de juego, de quien más se acercó a quien menos:</p><ol class="starter-draw-list">${rows.map((row, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ''}><span>${i + 1}.º ${escapeHtml(row.name)}</span><span>${escapeHtml(row.value)}</span></li>`).join("")}</ol>`;
+    return `<div class="starter-order-heading"><strong>Orden de salida</strong><span>Vuestra respuesta</span></div><ol class="starter-draw-list">${rows.map((row, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ''}><span class="starter-place" aria-label="Puesto ${i + 1}">${i + 1}.º</span> <span class="starter-order-name">${escapeHtml(row.name)}</span><span class="starter-order-value">${escapeHtml(row.value)}</span></li>`).join("")}</ol>`;
   }
 
   function syncStarterOptions() {

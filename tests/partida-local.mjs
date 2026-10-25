@@ -17,7 +17,7 @@ function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.
 
 
 function boot() {
-  return arrancarJuego();
+  return arrancarJuego({ antes: w => { w.Element.prototype.scrollIntoView = () => {}; } });
 }
 const click = (w, sel) => { const el = w.document.querySelector(sel); if (!el) throw new Error(`no existe ${sel}`); el.dispatchEvent(new w.MouseEvent("click", { bubbles: true })); };
 
@@ -98,9 +98,15 @@ ok("al principio hay que adivinar una cifra", !!w.document.querySelector('[data-
 click(w, '[data-action="draw-starter"]');
 ok("pide pasar el móvil al primer jugador, que lleva tu nombre", /Pasa el móvil a Prueba/.test(w.document.body.textContent));
 ok("el sorteo enseña la ilustración de la carta", !!w.document.querySelector('.starter-card-art img.animal-card-art'));
+ok("la ayuda está asociada a la respuesta", w.document.getElementById(w.document.getElementById("starter-guess-input").getAttribute("aria-describedby"))?.textContent.length > 0);
+click(w, '[data-cifra-signo]');
+ok("antes de Cristo queda marcado al elegirlo", w.document.querySelector('[data-cifra-signo]').getAttribute('aria-pressed') === 'true');
+click(w, '[data-cifra-signo]');
+ok("volver a tocarlo quita la marca y el signo", w.document.querySelector('[data-cifra-signo]').getAttribute('aria-pressed') === 'false' && w.document.getElementById('starter-guess-input').value === '');
 w.document.getElementById("starter-guess-input").value = "1900";
 click(w, '[data-action="starter-guess-submit"]');
 ok("después pide pasar el móvil al segundo jugador", /Pasa el móvil a Jugador 2/.test(w.document.body.textContent));
+ok("el turno siguiente anuncia su título y conserva el nombre accesible del diálogo", w.document.activeElement.id === 'starter-dialog-title' && !!w.document.getElementById(w.document.querySelector('[data-starter-dialog] .modal').getAttribute('aria-labelledby')));
 w.document.getElementById("starter-guess-input").value = "1901";
 click(w, '[data-action="starter-guess-submit"]');
 ok("el resultado enseña la cifra de cada jugador", w.document.querySelectorAll(".starter-draw-list li").length === 2);
