@@ -26,7 +26,8 @@
   }
   function answer(modeKey, id) {
     const hintId = `${id}-hint`;
-    const html = CT.Duelo.Cifras.campo(modeKey, id, { attrs: `placeholder="—" aria-describedby="${hintId}"`, hintId });
+    const placeholder = CT.axis(modeKey).cifra?.negativos ? "Escribe el año" : "Escribe una cifra";
+    const html = CT.Duelo.Cifras.campo(modeKey, id, { attrs: `placeholder="${placeholder}" aria-describedby="${hintId}"`, hintId });
     // La unidad inicial y el signo de antes de Cristo indican su estado en todas las entradas.
     const marked = html.replace(/<button type="button" class="cifra-chip"([^>]*)>/g, (match, attrs) => {
       const unit = attrs.match(/data-cifra-unidad="([^"]*)"/)?.[1];

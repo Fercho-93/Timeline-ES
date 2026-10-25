@@ -5627,12 +5627,12 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
 #app :is(.local-setup, .quick-local-setup, [data-starter-dialog], .starter-presentation) {
   --opening-sheet: #faf3e5; --opening-wash: #e9dcc1; --opening-edge: #b79a69;
   --opening-ink: #352a20; --opening-muted: #74634d; --opening-accent: var(--scene-color);
-  --opening-card-fill: #f5e8ce;
+  --opening-card-fill: #f5e8ce; --opening-input: #fffaf2;
 }
 :root[data-theme="dark"] #app :is(.local-setup, .quick-local-setup, [data-starter-dialog], .starter-presentation) {
   --opening-sheet: #2b2016; --opening-wash: #20170f; --opening-edge: #9c8056;
   --opening-ink: #f5e6cc; --opening-muted: #c7b18c; --opening-accent: #d4ad76;
-  --opening-card-fill: #382a1b;
+  --opening-card-fill: #382a1b; --opening-input: #35291d;
 }
 #app [data-starter-dialog] {
   padding: max(12px, var(--safe-top)) 12px max(12px, var(--safe-bottom));
@@ -5662,12 +5662,12 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
   background: transparent; box-shadow: none; color: var(--opening-ink);
 }
 #app :is([data-starter-dialog], .starter-presentation) .starter-card-art {
-  position: relative; isolation: isolate; margin: 0; padding: 0; overflow: hidden;
+  position: relative; isolation: isolate; margin: 0; padding: 10px; overflow: hidden;
   height: clamp(190px, calc(26 * var(--dvh)), 265px); border: 0; border-block: 1px solid var(--opening-edge); border-radius: 0;
   background: var(--opening-wash);
 }
 #app :is([data-starter-dialog], .starter-presentation) .starter-card-art .animal-card-art {
-  display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 28%;
+  display: block; width: 100%; height: 100%; object-fit: contain; object-position: center;
   filter: sepia(.25) saturate(.75) contrast(1.04);
 }
 #app :is([data-starter-dialog], .starter-presentation) .starter-card-art::after {
@@ -5693,13 +5693,13 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
 #app .starter-answer label { color: var(--opening-muted); font: 600 .64rem/1.5 var(--ui-font); letter-spacing: .07em; text-transform: uppercase; }
 #app .starter-answer .cifra-unidad { color: var(--opening-muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
 #app .starter-answer input {
-  width: 100%; height: 60px; min-height: 60px; margin: 0; padding: 3px 12px;
-  border: 0; border-bottom: 1px solid var(--opening-edge); border-radius: 0;
-  background: repeating-linear-gradient(90deg, transparent 0 10px, #b79a6918 10px 11px) bottom/100% 4px no-repeat;
-  color: var(--opening-ink); font: 500 2.3rem/1.1 var(--font-display); box-shadow: none;
+  width: 100%; height: 56px; min-height: 56px; margin: 10px 0 0; padding: 10px 12px;
+  border: 1px solid var(--opening-edge); border-radius: 9px;
+  background: var(--opening-input); color: var(--opening-ink);
+  font: 500 1.8rem/1.2 var(--font-display); box-shadow: inset 0 2px 4px #30201008;
 }
-#app .starter-answer input::placeholder { color: var(--opening-edge); opacity: .6; }
-#app .starter-answer input:focus { outline: 0; border-bottom: 2px solid var(--opening-accent); background-color: color-mix(in srgb, var(--opening-wash) 35%, transparent); }
+#app .starter-answer input::placeholder { color: var(--opening-muted); font: 400 1rem/1.2 var(--ui-font); opacity: .85; }
+#app .starter-answer input:focus { outline: 0; border-color: var(--opening-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--opening-accent) 18%, transparent); }
 #app .starter-answer .cifra-chips { justify-content: center; gap: 6px; margin-top: 10px; }
 #app .starter-answer .cifra-chip {
   min-width: 44px; min-height: 44px; padding: 6px 11px; border: 1px solid #b79a695c; border-radius: 99px;
