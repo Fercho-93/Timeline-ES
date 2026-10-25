@@ -935,7 +935,7 @@
   function starterFieldMarkup() {
     const names = playerNames();
     if (!starterDraw || starterDraw.winner === null || starterDraw.names.length !== names.length) {
-      return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-block starter-draw-cta" data-action="draw-starter"><span class="starter-draw-icon" aria-hidden="true">🂠</span><span class="starter-draw-copy"><b>Adivinar ${CT.starterNoun(selectedModeKey)}</b><small>Cada uno prueba con una carta y gana quien más se acerque</small></span><span class="starter-draw-arrow" aria-hidden="true">→</span></button>`;
+      return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-block starter-draw-cta" data-action="draw-starter"><span class="starter-draw-icon" aria-hidden="true">✦</span><span class="starter-draw-copy"><span class="starter-draw-kicker">El primer turno se gana</span><b>Adivinar ${CT.starterNoun(selectedModeKey)}</b><small>Cada uno prueba con una carta y gana quien más se acerque</small></span><span class="starter-draw-arrow" aria-hidden="true">→</span></button>`;
     }
     const ganador = escapeHtml(names[starterDraw.winner] ?? `Jugador ${starterDraw.winner + 1}`);
     const orden = (starterDraw.order || [starterDraw.winner]).map(i => escapeHtml(names[i] ?? `Jugador ${i + 1}`)).join(" → ");
@@ -976,9 +976,9 @@
     const card = starterCard();
     const regla = reglaCifra(selectedModeKey);
     const jugador = escapeHtml(starterDraw.names[starterDraw.step]);
-    renderStarterDialog(`<h2 data-dialog-focus tabindex="-1">Pasa el móvil a ${jugador}</h2>
+    renderStarterDialog(`<header class="starter-dialog-head"><p class="starter-eyebrow">Quién empieza <span>·</span> ${starterDraw.step + 1} / ${starterDraw.names.length}</p><h2 data-dialog-focus tabindex="-1">Pasa el móvil a <em>${jugador}</em></h2><div class="starter-turn-track" aria-hidden="true">${starterDraw.names.map((_, i) => `<i class="${i < starterDraw.step ? "is-done" : i === starterDraw.step ? "is-current" : ""}"></i>`).join("")}</div></header>
       <div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta || "")}</span></div>
-      ${CT.Duelo.Cifras.campo(selectedModeKey, "starter-guess-input")}
+      <section class="starter-answer">${CT.Duelo.Cifras.campo(selectedModeKey, "starter-guess-input")}</section>
       <div class="actions"><button class="btn btn-primary btn-block" data-action="starter-guess-submit">Adivinar <span>→</span></button></div>`);
     const campo = app.querySelector("#starter-guess-input");
     // El teclado no se abre solo: taparía la carta y el botón. Se abre al tocar el campo; mientras tanto el
@@ -1031,9 +1031,9 @@
     const active = [...document.querySelectorAll("#players input")].map(input => input.value);
     const names = CT.RecentPlayers.available(active);
     host.hidden = !names.length;
-    host.innerHTML = names.length ? `<div class="recent-players-head"><strong>Jugadores recientes</strong><button type="button" data-action="clear-recent-players">Borrar lista</button></div><div class="recent-player-list">${names.map(name => {
+    host.innerHTML = names.length ? `<div class="recent-players-head"><div><span class="recent-players-kicker">Vuelve a reunir a tu mesa</span><strong>Jugadores recientes</strong></div><button type="button" data-action="clear-recent-players">Borrar lista</button></div><div class="recent-player-list">${names.map(name => {
       const encoded = encodeURIComponent(name);
-      return `<span class="recent-player"><button type="button" data-action="add-recent-player" data-recent-name="${encoded}" aria-label="Añadir a ${escapeHtml(name)}">＋ ${escapeHtml(name)}</button><button type="button" data-action="remove-recent-player" data-recent-name="${encoded}" aria-label="Olvidar a ${escapeHtml(name)}">×</button></span>`;
+      return `<span class="recent-player"><button type="button" data-action="add-recent-player" data-recent-name="${encoded}" aria-label="Añadir a ${escapeHtml(name)}"><span class="recent-player-seal" aria-hidden="true">${escapeHtml(Array.from(name.trim())[0] || "✦")}</span><span class="recent-player-name">${escapeHtml(name)}</span><span class="recent-player-add" aria-hidden="true">+</span></button><button type="button" data-action="remove-recent-player" data-recent-name="${encoded}" aria-label="Olvidar a ${escapeHtml(name)}">×</button></span>`;
     }).join("")}</div>` : "";
   }
 

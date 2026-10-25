@@ -31,6 +31,7 @@
    27 · Preparación ilustrada, Retos rápidos en solitario, pista de colocación y deslizar para volver
    28 · Partida guardada, mazos del desplegable, cabeceras y selector de tiempo único
    29 · Contraste de noche (modo oscuro)
+   30 · La mesa de siempre y el minijuego de apertura
    Detrás de esta hoja cargan (index.html) y la retocan: accounts, quick-challenges,
    home-modes-v1, atlas-voyage (Atlas), guide-journal (Guía), tutorial, navigation-nautical
    (la barra inferior que se ve), mesa-escala y tablet. */
@@ -4287,12 +4288,6 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
   opacity: 1; filter: drop-shadow(0 3px 3px #734f2938);
 }
 
-/* Minijuego de «quién empieza»: sin el teclado abierto de entrada hay sitio para una lámina y una carta grandes. */
-.starter-card { padding: 24px 20px; }
-.starter-card strong { font-size: clamp(1.6rem, calc(7 * var(--vw)), 2.2rem); line-height: 1.2; }
-.starter-card > span { font-size: 1.05rem; }
-.starter-card .starter-card-art { margin: -24px -20px 16px; }
-.starter-card .starter-card-art .animal-card-art { height: min(calc(62 * var(--vw)), 280px); }
 
 /* ===== Pantalla de «pasa el móvil» y demás tarjetas de turno de las partidas multijugador =====
    Dejan el recuadro blanco liso y toman el pergamino del resto del juego: papel cálido, filete de latón
@@ -5626,3 +5621,106 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
    (que de noche es crema apagado). */
 :root[data-theme="dark"] .chapter-stop.current > span { background: var(--edition-surface); border-color: var(--edition-brass); color: var(--edition-brass); }
 :root[data-theme="dark"] .chapter-stop.current > :is(b, small) { color: var(--edition-brass); }
+
+/* ══ 30 · La mesa de siempre y el minijuego de apertura ══ */
+/* Estas piezas usan marfil, sin heredar el amarillo de las cartas del mazo. */
+:root:not([data-theme="dark"]) #app :is(.recent-players, .starter-draw-cta, [data-starter-dialog]) {
+  --edition-surface: #fffaf2; --edition-paper: #f0eade; --edition-line: #d1c3ac;
+}
+#app .recent-players {
+  padding: 18px 0 16px; border: 0; border-block: 1px solid var(--edition-line);
+  border-radius: 0; background: transparent; color: var(--edition-ink);
+}
+#app .recent-players-head { align-items: center; gap: 8px; margin-bottom: 14px; }
+#app .recent-players-kicker, #app .starter-draw-kicker, #app .starter-eyebrow {
+  display: block; color: var(--edition-brass); font: 600 .61rem/1.5 var(--ui-font);
+  letter-spacing: .13em; text-transform: uppercase;
+}
+#app .recent-players-head strong { display: block; margin-top: 3px; font: 600 1.05rem/1.3 var(--font-display); }
+#app .recent-players-head > button { min-height: 44px; color: var(--edition-muted); text-underline-offset: 4px; }
+#app .recent-player {
+  max-width: 100%; grid-template-columns: minmax(0, 1fr) 44px; min-height: 52px;
+  border: 1px solid var(--edition-line); border-radius: 7px;
+  background: var(--edition-surface); box-shadow: 0 3px 9px #3928190a;
+}
+#app .recent-player [data-action="add-recent-player"] { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 8px 10px; color: var(--edition-ink); }
+#app .recent-player-seal {
+  display: grid; place-items: center; flex: none; width: 30px; height: 30px;
+  border: 1px solid var(--edition-brass); border-radius: 50%; color: var(--edition-brass);
+  background: var(--edition-paper); font: 500 1rem var(--font-display); text-transform: uppercase;
+}
+#app .recent-player-name { overflow-wrap: anywhere; text-align: left; font: 600 1rem/1.2 var(--font-display); }
+#app .recent-player-add { color: var(--edition-brass); font: 400 1.2rem var(--ui-font); }
+#app .recent-player [data-action="remove-recent-player"] { padding: 0; border-left: 1px solid var(--edition-line); color: var(--edition-muted); font-weight: 400; }
+#app .starter-draw-cta {
+  position: relative; isolation: isolate; overflow: hidden; gap: 14px; padding: 20px 16px;
+  border: 1px solid var(--edition-line); border-left: 3px solid var(--scene-color); border-radius: 8px;
+  background: linear-gradient(115deg, var(--edition-surface), var(--edition-paper));
+  color: var(--edition-ink); box-shadow: 0 5px 15px #3928190c;
+}
+#app .starter-draw-cta::before {
+  content: ""; position: absolute; z-index: -1; width: 130px; height: 130px; right: -55px; top: -60px;
+  border: 1px solid var(--edition-line); border-radius: 50%; box-shadow: 0 0 0 12px var(--edition-surface), 0 0 0 13px var(--edition-line); opacity: .6;
+}
+#app .starter-draw-icon { display: grid; place-items: center; flex: none; width: 42px; height: 52px; border: 1px solid var(--edition-brass); outline: 1px solid var(--edition-line); outline-offset: 3px; border-radius: 3px; color: var(--edition-brass); font-size: 1.7rem; }
+#app .starter-draw-copy { min-width: 0; gap: 5px; }
+#app .starter-draw-copy .starter-draw-kicker { margin-left: 0; }
+#app .starter-draw-copy b { font: 600 1.2rem/1.15 var(--font-display); }
+#app .starter-draw-copy small { color: var(--edition-muted); font-size: .73rem; line-height: 1.45; }
+#app .starter-draw-cta .starter-draw-arrow { color: var(--edition-brass); }
+#app [data-starter-dialog] { padding: max(14px, var(--safe-top)) 14px max(14px, var(--safe-bottom)); }
+#app [data-starter-dialog] .modal {
+  position: relative; width: min(100%, 480px); max-height: calc(100 * var(--dvh) - max(14px, var(--safe-top)) - max(14px, var(--safe-bottom)));
+  padding: 24px 22px 20px; border: 1px solid var(--edition-brass); border-radius: 15px;
+  color: var(--edition-ink); background: linear-gradient(145deg, var(--edition-surface), var(--edition-paper));
+  box-shadow: inset 0 0 0 5px var(--edition-surface), inset 0 0 0 6px var(--edition-line), 0 22px 65px #15100c50;
+}
+#app .starter-dialog-head { margin-bottom: 18px; }
+#app .starter-eyebrow { margin: 0 0 8px; }
+#app .starter-eyebrow > span { padding-inline: 7px; }
+#app .starter-dialog-head h2 { margin: 0; font: 500 clamp(1.4rem, calc(5.5 * var(--vw)), 1.8rem)/1.15 var(--font-display); color: var(--edition-ink); }
+#app .starter-dialog-head h2 em { font-style: normal; color: var(--edition-brass); }
+#app .starter-turn-track { display: flex; justify-content: center; gap: 6px; margin: 14px auto 0; max-width: 190px; }
+#app .starter-turn-track i { height: 3px; flex: 1; background: var(--edition-line); border-radius: 2px; }
+#app .starter-turn-track .is-current { background: var(--edition-brass); }
+#app .starter-turn-track .is-done { background: var(--scene-color); }
+#app [data-starter-dialog] .starter-card {
+  padding: 10px 12px 16px; border: 1px solid var(--edition-line); border-radius: 9px;
+  background: var(--edition-surface); color: var(--edition-ink); box-shadow: 0 5px 14px #3928190a;
+}
+#app [data-starter-dialog] .starter-card-art {
+  position: relative; margin: 0 0 12px; padding: 8px; border: 1px solid var(--edition-line); border-radius: 4px;
+  background: repeating-linear-gradient(0deg, transparent 0 5px, #95734808 5px 6px), var(--edition-paper);
+}
+#app [data-starter-dialog] .starter-card-art::after { content: ""; position: absolute; inset: 4px; border: 1px solid var(--edition-line); pointer-events: none; }
+#app [data-starter-dialog] .starter-card-art .animal-card-art { display: block; width: 100%; height: clamp(145px, calc(27 * var(--dvh)), 250px); object-fit: contain; }
+#app [data-starter-dialog] .starter-card strong { margin: 8px 0 5px; font: 600 clamp(1.3rem, calc(5.5 * var(--vw)), 1.8rem)/1.15 var(--font-display); color: var(--edition-ink); }
+#app [data-starter-dialog] .starter-card > span { color: var(--edition-muted); font-size: .94rem; }
+#app .starter-answer { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--edition-line); }
+#app .starter-answer .cifra-field { margin: 0; text-align: left; }
+#app .starter-answer label { color: var(--edition-ink); font: 600 .9rem var(--font-display); }
+#app .starter-answer .cifra-unidad { color: var(--edition-muted); font-weight: 400; }
+#app .starter-answer input { min-height: 54px; margin-top: 8px; border: 1px solid var(--edition-brass); border-radius: 6px; background: var(--edition-surface); color: var(--edition-ink); font: 500 1.6rem var(--font-display); box-shadow: inset 0 2px 5px #39281908; }
+#app .starter-answer .cifra-chips { justify-content: flex-start; gap: 7px; margin-top: 10px; }
+#app .starter-answer .cifra-chip { min-width: 44px; min-height: 44px; border: 1px solid var(--edition-line); border-radius: 5px; background: var(--edition-surface); color: var(--edition-ink); font: 600 .8rem var(--ui-font); }
+#app .starter-answer .hint { margin: 10px 0 0; color: var(--edition-muted); font: .7rem/1.45 var(--ui-font); text-align: left; }
+#app [data-starter-dialog] .actions { margin-top: 16px; }
+#app [data-starter-dialog] .starter-winner-banner { border-color: var(--edition-line); background: var(--edition-surface); }
+#app [data-starter-dialog] .starter-draw-list li { background: var(--edition-surface); color: var(--edition-ink); border: 1px solid var(--edition-line); }
+#app [data-starter-dialog] .starter-draw-list .starter-draw-winner { border-color: var(--edition-brass); background: var(--edition-paper); }
+#app .recent-player button:focus-visible, #app .starter-answer .cifra-chip:focus-visible { outline: 2px solid var(--edition-brass); outline-offset: -3px; }
+@media (hover: hover) and (pointer: fine) {
+  #app .recent-player button:hover, #app .starter-answer .cifra-chip:hover { background: var(--edition-paper); }
+  #app .starter-draw-cta:hover { border-color: var(--edition-brass); }
+}
+@media (max-width: 360px) {
+  #app .starter-draw-cta { padding: 16px 12px; gap: 10px; }
+  #app .starter-draw-icon { width: 32px; height: 44px; }
+  #app .starter-draw-copy b { font-size: 1.05rem; }
+  #app .recent-players-kicker { letter-spacing: .07em; font-size: .56rem; }
+  #app [data-starter-dialog] .modal { padding: 22px 16px 18px; }
+}
+@media (max-height: 700px) {
+  #app [data-starter-dialog] .starter-card-art .animal-card-art { height: 145px; }
+  #app .starter-dialog-head { margin-bottom: 12px; }
+}
