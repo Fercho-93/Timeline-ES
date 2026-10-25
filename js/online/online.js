@@ -72,6 +72,19 @@ let presenceRoom = "", presenceTimer = null, presenceBusy = false, relayTimer = 
 // Temporizadores y marcas de la sala de espera pública (ver `renderPublicLobby`).
 // Tiempo que se deja ver quién empieza antes de arrancar la mesa pública.
 const STARTER_RESULT_MS = 8000;
+// Y lo mínimo que la carta se deja a la vista para responder, aunque la cuenta atrás de la mesa ya haya llegado a cero.
+const STARTER_ANSWER_MS = 20000;
+let starterShown = { card: null, at: 0 };
+function starterAge() {
+  const card = starterCardId();
+  if (card == null) return 0;
+  if (starterShown.card !== card) starterShown = { card, at: Date.now() };
+  return Date.now() - starterShown.at;
+}
+// La mesa arranca con todas las respuestas o, agotada la cuenta atrás, cuando los que faltan ya han tenido su tiempo.
+function publicStartDue(left, full) {
+  return (full && starterEveryoneAnswered()) || (left === 0 && (starterEveryoneAnswered() || starterAge() >= STARTER_ANSWER_MS));
+}
 let publicStarterTimer = null, publicClock = null, publicDrawFor = "", publicStartFor = "";
 const presenceListeners = new Map(), presenceRecords = new Map();
 let connectionMessage = "Conectando con la sala…";
@@ -866,7 +879,7 @@ function publicStatusMarkup() {
       <p>Llevas <b id="public-elapsed">${publicElapsed()}</b> en la mesa. En cuanto entre alguien más, empieza una cuenta atrás de ${PUBLIC_WAIT_SECONDS} s.</p>`;
   }
   const left = publicSecondsLeft();
-  if ((full && starterEveryoneAnswered()) || left === 0) {
+  if (publicStartDue(left, full)) {
     return `<div class="public-status-title">Empezando la partida…</div><p>Repartiendo las cartas.</p>`;
   }
   return `<div class="public-status-title">La partida empieza en <b id="public-clock" class="public-clock">${clockText(left)}</b></div>
@@ -927,7 +940,8 @@ function renderPublicLobby() {
 // que nadie tiene que tomar a mano: repartir la carta del minijuego y empezar.
 function managePublicStarter() {
   clearInterval(publicClock); publicClock = null;
-  clearTimeout(publicStarterTimer); publicStarterTimer = null;
+  // El arranque ya programado sobrevive a los repintados (cada respuesta ajena repinta la sala).
+  if (!roomState || roomState.matchmaking !== "public" || roomState.status !== "lobby") { clearTimeout(publicStarterTimer); publicStarterTimer = null; }
   if (!roomState || roomState.matchmaking !== "public" || roomState.status !== "lobby") return;
   const tick = () => {
     if (!roomState || roomState.status !== "lobby") { clearInterval(publicClock); publicClock = null; return; }
@@ -942,13 +956,16 @@ function managePublicStarter() {
       if (publicDrawFor !== roomCode) { publicDrawFor = roomCode; void drawStarterCard().then(ok => { if (!ok) publicDrawFor = ""; }); }
       return;
     }
-    const ready = (count >= roomState.capacity && starterEveryoneAnswered()) || left === 0;
+    const ready = publicStartDue(left, count >= roomState.capacity);
     const key = `${roomCode}:${roomState.version}`;
     if (!ready || publicStartFor === key) return;
     publicStartFor = key;
     // Con todas las respuestas se deja un momento para ver el orden.
+    const code = roomCode;
+    clearTimeout(publicStarterTimer);
     publicStarterTimer = setTimeout(() => {
-      if (roomState?.status !== "lobby" || roomState.hostUid !== user.uid) return;
+      if (roomCode !== code || roomState?.status !== "lobby" || roomState.hostUid !== user.uid) return;
+      if (!publicStartDue(publicSecondsLeft(), roomState.playerOrder.length >= roomState.capacity)) { publicStartFor = ""; return; }
       void startRoom().finally(() => { if (roomState?.status === "lobby") setTimeout(() => { publicStartFor = ""; }, 2000); });
     }, STARTER_RESULT_MS);
   };
