@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 803,
+  "cache": 805,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Menos calor y batería en iPhone: la partida online ya no repinta la mesa cuando la instantánea de la sala no cambia nada, los relojes se actualizan con menos frecuencia, los adornos animados de la portada se detienen tras unas repeticiones y no aparecen jugando. Además, la mano en abanico se puede hojear fuera de turno y en las mesas públicas el minijuego de quién empieza deja ver 8 segundos quién lleva el primer turno"
+  "reason": "Mesas públicas: el minijuego de quién empieza deja responder con tiempo (la carta queda al menos 20 s a la vista), enseña el resultado 8 segundos antes de arrancar y el arranque ya no se pierde con los repintados; también en las mesas públicas de Retos rápidos. Incluye lo anterior: menos calor y batería en iPhone y la mano en abanico que se puede hojear fuera de turno"
 }
