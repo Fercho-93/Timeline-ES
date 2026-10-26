@@ -86,7 +86,8 @@ function starterAge() {
 }
 // La mesa arranca con todas las respuestas o, agotada la cuenta atrás, cuando los que faltan ya han tenido su tiempo.
 function publicStartDue(left, full) {
-  return (full && starterEveryoneAnswered()) || (left === 0 && (starterEveryoneAnswered() || starterAge() >= STARTER_ANSWER_MS));
+  const age = starterAge(); // Se lee siempre: la carta cuenta desde que sale, no desde que acaba la cuenta atrás.
+  return (full && starterEveryoneAnswered()) || (left === 0 && (starterEveryoneAnswered() || age >= STARTER_ANSWER_MS));
 }
 let publicStarterTimer = null, publicClock = null, publicDrawFor = "", publicStartFor = "";
 const presenceListeners = new Map(), presenceRecords = new Map();
