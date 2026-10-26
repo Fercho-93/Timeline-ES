@@ -67,7 +67,7 @@ window.MUSIC_CARDS = [
   ,{ id: 6063, year: 1979, title: "Highway to Hell", detail: "AC/DC publica uno de sus grandes himnos de hard rock y el último álbum de estudio de la banda con Bon Scott como vocalista." }
   ,{ id: 6064, year: 1979, title: "Another Brick in the Wall (Part 2)", detail: "Pink Floyd convierte este fragmento de The Wall en un éxito mundial con un coro infantil y una crítica a la educación autoritaria." }
   ,{ id: 6065, year: 1981, title: "Como una ola", detail: "Rocío Jurado interpreta una de las canciones más populares de su repertorio, convertida en referencia de la canción española." }
-  ,{ id: 6066, year: 1983, title: "Billie Jean", detail: "Michael Jackson publica como sencillo, en enero de 1983, la canción cuyo bajo, producción y coreografía asociada se convierten en hitos del pop de los años ochenta; el álbum Thriller, que la incluye, es de 1982." }
+  ,{ id: 6066, year: 1983, title: "Billie Jean", detail: "Michael Jackson publica como sencillo, en enero de 1983, la canción cuyo bajo, producción y coreografía asociada se convierten en hitos del pop de los años ochenta." }
   ,{ id: 6067, year: 1983, title: "Every Breath You Take", detail: "The Police publican una canción de apariencia romántica y letra inquietante que se convierte en su mayor éxito internacional." }
   ,{ id: 6068, year: 1983, title: "Let’s Dance", detail: "David Bowie entra en una nueva etapa pop con una producción de Nile Rodgers y una canción que alcanza un enorme éxito comercial." }
   ,{ id: 6069, year: 1984, title: "Dancing in the Dark", detail: "Bruce Springsteen publica el sencillo que abre Born in the U.S.A. y amplía su presencia en la radio y en MTV." }
@@ -86,7 +86,7 @@ window.MUSIC_CARDS = [
   ,{ id: 6082, year: 1998, title: "…Baby One More Time", detail: "Britney Spears debuta con un sencillo pop que se convierte en uno de los grandes éxitos juveniles de finales de los noventa." }
   ,{ id: 6083, year: 1999, title: "La raja de tu falda", detail: "Estopa irrumpe con una mezcla de rumba, rock y lenguaje cotidiano que se convierte en uno de los grandes éxitos españoles de la década." }
   ,{ id: 6084, year: 2000, title: "Yellow", detail: "Coldplay publica una canción de guitarras envolventes que presenta a la banda ante el gran público internacional." }
-  ,{ id: 6085, year: 2001, title: "In the End", detail: "Linkin Park publica como sencillo, en octubre de 2001, una canción que combina rock, rap y electrónica y define el nu metal de comienzos del siglo XXI; el álbum Hybrid Theory, que la incluye, es de 2000." }
+  ,{ id: 6085, year: 2001, title: "In the End", detail: "Linkin Park publica como sencillo, en octubre de 2001, una canción que combina rock, rap y electrónica y define el nu metal de comienzos del siglo XXI; el álbum Hybrid Theory, que la incluye, había salido el año anterior." }
   ,{ id: 6086, year: 2002, title: "Sin ti no soy nada", detail: "Amaral publica una canción de pop rock melódico que se convierte en una de las piezas más reconocibles del dúo zaragozano." }
   ,{ id: 6087, year: 2002, title: "Lose Yourself", detail: "Eminem publica para la película 8 Mile una canción de rap sobre la presión y la oportunidad que gana el Óscar a mejor canción original." }
   ,{ id: 6088, year: 2003, title: "Crazy in Love", detail: "Beyoncé inicia su carrera solista con una producción de pop y R&B impulsada por un sample de soul y la colaboración de Jay-Z." }

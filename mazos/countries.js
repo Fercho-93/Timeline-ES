@@ -2,7 +2,8 @@
 // para que colocarlas bien no fuera cuestión de suerte, aunque ya no se exige un margen
 // mínimo entre ellas: las cifras se revisan a mano, una por una. Los países que faltan
 // suelen faltar por parecerse demasiado a otro ya incluido (China y Canadá a Estados
-// Unidos, Alemania a Japón).
+// Unidos, Alemania a Japón). Solo entran Estados soberanos, no territorios dependientes:
+// el mazo se llama «Superficie de países».
 window.COUNTRY_CARDS = [
   { id: 2001, value: 17098246, title: "Rusia", detail: "El país más extenso del mundo: ocupa once husos horarios." },
   { id: 2002, value: 9833517, title: "Estados Unidos", detail: "Superficie total, aguas interiores incluidas; Alaska aporta casi una sexta parte." },
@@ -59,7 +60,6 @@ window.COUNTRY_CARDS = [
   { id: 2041, value: 30528, title: "Bélgica", detail: "Una de las densidades de población más altas de Europa." },
   { id: 2042, value: 22072, title: "Israel", detail: "Poco más extenso que la provincia de Badajoz." },
   { id: 2043, value: 20273, title: "Eslovenia", detail: "Entre los Alpes y el Adriático, con apenas 47 kilómetros de costa." },
-  { id: 2072, value: 18575, title: "Nueva Caledonia", detail: "Territorio no autónomo del Pacífico; las Naciones Unidas registran 18.575 km² de superficie terrestre.", source: "https://www.un.org/dppa/decolonization/en/nsgt/new-caledonia" },
   { id: 2044, value: 17818, title: "Kuwait", detail: "Un emirato desértico en el golfo Pérsico." },
   { id: 2045, value: 11586, title: "Catar", detail: "Una península más pequeña que la provincia de Cuenca." },
   { id: 2046, value: 10452, title: "Líbano", detail: "Una franja mediterránea con montañas nevadas a la vista del mar." },

@@ -122,5 +122,5 @@ window.WORLD_CARDS = [
   { id: 5114, year: 2011, title: "La Primavera Árabe se extiende por la región", detail: "Las protestas iniciadas en Túnez en diciembre de 2010 se extienden en 2011 por países del norte de África y Oriente Próximo." },
   { id: 5115, year: 2016, title: "El referéndum del Brexit", detail: "La salida de la Unión Europea gana con el 51,9 % frente al 48,1 %: una diferencia de 3,8 puntos porcentuales." },
   { id: 5116, year: 2020, title: "La OMS declara pandemia", detail: "En marzo, numerosos países adoptan restricciones extraordinarias de movilidad ante la expansión mundial de la COVID-19." },
-  { id: 5117, year: 2022, title: "La invasión rusa de Ucrania", detail: "La mayor guerra en suelo europeo desde 1945." }
+  { id: 5117, year: 2022, title: "La invasión rusa de Ucrania", detail: "La mayor guerra en suelo europeo desde la Segunda Guerra Mundial." }
 ];

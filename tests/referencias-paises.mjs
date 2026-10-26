@@ -7,7 +7,8 @@ const window = {};
 vm.runInNewContext(fs.readFileSync("mazos/countries.js", "utf8"), { window });
 
 const cards = window.COUNTRY_CARDS;
-assert.equal(cards.length, 72, "El mazo de superficies debe conservar sus 72 cartas");
+// 71 desde que salió Nueva Caledonia: es un territorio dependiente, no un país.
+assert.equal(cards.length, 71, "El mazo de superficies debe conservar sus 71 cartas");
 
 const hashes = new Map();
 for (const card of cards) {

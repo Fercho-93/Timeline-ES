@@ -13,7 +13,7 @@ Lo que pasa por el servidor tiene su propio documento: cuentas y ranking en
 
 Los juegos se agrupan en seis bloques. La portada enseña el bloque y lista sus juegos debajo,
 así que añadir uno es declararlo en `js/juego/modes.js` y sumarlo a `games`. En total son 15 mazos
-y 1.272 cartas (recuento de octubre de 2026; la cifra exacta la da `CT.cards(mazo)`).
+y 1.271 cartas (recuento de octubre de 2026; la cifra exacta la da `CT.cards(mazo)`).
 
 **Historia**
 
@@ -58,7 +58,7 @@ y 1.272 cartas (recuento de octubre de 2026; la cifra exacta la da `CT.cards(maz
 
 **Geografía**
 
-- **Superficie de países:** 72 países ordenados de menor a mayor, de la Ciudad del Vaticano a Rusia.
+- **Superficie de países:** 71 países ordenados de menor a mayor, de la Ciudad del Vaticano a Rusia.
   Aquí la línea no es temporal: se ordena por tamaño.
 - **Población de países:** 77 países ordenados de menos a más gente, del Vaticano a la India,
   con la proyección de la ONU a 1 de julio de 2026 (WPP 2024, vía Worldometer).

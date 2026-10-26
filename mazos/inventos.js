@@ -52,7 +52,7 @@ window.INVENTION_CARDS = [
   { id: 4061, year: 1903, title: "El primer vuelo de los hermanos Wright", detail: "Doce segundos y treinta y seis metros en Kitty Hawk, con un aparato más pesado que el aire." },
   { id: 4063, year: 1907, title: "La baquelita, el primer plástico sintético", detail: "Baekeland fabrica un material que no viene de ninguna planta ni animal." },
   { id: 4064, year: 1909, title: "El proceso Haber para el amoniaco", detail: "Fijar el nitrógeno del aire da fertilizantes baratos y multiplica las cosechas del siglo." },
-  { id: 4065, year: 1911, title: "Rutherford propone el modelo nuclear del átomo", detail: "Rutherford interpreta los experimentos de dispersión de Geiger y Marsden, publicados en 1909, y propone un átomo con un núcleo pequeño y concentrado en 1911." },
+  { id: 4065, year: 1911, title: "Rutherford propone el modelo nuclear del átomo", detail: "Rutherford interpreta los experimentos de dispersión de Geiger y Marsden, publicados dos años antes, y propone un átomo con un núcleo pequeño y concentrado en 1911." },
   { id: 4066, year: 1913, title: "La cadena de montaje de Ford", detail: "El chasis pasa por delante del obrero y el tiempo de fabricación cae de doce horas a hora y media." },
   { id: 4069, year: 1926, title: "La primera demostración de la televisión", detail: "Baird transmite una cara reconocible en movimiento ante la Royal Institution." },
   { id: 4071, year: 1930, title: "La patente del motor a reacción", detail: "Frank Whittle solicita la patente de la turbina de gas para aviación el 16 de enero de 1930, con veintidós años; se le concederá en 1932." },

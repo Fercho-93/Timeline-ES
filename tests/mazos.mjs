@@ -119,6 +119,35 @@ console.log("\nDeuda de fuentes en Naturaleza");
 }
 
 const cronologicos = [HISTORY_CARDS, WORLD_CARDS, INVENTION_CARDS, MOVIE_CARDS, MUSIC_CARDS, VIDEOGAME_CARDS, ASTRONOMY_CARDS, MEDICINE_CARDS];
+// Una carta ya colocada se puede girar y leer mientras las demás siguen en juego: si su
+// explicación cita el año exacto de otra carta del mismo mazo («la Constitución de 1812»,
+// «clasificado desde 2006 como planeta enano»), le está dando la respuesta. Se buscan los
+// años de cuatro cifras y los «a. C.»; el de la propia carta sí puede aparecer.
+console.log("\nExplicaciones que no delatan otras cartas");
+for (const mazo of cronologicos) {
+  const porAño = new Map();
+  for (const carta of mazo) porAño.set(carta.year, [...(porAño.get(carta.year) || []), carta]);
+  const delatan = [];
+  for (const carta of mazo) {
+    for (const [, cifra, ac] of (carta.detail || "").matchAll(/(?<![\d.,])(\d{1,4})(?![\d.,]\d)(\s*a\.\s*C\.)?/g)) {
+      const año = ac ? -Number(cifra) : Number(cifra);
+      if (!ac && (cifra.length < 4 || año === carta.year)) continue;
+      const otras = (porAño.get(año) || []).filter(otra => otra.id !== carta.id);
+      if (otras.length) delatan.push(`${carta.id} «${carta.title}» cita ${cifra}${ac || ""}, el año de «${otras[0].title}»`);
+    }
+  }
+  ok(`${mazo.length} cartas sin años ajenos en la explicación${delatan.length ? `: ${delatan.join("; ")}` : ""}`, !delatan.length);
+}
+
+// La historia de las correcciones va en docs/revisiones/, no en la carta: «Sustituye a la
+// gallina…» o «los 30 km/h anteriores…» no le dicen nada al jugador, y a veces le contradicen.
+{
+  const notas = /\b(sustituye (a|al)|anteriores? no (tenían|estaban|tenía)|antiguo valor|los [\d.,]+ ?\S+ anteriores)\b/i;
+  const conNotas = [...cronologicos.flat(), ...COUNTRY_CARDS, ...POPULATION_CARDS, ...LANGUAGE_CARDS, ...ANIMAL_WEIGHT_CARDS, ...ANIMAL_LIFESPAN_CARDS, ...ANIMAL_SPEED_CARDS, ...CITY_DISTANCE_CARDS]
+    .filter(carta => notas.test(carta.detail || "") && !/Los billetes y monedas de euro sustituyen/.test(carta.detail));
+  ok(`ninguna explicación cuenta correcciones del mazo${conNotas.length ? `: ${conNotas.map(c => `${c.id} «${c.title}»`).join(", ")}` : ""}`, !conNotas.length);
+}
+
 const todos = [...cronologicos.flat(), ...COUNTRY_CARDS, ...POPULATION_CARDS, ...LANGUAGE_CARDS, ...ANIMAL_WEIGHT_CARDS, ...ANIMAL_LIFESPAN_CARDS, ...ANIMAL_SPEED_CARDS, ...CITY_DISTANCE_CARDS];
 console.log("\nEntre mazos");
 ok("los identificadores no chocan entre modalidades", new Set(todos.map(c => c.id)).size === todos.length);

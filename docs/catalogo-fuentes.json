@@ -6430,7 +6430,7 @@
       "file": "mazos/speed.js",
       "id": 13002,
       "title": "Cangrejo fantasma (carrera en tierra)",
-      "value": 14,
+      "value": 14.4,
       "source": "https://www.guinnessworldrecords.com/world-records/112626-fastest-moving-crustacean-on-land",
       "reviewStatus": null,
       "comparison": null,
@@ -6490,7 +6490,7 @@
       "file": "mazos/speed.js",
       "id": 13008,
       "title": "Mamba negra (esprint en terreno llano)",
-      "value": 18,
+      "value": 17.5,
       "source": "https://www.guinnessworldrecords.com/world-records/70269-fastest-land-snake",
       "reviewStatus": null,
       "comparison": null,
@@ -6749,9 +6749,9 @@
     {
       "file": "mazos/speed.js",
       "id": 13034,
-      "title": "Cebra común (carrera)",
+      "title": "Cebra de Grevy (carrera)",
       "value": 64,
-      "source": "https://sydneyzoo.com/animals/plains-zebra",
+      "source": "https://seaworld.org/animals/facts/mammals/grevys-zebra/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10582,16 +10582,6 @@
       "title": "Eslovenia",
       "value": 20273,
       "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "mazos/countries.js",
-      "id": 2072,
-      "title": "Nueva Caledonia",
-      "value": 18575,
-      "source": "https://www.un.org/dppa/decolonization/en/nsgt/new-caledonia",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null

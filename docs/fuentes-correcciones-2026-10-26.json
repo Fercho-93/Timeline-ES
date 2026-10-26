@@ -1,0 +1,41 @@
+{
+  "reviewedAt": "2026-10-26",
+  "scope": "Correcciones de datos de Retos rápidos de la auditoría de incoherencias (detalle en docs/revisiones/revision-datos-2026-10-26.md). Coca-Cola se fecha, como Nintendo y Nokia, por el origen del negocio; el hito duplicado del armisticio italiano se sustituye por la entrada aliada en Nápoles.",
+  "cards": [
+    {
+      "id": "companies-founded-1",
+      "deck": "companies-founded",
+      "title": "Coca-Cola",
+      "value": 1886,
+      "label": "1886",
+      "artist": null,
+      "source": "https://www.coca-colacompany.com/about-us/history",
+      "curiosity": "La bebida comenzó vendiéndose por vasos en una farmacia de Atlanta; la historia del refresco precede a la expansión mundial de la compañía.",
+      "curiositySource": "https://www.coca-colacompany.com/about-us/history/the-birth-of-a-refreshing-idea",
+      "scope": "Origen del negocio: John Pemberton sirvió la bebida por primera vez en 1886; The Coca-Cola Company se constituyó en 1892.",
+      "dataDate": "consulta del 26 de octubre de 2026",
+      "measureNote": "Origen del negocio: John Pemberton sirvió la bebida por primera vez en 1886; The Coca-Cola Company se constituyó en 1892."
+    }
+  ],
+  "corrections": [
+    {
+      "id": "companies-founded-1",
+      "title": "Coca-Cola",
+      "previousValue": 1892,
+      "value": 1886,
+      "label": "1886",
+      "source": "https://www.coca-colacompany.com/about-us/history",
+      "scope": "Origen del negocio: John Pemberton sirvió la bebida por primera vez en 1886; The Coca-Cola Company se constituyó en 1892."
+    },
+    {
+      "id": "wwii-14",
+      "title": "Entrada aliada en Nápoles",
+      "previousTitle": "Rendición de Italia",
+      "previousValue": 19430908,
+      "value": 19431001,
+      "label": "1 octubre 1943",
+      "source": "https://en.wikipedia.org/wiki/Four_Days_of_Naples",
+      "scope": "«Rendición de Italia» era el anuncio del armisticio de wwii-7 con otra fecha; la carta pasa a un hito distinto."
+    }
+  ]
+}

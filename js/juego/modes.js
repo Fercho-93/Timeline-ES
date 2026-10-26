@@ -70,15 +70,20 @@
       if (horas < 1) return `${Math.round(horas * 60)} min`;
       return `${horas.toLocaleString("es-ES", { maximumFractionDigits: 1 })} h`;
     }
-    if (value < 1 / 12) {
+    // Hasta unos tres meses se cuenta en días, o en semanas si el dato es un número exacto de
+    // ellas: redondeadas a meses, las «seis semanas» de la abeja salían como «1 mes» y los
+    // «80 días» de la mosca de la fruta como «3 meses», distintos de lo que dice su carta.
+    if (dias < 100) {
       const enteros = Math.round(dias);
+      if (enteros >= 14 && enteros % 7 === 0) return `${enteros / 7} semanas`;
       return `${enteros} ${enteros === 1 ? "día" : "días"}`;
     }
     if (value < 1) {
       const meses = Math.round(value * 12);
       return `${meses} ${meses === 1 ? "mes" : "meses"}`;
     }
-    return `${value.toLocaleString("es-ES", { maximumFractionDigits: 1 })} años`;
+    // Como los meses y los días: «1 año», no «1 años».
+    return `${value.toLocaleString("es-ES", { maximumFractionDigits: 1 })} ${value === 1 ? "año" : "años"}`;
   }
 
   function compactSpeed(value) {
@@ -783,7 +788,7 @@
     7083: "playstation-2", 7084: "playstation-3", 7085: "playstation-4", 7086: "playstation-5",
     7087: "xbox", 7088: "xbox-360", 7089: "xbox-one", 7090: "xbox-series-x-s"
   };
-  const COUNTRY_ART_IDS = new Set([2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040, 2041, 2042, 2043, 2044, 2045, 2046, 2047, 2048, 2049, 2050, 2051, 2052, 2053, 2054, 2055, 2056, 2057, 2058, 2059, 2060, 2061, 2062, 2063, 2064, 2065, 2066, 2067, 2068, 2069, 2070, 2071, 2072]);
+  const COUNTRY_ART_IDS = new Set([2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040, 2041, 2042, 2043, 2044, 2045, 2046, 2047, 2048, 2049, 2050, 2051, 2052, 2053, 2054, 2055, 2056, 2057, 2058, 2059, 2060, 2061, 2062, 2063, 2064, 2065, 2066, 2067, 2068, 2069, 2070, 2071]);
   const POPULATION_ART_BY_ID = Object.fromEntries((window.POPULATION_CARDS || []).map(card => [card.id, String(card.id)]));
   const LANGUAGE_ART_BY_ID = Object.fromEntries((window.LANGUAGE_CARDS || []).map(card => [card.id, String(card.id)]));
   const DISTANCE_ART_BY_ID = {

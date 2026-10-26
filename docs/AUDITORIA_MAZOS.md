@@ -7,7 +7,7 @@ Este registro indica qué cartas se han contrastado de forma individual. Una pru
 > una con fuente individual: ver [revision-siete-retos-ampliacion-2026-10-05.md](revisiones/revision-siete-retos-ampliacion-2026-10-05.md) y
 > [revision-seis-retos-ampliacion-2026-10-05.md](revisiones/revision-seis-retos-ampliacion-2026-10-05.md). Los recuentos «cerrado» de abajo se refieren a
 > las cartas que había entonces; el catálogo actual tiene 567 cartas en 29 retos y las Grandes
-> colecciones, 1.272.
+> colecciones, 1.271.
 
 ## Retos rápidos
 
@@ -45,6 +45,11 @@ Quedan pendientes 202 cartas de retos rápidos: 19 de `drinks` y 183 de otros 14
 > Confederación del Miño-Sil (Guadiana 818, Duero 895, Ebro 910), «In the End» 2001 e Intellivision
 > aclarada. Detalle en
 > [revision-verificacion-2026-10-20.md](revisiones/revision-verificacion-2026-10-20.md). No sustituye al cierre carta a carta de abajo.
+>
+> **Correcciones del 26 de octubre de 2026.** Armisticio de Italia duplicado, mamba negra, cangrejo
+> fantasma, cebra de Grevy, Coca-Cola, Nueva Caledonia (retirada: no es un país), formato de las
+> longevidades cortas, explicaciones que daban el año de otra carta y notas de revisión que leía el
+> jugador. Detalle en [revision-datos-2026-10-26.md](revisiones/revision-datos-2026-10-26.md).
 
 Las otras 14 grandes colecciones ya han tenido revisiones generales y algunas correcciones, pero siguen pendientes de cierre individual carta por carta en esta ronda: 1.217 cartas en total. No significa que estén sin mirar, sino que aún no se han certificado formalmente todas sus afirmaciones y fuentes. Sumadas a los 202 retos rápidos pendientes, quedan 1.419 cartas por cerrar formalmente.
 

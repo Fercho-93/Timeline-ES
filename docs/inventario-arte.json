@@ -4514,20 +4514,6 @@
       }
     },
     {
-      "path": "assets/country-cards/2072.webp",
-      "sha256": "32680eb165c65d14b6e63c9dc3ff2e17d95d565a21da74aa1cb4c4ff98633b53",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
       "path": "assets/difficulty-easy-v1.webp",
       "sha256": "740f932abd8c2b6714293397a1905188c5e8ec8f546580021f6a7d5165aa9099",
       "rightsEvidence": {
@@ -22324,7 +22310,7 @@
     },
     {
       "path": "assets/quick-cards/wwii-14.webp",
-      "sha256": "2de0a027b5ca44685f33bb0778d8dcb04e1272e1ae7c896ec33ae16913c1d4a1",
+      "sha256": "5891e1424e68f2fc5da5087d3be9496e31d40ddb6bc49038acaf10d740d37c4d",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -22464,7 +22450,7 @@
     },
     {
       "path": "assets/quick-cards/wwii-7.webp",
-      "sha256": "5891e1424e68f2fc5da5087d3be9496e31d40ddb6bc49038acaf10d740d37c4d",
+      "sha256": "2de0a027b5ca44685f33bb0778d8dcb04e1272e1ae7c896ec33ae16913c1d4a1",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",

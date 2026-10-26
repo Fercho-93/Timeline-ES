@@ -18,7 +18,7 @@ const quickCards = CT.QuickCatalog.challenges.flatMap(deck => deck.cards);
 assert.equal(CT.QuickCatalog.version, 3, 'los cambios de texto conservan las partidas guardadas');
 assert.equal(quickCards.length, 567);
 assert.equal(new Set(quickCards.map(card => card.curiosity)).size, 567);
-const auditedNotes = new Map(['docs/fuentes-metros-ampliacion-2026-10-04.json','docs/fuentes-siete-retos-ampliacion-2026-10-05.json','docs/fuentes-seis-retos-ampliacion-2026-10-05.json'].flatMap(file=>JSON.parse(read(file)).cards.map(card=>[card.id,card.measureNote])));
+const auditedNotes = new Map(['docs/fuentes-metros-ampliacion-2026-10-04.json','docs/fuentes-siete-retos-ampliacion-2026-10-05.json','docs/fuentes-seis-retos-ampliacion-2026-10-05.json','docs/fuentes-correcciones-2026-10-26.json'].flatMap(file=>JSON.parse(read(file)).cards.map(card=>[card.id,card.measureNote])));
 for (const deck of CT.QuickCatalog.challenges) for (const card of deck.cards) {
   assert.ok(card.image && fs.existsSync(new URL('../' + card.image, import.meta.url)), `${card.id}: ilustración propia existente`);
   assert.ok(typeof card.curiosity === 'string' && card.curiosity.length >= 50, `${card.id}: curiosidad propia`);
