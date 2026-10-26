@@ -94,3 +94,22 @@ carta y quedan aquí:
   de la Xbox. Las consolas numeradas (PlayStation, Xbox) llevan `serie` y el reparto deja una de
   cada serie, como hace con los empates. En la Gran mezcla salen los tres hitos de Mundial que
   repetían uno de España.
+
+## Tercera tanda: fuentes de las Grandes colecciones (D18, primera parte)
+
+- **Fuentes añadidas.** 173 cartas que no tenían `source` lo llevan ahora, tras comprobar el año o
+  la cifra contra Britannica, el AFI Catalog, el World Factbook, la Library of Congress, el Museum of
+  Play u otra fuente de referencia (Wikipedia solo cuando no salió nada mejor): España 1–26 y 73,
+  Cine 1001–1015, Música 6001–6029, Videojuegos 7001–7029, Inventos (20), Medicina (18), Mundial
+  5001–5009 salvo Qadesh, Superficie 2001–2018 e Idiomas (10).
+- **Explicaciones corregidas.** Pólvora (las recetas del Wujing Zongyao eran incendiarias),
+  pararrayos (Franklin lo propuso antes de la cometa), Finlandia («uno de los países con más
+  lagos»), independencias de 1810 (juntas de Caracas, Buenos Aires, Bogotá y Santiago, y el grito de
+  Dolores), Imperio alemán (el káiser es proclamado, no coronado), Porfiriato («más de treinta»
+  años), «Baby» (Ludacris colabora, no produce), «Jealous Guy» (maqueta de la época del White
+  Album), Kingdom Hearts (sellar las cerraduras de los mundos) y Blancanieves (primer largometraje
+  animado de un estudio estadounidense).
+- **Pendiente.** Qadesh se queda en 1274 a. C. (cronología egipcia habitual; Britannica da 1275).
+  Seis cifras de Idiomas (telugu, turco, tamil, árabe egipcio, persa, francés…) difieren de las de
+  Britannica, que no dice qué edición de Ethnologue usa: no se cambian hasta contrastarlas con la de
+  2022. El resto de cartas sin fuente sigue en revisión.

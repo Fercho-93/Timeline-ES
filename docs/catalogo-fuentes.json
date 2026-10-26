@@ -6,7 +6,7 @@
       "id": 1,
       "title": "Desembarco romano en Emporion",
       "value": -218,
-      "source": null,
+      "source": "https://www.britannica.com/biography/Publius-Cornelius-Scipio",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -16,7 +16,7 @@
       "id": 2,
       "title": "Caída de Numancia",
       "value": -133,
-      "source": null,
+      "source": "https://www.britannica.com/place/Numantia",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -26,7 +26,7 @@
       "id": 3,
       "title": "Fin de las guerras cántabras",
       "value": -19,
-      "source": null,
+      "source": "https://www.britannica.com/topic/Cantabrian-War",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -36,7 +36,7 @@
       "id": 4,
       "title": "Ciudadanía romana para los hispanos",
       "value": 212,
-      "source": null,
+      "source": "https://www.britannica.com/topic/Constitutio-Antoniniana-de-Civitate",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -46,7 +46,7 @@
       "id": 5,
       "title": "Llegada de suevos, vándalos y alanos",
       "value": 409,
-      "source": null,
+      "source": "https://www.britannica.com/place/Spain/Romanization",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -56,7 +56,7 @@
       "id": 6,
       "title": "III Concilio de Toledo",
       "value": 589,
-      "source": null,
+      "source": "https://www.britannica.com/event/councils-of-Toledo",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -66,7 +66,7 @@
       "id": 7,
       "title": "Promulgación del Liber Iudiciorum",
       "value": 654,
-      "source": null,
+      "source": "https://www.britannica.com/print/article/338991",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -76,7 +76,7 @@
       "id": 8,
       "title": "Batalla de Guadalete",
       "value": 711,
-      "source": null,
+      "source": "https://www.britannica.com/biography/Roderick",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -86,7 +86,7 @@
       "id": 9,
       "title": "Batalla de Covadonga (fecha tradicional)",
       "value": 722,
-      "source": null,
+      "source": "https://en.wikipedia.org/wiki/Battle_of_Covadonga",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -96,7 +96,7 @@
       "id": 10,
       "title": "Emirato independiente de Córdoba",
       "value": 756,
-      "source": null,
+      "source": "https://www.britannica.com/biography/Abd-al-Rahman-I",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -106,7 +106,7 @@
       "id": 11,
       "title": "Califato de Córdoba",
       "value": 929,
-      "source": null,
+      "source": "https://www.britannica.com/biography/Abd-al-Rahman-III",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -116,7 +116,7 @@
       "id": 12,
       "title": "Fin del Califato de Córdoba",
       "value": 1031,
-      "source": null,
+      "source": "https://www.britannica.com/place/Caliphate-of-Cordoba",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -126,7 +126,7 @@
       "id": 13,
       "title": "Conquista cristiana de Toledo",
       "value": 1085,
-      "source": null,
+      "source": "https://www.britannica.com/event/Siege-of-Toledo",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -136,7 +136,7 @@
       "id": 14,
       "title": "El Cid conquista Valencia",
       "value": 1094,
-      "source": null,
+      "source": "https://www.britannica.com/event/Conquest-of-Valencia",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -146,7 +146,7 @@
       "id": 15,
       "title": "Batalla de las Navas de Tolosa",
       "value": 1212,
-      "source": null,
+      "source": "https://www.britannica.com/topic/Almohads",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -156,7 +156,7 @@
       "id": 16,
       "title": "Unión definitiva de León y Castilla",
       "value": 1230,
-      "source": null,
+      "source": "https://www.britannica.com/biography/Ferdinand-III-king-of-Castile-and-Leon",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -166,7 +166,7 @@
       "id": 17,
       "title": "Conquista de Valencia por Jaime I",
       "value": 1238,
-      "source": null,
+      "source": "https://www.britannica.com/biography/James-I-king-of-Aragon",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -176,7 +176,7 @@
       "id": 18,
       "title": "La peste negra llega a la península",
       "value": 1348,
-      "source": null,
+      "source": "https://www.britannica.com/event/Black-Death/Cause-and-outbreak",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -186,7 +186,7 @@
       "id": 19,
       "title": "Matrimonio de Isabel y Fernando",
       "value": 1469,
-      "source": null,
+      "source": "https://www.britannica.com/biography/Isabella-I-queen-of-Spain",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -196,7 +196,7 @@
       "id": 20,
       "title": "Creación de la Inquisición española",
       "value": 1478,
-      "source": null,
+      "source": "https://www.britannica.com/topic/Spanish-Inquisition",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -206,7 +206,7 @@
       "id": 21,
       "title": "Conquista de Granada",
       "value": 1492,
-      "source": null,
+      "source": "https://www.britannica.com/biography/Muhammad-XII",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -216,7 +216,7 @@
       "id": 22,
       "title": "Primer viaje de Colón a América",
       "value": 1492,
-      "source": null,
+      "source": "https://www.britannica.com/topic/Where-Did-Columbus-Land",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -226,7 +226,7 @@
       "id": 23,
       "title": "Expulsión de los judíos",
       "value": 1492,
-      "source": null,
+      "source": "https://www.britannica.com/place/Spain/The-Spanish-Inquisition",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -236,7 +236,7 @@
       "id": 24,
       "title": "Tratado de Tordesillas",
       "value": 1494,
-      "source": null,
+      "source": "https://www.britannica.com/event/Treaty-of-Tordesillas",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -246,7 +246,7 @@
       "id": 25,
       "title": "Conquista de Navarra",
       "value": 1512,
-      "source": null,
+      "source": "https://www.britannica.com/place/Navarra",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -256,7 +256,7 @@
       "id": 26,
       "title": "Carlos I accede al trono",
       "value": 1516,
-      "source": null,
+      "source": "https://www.britannica.com/biography/Charles-V-Holy-Roman-emperor",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -726,7 +726,7 @@
       "id": 73,
       "title": "Fundación griega de Emporion (fecha aproximada)",
       "value": -575,
-      "source": null,
+      "source": "https://www.britannica.com/place/Spain/Phoenicians",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -1676,7 +1676,7 @@
       "id": 1001,
       "title": "Viaje a la Luna",
       "value": 1902,
-      "source": null,
+      "source": "https://catalog.afi.com/Catalog/moviedetails/31490",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -1686,7 +1686,7 @@
       "id": 1002,
       "title": "El gabinete del doctor Caligari",
       "value": 1920,
-      "source": null,
+      "source": "https://kids.britannica.com/students/article/Robert-Wiene/340429",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -1696,7 +1696,7 @@
       "id": 1003,
       "title": "El acorazado Potemkin",
       "value": 1925,
-      "source": null,
+      "source": "https://www.britannica.com/print/article/472603",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -1706,7 +1706,7 @@
       "id": 1004,
       "title": "Metrópolis",
       "value": 1927,
-      "source": null,
+      "source": "https://britannica.com/topic/Metropolis-film-1927",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -1716,7 +1716,7 @@
       "id": 1005,
       "title": "Luces de la ciudad",
       "value": 1931,
-      "source": null,
+      "source": "https://www.afi.com/news/afi-movie-club-city-lights/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -1726,7 +1726,7 @@
       "id": 1006,
       "title": "King Kong",
       "value": 1933,
-      "source": null,
+      "source": "https://www.britannica.com/print/article/318473",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -1736,7 +1736,7 @@
       "id": 1007,
       "title": "Tiempos modernos",
       "value": 1936,
-      "source": null,
+      "source": "https://www.britannica.com/print/article/387247",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -1746,7 +1746,7 @@
       "id": 1008,
       "title": "Blancanieves y los siete enanitos",
       "value": 1937,
-      "source": null,
+      "source": "https://www.britannica.com/print/article/550602",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -1756,7 +1756,7 @@
       "id": 1009,
       "title": "Lo que el viento se llevó",
       "value": 1939,
-      "source": null,
+      "source": "https://www.britannica.com/topic/Gone-with-the-Wind-film-by-Fleming",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -1766,7 +1766,7 @@
       "id": 1010,
       "title": "El gran dictador",
       "value": 1940,
-      "source": null,
+      "source": "https://www.britannica.com/topic/The-Great-Dictator",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -1776,7 +1776,7 @@
       "id": 1011,
       "title": "Ciudadano Kane",
       "value": 1941,
-      "source": null,
+      "source": "https://www.britannica.com/topic/Citizen-Kane",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -1786,7 +1786,7 @@
       "id": 1012,
       "title": "Casablanca",
       "value": 1942,
-      "source": null,
+      "source": "https://catalog.afi.com/Catalog/moviedetails/27175",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -1796,7 +1796,7 @@
       "id": 1013,
       "title": "¡Qué bello es vivir!",
       "value": 1946,
-      "source": null,
+      "source": "https://www.britannica.com/topic/Its-a-Wonderful-Life",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -1806,7 +1806,7 @@
       "id": 1014,
       "title": "Ladrón de bicicletas",
       "value": 1948,
-      "source": null,
+      "source": "https://www.britannica.com/topic/The-Bicycle-Thief",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -1816,7 +1816,7 @@
       "id": 1015,
       "title": "La Cenicienta",
       "value": 1950,
-      "source": null,
+      "source": "https://www.britannica.com/topic/Cinderella-film-by-Geronimi-Jackson-and-Luske",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -2876,7 +2876,7 @@
       "id": 6001,
       "title": "Estreno de L’Orfeo",
       "value": 1607,
-      "source": null,
+      "source": "https://www.kennedy-center.org/education/resources-for-educators/classroom-resources/media-and-interactives/artsdays/02-february/0224/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -2886,7 +2886,7 @@
       "id": 6002,
       "title": "Conciertos de Brandeburgo",
       "value": 1721,
-      "source": null,
+      "source": "https://www.britannica.com/print/article/77678",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -2896,7 +2896,7 @@
       "id": 6003,
       "title": "Publicación de las Variaciones Goldberg",
       "value": 1741,
-      "source": null,
+      "source": "https://en.wikipedia.org/wiki/Goldberg_Variations",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -2906,7 +2906,7 @@
       "id": 6004,
       "title": "Estreno de Don Giovanni",
       "value": 1787,
-      "source": null,
+      "source": "https://britannica.com/topic/Don-Giovanni-opera-by-Mozart/Introduction",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -2916,7 +2916,7 @@
       "id": 6005,
       "title": "Estreno público de la Heroica",
       "value": 1805,
-      "source": null,
+      "source": "https://www.britannica.com:443/print/article/191782",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -2926,7 +2926,7 @@
       "id": 6006,
       "title": "Estreno de la Novena de Beethoven",
       "value": 1824,
-      "source": null,
+      "source": "https://en.wikipedia.org/wiki/Symphony_No._9_(Beethoven)",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -2936,7 +2936,7 @@
       "id": 6007,
       "title": "Estreno de la Sinfonía fantástica",
       "value": 1830,
-      "source": null,
+      "source": "https://www.britannica.com/print/article/578001",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -2946,7 +2946,7 @@
       "id": 6008,
       "title": "Estreno de Tristán e Isolda",
       "value": 1865,
-      "source": null,
+      "source": "https://www.mariinsky.ru/en/playbill/repertoire/opera/tristan_und_isolde/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -2956,7 +2956,7 @@
       "id": 6009,
       "title": "Edison presenta el fonógrafo",
       "value": 1877,
-      "source": null,
+      "source": "https://www.asme.org/about-asme/engineering-history/landmarks/68-Edison-Experimental-Recording-Phonograph",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -2966,7 +2966,7 @@
       "id": 6010,
       "title": "Se graba «Israel en Egipto» en el Crystal Palace",
       "value": 1888,
-      "source": null,
+      "source": "https://home.nps.gov/edis/learn/photosmultimedia/very-early-recorded-sound.htm",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -2976,7 +2976,7 @@
       "id": 6011,
       "title": "Estreno de la Sinfonía del Nuevo Mundo",
       "value": 1893,
-      "source": null,
+      "source": "https://carnegiehall.org/Explore/Articles/2020/09/21/Carnegie-Hall-Premieres-Dvoraks-New-World-Symphony",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -2986,7 +2986,7 @@
       "id": 6012,
       "title": "Caruso graba en Milán",
       "value": 1902,
-      "source": null,
+      "source": "https://en.wikipedia.org/wiki/Enrico_Caruso",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -2996,7 +2996,7 @@
       "id": 6013,
       "title": "El escándalo de La consagración de la primavera",
       "value": 1913,
-      "source": null,
+      "source": "https://www.britannica.com/print/article/504598",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3006,7 +3006,7 @@
       "id": 6014,
       "title": "Comienza la radio comercial",
       "value": 1920,
-      "source": null,
+      "source": "https://www.britannica.com/topic/KDKA",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3016,7 +3016,7 @@
       "id": 6015,
       "title": "Llega la grabación eléctrica",
       "value": 1925,
-      "source": null,
+      "source": "https://ethw.org/Electrical_Recording",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3026,7 +3026,7 @@
       "id": 6016,
       "title": "La primera guitarra eléctrica comercial",
       "value": 1932,
-      "source": null,
+      "source": "https://www.metmuseum.org/art/collection/search/729575",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3036,7 +3036,7 @@
       "id": 6017,
       "title": "Presentación del Magnetophon",
       "value": 1935,
-      "source": null,
+      "source": "https://www.storagenewsletter.com/2018/02/19/history-1935-aeg-debuts-magnetophon-commercial-audio-tape-recorder-with-low-cost-magnetic-tape/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3046,7 +3046,7 @@
       "id": 6018,
       "title": "Nace el disco de larga duración",
       "value": 1948,
-      "source": null,
+      "source": "https://blogs.loc.gov/now-see-hear/2019/04/inside-the-archival-box-the-first-long-playing-disc/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3056,7 +3056,7 @@
       "id": 6019,
       "title": "Rock Around the Clock",
       "value": 1954,
-      "source": null,
+      "source": "https://www.history.com/this-day-in-history/april-12/bill-haley-and-the-comets-record-rock-around-the-clock",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3066,7 +3066,7 @@
       "id": 6020,
       "title": "Primer álbum de Elvis Presley",
       "value": 1956,
-      "source": null,
+      "source": "https://en.wikipedia.org/wiki/Elvis_Presley_(album)",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3086,7 +3086,7 @@
       "id": 6022,
       "title": "Love Me Do",
       "value": 1962,
-      "source": null,
+      "source": "https://en.wikipedia.org/wiki/Love_Me_Do",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3096,7 +3096,7 @@
       "id": 6023,
       "title": "Like a Rolling Stone",
       "value": 1965,
-      "source": null,
+      "source": "https://americansongwriter.com/on-this-day-in-1965-bob-dylan-released-a-hank-williams-inspired-song-that-broke-all-the-rules-and-made-him-an-international-star/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3106,7 +3106,7 @@
       "id": 6024,
       "title": "Sgt. Pepper’s Lonely Hearts Club Band",
       "value": 1967,
-      "source": null,
+      "source": "https://beatles.com/sgt-peppers-lonely-hearts-club-band-0",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3116,7 +3116,7 @@
       "id": 6025,
       "title": "Festival de Woodstock",
       "value": 1969,
-      "source": null,
+      "source": "https://en.wikipedia.org/wiki/Woodstock",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3126,7 +3126,7 @@
       "id": 6026,
       "title": "What’s Going On",
       "value": 1971,
-      "source": null,
+      "source": "https://www.kennedy-center.org/education/resources-for-educators/classroom-resources/media-and-interactives/artsdays/05-may/0521/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3136,7 +3136,7 @@
       "id": 6027,
       "title": "The Dark Side of the Moon",
       "value": 1973,
-      "source": null,
+      "source": "https://www.billboard.com/?p=266516",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3146,7 +3146,7 @@
       "id": 6028,
       "title": "Bohemian Rhapsody",
       "value": 1975,
-      "source": null,
+      "source": "https://officialcharts.com/chart-news/queen-bohemian-rhapsody-50-years/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3156,7 +3156,7 @@
       "id": 6029,
       "title": "Rumours",
       "value": 1977,
-      "source": null,
+      "source": "https://en.wikipedia.org/wiki/Rumours_(album)",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3866,7 +3866,7 @@
       "id": 7001,
       "title": "OXO",
       "value": 1952,
-      "source": null,
+      "source": "https://www.guinnessworldrecords.com/world-records/first-strategy-game",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3876,7 +3876,7 @@
       "id": 7002,
       "title": "Tennis for Two",
       "value": 1958,
-      "source": null,
+      "source": "https://www.museumofplay.org/?p=7463",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3886,7 +3886,7 @@
       "id": 7003,
       "title": "Spacewar!",
       "value": 1962,
-      "source": null,
+      "source": "https://www.technologyreview.com/2005/06/01/230884/the-start-of-computer-games/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3896,7 +3896,7 @@
       "id": 7004,
       "title": "Computer Space",
       "value": 1971,
-      "source": null,
+      "source": "https://arcade-museum.com/Videogame/computer-space",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3906,7 +3906,7 @@
       "id": 7005,
       "title": "Pong",
       "value": 1972,
-      "source": null,
+      "source": "https://www.britannica.com/topic/Pong",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3916,7 +3916,7 @@
       "id": 7006,
       "title": "Atari 2600",
       "value": 1977,
-      "source": null,
+      "source": "https://artsandculture.google.com/asset/video-game-console-atari-2600-atari-inc/SQHZhWuFAZiRkA",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3926,7 +3926,7 @@
       "id": 7007,
       "title": "Space Invaders",
       "value": 1978,
-      "source": null,
+      "source": "https://www.britannica.com/topic/Space-Invaders",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3936,7 +3936,7 @@
       "id": 7008,
       "title": "Pac-Man",
       "value": 1980,
-      "source": null,
+      "source": "https://www.britannica.com/topic/Pac-Man-1688279",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3946,7 +3946,7 @@
       "id": 7009,
       "title": "Donkey Kong",
       "value": 1981,
-      "source": null,
+      "source": "https://ebsco.com/research-starters/sports-and-leisure/donkey-kong-electronic-game",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3956,7 +3956,7 @@
       "id": 7010,
       "title": "Commodore 64",
       "value": 1982,
-      "source": null,
+      "source": "https://www.homecomputermuseum.nl/en/collectie/commodore/commodore-64/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3966,7 +3966,7 @@
       "id": 7011,
       "title": "Famicom llega a Japón",
       "value": 1983,
-      "source": null,
+      "source": "https://www.computinghistory.org.uk/det/20983/Nintendo-Famicom/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3976,7 +3976,7 @@
       "id": 7012,
       "title": "Tetris",
       "value": 1984,
-      "source": null,
+      "source": "https://www.computerhistory.org/revolution/computer-games/16/194/811?position=0",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3986,7 +3986,7 @@
       "id": 7013,
       "title": "Super Mario Bros.",
       "value": 1985,
-      "source": null,
+      "source": "https://www.computinghistory.org.uk/det/32126/Super-Mario-Bros/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3996,7 +3996,7 @@
       "id": 7014,
       "title": "The Legend of Zelda",
       "value": 1986,
-      "source": null,
+      "source": "https://nintendolife.com/news/2010/11/feature_slipped_disk_the_history_of_the_famicom_disk_system",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4006,7 +4006,7 @@
       "id": 7015,
       "title": "Final Fantasy",
       "value": 1987,
-      "source": null,
+      "source": "https://en.wikipedia.org/wiki/Final_Fantasy_(video_game)",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4016,7 +4016,7 @@
       "id": 7016,
       "title": "Mega Drive",
       "value": 1988,
-      "source": null,
+      "source": "https://www.computinghistory.org.uk/det/32312/Sega-Mega-Drive-(Japanese)",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4026,7 +4026,7 @@
       "id": 7017,
       "title": "Game Boy",
       "value": 1989,
-      "source": null,
+      "source": "https://www.smithsonianmag.com/innovation/thirty-years-ago-game-boy-changed-way-america-played-video-games-180972743/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4036,7 +4036,7 @@
       "id": 7018,
       "title": "The Secret of Monkey Island",
       "value": 1990,
-      "source": null,
+      "source": "https://www.giantbomb.com/games/3030-3019/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4046,7 +4046,7 @@
       "id": 7019,
       "title": "Sonic the Hedgehog",
       "value": 1991,
-      "source": null,
+      "source": "https://www.videogameschronicle.com/news/sonic-the-hedgehog-celebrates-its-30th-anniversary-today/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4056,7 +4056,7 @@
       "id": 7020,
       "title": "Mortal Kombat",
       "value": 1992,
-      "source": null,
+      "source": "https://www.inverse.com/gaming/mortal-kombat-30th-anniversary",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4066,7 +4066,7 @@
       "id": 7021,
       "title": "Doom",
       "value": 1993,
-      "source": null,
+      "source": "https://artsandculture.google.com/asset/video-game-doom/OAGZGkkM8z9WNA?hl=en",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4076,7 +4076,7 @@
       "id": 7022,
       "title": "PlayStation llega a Japón",
       "value": 1994,
-      "source": null,
+      "source": "https://giantbomb.com/wiki/Platforms/PlayStation",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4086,7 +4086,7 @@
       "id": 7023,
       "title": "Chrono Trigger",
       "value": 1995,
-      "source": null,
+      "source": "https://www.arcade-history.com/game/61142/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4096,7 +4096,7 @@
       "id": 7024,
       "title": "Pokémon Rojo y Verde",
       "value": 1996,
-      "source": null,
+      "source": "https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_Red_and_Green",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4106,7 +4106,7 @@
       "id": 7025,
       "title": "Final Fantasy VII",
       "value": 1997,
-      "source": null,
+      "source": "https://gematsu.com/2023/01/final-fantasy-vii-day-officially-registered-with-japan-anniversary-association",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4116,7 +4116,7 @@
       "id": 7026,
       "title": "Half-Life",
       "value": 1998,
-      "source": null,
+      "source": "https://www.giantbomb.com/games/3030-2980/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4126,7 +4126,7 @@
       "id": 7027,
       "title": "Dreamcast llega a Europa",
       "value": 1999,
-      "source": null,
+      "source": "https://www.timeextension.com/news/2024/10/anniversary-25-years-ago-sega-launched-dreamcast-in-europe-with-one-of-the-most-esoteric-campaigns-ever",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4136,7 +4136,7 @@
       "id": 7028,
       "title": "Los Sims",
       "value": 2000,
-      "source": null,
+      "source": "https://en.wikipedia.org/wiki/The_Sims_(video_game)",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4146,7 +4146,7 @@
       "id": 7029,
       "title": "Halo: Combat Evolved",
       "value": 2001,
-      "source": null,
+      "source": "https://en.wikipedia.org/wiki/Halo:_Combat_Evolved",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7111,7 +7111,7 @@
       "id": 4001,
       "title": "La escritura cuneiforme (fecha aproximada)",
       "value": -3300,
-      "source": null,
+      "source": "https://www.larousse.fr/encyclopedie/divers/cunéiforme/39105",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7121,7 +7121,7 @@
       "id": 4002,
       "title": "La rueda de alfarero (fecha aproximada)",
       "value": -3500,
-      "source": null,
+      "source": "https://www.britannica.com/technology/wheel",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7131,7 +7131,7 @@
       "id": 4003,
       "title": "El papiro egipcio (fecha aproximada)",
       "value": -2600,
-      "source": null,
+      "source": "https://www.guinnessworldrecords.com/world-records/711805-oldest-papyrus",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7141,7 +7141,7 @@
       "id": 4004,
       "title": "El código de Hammurabi (fecha aproximada)",
       "value": -1750,
-      "source": null,
+      "source": "https://www.britannica.com/topic/Code-of-Hammurabi",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7151,7 +7151,7 @@
       "id": 4005,
       "title": "Las primeras monedas acuñadas (fecha aproximada)",
       "value": -630,
-      "source": null,
+      "source": "https://www.lbma.org.uk/wonders-of-gold/items/lydian-electrum-coin",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7161,7 +7161,7 @@
       "id": 4008,
       "title": "Julio César decreta la reforma del calendario",
       "value": -46,
-      "source": null,
+      "source": "https://www.britannica.com/science/Roman-republican-calendar",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7171,7 +7171,7 @@
       "id": 4009,
       "title": "La mejora del papel en China (fecha tradicional)",
       "value": 105,
-      "source": null,
+      "source": "https://www.Britannica.Com/biography/Cai-Lun",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7181,7 +7181,7 @@
       "id": 4012,
       "title": "El tratado de álgebra de Al-Juarismi (fecha aproximada)",
       "value": 830,
-      "source": null,
+      "source": "https://www.britannica.com/biography/al-Khwarizmi",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7191,7 +7191,7 @@
       "id": 4013,
       "title": "Una de las primeras fórmulas escritas de la pólvora",
       "value": 1044,
-      "source": null,
+      "source": "https://en.wikipedia.org/wiki/History_of_gunpowder",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7201,7 +7201,7 @@
       "id": 4016,
       "title": "La imprenta de tipos móviles de Gutenberg",
       "value": 1450,
-      "source": null,
+      "source": "https://kids.britannica.com/students/article/Johannes-Gutenberg/38592",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7211,7 +7211,7 @@
       "id": 4018,
       "title": "El calendario gregoriano",
       "value": 1582,
-      "source": null,
+      "source": "https://www.britannica.com/story/ten-days-that-vanished-the-switch-to-the-gregorian-calendar",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7221,7 +7221,7 @@
       "id": 4019,
       "title": "Gilbert explica el imán",
       "value": 1600,
-      "source": null,
+      "source": "https://www.britannica.com/print/article/233551",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7231,7 +7231,7 @@
       "id": 4023,
       "title": "La calculadora de Pascal",
       "value": 1642,
-      "source": null,
+      "source": "https://www.Britannica.Com/technology/Pascaline",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7241,7 +7241,7 @@
       "id": 4024,
       "title": "El reloj de péndulo",
       "value": 1656,
-      "source": null,
+      "source": "https://www.guinnessworldrecords.com/world-records/first-operational-pendulum-clock",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7251,7 +7251,7 @@
       "id": 4028,
       "title": "La primera máquina de vapor comercial",
       "value": 1698,
-      "source": null,
+      "source": "https://www.Britannica.Com/biography/Thomas-Savery",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7261,7 +7261,7 @@
       "id": 4029,
       "title": "La máquina atmosférica de Newcomen",
       "value": 1712,
-      "source": null,
+      "source": "https://collection.sciencemuseumgroup.org.uk/objects/co50900/newcomen-atmospheric-engine-atmospheric-steam-engine",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7271,7 +7271,7 @@
       "id": 4031,
       "title": "Linneo publica la primera edición de «Systema Naturae»",
       "value": 1735,
-      "source": null,
+      "source": "https://en.wikipedia.org/wiki/Systema_Naturae",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7281,7 +7281,7 @@
       "id": 4032,
       "title": "El pararrayos de Franklin",
       "value": 1752,
-      "source": null,
+      "source": "https://www.founders.archives.gov/documents/Franklin/01-04-02-0135",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7291,7 +7291,7 @@
       "id": 4033,
       "title": "Watt patenta el condensador separado",
       "value": 1769,
-      "source": null,
+      "source": "https://blog.sciencemuseum.org.uk/james-watt-and-the-separate-condenser",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7301,7 +7301,7 @@
       "id": 4035,
       "title": "El primer vuelo tripulado en globo de aire caliente",
       "value": 1783,
-      "source": null,
+      "source": "https://www.si.edu/object/nasm_A19930237000",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7311,7 +7311,7 @@
       "id": 4037,
       "title": "La pila de Volta",
       "value": 1800,
-      "source": null,
+      "source": "https://nationalmaglab.org/magnet-academy/history-of-electricity-magnetism/museum/voltaic-pile-1800/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7321,7 +7321,7 @@
       "id": 4038,
       "title": "La primera locomotora de vapor",
       "value": 1804,
-      "source": null,
+      "source": "https://www.guinnessworldrecords.com/world-records/454107-first-steam-locomotive-to-run-on-rails",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7781,7 +7781,7 @@
       "id": 5001,
       "title": "La unificación de Egipto (fecha aproximada)",
       "value": -3100,
-      "source": null,
+      "source": "https://egymonuments.gov.eg/en/historical-periods/early-dynastic-period",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7791,7 +7791,7 @@
       "id": 5002,
       "title": "La Gran Pirámide de Guiza (fecha aproximada)",
       "value": -2560,
-      "source": null,
+      "source": "https://www.britannica.com/place/How-long-did-the-Great-Pyramid-of-Giza-hold-the-record-as-the-tallest-man-made-structure-in-the-world",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7811,7 +7811,7 @@
       "id": 5004,
       "title": "El colapso de la Edad del Bronce (fecha aproximada)",
       "value": -1200,
-      "source": null,
+      "source": "https://www.britannica.com/topic/Sea-People",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7821,7 +7821,7 @@
       "id": 5005,
       "title": "La fundación de Roma (fecha tradicional)",
       "value": -753,
-      "source": null,
+      "source": "https://www.britannica.com/place/ancient-Rome/Romes-foundation-myth",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7831,7 +7831,7 @@
       "id": 5006,
       "title": "La destrucción del Primer Templo de Jerusalén",
       "value": -586,
-      "source": null,
+      "source": "https://www.britannica.com/event/Babylonian-Captivity",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7841,7 +7841,7 @@
       "id": 5007,
       "title": "Ciro el Grande conquista Babilonia",
       "value": -539,
-      "source": null,
+      "source": "https://kids.britannica.com/scholars/article/Cyrus-the-Great/28433",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7851,7 +7851,7 @@
       "id": 5008,
       "title": "Nace la República romana (fecha tradicional)",
       "value": -509,
-      "source": null,
+      "source": "https://www.britannica.com/print/article/583670",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -7861,7 +7861,7 @@
       "id": 5009,
       "title": "La batalla de Maratón",
       "value": -490,
-      "source": null,
+      "source": "https://www.britannica.com/event/Battle-of-Marathon",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9501,7 +9501,7 @@
       "id": 9001,
       "title": "El corpus hipocrático (fecha aproximada)",
       "value": -400,
-      "source": null,
+      "source": "https://www.britannica.com/topic/Hippocratic-Collection",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9511,7 +9511,7 @@
       "id": 9002,
       "title": "El Canon de medicina de Avicena",
       "value": 1025,
-      "source": null,
+      "source": "https://en.wikipedia.org/wiki/The_Canon_of_Medicine",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9521,7 +9521,7 @@
       "id": 9003,
       "title": "Ibn al-Nafis describe la circulación pulmonar",
       "value": 1242,
-      "source": null,
+      "source": "https://www.britannica.com/biography/Ibn-an-Nafis",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9531,7 +9531,7 @@
       "id": 4015,
       "title": "Las primeras gafas (fecha aproximada)",
       "value": 1286,
-      "source": null,
+      "source": "https://sites.utexas.edu/ransomcentermagazine/2012/04/17/medieval-spectacles/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9541,7 +9541,7 @@
       "id": 9004,
       "title": "Vesalio publica De humani corporis fabrica",
       "value": 1543,
-      "source": null,
+      "source": "https://sites.wip.nlm.nih.gov/exhibition/historicalanatomies/vesalius_bio.html",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9551,7 +9551,7 @@
       "id": 9005,
       "title": "Harvey explica la circulación de la sangre",
       "value": 1628,
-      "source": null,
+      "source": "https://www.cai.cam.ac.uk/node/7015",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9561,7 +9561,7 @@
       "id": 9006,
       "title": "Micrographia",
       "value": 1665,
-      "source": null,
+      "source": "https://www.rct.uk/collection/stories/natural-history-in-the-royal-library/micrographia-or-some-physiological-descriptions-of-minute-bodies-made-by-magnifying-glasses-with",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9571,7 +9571,7 @@
       "id": 9007,
       "title": "Leeuwenhoek observa microorganismos",
       "value": 1674,
-      "source": null,
+      "source": "https://www.britannica.com/biography/Antonie-van-Leeuwenhoek",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9581,7 +9581,7 @@
       "id": 4030,
       "title": "El termómetro de mercurio",
       "value": 1714,
-      "source": null,
+      "source": "https://www.britannica.com/biography/Daniel-Gabriel-Fahrenheit",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9591,7 +9591,7 @@
       "id": 9008,
       "title": "La variolización llega a Inglaterra",
       "value": 1721,
-      "source": null,
+      "source": "https://news.liverpool.ac.uk/2021/07/21/lady-mary-wortley-montagu-forgotten-immunisation-pioneer/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9601,7 +9601,7 @@
       "id": 9009,
       "title": "James Lind prueba tratamientos contra el escorbuto",
       "value": 1747,
-      "source": null,
+      "source": "https://www.encyclopedia.com/science/encyclopedias-almanacs-transcripts-and-maps/james-lind",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9611,7 +9611,7 @@
       "id": 4034,
       "title": "Priestley aísla el gas que llamaremos oxígeno",
       "value": 1774,
-      "source": null,
+      "source": "https://www.britannica.com/biography/Joseph-Priestley",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9621,7 +9621,7 @@
       "id": 9010,
       "title": "Morgagni relaciona síntomas y órganos",
       "value": 1761,
-      "source": null,
+      "source": "https://www.britannica.com/biography/Giovanni-Battista-Morgagni",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9631,7 +9631,7 @@
       "id": 9011,
       "title": "Primera vacuna contra la viruela",
       "value": 1796,
-      "source": null,
+      "source": "https://www.britannica.com/biography/Edward-Jenner",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9641,7 +9641,7 @@
       "id": 9012,
       "title": "Invención del estetoscopio",
       "value": 1816,
-      "source": null,
+      "source": "https://www.britannica.com/biography/Rene-Laennec",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9651,7 +9651,7 @@
       "id": 9013,
       "title": "Demostración pública de anestesia con éter",
       "value": 1846,
-      "source": null,
+      "source": "https://en.wikipedia.org/wiki/Ether_Dome",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9661,7 +9661,7 @@
       "id": 9014,
       "title": "Semmelweis exige lavarse las manos",
       "value": 1847,
-      "source": null,
+      "source": "https://www.britannica.com/biography/Ignaz-Semmelweis",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9671,7 +9671,7 @@
       "id": 9015,
       "title": "John Snow rastrea el cólera",
       "value": 1854,
-      "source": null,
+      "source": "https://www.britannica.com/topic/Broad-Street-pump-cholera-outbreak-of-1854",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10041,7 +10041,7 @@
       "id": 2001,
       "title": "Rusia",
       "value": 17098246,
-      "source": null,
+      "source": "https://www.cia.gov/the-world-factbook/static/218b2ecaedbfc2cac729aadd350c5416/RS-summary.pdf",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10051,7 +10051,7 @@
       "id": 2002,
       "title": "Estados Unidos",
       "value": 9833517,
-      "source": null,
+      "source": "https://www.cia.gov/the-world-factbook/about/archives/2021/static/08b2fca4db11ce7ed8424f0a320287b0/US-summary.pdf",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10061,7 +10061,7 @@
       "id": 2003,
       "title": "Brasil",
       "value": 8515767,
-      "source": null,
+      "source": "https://www.cia.gov/the-world-factbook/about/archives/2021/static/27d8f20536d4429d3c277ce523a691f2/BR-summary.pdf",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10071,7 +10071,7 @@
       "id": 2004,
       "title": "Australia",
       "value": 7692024,
-      "source": null,
+      "source": "https://www.abs.gov.au/ausstats/abs@.nsf/0/F0493C5599FC13E4CA256CAD0080A8F5",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10081,7 +10081,7 @@
       "id": 2005,
       "title": "India",
       "value": 3287263,
-      "source": null,
+      "source": "https://www.cia.gov:443/the-world-factbook/static/347043e76db082bed9086e8ce3e2ce9d/IN-summary.pdf",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10091,7 +10091,7 @@
       "id": 2006,
       "title": "Argentina",
       "value": 2780400,
-      "source": null,
+      "source": "https://www.cia.gov/the-world-factbook/about/archives/2021/static/f6cfd1c90a9bf3140e34943af7ecad54/AR-summary.pdf",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10111,7 +10111,7 @@
       "id": 2007,
       "title": "Argelia",
       "value": 2381741,
-      "source": null,
+      "source": "https://www.cia.gov/the-world-factbook/about/archives/2021/static/dbca2132e5f59d847b3df800a56c4ebb/AG-summary.pdf",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10121,7 +10121,7 @@
       "id": 2008,
       "title": "Arabia Saudí",
       "value": 2149690,
-      "source": null,
+      "source": "https://www.cia.gov:443/the-world-factbook/about/archives/2021/static/fc0ba352c88a4755c0c95e856fb626c1/SA-summary.pdf",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10131,7 +10131,7 @@
       "id": 2009,
       "title": "México",
       "value": 1964375,
-      "source": null,
+      "source": "https://www.cia.gov/the-world-factbook/about/archives/2021/static/d9291be7ba66e5467faa50e3f88492d3/MX-summary.pdf",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10151,7 +10151,7 @@
       "id": 2010,
       "title": "Irán",
       "value": 1648195,
-      "source": null,
+      "source": "https://www.cia.gov/the-world-factbook/countries/iran/summaries/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10171,7 +10171,7 @@
       "id": 2011,
       "title": "Sudáfrica",
       "value": 1221037,
-      "source": null,
+      "source": "https://www.cia.gov/the-world-factbook/about/archives/2021/static/e9191f34dc1b541ca2090221fa087567/SF-summary.pdf",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10181,7 +10181,7 @@
       "id": 2012,
       "title": "Bolivia",
       "value": 1098581,
-      "source": null,
+      "source": "https://www.cia.gov/the-world-factbook/about/archives/2023/countries/bolivia",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10191,7 +10191,7 @@
       "id": 2013,
       "title": "Egipto",
       "value": 1001450,
-      "source": null,
+      "source": "https://www.cia.gov:443/the-world-factbook/static/8fa904f15741ea3bdabf92085c4a44e5/EG-summary.pdf",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10201,7 +10201,7 @@
       "id": 2014,
       "title": "Nigeria",
       "value": 923768,
-      "source": null,
+      "source": "https://www.cia.gov/the-world-factbook/static/d4160d983592471f0ec4ef53cf9f5372/NI-summary.pdf",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10211,7 +10211,7 @@
       "id": 2015,
       "title": "Turquía",
       "value": 783562,
-      "source": null,
+      "source": "https://www.cia.gov/the-world-factbook/static/260890b25aa9d41a9debbfb5f65d33e9/TU-summary.pdf",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10231,7 +10231,7 @@
       "id": 2016,
       "title": "Afganistán",
       "value": 652230,
-      "source": null,
+      "source": "https://www.cia.gov/the-world-factbook/about/archives/2023/countries/afghanistan",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10251,7 +10251,7 @@
       "id": 2017,
       "title": "Ucrania",
       "value": 603550,
-      "source": null,
+      "source": "https://www.cia.gov/the-world-factbook/static/5228e3ff772c9465025d576d6a489b30/UP-summary.pdf",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -10261,7 +10261,7 @@
       "id": 2018,
       "title": "Francia metropolitana",
       "value": 551695,
-      "source": null,
+      "source": "https://www.cia.gov/the-world-factbook/about/archives/2023/countries/france",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -11521,7 +11521,7 @@
       "id": 14001,
       "title": "Chino mandarín",
       "value": 929000000,
-      "source": null,
+      "source": "https://wiki.undernet.uy/content/wikipedia_es_all_maxi_2025-08/Anexo%3AIdiomas_por_n%C3%BAmero_de_hablantes_nativos",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -11531,7 +11531,7 @@
       "id": 14002,
       "title": "Español",
       "value": 474700000,
-      "source": null,
+      "source": "https://wiki.undernet.uy/content/wikipedia_es_all_maxi_2025-08/Anexo%3AIdiomas_por_n%C3%BAmero_de_hablantes_nativos",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -11541,7 +11541,7 @@
       "id": 14003,
       "title": "Inglés",
       "value": 372900000,
-      "source": null,
+      "source": "https://wiki.undernet.uy/content/wikipedia_es_all_maxi_2025-08/Anexo%3AIdiomas_por_n%C3%BAmero_de_hablantes_nativos",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -11601,7 +11601,7 @@
       "id": 14009,
       "title": "Lahnda",
       "value": 92700000,
-      "source": null,
+      "source": "https://wiki.undernet.uy/content/wikipedia_es_all_maxi_2025-08/Anexo%3AIdiomas_por_n%C3%BAmero_de_hablantes_nativos",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -11611,7 +11611,7 @@
       "id": 14010,
       "title": "Chino yue (cantonés)",
       "value": 85200000,
-      "source": null,
+      "source": "https://wiki.undernet.uy/content/wikipedia_es_all_maxi_2025-08/Anexo%3AIdiomas_por_n%C3%BAmero_de_hablantes_nativos",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -11621,7 +11621,7 @@
       "id": 14011,
       "title": "Vietnamita",
       "value": 84600000,
-      "source": null,
+      "source": "https://wiki.undernet.uy/content/wikipedia_es_all_maxi_2025-08/Anexo%3AIdiomas_por_n%C3%BAmero_de_hablantes_nativos",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -11631,7 +11631,7 @@
       "id": 14012,
       "title": "Maratí",
       "value": 83100000,
-      "source": null,
+      "source": "https://wiki.undernet.uy/content/wikipedia_es_all_maxi_2025-08/Anexo%3AIdiomas_por_n%C3%BAmero_de_hablantes_nativos",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -11661,7 +11661,7 @@
       "id": 14015,
       "title": "Coreano",
       "value": 81700000,
-      "source": null,
+      "source": "https://britannica.com/topic/languages-by-number-of-native-speakers-2228882",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -11711,7 +11711,7 @@
       "id": 14020,
       "title": "Javanés",
       "value": 68300000,
-      "source": null,
+      "source": "https://britannica.com/topic/languages-by-number-of-native-speakers-2228882",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -11741,7 +11741,7 @@
       "id": 14023,
       "title": "Guyaratí",
       "value": 57000000,
-      "source": null,
+      "source": "https://britannica.com/topic/languages-by-number-of-native-speakers-2228882",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null

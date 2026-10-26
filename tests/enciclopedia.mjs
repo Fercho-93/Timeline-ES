@@ -94,7 +94,7 @@ console.log("\nFiltrado puro (CT.Enciclopedia)");
   ok("hay una carta con fuente en Peso de animales", !!conFuente);
   const markup = w.CONTINUUM.Enciclopedia.cardMarkup("animals", conFuente);
   ok("la carta con fuente enlaza a esa fuente", markup.includes(`href="${conFuente.source}"`));
-  const sinFuente = w.CONTINUUM.Enciclopedia.cardMarkup("history", w.HISTORY_CARDS[0]);
+  const sinFuente = w.CONTINUUM.Enciclopedia.cardMarkup("history", w.HISTORY_CARDS.find(c => !c.source));
   ok("una carta sin fuente no inventa un enlace", !sinFuente.includes("enc-source"));
 }
 
