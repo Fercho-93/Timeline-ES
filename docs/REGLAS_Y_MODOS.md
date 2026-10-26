@@ -233,7 +233,8 @@ otros mazos.
 
 Los dos poderes se activan o desactivan con los interruptores «Cartas Fantasma» y «Cartas Pulso»
 al configurar la partida, tanto en un solo móvil como en salas; parten marcados o desmarcados
-según su valor por defecto y se pueden cambiar antes de barajar.
+según su valor por defecto y se pueden cambiar antes de barajar. La competición no los ofrece:
+se juega siempre sin poderes, en un solo móvil, en la sala online y en la de Wi‑Fi.
 
 ### Fantasma
 

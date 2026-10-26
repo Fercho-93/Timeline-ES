@@ -103,7 +103,8 @@
     if (state.playerOrder.length < MIN_PLAYERS) throw new Error("INVALID_START");
     if (laterRound(state)) order = rotatedOrder(state);
     else if (!starterComplete(state)) throw new Error("STARTER_PENDING");
-    if (state.tournament) handSize = state.tournament.handSize;
+    // La competición se juega con las cartas que fija y sin poderes, como dice la Guía.
+    if (state.tournament) { handSize = state.tournament.handSize; ghost = false; pulse = false; }
     const sameTable = Array.isArray(order) && order.length === state.playerOrder.length && state.playerOrder.every(id => order.includes(id));
     if (!sameTable) throw new Error("INVALID_START");
     const deck = [...shuffledDeck];

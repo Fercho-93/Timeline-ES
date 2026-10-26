@@ -269,7 +269,10 @@ try {
  await clients[0].call('renderLobby');assert.equal(clients[0].w.document.getElementById('online-hand-size').disabled,true);
  assert.equal(clients[0].w.document.querySelectorAll('.table-seat.occupied').length,9);
  assert.equal(clients[0].w.document.querySelectorAll('.ready-seal').length,9);
+ // La competición se juega sin poderes: la sala de espera no los ofrece y el reparto no los esconde.
+ assert.equal(clients[0].w.document.getElementById('online-ghost'),null);assert.equal(clients[0].w.document.getElementById('online-pulse'),null);
  await clients[0].call('startRoom');s=await snapshot();assert.equal(s.status,'playing');assert.ok(Object.values(s.players).every(p=>p.hand.length===1));
+ assert.ok(!s.ghost && !s.pulsePower && !s.pulse,'la competición no reparte poderes');
  await clients[1].call('renderGame');assert.match(clients[1].w.document.body.textContent,/Competición · ronda 2 de 3/);
  s.phase='reveal';s.turnsInRound=8;s.current=8;s.players[A].hand=[];s.players[B].hand=[];await seed(s);
  await clients[0].call('finishTurn');s=await snapshot();assert.equal(s.final.round,3,'las respuestas de otra ronda no se reutilizan');

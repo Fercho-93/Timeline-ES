@@ -452,22 +452,23 @@
     app.querySelector('.setup-section h2').outerHTML = '<div class="eyebrow"><span class="eyebrow-line"></span> Competición</div><h2 data-focus tabindex="-1">Competición en un solo móvil</h2>';
     app.querySelector('.setup-section .lead').textContent = `Temas al azar de las Grandes colecciones, uno por ronda. Ganar la ronda suma un punto; las cartas que te queden en la mano restan su número menos uno.`;
   }
-  function startTournamentRound(t, players, starter, ghost, pulse, excludedCardId = null) {
+  // La competición se juega sin poderes, como dice la Guía: ni Fantasma ni Pulso en ningún tema.
+  function startTournamentRound(t, players, starter, excludedCardId = null) {
     selectedModeKey = t.queue[t.index];
     selectedBlockKey = CT.blockOf(selectedModeKey).key;
     cardsById = new Map(CT.cards(selectedModeKey).map(c=>[c.id,c]));
     const deck = shuffle(CT.uniqueValueIds(selectedModeKey, CT.cards(selectedModeKey).map(c=>c.id).filter(id => id !== excludedCardId)));
     const handSize = Math.min(t.handSize, Math.floor((deck.length-1)/players.length));
-    const powers = CT.Powers.create(deck,players.length,handSize,ghost,pulse);
+    const powers = CT.Powers.create(deck,players.length,handSize,false,false);
     const roster = players.map(p=>({id:p.id,name:p.name,hand:deck.splice(0,handSize),pulseUsed:false,shieldRound:0}));
     const timeline=[deck.shift()];
     roster.forEach(p=>p.hand.forEach(id=>CT.Powers.claim(powers,id,p.id,deck)));
-    game={mode:selectedModeKey,tournament:t,competitionGhost:ghost,pulse,...powers,players:roster,deck,discard:[],timeline,current:starter,starter,turnsInRound:0,round:1,winner:null,winners:null,tournamentIntro:true,pulseTurn:null,pulseGift:null,turnSeconds:CT.Tiempo.get("local")};
+    game={mode:selectedModeKey,tournament:t,pulse:false,...powers,players:roster,deck,discard:[],timeline,current:starter,starter,turnsInRound:0,round:1,winner:null,winners:null,tournamentIntro:true,pulseTurn:null,pulseGift:null,turnSeconds:CT.Tiempo.get("local")};
     selectedCardId=null;pendingIndex=null;result=null;saveGame();renderTournamentIntro();
   }
   function nextTournamentRound() {
     if (!game?.tournament || !game.winners || game.tournament.index+1>=game.tournament.queue.length) return;
-    startTournamentRound(CT.Tournament.next(game.tournament,game.players,game.winners),game.players,(game.starter+1)%game.players.length,game.competitionGhost,game.pulse);
+    startTournamentRound(CT.Tournament.next(game.tournament,game.players,game.winners),game.players,(game.starter+1)%game.players.length);
   }
   function resumeMultiCompetition() {
     try {
@@ -921,12 +922,12 @@
               <div class="field local-hand-size"><span class="local-hand-art" aria-hidden="true">${CT.StarterPresentation.cardsIcon()}</span><label for="hand-size">Cartas iniciales por persona<small>En la mano de cada jugador</small></label><select id="hand-size">${[1, 2, 3, 4, 5, 6].map(n => `<option${n === (lastLocalSetup?.handSize || 4) ? " selected" : ""}>${n}</option>`).join("")}</select></div>
             </div>
           </div>
-          <div class="setup-block">
+          ${pendingTournament ? "" : `          <div class="setup-block">
             <div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Poderes</span></div>
             <p class="hint">Para una primera partida, mejor sin poderes.</p>
             <label class="opt-row local-power local-power-ghost"><i class="local-power-mark" aria-hidden="true">${localPowerIcon("ghost")}</i><span>Cartas Fantasma <small>Esconde de 1 a 3 Fantasmas según los jugadores. Pueden salir al repartir o robar, o quedarse sin descubrir. Se guardan aparte y no cuentan para ganar.</small></span><input type="checkbox" id="ghost-toggle"${lastLocalSetup?.ghost ? " checked" : ""}></label>
             <label class="opt-row local-power local-power-pulse"><i class="local-power-mark" aria-hidden="true">${localPowerIcon("pulse")}</i><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="pulse-toggle"${lastLocalSetup?.pulse ? " checked" : ""}></label>
-          </div>
+          </div>`}
           <div class="setup-block">
             ${CT.Tiempo.field("local")}
           </div>
@@ -1081,7 +1082,7 @@
     lastLocalSetup = { names, handSize: requestedHand, ghost, pulse };
     if (pendingTournament) {
       const t=CT.Tournament.create(Number(document.getElementById('competition-length')?.value)||pendingTournament.rounds,requestedHand);pendingTournament=null;
-      startTournamentRound(t,names.map((name,i)=>({id:i+1,name})),starter,ghost,pulse,starterDraw.cardId);return;
+      startTournamentRound(t,names.map((name,i)=>({id:i+1,name})),starter,starterDraw.cardId);return;
     }
     // Las cartas que se sacaron para decidir quién empieza ya se han visto: se apartan
     // del mazo para que nadie vuelva a encontrárselas en la partida.

@@ -35,6 +35,8 @@ w.CONTINUUM.ModeHubs.open('hub-friends-local');click('[data-action="competition-
 // Un solo móvil: una única ventana de ajustes (rondas y cartas), sin pantalla previa.
 assert.equal(w.document.getElementById('competition-cards'),null);
 w.document.getElementById('competition-length').value='3';w.document.getElementById('hand-size').value='1';
+// La competición se juega sin poderes: la preparación no ofrece los interruptores.
+assert.equal(w.document.getElementById('ghost-toggle'),null);assert.equal(w.document.getElementById('pulse-toggle'),null);
 click('[data-action="start"]');
 // Antes de repartir se juega el minijuego de quién empieza (todas con la misma
 // cifra: a igual distancia se respeta el orden de la mesa).
@@ -43,6 +45,7 @@ click('[data-action="starter-start"]');
 click('[data-action="competition-round-start"]');
 assert.equal(state().tournament.queue.length,3);assert.equal(new Set(state().tournament.queue).size,3);
 assert.ok(state().players.every(p=>p.hand.length===1));
+assert.ok(!state().ghost && !state().pulsePower && state().pulse===false,'el reparto no esconde poderes');
 for(let round=0;round<3;round++) {
  for(let turn=0;turn<2;turn++) {
   click('[data-action="ready"]');const s=state(),CT=w.CONTINUUM;

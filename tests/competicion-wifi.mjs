@@ -50,7 +50,8 @@ ok("la ronda anterior queda apuntada con las cartas de cada cual", sala.tourname
 ok("se limpia la mesa", sala.timeline.length === 0 && sala.deck.length === 0 && sala.players.ana.hand.length === 0);
 ok("ya no entra nadie nuevo", intenta(() => act(sala, "join", { playerId: "luis", name: "Luis" })) === "ALREADY_STARTED");
 ok("es una ronda posterior", Room.laterRound(sala));
-sala = act(sala, "start", { requesterId: "host", handSize: 5, deck: mazo("b") });
+sala = act(sala, "start", { requesterId: "host", handSize: 5, deck: mazo("b"), ghost: true, pulse: true });
+ok("la competición no reparte poderes aunque se pidan", !sala.ghost && !sala.pulsePower && !sala.pulse);
 ok("empieza sin minijuego y el turno inicial rota al siguiente de la mesa", sala.status === "playing" && sala.playerOrder[0] === "ana" && sala.timeline[0].startsWith("b-"));
 sala = { ...sala, status: "ended", phase: "finished", winner: "ana", winners: ["ana"], players: { ...sala.players, ana: { ...sala.players.ana, hand: [] } } };
 ok("con el último tema jugado no hay siguiente", intenta(() => act(sala, "competition-next", { requesterId: "host" })) === "NOT_ALLOWED");
