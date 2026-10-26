@@ -684,6 +684,9 @@ Pensado para el dedo. Ningún control baja de los 44 px que necesita una yema.
   sin querer al mirar la mesa—, encima de una tira que se desplaza a los lados, como la línea
   temporal o el marcador, y sobre un campo de texto o un desplegable. Desde el inicio no hace
   nada: cerrar la aplicación sigue siendo cosa del botón Atrás de Android.
+  La flecha **Volver** se ve también en las pantallas táctiles: deslizar es un atajo, no la
+  única forma de volver. Las capas (Guía, Ajustes, Enciclopedia) se cierran con esa flecha o con
+  el botón **Volver** de abajo.
 - **Botón Atrás de Android.** Solo dentro de la app (Capacitor): cierra el diálogo abierto,
   pregunta antes de abandonar una partida o vuelve al inicio (`js/interfaz/a11y.js`,
   `backPressed`, y `js/juego/app.js`). El deslizamiento comparte ese mismo «atrás».

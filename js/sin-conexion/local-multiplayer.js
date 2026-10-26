@@ -897,7 +897,7 @@ function starterPanelMarkupContent(isHost) {
   }
 
   function showGuide() {
-    appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-local-guide><div class="modal rules"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-local-action="close-guide" aria-label="Cerrar guía">×</button></div><div class="guide-content">${CT.guideMarkup(modeKey, "online", { pulse: roomState?.status === "playing" ? !!roomState.pulse : !roomState?.tournament && !!lobbySettings.pulse, ghost: roomState?.status === "playing" ? !!roomState.ghost : !roomState?.tournament && !!lobbySettings.ghost })}</div><button class="btn btn-primary btn-block" data-local-action="close-guide">Entendido</button></div></div>`);
+    appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-local-guide><div class="modal rules"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-local-action="close-guide" aria-label="Cerrar guía">×</button></div><div class="guide-content">${CT.guideMarkup(modeKey, "online", { pulse: roomState?.status === "playing" ? !!roomState.pulse : !roomState?.tournament && !!lobbySettings.pulse, ghost: roomState?.status === "playing" ? !!roomState.ghost : !roomState?.tournament && !!lobbySettings.ghost })}</div><button class="btn btn-primary btn-block" data-local-action="close-guide">Volver</button></div></div>`);
     CT.openDialog(appEl.querySelector("[data-local-guide]"), true);
   }
 

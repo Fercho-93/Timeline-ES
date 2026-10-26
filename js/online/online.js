@@ -402,7 +402,7 @@ const showToast = message => CT.toast(message, 3000);
 
 function showGuide() {
   const mode = modeKey();
-  appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-online-guide><div class="modal rules"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-online-action="close-guide" aria-label="Cerrar guía">×</button></div><div class="guide-content">${CT.guideMarkup(mode, "online", { pulse: roomState?.status === "playing" ? !!roomState.pulse : !roomState?.tournament && !!lobbySettings.pulse, ghost: roomState?.status === "playing" ? !!roomState.ghost : !roomState?.tournament && !!lobbySettings.ghost })}</div><button class="btn btn-primary btn-block" data-online-action="close-guide">Entendido</button></div></div>`);
+  appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-online-guide><div class="modal rules"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-online-action="close-guide" aria-label="Cerrar guía">×</button></div><div class="guide-content">${CT.guideMarkup(mode, "online", { pulse: roomState?.status === "playing" ? !!roomState.pulse : !roomState?.tournament && !!lobbySettings.pulse, ghost: roomState?.status === "playing" ? !!roomState.ghost : !roomState?.tournament && !!lobbySettings.ghost })}</div><button class="btn btn-primary btn-block" data-online-action="close-guide">Volver</button></div></div>`);
   abreCapa(appEl.querySelector("[data-online-guide]"), true);
 }
 

@@ -749,7 +749,7 @@
     screen = "duelos";
     paint(`<div class="shell">${header("back-menu")}
       <section class="setup-section perfil-section">
-        <header class="atlas-page-heading"><div class="eyebrow">Cara a cara</div><h1 data-focus tabindex="-1">Tus duelos</h1><p>Tus duelos por turnos: en qué punto está cada uno y a quién le toca.</p></header>
+        <header class="atlas-page-heading illustrated-heading"><img class="illustrated-heading-art" src="assets/voyage-duels-v1.webp" alt="" aria-hidden="true" decoding="async"><div class="eyebrow">Cara a cara</div><h1 data-focus tabindex="-1">Tus duelos</h1><p>Tus duelos por turnos: en qué punto está cada uno y a quién le toca.</p></header>
         <section class="panel turn-duel-profile" id="turn-duels-list"><p role="status">Cargando tus duelos…</p></section>
       </section>
       ${homeNav()}
@@ -1735,9 +1735,9 @@
     const conLaminas = all || CT.Enciclopedia.seenProgress(encMode).total > 0;
     const chipLock = (key, etiqueta) => `<button type="button" class="enc-lock-chip${encLock === key ? " active" : ""}" data-action="enc-lock" data-lock="${key}" aria-pressed="${encLock === key}">${etiqueta}</button>`;
     paint(`<div class="enc-background" data-background-screen="${encBackgroundScreen}" inert aria-hidden="true">${encBackground}</div><div class="overlay" data-overlay="encyclopedia"><div class="modal settings-modal enc-modal">
-      <button class="btn btn-secondary" data-action="enc-back" data-dialog-focus>Cerrar enciclopedia</button>
+      <button class="icon-btn" data-action="enc-back" data-dialog-focus aria-label="Volver a la pantalla anterior">Volver</button>
       <section class="setup-section enc-section">
-        <header class="atlas-page-heading"><div class="eyebrow">Tu Atlas</div><h1 data-focus tabindex="-1">Enciclopedia</h1><p>Explora las cartas. Completa tu colección, una partida a la vez.</p></header><div class="enc-selection-heading"><h2>${escapeHtml(mode.name)}</h2><p id="enc-count" role="status">${encCountText(encMode, cards.length)}</p></div>
+        <header class="atlas-page-heading illustrated-heading"><img class="illustrated-heading-art" src="assets/voyage-collection-v1.webp" alt="" aria-hidden="true" decoding="async"><div class="eyebrow">Tu Atlas</div><h1 data-focus tabindex="-1">Enciclopedia</h1><p>Explora las cartas. Completa tu colección, una partida a la vez.</p></header><div class="enc-selection-heading"><h2>${escapeHtml(mode.name)}</h2><p id="enc-count" role="status">${encCountText(encMode, cards.length)}</p></div>
         <div class="panel enc-toolbar enc-toolbar-compact">
           <div class="field enc-topic-select">
             <label for="enc-mode-select">Explorar temática</label>
@@ -1766,7 +1766,7 @@
         ${all && !encQuery && encLock === "all" ? CT.Enciclopedia.recentMarkup() : ""}
         ${all && encLock === "all" ? '<p class="hint" data-enc-browse-hint>Explora una temática y despliega un mazo, o busca entre todas las cartas.</p>' : ''}
         <div id="enc-results">${all ? CT.Enciclopedia.catalogMarkup(encQuery, { lock: encLock }) : CT.Enciclopedia.resultsMarkup(encMode, cards, { highlight: encHighlight })}</div>
-        <button type="button" class="btn btn-secondary btn-block" data-action="enc-back">Cerrar enciclopedia</button>
+        <button type="button" class="btn btn-primary btn-block" data-action="enc-back">Volver</button>
       </section>
     </div></div>`);
     app.querySelectorAll('.home-nav [aria-current]').forEach(button => button.removeAttribute('aria-current'));
@@ -3874,7 +3874,7 @@
     const entreMoviles = ["duelos", "friends-join", "competition-friends"].includes(screen);
     const context = enSolitario ? (comp ? "competition" : "solo") : enGrupo ? "local" : entreMoviles ? "online" : "general";
     const modeKey = screen === 'solo' ? solo.mode : CT.UI.isPlaying(screen) ? (game?.mode || selectedModeKey) : selectedModeKey;
-    overlay(`<div class="overlay" data-overlay="rules"><div class="modal rules"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-action="close-rules" aria-label="Cerrar guía">×</button></div><div class="guide-content">${CT.guideMarkup(modeKey, context, { pulse: !!game?.pulse, ghost: game ? !!game.ghost : true })}</div><button class="btn btn-primary btn-block" data-action="close-rules" data-return="${returnTo}">Entendido</button></div></div>`, true);
+    overlay(`<div class="overlay" data-overlay="rules"><div class="modal rules"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-action="close-rules" aria-label="Cerrar guía">×</button></div><div class="guide-content">${CT.guideMarkup(modeKey, context, { pulse: !!game?.pulse, ghost: game ? !!game.ghost : true })}</div><button class="btn btn-primary btn-block" data-action="close-rules" data-return="${returnTo}">Volver</button></div></div>`, true);
   }
 
   function returnFromPlay() {

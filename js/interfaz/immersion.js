@@ -912,8 +912,11 @@
   });
   const surfaceNav = new Map();
   function openSurface(modal) {
-    if (playing.has(document.getElementById('app').dataset.screen)) return;
     if (!modal.matches('.rules, .settings-modal')) return;
+    // La «×» de cerrar es la flecha de volver en todas las capas, también en plena partida.
+    const close = modal.querySelector('.guide-close, .settings-close, [data-action="enc-back"]');
+    if (close) { if (!close.hasAttribute('aria-label')) close.setAttribute('aria-label','Volver a la pantalla anterior'); close.innerHTML = icon('back'); close.classList.add('atlas-dialog-back'); }
+    if (playing.has(document.getElementById('app').dataset.screen)) return;
     const navigation = document.querySelector('#app .home-nav');
     if (navigation && !modal.contains(navigation)) {
       surfaceNav.set(modal, {navigation, parent: navigation.parentElement, next: navigation.nextSibling,
@@ -935,9 +938,7 @@
         active: navigation.querySelector('[aria-current]')
       });
     }
-    const close = modal.querySelector('.guide-close, .settings-close, [data-action="enc-back"]');
     refreshDepth();
-    if (close) { if (!close.hasAttribute('aria-label')) close.setAttribute('aria-label','Volver a la pantalla anterior'); close.innerHTML = icon('back'); close.classList.add('atlas-dialog-back'); }
   }
   function closeSurface(modal) {
     const saved = surfaceNav.get(modal); if (!saved) return;

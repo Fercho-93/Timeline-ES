@@ -368,7 +368,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 /* Atlas: navegación común, arte integrado y mesa compacta. */
 :root { --atlas-selection: #9b452b; }
 :root[data-theme="dark"] { --atlas-selection: #f2aa83; }
-#app .atlas-topbar { display: grid; grid-template-columns: 44px minmax(0,1fr) auto; align-items: center; gap: 8px; width: 100%; padding: 4px 0; margin: 0 0 12px; min-height: 48px; border: 0; }
+#app .atlas-topbar { display: grid; grid-template-columns: 44px minmax(0,1fr) minmax(44px, auto); align-items: center; gap: 8px; width: 100%; padding: 4px 0; margin: 0 0 12px; min-height: 48px; border: 0; }
 #app .atlas-topbar .brand { min-height: 0; text-align: center; font-size: .72rem; letter-spacing: .16em; }
 #app .atlas-topbar .icon-btn { display: grid; place-items: center; width: 44px; height: 44px; min-width: 44px; padding: 0; border-radius: 50%; background: transparent; }
 /* Tercera columna: fila propia con el sonido y, si la pantalla lo pide, el menú de la
@@ -5298,15 +5298,8 @@ html #app[data-screen] .setup-art-panel .quick-length-more { min-height: 44px; b
 #app .hand .hand-card:has(> .card-hint) { overflow: visible; }
 #app .hand .hand-card:has(> .card-hint) > .carta-reverso { border-radius: inherit; }
 
-/* Deslizar para volver sustituye a la flecha en pantallas táctiles, solo donde el gesto
-   vuelve de verdad (swipe.js pone la marca). La flecha sigue en el documento para los
-   lectores de pantalla y el teclado, y reaparece si recibe el foco. */
-@media (hover: none) and (pointer: coarse) {
-  html.swipe-back-ready #app :is(.atlas-back, .atlas-dialog-back, .turn-duel-back, .topbar [data-local-action][aria-label="Volver"]):not(:focus-visible) {
-    opacity: 0 !important;
-    pointer-events: none !important;
-  }
-}
+/* La flecha de volver se ve también en las pantallas táctiles: deslizar es un atajo, pero
+   quien no lo conoce necesita ver por dónde se vuelve. */
 /* La pantalla que asoma detrás al deslizar es una copia de cómo se dejó: lo que estaba
    entrando o moviéndose se ve ya en su sitio, sin repetir la entrada. */
 .swipe-peek *, .swipe-peek *::before, .swipe-peek *::after {
@@ -5451,19 +5444,23 @@ html #app[data-screen] .setup-art-panel.solo-fold > summary::before {
   width: 55%; -webkit-mask-image: linear-gradient(90deg, transparent, #000 85%);
   mask-image: linear-gradient(90deg, transparent, #000 85%);
 }
-html #app[data-screen] .settings-modal .settings-illustrated-heading {
+html #app[data-screen] .illustrated-heading {
   position: relative; isolation: isolate; overflow: hidden;
   min-height: 175px; padding: 24px 20px; margin-top: 12px;
   border: 1px solid var(--edition-line); border-radius: 18px; background: var(--edition-paper);
 }
-html #app[data-screen] .settings-heading-art {
+html #app[data-screen] .illustrated-heading-art {
   position: absolute; z-index: -1; inset: 0 0 0 auto; width: 55%; height: 100%;
   object-fit: cover; object-position: 70% center; opacity: .85;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 85%);
   mask-image: linear-gradient(90deg, transparent, #000 85%);
 }
-html #app[data-screen] .settings-illustrated-heading > :not(img) { max-width: 66%; }
-html[data-theme="dark"] #app[data-screen] :is(.setup-art-image, .settings-heading-art) { opacity: .55; }
+html #app[data-screen] .illustrated-heading > :not(img) { max-width: 66%; }
+html #app[data-screen] .illustrated-heading { text-align: left; }
+html #app[data-screen] .illustrated-heading .eyebrow { justify-content: flex-start; }
+html #app[data-screen] .illustrated-heading h1 { margin: 8px 0 10px; font: 400 clamp(2.25rem, 9vw, 3rem)/1.05 var(--font-display); letter-spacing: -.035em; }
+html #app[data-screen] .illustrated-heading p { margin: 0; max-width: 34ch; font: .85rem/1.55 var(--ui-font); }
+html[data-theme="dark"] #app[data-screen] :is(.setup-art-image, .illustrated-heading-art) { opacity: .55; }
 @media (max-width: 370px) {
   html #app[data-screen] .setup-art-panel:not(.solo-fold) { --setup-inset: 16px; }
   html #app[data-screen] .setup-art-panel .setup-art-head { min-height: 132px; }

@@ -1125,7 +1125,7 @@
       guideCard('＋','Tamaño de las cartas','80 % · 100 % · 120 %','El zoom está en el menú ⋯ de la partida, en «Zoom de las cartas» (donde no hay menú, en la lupa junto a la línea). Vuelve al 100 % al cambiar de pantalla.')+
       guideCard('⋯','Menú y salida','','El menú ⋯ reúne la guía, los ajustes y el zoom. Al salir de una partida eliges «Guardar y salir», para retomarla desde Inicio, o «Salir sin guardar», que la descarta: no cuenta nada de ella, ni aciertos, ni láminas, ni logros. En la competición, los temas ya terminados sí quedan en tu Atlas.')+
       guideCard('⌂','Salir de una sala','','Salir no pausa la partida para los demás, y lo que ya acertaste cuenta. Quien creó la sala puede saltar el turno de alguien, expulsar a un participante o cerrar la sala para todos.')+
-      guideCard('←','Volver','Desliza hacia la derecha','En el móvil, desliza el dedo de izquierda a derecha (fuera de la línea): la pantalla o el diálogo se apartan con el dedo y, al soltar, vuelves a lo anterior. Si sueltas pronto, se quedan donde estaban. En el ordenador se usa la flecha de arriba'+(window.Capacitor?.isNativePlatform?.() && window.Capacitor.getPlatform?.() === 'ios' ? '' : ', y en Android también vale el botón Atrás')+'. En plena partida el gesto no hace nada: la flecha y el menú ⋯ preguntan antes si quieres guardar.')+'</div>';
+      guideCard('←','Volver','La flecha o deslizar','Toca la flecha de arriba a la izquierda. En el móvil también puedes deslizar el dedo de izquierda a derecha (fuera de la línea): la pantalla o el diálogo se apartan con el dedo y, al soltar, vuelves a lo anterior. Si sueltas pronto, se quedan donde estaban'+(window.Capacitor?.isNativePlatform?.() && window.Capacitor.getPlatform?.() === 'ios' ? '' : ', y en Android también vale el botón Atrás')+'. En plena partida el gesto no hace nada: la flecha y el menú ⋯ preguntan antes si quieres guardar.')+'</div>';
     // Apple solo se ofrece en la app de iPhone (ver `prepareApple` en accounts.js).
     const appleSignIn = window.Capacitor?.isNativePlatform?.() && window.Capacitor.getPlatform?.() === 'ios';
     const progress = '<div class="guide-cards">'+
@@ -1149,7 +1149,7 @@
       ['Lámina','La ilustración de una carta, una vez desbloqueada en tu Atlas.']
     ].map(([term, text]) => '<dt>'+term+'</dt><dd>'+text+'</dd>').join('')+'</dl>';
     // La guía empieza por el vídeo (tutorial.js); debajo queda el manual de consulta.
-    return '<div class="guide-handbook"><header class="guide-masthead"><div class="eyebrow">Para explorar el juego</div><h1>Guía</h1><p>Primero, el vídeo con lo esencial. Debajo, la Guía completa por temas.</p></header>'+
+    return '<div class="guide-handbook"><header class="guide-masthead atlas-page-heading illustrated-heading"><img class="illustrated-heading-art" src="assets/guide-notebook-v1.webp" alt="" aria-hidden="true" decoding="async"><div class="eyebrow">Para explorar el juego</div><h1>Guía</h1><p>Primero, el vídeo con lo esencial. Debajo, la Guía completa por temas.</p></header>'+
       (window.CONTINUUM.Tutorial?.markup(modeKey) || '')+
       '<div class="atlas-section-heading guide-manual"><h2>La Guía, por temas</h2><p class="guide-index-hint">'+(here ? here+' · ' : '')+'Abre el tema que quieras consultar.</p></div>'+
       guideChapter('01','Aciertos, fallos y cómo se gana','Qué pasa al confirmar y quién gana','result',result)+
