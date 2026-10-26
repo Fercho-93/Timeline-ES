@@ -15,6 +15,10 @@ assert.match(source, /online-entry-invited/, "las invitaciones deben tener un es
 assert.equal(CLIENT_VERSION, 42, "la versión mínima debe estar centralizada en js/online/public-matchmaking.js");
 assert.match(source, /^import \{ CLIENT_VERSION \} from '\.\/public-matchmaking\.js';$/m, "js/online/online.js usa la versión de js/online/public-matchmaking.js");
 assert.doesNotMatch(fs.readFileSync(new URL("../js/online/public-matchmaking-online.js", import.meta.url), "utf8"), /const CLIENT_VERSION\b/, "la partida rápida no declara su propia versión");
+// La capacidad de una sala se elige (de 2 a 9): el aviso de sala llena no puede dar una cifra fija.
+assert.doesNotMatch(source, /ROOM_FULL: "[^"]*\d/, "el aviso de sala llena no da una cifra fija");
+// Quien sale o es expulsado deja sus cartas en el descarte, no en el mazo (local-room.js y removePlayer).
+for (const archivo of ["js/online/online.js", "js/sin-conexion/local-multiplayer.js"]) assert.doesNotMatch(fs.readFileSync(new URL(`../${archivo}`, import.meta.url), "utf8"), /cartas (volverán|vuelven) al mazo/, `${archivo} no dice que las cartas vuelven al mazo`);
 assert.equal((source.match(/clientVersion: CLIENT_VERSION/g) || []).length, 2, "crear y unirse deben registrar la misma versión");
 assert.doesNotMatch(source, /Para usar esta sala, actualizad todos los móviles a v39/, "el aviso no debe seguir mostrando la versión antigua");
 assert.match(source, /paint\(`<div class="shell">\$\{header\(\x27<button class="icon-btn" data-online-action="room"/, "la partida debe mostrar un menú de controles de sala");

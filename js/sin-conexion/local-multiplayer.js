@@ -797,7 +797,7 @@ function starterPanelMarkupContent(isHost) {
       }
       leaveToEntrada();
     } else if (role === "guest" && roomState && roomState.status === "playing") {
-      CT.UI.confirmDialog("La partida no se guarda: tus cartas volverán al mazo.", () => leaveToEntrada(), { title: "¿Salir de la partida?", confirmLabel: "Salir sin guardar", cancelLabel: "Seguir jugando" });
+      CT.UI.confirmDialog("La partida no se guarda: tus cartas pasarán al descarte.", () => leaveToEntrada(), { title: "¿Salir de la partida?", confirmLabel: "Salir sin guardar", cancelLabel: "Seguir jugando" });
     } else leaveToEntrada();
   }
 
@@ -1088,7 +1088,7 @@ function starterPanelMarkupContent(isHost) {
     const uids = (roomState.winners || (roomState.winner ? [roomState.winner] : [])).filter(uid => roomState.players[uid]);
     const names = uids.map(uid => escapeHtml(roomState.players[uid].name) + (uid === myPlayerId ? " (tú)" : ""));
     const title = !names.length ? "Partida terminada" : names.length === 1 ? `${names[0]} gana` : `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]} ganan`;
-    const lead = roomState.final ? "Ha ganado la final con la cifra más cercana." : names.length ? (roomState.playerOrder.length === 1 ? "Es la última persona que queda en la mesa." : "Se ha quedado sin cartas antes que nadie.") : "";
+    const lead = names.length ? CT.Final.verdict({ ganadores: names.length, final: !!roomState.final, quedan: roomState.playerOrder.length }) : "";
     const isHost = role === "host";
     const t = roomState.tournament;
     if (t) {
@@ -1272,7 +1272,7 @@ function starterPanelMarkupContent(isHost) {
     else if (action === "close-room") doCloseRoom();
     else if (action === "review-timeline" || action === "review-failed") renderReview(action === "review-failed");
     else if (action === "back-from-review") renderCurrent();
-    else if (action === "kick") { const uid = target.dataset.uid, name = roomState?.players[uid]?.name || "esta persona"; CT.UI.confirmDialog("Saldrá de la sala y sus cartas volverán al mazo.", () => { CT.closeDialog?.(); doRemovePlayer(uid); }, { title: `¿Expulsar a ${name}?`, confirmLabel: "Expulsar", cancelLabel: "Cancelar" }); }
+    else if (action === "kick") { const uid = target.dataset.uid, name = roomState?.players[uid]?.name || "esta persona"; CT.UI.confirmDialog("Saldrá de la sala y sus cartas pasarán al descarte.", () => { CT.closeDialog?.(); doRemovePlayer(uid); }, { title: `¿Expulsar a ${name}?`, confirmLabel: "Expulsar", cancelLabel: "Cancelar" }); }
     else if (action === "select") doSelect(target.dataset.id);
     else if (action === "place" || action === "pulse-place") doPlace(Number(target.dataset.index));
     else if (action === "confirm-place") doConfirmPlace();

@@ -592,7 +592,7 @@ async function joinRoom(code, name) {
     updateRoomAddress(code);
     connectToRoom(code);
   } catch (error) {
-    const messages = { ROOM_NOT_FOUND: "No existe ninguna sala con ese código", ALREADY_STARTED: "La partida ya ha comenzado", ROOM_FULL: "La sala ya tiene 9 participantes", DECK_MISMATCH: "Tu móvil lleva una versión distinta del juego. Actualiza la aplicación para poder entrar." };
+    const messages = { ROOM_NOT_FOUND: "No existe ninguna sala con ese código", ALREADY_STARTED: "La partida ya ha comenzado", ROOM_FULL: "La sala ya tiene el máximo de participantes", DECK_MISMATCH: "Tu móvil lleva una versión distinta del juego. Actualiza la aplicación para poder entrar." };
     console.error(error);
     showToast(messages[error.message] || roomErrorMessage(error, "No se pudo entrar en la sala. Vuelve a intentarlo; si persiste, comunica el error."));
   } finally { busy = false; }
@@ -1630,9 +1630,8 @@ function renderWinner() {
   const uids = (roomState.winners || [roomState.winner]).filter(uid => roomState.players[uid]);
   const names = uids.map(uid => escapeHtml(roomState.players[uid].name));
   const title = names.length === 1 ? `${names[0]} gana` : `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]} ganan`;
-  const lead = roomState.final ? (CT.Final.valid(modeKey(), roomState.final) ? "Ha ganado la final con la cifra más cercana." : "La final se manipuló: este resultado no es válido.") : names.length === 1
-    ? "Ha sido la única persona en terminar la ronda sin cartas."
-    : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
+  const lead = roomState.final && !CT.Final.valid(modeKey(), roomState.final) ? "La final se manipuló: este resultado no es válido."
+    : CT.Final.verdict({ ganadores: names.length, final: !!roomState.final, quedan: roomState.playerOrder.length });
   const logroMarkup=sessionAchievements.length?`<div class="logros-nuevos" role="status"><div class="eyebrow">${sessionAchievements.length===1?'Logro nuevo':`${sessionAchievements.length} logros nuevos`}</div>${sessionAchievements.map(item=>`<div class="logro-chip"><b>${escapeHtml(item.name)}</b><small>${escapeHtml(item.desc)}</small></div>`).join('')}</div>`:'';
   paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel winner-online final-composition"><div class="eyebrow">Fin de la partida · Sala ${roomCode}</div><h1 class="final-title" data-focus tabindex="-1">${title}</h1><p class="final-lead">${lead}</p>${onlineFinalMetrics(roomState.timeline.length,sessionNewDiscoveries,sessionAchievements.length)}${logroMarkup}<div class="actions final-actions"><button class="btn btn-ghost" data-online-action="review-timeline">Ver las ${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"} jugadas</button>${failedHere().length ? `<button class="btn btn-ghost" data-online-action="review-failed">Ver lo que se falló (${failedHere().length})</button>` : ""}${roomState.matchmaking === "public" ? '<button class="btn btn-primary" data-online-action="public-again">Buscar otra partida</button><button class="btn btn-secondary" data-online-action="back">Ir al inicio</button>' : `<button class="btn btn-primary" data-online-action="back">Ir al inicio</button>${roomState.hostUid === user.uid ? '<button class="btn btn-secondary" data-online-action="close-room">Cerrar sala</button>' : ""}`}</div></div></section></div>`, "online-winner");
   if(roomState.tournament) {
@@ -1884,11 +1883,11 @@ function closeRoom() {
   const jugando = roomState?.status === "playing";
   CT.UI.confirmDialog(jugando ? "La partida no se guarda: se cerrará la sala para todos los participantes." : "Se cerrará la sala para todos los participantes.", () => { void deleteRoom(); }, { title: jugando ? "¿Salir de la partida?" : "¿Cerrar la sala?", confirmLabel: jugando ? "Salir sin guardar" : "Cerrar sala", cancelLabel: jugando ? "Seguir jugando" : "Seguir en la sala" });
 }
-// Salir de la sala: quien no organiza deja su plaza (sus cartas vuelven al mazo si se estaba
+// Salir de la sala: quien no organiza deja su plaza (sus cartas pasan al descarte si se estaba
 // jugando); en una mesa pública, además, es dejar de buscar.
 function requestLeaveRoom() {
   if (roomState?.matchmaking === "public" && roomState.status === "lobby") { void leavePublicLobby(); return; }
-  const message = roomState?.status === "playing" ? "Tus cartas volverán al mazo." : roomState?.matchmaking === "public" ? "Tu plaza quedará libre para otra persona." : "Podrás volver a entrar con el código de la sala.";
+  const message = roomState?.status === "playing" ? "Tus cartas pasarán al descarte." : roomState?.matchmaking === "public" ? "Tu plaza quedará libre para otra persona." : "Podrás volver a entrar con el código de la sala.";
   const jugando = roomState?.status === "playing", buscando = roomState?.matchmaking === "public" && !jugando;
   // En mitad de una partida la salida se llama igual que en el resto del juego: «Salir sin guardar».
   const title = buscando ? "¿Dejar de buscar partida?" : jugando ? "¿Salir de la partida?" : "¿Salir de la sala?";
@@ -1939,12 +1938,12 @@ function navigateOnline(action) {
     } else CT.localNavigate?.(action);
   };
   // Como en el resto del juego, salir de una partida ofrece siempre «Salir sin guardar»: aquí es abandonarla
-  // (las cartas vuelven al mazo); quien organiza, en cambio, tendría que cerrar la sala para todos.
+  // (las cartas pasan al descarte); quien organiza, en cambio, tendría que cerrar la sala para todos.
   const esAnfitrion = roomState?.hostUid === user?.uid;
   const salirSinGuardar = { label: 'Salir sin guardar', proceed: () => { if (esAnfitrion) closeRoom(); else void removePlayer(user.uid); } };
   if (roomState?.status === 'playing') CT.UI.confirmExit(esAnfitrion
     ? 'La sala seguirá en marcha y podrás volver a entrar con su código; tu turno no se pausa. «Salir sin guardar» cierra la sala para todos.'
-    : 'La sala seguirá en marcha y podrás volver a entrar con su código; tu turno no se pausa. «Salir sin guardar» abandona la partida y tus cartas vuelven al mazo.', go, '¿Salir de la partida?', 'Guardar y salir', salirSinGuardar);
+    : 'La sala seguirá en marcha y podrás volver a entrar con su código; tu turno no se pausa. «Salir sin guardar» abandona la partida y tus cartas pasan al descarte.', go, '¿Salir de la partida?', 'Guardar y salir', salirSinGuardar);
   else go();
 }
 CT.onlineNavigate = navigateOnline;
@@ -2043,7 +2042,7 @@ document.addEventListener("click", event => {
   else if (action === "skip") { CT.closeDialog(); skipTurn(); }
   else if (action === "kick") {
     const uid = target.dataset.uid, name = roomState?.players[uid]?.name || "esta persona";
-    CT.UI.confirmDialog("Saldrá de la sala y sus cartas volverán al mazo.", () => { CT.closeDialog(); removePlayer(uid); }, { title: `¿Expulsar a ${name}?`, confirmLabel: "Expulsar", cancelLabel: "Cancelar" });
+    CT.UI.confirmDialog("Saldrá de la sala y sus cartas pasarán al descarte.", () => { CT.closeDialog(); removePlayer(uid); }, { title: `¿Expulsar a ${name}?`, confirmLabel: "Expulsar", cancelLabel: "Cancelar" });
   } else if (action === "leave-public") void leavePublicLobby();
   else if (action === "public-again") { detachOnline(); CT.launchPublicMatch?.(); }
   else if (action === "leave-room") requestLeaveRoom();

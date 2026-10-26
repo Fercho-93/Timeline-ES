@@ -1619,9 +1619,7 @@
     const list = [].concat(winners);
     const names = list.map(player => escapeHtml(player.name));
     const title = names.length === 1 ? `${names[0]} gana` : `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]} ganan`;
-    const lead = game.final ? "Ha ganado la final con la cifra más cercana." : names.length === 1
-      ? "Ha sido la única persona en terminar la ronda sin cartas."
-      : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
+    const lead = CT.Final.verdict({ ganadores: names.length, final: !!game.final, quedan: game.players.length });
     const fallosUnicos = new Set(game.failed || []).size;
     const earned=game.earnedAchievements||[];
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel final-composition"><div class="eyebrow">Fin de la partida</div><h1 class="final-title" data-focus tabindex="-1">${title}</h1><p class="final-lead">${lead}</p>${finalMetrics(game.timeline.length,'láminas jugadas',`Ronda ${game.round||1}`,'mejor tramo',game.newDiscoveries||0,earned.length)}${logrosMarkup(earned)}<div class="actions final-actions"><button class="btn btn-ghost" data-action="review-timeline">Ver las ${game.timeline.length} ${game.timeline.length === 1 ? "carta" : "cartas"} jugadas</button>${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-game">Ver lo que se falló (${fallosUnicos})</button>` : ""}${game.tournament ? "" : '<button class="btn btn-primary" data-action="rematch-local">Revancha · mismos jugadores</button>'}<button class="btn ${game.tournament ? "btn-primary" : "btn-secondary"}" data-action="setup">${game.tournament ? "Otra partida" : "Cambiar jugadores o ajustes"}</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`);

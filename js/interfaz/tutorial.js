@@ -209,21 +209,25 @@
       // 3 · En grupo
       blockIntro(2, "En grupo", "Jugar con amigos", "Con otras personas", "Las reglas de una mesa compartida",
         ["Inicio", "Jugar"], "Veamos cómo se juega con otras personas."),
-      { chapter: 2, title: "Tu mano", duration: 11000,
-        html: `<div class="tv-board"><div class="tv-path"><span>Grandes colecciones · en grupo</span></div><div class="tv-seats">${seat("Ana", 3)}${seat("Luis", 3)}${seat("Sara", 3)}</div>
+      // Un turno es una carta: Ana se queda sin cartas en su turno, pero gana al cerrar la vuelta,
+      // después de que jueguen Luis y Sara (sin cartas también ellos, habría final).
+      { chapter: 2, title: "Tu mano", duration: 11600,
+        html: `<div class="tv-board"><div class="tv-path"><span>Grandes colecciones · en grupo</span></div><div class="tv-seats">${seat("Ana", 2)}${seat("Luis", 3)}${seat("Sara", 3)}</div>
           <div class="tv-piles"><span data-pile="deck">Mazo</span><span data-pile="discard">Descarte</span></div></div>`,
         steps: [
           [0, c => { c.say("Cada persona tiene su propia mano de cartas."); c.stagger(".tv-seat", 300); }],
           [1200, c => c.add(".tv-piles", "is-in")],
           [2600, c => { c.turn(0); c.say("Si aciertas, te queda una carta menos."); }],
           [3300, c => c.play(0, true)],
-          [5000, c => { c.turn(1); c.say("Si fallas, va al descarte y robas otra."); }],
-          [5700, c => { c.play(1, false); c.pulse('[data-pile="discard"]'); }],
-          [6600, c => { c.draw(1); c.pulse('[data-pile="deck"]'); }],
-          [8000, c => { c.turn(0); c.say("Gana quien se quede sin cartas."); }],
-          [8400, c => c.play(0, true)],
-          [8900, c => c.play(0, true)],
-          [9400, c => c.win(0)]
+          [4600, c => { c.turn(1); c.say("Si fallas, va al descarte y robas otra."); }],
+          [5300, c => { c.play(1, false); c.pulse('[data-pile="discard"]'); }],
+          [6100, c => { c.draw(1); c.pulse('[data-pile="deck"]'); }],
+          [6900, c => { c.turn(2); c.play(2, true); }],
+          [7800, c => { c.turn(0); c.say("Gana quien termine la vuelta sin cartas."); }],
+          [8300, c => c.play(0, true)],
+          [9000, c => { c.turn(1); c.play(1, true); }],
+          [9700, c => { c.turn(2); c.play(2, true); }],
+          [10500, c => { c.turn(-1); c.win(0); }]
         ] },
       { chapter: 2, title: "Quién empieza", duration: 10600,
         html: `<div class="tv-center">${cardMarkup(modeKey, D, { hidden: true, extra: "tv-big tv-guess-card" })}<div class="tv-guesses">${guesses.map(([name, card], i) => `<span data-guess="${i}"><b>${name}</b>${esc(CT.shortValue(modeKey, card))}</span>`).join("")}</div></div>`,

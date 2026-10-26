@@ -83,4 +83,12 @@ finishLocalFinal(w,key);
 state=JSON.parse(w.localStorage.getItem(key));
 assert.equal(state.winners.length,1);
 w.close();
+// La frase bajo «X gana» es la misma en los tres modos y dice cómo se ganó de verdad.
+{
+  const v = boot().CONTINUUM.Final.verdict;
+  assert.equal(v({ ganadores: 1, final: false, quedan: 3 }), 'Ha sido la única persona en terminar la vuelta sin cartas.');
+  assert.equal(v({ ganadores: 1, final: false, quedan: 1 }), 'Es la última persona que queda en la mesa.', 'si los demás se marcharon no ganó por cartas');
+  assert.equal(v({ ganadores: 1, final: true, quedan: 3 }), 'Ha ganado la final con la cifra más cercana.');
+  assert.equal(v({ ganadores: 2, final: true, quedan: 3 }), 'Han empatado en la final con la misma diferencia.');
+}
 console.log('Final: unidades, decimales, a. C., empate, carta nueva, secreto local, recarga y ganador único: OK');

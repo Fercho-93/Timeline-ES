@@ -324,6 +324,7 @@ ok("el anfitrión ya no la ve desconectada", !/Ana · desconectado/.test(html(an
 console.log("\nSi la invitada sale de la partida");
 click(invitada, '[data-local-action="room-menu"]');
 click(invitada, '[data-local-action="leave"]');
+ok("el aviso dice adónde van sus cartas: al descarte", /pasarán al descarte/.test(invitada.document.querySelector(".overlay:last-of-type")?.textContent || ""));
 click(invitada, '[data-ask-action="0"]'); // la pregunta es un diálogo del juego, no el confirm() del navegador
 await until(() => pantalla(anfitrion) === "local-final");
 ok("la invitada vuelve a la entrada del modo", pantalla(invitada) === "local-entrada");

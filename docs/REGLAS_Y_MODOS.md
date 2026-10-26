@@ -144,9 +144,10 @@ gestión de sala.
 - En la final se revelan las cifras cuando todos los finalistas responden. Gana la menor
   diferencia absoluta; si empatan, solo quienes comparten la mejor respuesta repiten con otra
   carta. La final no usa poderes ni reparte cartas a las manos.
-- Al terminar una partida —local, en solitario, de competición o en una sala online o por Wi‑Fi— si
-  hubo alguna carta mal colocada aparece un botón para repasarlas: dónde iban de verdad, con su época y su explicación
-  completa, y un enlace a su ficha en la [enciclopedia](#enciclopedia).
+- Al terminar una partida —local, en solitario, de competición o en una sala online o por Wi‑Fi—
+  si hubo alguna carta mal colocada aparece un botón para repasarlas: dónde iban de verdad, con su
+  época y su explicación completa (en un solo móvil y en solitario, también con un enlace a su
+  ficha en la [enciclopedia](#enciclopedia)).
 
 ## Jugar solo
 

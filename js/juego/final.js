@@ -68,7 +68,14 @@
     const ranked = rank(final, answers);
     return `<section class="panel final-results"><h2>Valor real: ${value(mode, final.target)}</h2><table><thead><tr><th>Finalista</th><th>Respuesta</th><th>Diferencia</th></tr></thead><tbody>${ranked.rows.map(row => `<tr${ranked.winners.includes(row.uid) ? ' class="final-best"' : ''}><th>${CT.escapeHtml(name(row.uid))}</th><td>${value(mode, row.answer)}</td><td>${value(mode, row.distance)}</td></tr>`).join('')}</tbody></table><p>${ranked.winners.length === 1 ? `${CT.escapeHtml(name(ranked.winners[0]))} gana la final.` : `Empate: ${ranked.winners.map(uid => CT.escapeHtml(name(uid))).join(', ')} pasan a otra carta.`}</p></section>`;
   }
-  CT.Final = {factor, parse, create, rank, value, question, form, results, targetOf, valid};
+  // La frase bajo «X gana» al terminar, igual en un solo móvil, en la sala online y por Wi‑Fi.
+  // `quedan` es cuánta gente sigue en la mesa: si los demás se marcharon, no ganó por cartas.
+  function verdict({ ganadores, final, quedan }) {
+    if (final) return ganadores > 1 ? "Han empatado en la final con la misma diferencia." : "Ha ganado la final con la cifra más cercana.";
+    if (quedan === 1) return "Es la última persona que queda en la mesa.";
+    return ganadores > 1 ? "Han terminado la vuelta empatadas sin cartas." : "Ha sido la única persona en terminar la vuelta sin cartas.";
+  }
+  CT.Final = {factor, parse, create, rank, value, question, form, results, targetOf, valid, verdict};
 
   // El minijuego de quién empieza, igual en todas las modalidades con turnos: cada
   // persona escribe la cifra de la misma carta, empieza quien más se acerque y el resto
