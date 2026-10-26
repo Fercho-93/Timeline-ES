@@ -85,7 +85,7 @@ try {
   const rooms={};let failures=[];
   const h=await adapter('host',host)({name:'Ana',create:true,onChange:r=>rooms.h=r,onError:e=>failures.push(e)});
   const g=await adapter('guest',guest)({name:'Bea',code:h.code,onChange:r=>rooms.g=r,onError:e=>failures.push(e)});
-  const wait=async predicate=>{for(let n=0;n<100&&!predicate();n++)await new Promise(r=>setTimeout(r,30));assert.ok(predicate());};
+  const wait=async (predicate,ms=3000)=>{for(let n=0;n<ms/30&&!predicate();n++)await new Promise(r=>setTimeout(r,30));assert.ok(predicate());};
   await wait(()=>rooms.h?.members.length===2&&rooms.g?.members.length===2);
   await h.act({type:'start',rounds});await wait(()=>rooms.g?.phase==='turn');
   await assert.rejects(g.act({type:'bank'}));
@@ -119,7 +119,8 @@ try {
   await first.act({type:'starter-guess',value:1900});
   await assert.rejects(first.act({type:'starter-guess',value:1800}),'no se puede cambiar la respuesta');
   await second.act({type:'starter-guess',value:5});
-  await wait(()=>publicRooms.guest?.phase==='turn');
+  // Con todas las respuestas, la mesa deja ver 8 s quién empieza antes de arrancar (STARTER_RESULT_MS en quick-online.js).
+  await wait(()=>publicRooms.guest?.phase==='turn',12000);
   assert.equal(publicRooms.guest.config.first,R.starterOrder(publicRooms.guest)[0],'empieza quien más se acercó');
   assert.deepEqual(failures,[]);
   first.close();second.close();
