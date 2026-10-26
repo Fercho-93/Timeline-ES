@@ -362,7 +362,11 @@ console.log("\nContraste de los temas de la interfaz");
     const desde = css.indexOf(selector);
     if (desde === -1) return null;
     const bloque = css.slice(desde, css.indexOf("}", desde));
-    const color = nombre => bloque.match(new RegExp(`--edition-${nombre}: *(#[0-9a-f]{3,6})`))?.[1];
+    // El tema claro apunta a su paleta única (`--edition-paper: var(--claro-paper)`).
+    const color = nombre => {
+      const valor = bloque.match(new RegExp(`--edition-${nombre}: *(#[0-9a-f]{3,6}|var\\(--claro-${nombre}\\))`))?.[1];
+      return valor?.startsWith("var(") ? bloque.match(new RegExp(`--claro-${nombre}: *(#[0-9a-f]{3,6})`))?.[1] : valor;
+    };
     const valores = { paper: color("paper"), surface: color("surface"), ink: color("ink"), muted: color("muted"), brass: color("brass") };
     return Object.values(valores).every(Boolean) ? valores : null;
   };

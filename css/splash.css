@@ -494,7 +494,7 @@ html.splash-active #app-splash .splash-masthead {
 }
 @keyframes splash-hito-latido {
   0%, 60%, 100% { background: #f3e7ce; }
-  25% { background: #8e3a24; }
+  25% { background: var(--terracota); }
 }
 @keyframes splash-play-in {
   from { opacity: 0; transform: translateX(-50%) translateY(12px); }

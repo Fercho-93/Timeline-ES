@@ -11,7 +11,7 @@
 #app .mode-choices-reveal { contain: layout paint; }
 #app .mode-play-card .mode-play-chevron { display: inline-block; margin-left: 8px; font: 700 1.35rem/0.7 var(--font-display); vertical-align: middle; transition: transform .32s ease; }
 #app .mode-play-card[aria-expanded="true"] .mode-play-chevron { transform: rotate(180deg); }
-#app .mode-play-card:focus-visible { outline: 3px solid #9c4f2c; outline-offset: 3px; }
+#app .mode-play-card:focus-visible { outline: 3px solid var(--edition-rust); outline-offset: 3px; }
 #app .mode-choices-reveal { display: grid; grid-template-rows: 0fr; margin-top: 0; opacity: 0; visibility: hidden;  }
 #app .mode-choices-reveal.is-open { grid-template-rows: 1fr; margin-top: 12px; opacity: 1; visibility: visible; }
 /* Sangrado con una línea guía: las opciones son hijas de la lámina «Jugar» de
@@ -44,7 +44,7 @@
 #app .mode-entry-cta span { margin-left: 3px; }
 #app .mode-entry-featured { grid-column: 1 / -1; min-height: 164px; }
 #app .mode-entry-featured .mode-entry-art { width: 63%; }
-#app .mode-entry:focus-visible { outline: 3px solid #9c4f2c; outline-offset: 3px; }
+#app .mode-entry:focus-visible { outline: 3px solid var(--edition-rust); outline-offset: 3px; }
 #app .mode-entry:active { transform: translateY(1px); }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   #app .mode-entry:hover { box-shadow: 0 2px 0 #e2cfa6, 0 16px 30px #4a321a2e; }
@@ -74,7 +74,7 @@
 #app .mode-hub-head .icon-btn { align-self: flex-start; flex: 0 0 auto; background: #f8f0dfcc; }
 #app .mode-hub-title { position: relative; z-index: 1; }
 #app .mode-hub-title .eyebrow { color: #805b37; }
-#app .mode-hub-title h1 { margin: .25rem 0 0; color: #2a1c12; font: 500 clamp(1.8rem, 5vw, 2.6rem)/1.1 var(--font-display); }
+#app .mode-hub-title h1 { margin: .25rem 0 0; color: #2a1c12; font: 400 clamp(1.8rem, 5vw, 2.6rem)/1.1 var(--font-display); }
 #app .mode-hub-list { display: grid; gap: 12px; }
 #app .mode-hub-list .mode-entry { min-height: 126px; }
 #app .mode-hub-list .mode-entry-copy b { font-size: clamp(1.3rem, 4.2vw, 1.65rem); }
@@ -86,9 +86,9 @@
 #app .mode-topic-grid label { position: relative; display: flex; align-items: center; gap: 9px; min-height: 52px; padding: 8px 11px; font-size: .9rem; line-height: 1.2; border: 1px solid #d2b683; border-radius: 10px; background: #f8f0df; cursor: pointer; transition: background .15s ease, color .15s ease; }
 #app .mode-topic-grid input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
 #app .mode-topic-grid label::before { content: "✓"; display: grid; place-items: center; flex: 0 0 auto; width: 18px; height: 18px; border: 1.5px solid #9c7641; border-radius: 5px; color: transparent; font: 800 .74rem/1 var(--ui-font); }
-#app .mode-topic-grid label:has(input:checked) { color: var(--ink-solid-contrast, #fff); background: var(--ink-solid, #84432a); border-color: transparent; }
+#app .mode-topic-grid label:has(input:checked) { color: var(--ink-solid-contrast, #fff); background: var(--ink-solid, var(--terracota)); border-color: transparent; }
 #app .mode-topic-grid label:has(input:checked)::before { border-color: currentColor; color: currentColor; }
-#app .mode-topic-grid label:has(input:focus-visible) { outline: 3px solid #9c4f2c; outline-offset: 2px; }
+#app .mode-topic-grid label:has(input:focus-visible) { outline: 3px solid var(--edition-rust); outline-offset: 2px; }
 #app .mode-topic-count { margin: -4px 2px 0; }
 /* Jugar online: el tablón de mesas abiertas (como el vestíbulo de Risk) y la pantalla para crear una. */
 #app .public-board { display: grid; gap: 8px; }
@@ -109,7 +109,7 @@
 #app .public-table-copy small { color: #5c4a3a; font-size: .82rem; line-height: 1.3; overflow-wrap: anywhere; }
 #app .public-table-seats { display: flex; align-items: center; gap: 4px; margin-top: 3px; }
 #app .public-table-seats i { width: 10px; height: 10px; border: 1.5px solid #9c7641; border-radius: 50%; }
-#app .public-table-seats i.is-taken { border-color: #84432a; background: #84432a; }
+#app .public-table-seats i.is-taken { border-color: var(--terracota); background: var(--terracota); }
 #app .public-table-seats em { margin-left: 4px; color: #5c4a3a; font-size: .78rem; font-style: normal; font-variant-numeric: tabular-nums; }
 #app .public-table-join { flex: 0 0 auto; min-height: 44px; padding-inline: 16px; }
 #app .public-create { display: grid; gap: 14px; }
@@ -120,7 +120,7 @@
 #app .public-create-segmented .segmented-option b { font-size: .92rem; }
 html #app .public-create-segmented .segmented-option::after { content: none !important; }
 :root[data-theme="dark"] #app .public-table,
-:root[data-theme="dark"] #app .public-board-empty { background: #332a20; border-color: #8c6f45; color: #e8dccb; }
+:root[data-theme="dark"] #app .public-board-empty { background: var(--noche-relieve); border-color: #8c6f45; color: #e8dccb; }
 :root[data-theme="dark"] #app .public-table-copy b { color: #f3e8d6; }
 :root[data-theme="dark"] #app .public-table-copy small,
 :root[data-theme="dark"] #app .public-table-seats em { color: #cdbda5; }
@@ -151,7 +151,7 @@ html #app .public-create-segmented .segmented-option::after { content: none !imp
   #app .mode-topic-grid { grid-template-columns: 1fr; }
 }
 :root[data-theme="dark"] #app .mode-entry,
-:root[data-theme="dark"] #app .mode-hub-head { --mode-paper: #332a20; background: #332a20; border-color: #8c6f45; box-shadow: 0 12px 26px #0006; }
+:root[data-theme="dark"] #app .mode-hub-head { --mode-paper: #332a20; background: var(--noche-relieve); border-color: #8c6f45; box-shadow: 0 12px 26px #0006; }
 :root[data-theme="dark"] #app .mode-entry-grid { border-left-color: #8c6f45; }
 :root[data-theme="dark"] #app .mode-entry::after { background: linear-gradient(90deg, #332a20 0 26%, #332a20e8 44%, #332a207a 70%, transparent 100%); }
 :root[data-theme="dark"] #app .mode-entry-copy b,

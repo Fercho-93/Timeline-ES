@@ -1121,7 +1121,7 @@
     // Quien recibió una carta en el Pulso de otro se entera aquí, al recoger el móvil, y
     // no antes: es su carta y nadie más tiene por qué verla en la pantalla de paso.
     const regalo = game.pulseGift && game.pulseGift.to === player.id
-      ? `<p class="pulse-gift">⚡ <b>${escapeHtml(game.pulseGift.from)}</b> te ha pasado <b>${escapeHtml(cardsById.get(game.pulseGift.cardId).title)}</b> con su Pulso.</p>`
+      ? `<p class="pulse-gift"><span aria-hidden="true">ϟ</span> <b>${escapeHtml(game.pulseGift.from)}</b> te ha pasado <b>${escapeHtml(cardsById.get(game.pulseGift.cardId).title)}</b> con su Pulso.</p>`
       : "";
     paint(`<div class="shell">${header()}
       <section class="pass-screen"><div class="panel pass-card"><div class="player-medallion player-medallion-avatar">${jugadorAvatar(player, 76)}</div><div class="eyebrow">${game.tournament ? `Competición · tema ${game.tournament.index + 1} de ${game.tournament.queue.length}` : `Vuelta ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}</div><h2 data-focus tabindex="-1">El turno es de<br>${escapeHtml(player.name)}</h2><p>Pásale el móvil. Las fechas siguen ocultas hasta colocar una carta.</p>${regalo}<button class="btn btn-primary btn-block" data-action="ready">Empezar mi turno <span>→</span></button></div></section>
@@ -1169,12 +1169,12 @@
         : `Colócala. Si aciertas y ${escapeHtml(pulseTarget.name)} falla, le pasas una carta tuya`;
     const manoHtml = pulseCard
       ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>${defending ? `te reta ${escapeHtml(currentPlayer().name)}` : `contra ${escapeHtml(pulseTarget.name)}`}</small></div>${pendingIndex === null ? `<div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}">${categoryBadge(pulseCard)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(pulseCard.title)}</strong></div></div>` : `<p class="hint provisional-hand-note">La carta está en la línea como vista previa.</p>`}<p class="hint">${pistaPulso()}</p></section>`
-      : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${handCards.length} en mano</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${pendingIndex === null && selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${pendingIndex === null && selectedCardId === card.id}">${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco"}</p>${!game.pulsePower && pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
+      : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${handCards.length} en mano</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${pendingIndex === null && selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${pendingIndex === null && selectedCardId === card.id}">${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco"}</p>${!game.pulsePower && pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open"><span aria-hidden="true">ϟ</span> Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
     paint(`<div class="shell">${header()}
       <h1 class="solo-lectores" data-focus tabindex="-1">${defending ? `Defiendes el Pulso de ${escapeHtml(currentPlayer().name)}, ${escapeHtml(player.name)}` : `Turno de ${escapeHtml(player.name)}, vuelta ${game.round}`}</h1>
-      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${defending ? "⚡ Defensa del Pulso" : `${game.tournament ? `Competición · tema ${game.tournament.index + 1} de ${game.tournament.queue.length}` : `Vuelta ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}`}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
+      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${defending ? "ϟ Defensa del Pulso" : `${game.tournament ? `Competición · tema ${game.tournament.index + 1} de ${game.tournament.queue.length}` : `Vuelta ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}`}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
       <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores${game.players.length > 2 ? " · desliza →" : ""}</div><div class="scoreboard"${game.players.length > 2 ? ' aria-label="Jugadores; desliza para ver los demás"' : ""}>${game.players.map((p, i) => `<span class="score ${i === game.current ? "active" : ""}"${i === game.current ? ' aria-current="true"' : ""}><i class="score-avatar">${jugadorAvatar(p, 40)}</i><span class="score-copy"><b>${escapeHtml(p.name)}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(p.hand.length, game.players)}%"></i></span></span><em><strong>${p.hand.length}</strong><small>cartas</small></em></span>`).join("")}</div></section>
-      ${pulseCard ? `<div class="pulse-banner">⚡ Pulso · <b>${escapeHtml(currentPlayer().name)}</b> reta a <b>${escapeHtml(pulseTarget.name)}</b>${defending ? " · te toca defender" : ""}</div>` : ""}
+      ${pulseCard ? `<div class="pulse-banner"><span aria-hidden="true">ϟ</span> Pulso · <b>${escapeHtml(currentPlayer().name)}</b> reta a <b>${escapeHtml(pulseTarget.name)}</b>${defending ? " · te toca defender" : ""}</div>` : ""}
       ${localTimed() ? CT.Tiempo.bar(game.turnSeconds * 1000 - (Date.now() - localTurnStart()), game.turnSeconds * 1000) : ""}
       ${CT.Ghost.banner(game.ghost, game.players)}
       ${manoHtml}
@@ -1461,7 +1461,7 @@
     paint(`<div class="shell">${header()}
       <section class="pass-screen"><div class="panel pass-card">
         <div class="player-medallion player-medallion-avatar">${jugadorAvatar(target, 76)}</div>
-        <div class="eyebrow">⚡ Pulso · Te retan</div>
+        <div class="eyebrow"><span aria-hidden="true">ϟ</span> Pulso · Te retan</div>
         <h2 data-focus tabindex="-1">Pásale el móvil a<br>${escapeHtml(target.name)}</h2>
         <p>Coloca la misma carta donde creas que va. No verás dónde la ha puesto ${escapeHtml(currentPlayer().name)} hasta que los dos hayáis jugado.</p>
         <button class="btn btn-primary btn-block" data-action="pulse-defend">Defender <span>→</span></button>
@@ -1502,7 +1502,7 @@
     if (result.duel) {
       const marcador = jugada => `<div class="pulse-duel-row ${jugada.ok ? "pulse-duel-hit" : "pulse-duel-miss"}"><span class="pulse-duel-mark" aria-hidden="true">${jugada.ok ? "✓" : "×"}</span><span><b>${escapeHtml(jugada.name)}</b><small>${jugada.ok ? "Acierta" : "Falla"}: la puso ${jugada.donde}</small></span></div>`;
       overlay(`<div class="overlay" data-result-card="${correct || result.targetOk ? card.id : ''}"><div class="modal pulse-duel-modal">
-        <div class="eyebrow" aria-hidden="true">⚡ Pulso · ${escapeHtml(result.byName)} contra ${escapeHtml(result.targetName)}</div>
+        <div class="eyebrow" aria-hidden="true">ϟ Pulso · ${escapeHtml(result.byName)} contra ${escapeHtml(result.targetName)}</div>
         <h2>${escapeHtml(card.title)}</h2>
         <div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>
         <div class="pulse-duel-rows">
@@ -4064,7 +4064,7 @@
         : error?.message === "MATCH_TIMEOUT"
           ? "La conexión con el servidor tarda demasiado. Comprueba tu internet e inténtalo de nuevo."
           : "No se pudo crear ni encontrar una mesa pública.";
-      paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">☁</div><h2 data-focus tabindex="-1">No se pudo preparar la partida</h2><p class="lead" style="margin-inline:auto">${detail}</p>${table ? '<button class="btn btn-primary btn-block" data-action="online-hub">Ver mesas abiertas</button>' : '<button class="btn btn-primary btn-block" data-action="public-match">Buscar otra vez</button>'}<button class="btn btn-ghost btn-block" data-action="public-match-back">Volver</button></div></section></div>`);
+      paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">☁️</div><h2 data-focus tabindex="-1">No se pudo preparar la partida</h2><p class="lead" style="margin-inline:auto">${detail}</p>${table ? '<button class="btn btn-primary btn-block" data-action="online-hub">Ver mesas abiertas</button>' : '<button class="btn btn-primary btn-block" data-action="public-match">Buscar otra vez</button>'}<button class="btn btn-ghost btn-block" data-action="public-match-back">Volver</button></div></section></div>`);
     }
   }
 
@@ -4077,7 +4077,7 @@
     } catch (error) {
       console.error(error);
       screen = "online-error";
-      paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">☁</div><h2 data-focus tabindex="-1">No se pudo conectar</h2><p class="lead" style="margin-inline:auto">Comprueba la conexión a internet y vuelve a intentarlo. No se ha borrado ninguna partida guardada.</p><button class="btn btn-primary btn-block" data-action="retry-online">Reintentar conexión</button><button class="btn btn-ghost btn-block" data-action="home">Ir al inicio</button></div></section></div>`);
+      paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">☁️</div><h2 data-focus tabindex="-1">No se pudo conectar</h2><p class="lead" style="margin-inline:auto">Comprueba la conexión a internet y vuelve a intentarlo. No se ha borrado ninguna partida guardada.</p><button class="btn btn-primary btn-block" data-action="retry-online">Reintentar conexión</button><button class="btn btn-ghost btn-block" data-action="home">Ir al inicio</button></div></section></div>`);
     }
   }
 

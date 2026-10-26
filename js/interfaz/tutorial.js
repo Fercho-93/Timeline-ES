@@ -263,7 +263,7 @@
         ["Jugar", "Jugar online"], "En «Jugar online» puedes unirte a una mesa pública o crear la tuya."),
       { chapter: 2, title: "Online", duration: 8800,
         html: `<div class="tv-board">${path(["Jugar", "Jugar online"])}<div class="tv-table-seats"><span>●</span><span>●</span><span class="is-free">○</span><span class="is-free">○</span></div><div class="tv-tiles tv-three">
-          ${tile("◎", "Mesas abiertas", "Siéntate en una")}${tile("+", "Crear mesa", "Juego, jugadores y tiempo")}${tile("⚡", "Partida rápida", "Te sentamos")}</div></div>`,
+          ${tile("◎", "Mesas abiertas", "Siéntate en una")}${tile("+", "Crear mesa", "Juego, jugadores y tiempo")}${tile("»", "Partida rápida", "Te sentamos")}</div></div>`,
         steps: [
           [0, c => { c.say("En las mesas públicas podéis jugar de 2 a 4 jugadores."); c.add(".tv-table-seats", "is-in"); }],
           [1400, c => c.fill(".tv-table-seats .is-free", 800)],

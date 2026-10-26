@@ -995,7 +995,7 @@ function starterPanelMarkupContent(isHost) {
       <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, vuelta ${roomState.round}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length} · ` : ""}Vuelta ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo restante para esta carta"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
       <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores</div><div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i class="score-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'room:' + uid, id: esMio(uid) ? CT.Avatares.ownId() : player.avatarId })}</i><span class="score-copy"><b>${escapeHtml(player.name)}${uid === myPlayerId ? " · tú" : ""}${player.away ? " · desconectado" : ""}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(player.hand.length)}%"></i></span></span><em><strong>${player.hand.length}</strong><small>cartas</small></em></span>`; }).join("")}</div></section>
-      ${pulsing ? `<div class="pulse-banner">⚡ Pulso · <b>${escapeHtml(currentPlayer.name)}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
+      ${pulsing ? `<div class="pulse-banner"><span aria-hidden="true">ϟ</span> Pulso · <b>${escapeHtml(currentPlayer.name)}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
       ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
       ${boardQuestion()}
       ${handSection}
@@ -1021,7 +1021,7 @@ function starterPanelMarkupContent(isHost) {
   // activó sin reparto), exactamente igual que en la sala online.
   function pulseButton(me, enabled) {
     if (roomState.pulsePower) return CT.Powers.pulsePower(roomState.pulsePower, myPlayerId, me.hand.length, 'data-local-action="pulse-open"', enabled && CT.LocalRoom.pulseAvailable(roomState, myPlayerId));
-    return enabled && CT.LocalRoom.pulseAvailable(roomState, myPlayerId) ? `<button class="btn btn-secondary btn-block pulse-btn" data-local-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : "";
+    return enabled && CT.LocalRoom.pulseAvailable(roomState, myPlayerId) ? `<button class="btn btn-secondary btn-block pulse-btn" data-local-action="pulse-open"><span aria-hidden="true">ϟ</span> Usar mi Pulso <small>una vez por partida</small></button>` : "";
   }
 
   function revealOverlay(currentUid) {
@@ -1053,7 +1053,7 @@ function starterPanelMarkupContent(isHost) {
             ? `<b>${escapeHtml(reveal.targetName)}</b> se defiende y coloca la carta en la línea. <b>${escapeHtml(reveal.playerName)}</b> ${reveal.penaltySkipped ? "no roba: el mazo y el descarte están agotados" : "roba una por fallar el reto"}.`
             : `No la acierta ninguno de los dos: la carta va al descarte y <b>${escapeHtml(reveal.playerName)}</b> roba una por haber lanzado el reto.`;
       return `<div class="overlay" data-result-card="${reveal.correct || reveal.targetOk ? card.id : ""}"><div class="modal pulse-duel-modal">
-        <div class="eyebrow" aria-hidden="true">⚡ Pulso · ${escapeHtml(reveal.playerName)} contra ${escapeHtml(reveal.targetName)}</div>
+        <div class="eyebrow" aria-hidden="true">ϟ Pulso · ${escapeHtml(reveal.playerName)} contra ${escapeHtml(reveal.targetName)}</div>
         <h2>${escapeHtml(card.title)}</h2>${fichaCarta}
         <div class="pulse-duel-rows">${fila(reveal.playerName, reveal.correct, reveal.byIndex)}${fila(reveal.targetName, reveal.targetOk, reveal.targetIndex)}</div>
         <p class="pulse-outcome">${cierre}</p>${seguir}

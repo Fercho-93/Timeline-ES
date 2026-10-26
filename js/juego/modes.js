@@ -352,7 +352,7 @@
         { limit: 1750, key: "barroco", name: "Barroco", symbol: "♫" },
         { limit: 1820, key: "clasica", name: "Clasicismo", symbol: "♩" },
         { limit: 1900, key: "romantica", name: "Romanticismo y grabación", symbol: "♪" },
-        { limit: 1950, key: "electrica", name: "Radio y sonido eléctrico", symbol: "⚡" },
+        { limit: 1950, key: "electrica", name: "Radio y sonido eléctrico", symbol: "ϟ" },
         { limit: 1980, key: "popular", name: "Música popular", symbol: "★" },
         { limit: 2000, key: "videoclip", name: "Era del videoclip", symbol: "▶" },
         { limit: Infinity, key: "streaming", name: "Era digital", symbol: "⌁" }
@@ -380,7 +380,7 @@
         { limit: 1400, key: "medieval", name: "Edad Media", symbol: "♜" },
         { limit: 1700, key: "cientifica", name: "Revolución científica", symbol: "✧" },
         { limit: 1830, key: "industrial", name: "Revolución industrial", symbol: "⚙" },
-        { limit: 1900, key: "electrica", name: "Era eléctrica", symbol: "⚡" },
+        { limit: 1900, key: "electrica", name: "Era eléctrica", symbol: "ϟ" },
         { limit: 1970, key: "atomica", name: "Siglo de los átomos", symbol: "⚛" },
         { limit: Infinity, key: "digital", name: "Era digital", symbol: "⌘" }
       ]
@@ -1101,7 +1101,7 @@
       '<h4>Jugar con amigos</h4><div class="guide-cards">'+
       guideCard('♟','Un solo móvil','2–9 jugadores','Escribid los nombres; elegid cuántas cartas tiene cada uno (de 1 a 6), si hay poderes y tiempo por carta, y jugad el minijuego de quién empieza. Pasad el móvil a quien le toque, sin mirar las cartas de los demás. También vale para la competición y para Retos rápidos (de 2 a 8 jugadores o equipos).')+
       guideCard('⌁','Cada uno en su móvil','Elige el ritmo','Quien crea la partida elige el mazo (o Retos rápidos, o una competición) y el ritmo: «En directo», «Por turnos» o «Mismas cartas». Los demás entran con «Unirme a una partida», usando el código, el enlace o el QR.')+
-      guideCard('⌁','En directo','Todos a la vez · 2–9 jugadores','Una sala con todos conectados. Quien crea la partida elige la conexión (por internet, o en la misma Wi-Fi sin internet), el máximo de participantes y el tiempo por carta: sin tiempo, 15, 20 o 30 segundos. En Grandes colecciones elige también las cartas por persona y los poderes. En Retos rápidos caben hasta 8 personas.')+
+      guideCard('●','En directo','Todos a la vez · 2–9 jugadores','Una sala con todos conectados. Quien crea la partida elige la conexión (por internet, o en la misma Wi-Fi sin internet), el máximo de participantes y el tiempo por carta: sin tiempo, 15, 20 o 30 segundos. En Grandes colecciones elige también las cartas por persona y los poderes. En Retos rápidos caben hasta 8 personas.')+
       guideCard('⌔','Sala sin internet','Misma red Wi-Fi','Un móvil crea la sala y muestra un QR de invitación; cada persona lo escanea y enseña el QR de respuesta que le aparece, para que el anfitrión lo escanee a su vez. En iPhone también hay «Salas cercanas», con un código de cuatro cifras. Las reglas son las mismas que por internet, poderes incluidos. Si alguien pierde la conexión, conserva su plaza y sus cartas y vuelve escaneando una invitación nueva. Si el anfitrión sale, la sala se cierra para todos.')+
       guideCard('⇄','Por turnos','Entre dos · cuando cada uno pueda','En Grandes colecciones, los dos comparten una línea y se turnan hasta jugar 16 cartas, 8 cada uno (10 en el duelo de cifras, 5 cada uno). Empieza quien crea el duelo: juega su primera carta y después manda el enlace (por WhatsApp, correo o como quiera); el otro entra directamente en la partida. Si hay tiempo por carta, el reloj empieza al abrir tu carta. Gana quien más acierte; con los mismos aciertos, es empate. En la revancha empieza el otro. Sin conexión, tu jugada se guarda y se envía sola al volver. '+(window.CONTINUUM.Deployment?.nativePush === true ? 'Tras 48 horas sin jugar llega un recordatorio y, a los 7 días, el duelo caduca.' : 'A los 7 días sin jugar, el duelo caduca.')+' También hay competición por turnos, de hasta 5 temas.')+
       guideCard('↗','Mismas cartas','Sin vidas · 15 cartas','Juegas tú y compartes un enlace: la otra persona juega las mismas cartas cuando quiera, sin coincidir contigo. El tiempo por carta se elige al crear el duelo. En Grandes colecciones son 15 cartas (10 si es de escribir la cifra); en Retos rápidos, 1, 3 o 5 mazos. Gana quien más acierte; con los mismos aciertos, es empate. Al terminar se puede devolver el reto.')+

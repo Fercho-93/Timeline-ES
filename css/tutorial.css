@@ -2,8 +2,8 @@
    subtítulos sobre un degradado y controles de reproductor (línea de escenas arriba, mando
    abajo). Se ve igual en la Guía del juego (#app) y suelta sobre la portada (#app-splash). */
 #app .guide-handbook > .guide-masthead { margin: 4px 0 14px; text-align: center; }
-#app .guide-handbook > .guide-masthead .eyebrow { justify-content: center; color: var(--edition-brass); font: 600 .62rem/1.5 var(--ui-font); letter-spacing: .2em; }
-#app .guide-handbook > .guide-masthead h1 { margin: 6px auto 8px; color: var(--journal-ink); font: 500 clamp(2.2rem, 9vw, 3.2rem)/1.05 var(--font-display); letter-spacing: -.045em; }
+#app .guide-handbook > .guide-masthead .eyebrow { justify-content: center; color: var(--edition-brass); font: 600 .625rem/1.5 var(--ui-font); letter-spacing: .2em; }
+#app .guide-handbook > .guide-masthead h1 { margin: 6px auto 8px; color: var(--journal-ink); font: 400 clamp(2.2rem, 9vw, 3.2rem)/1.05 var(--font-display); letter-spacing: -.045em; }
 #app .guide-handbook > .guide-masthead p { max-width: 36ch; margin: 0 auto; color: var(--edition-muted); font: .82rem/1.6 var(--ui-font); text-wrap: balance; }
 
 :is(#app, #app-splash) .tv-player {
