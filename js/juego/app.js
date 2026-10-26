@@ -1065,8 +1065,6 @@
     // ahora, y su resultado ya ofrece barajar.
     if (!starterDraw || starterDraw.winner === null || starterDraw.names.length !== names.length) { beginStarterDraw(); return; }
     const requestedHand = Number(document.getElementById("hand-size").value);
-    const handSize = Math.min(requestedHand, Math.floor((currentMode().cards.length - 1) / names.length));
-    if (handSize < requestedHand) showToast(`Mazo pequeño: ${handSize} cartas por persona para reservar el tablero.`);
     // La mesa se sienta por orden de cercanía en el minijuego y empieza la primera.
     let starter = starterDraw.winner;
     if (starterDraw.order?.length === names.length) { names = starterDraw.order.map(i => names[i]); starter = 0; }
@@ -1081,6 +1079,10 @@
     // Las cartas que se sacaron para decidir quién empieza ya se han visto: se apartan
     // del mazo para que nadie vuelva a encontrárselas en la partida.
     const shuffled = shuffle(CT.uniqueValueIds(selectedModeKey, currentMode().cards.map(card => card.id).filter(id => !drawnIds.includes(id))));
+    // El tope sale de este mazo, ya sin valores repetidos ni cartas del minijuego, como en
+    // las salas: contar el mazo entero dejaba la línea sin carta inicial en los mazos pequeños.
+    const handSize = Math.min(requestedHand, Math.floor((shuffled.length - 1) / names.length));
+    if (handSize < requestedHand) showToast(`Mazo pequeño: ${handSize} cartas por persona para reservar el tablero.`);
     // `pulseUsed` y `shieldRound` solo los mira el Pulso; una partida guardada de antes
     // no los lleva, y sin ellos `undefined` se comporta como «no usado» y «sin escudo»,
     // que es justo lo que hace falta para que siga abriéndose sin migrarla.

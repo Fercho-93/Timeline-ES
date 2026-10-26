@@ -145,5 +145,21 @@ ok("el diálogo de salir ofrece también abandonar la partida", !!w.document.que
 click(w, '[data-exit-discard]');
 ok("no queda partida guardada", !w.localStorage.getItem("hilo-game-history-v1"));
 
+console.log("\nMesa llena en un mazo pequeño");
+// Velocidad tiene valores repetidos: el tope de la mano se calcula sobre el mazo que se
+// reparte de verdad, no sobre todas sus cartas, o la línea empezaba sin carta.
+w = boot();
+click(irAJugar(w), '[data-block="naturaleza"]');
+click(w, '[data-mode="speed"]');
+(w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('local');
+while (w.document.querySelectorAll("#players input").length < 8) click(w, '[data-action="add-player"]');
+w.document.getElementById("hand-size").value = "6";
+click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
+const mesaLlena = JSON.parse(w.localStorage.getItem("hilo-game-speed-v1"));
+const manosLlenas = mesaLlena.players.map(p => p.hand.length);
+ok("la línea empieza con una carta de verdad", mesaLlena.timeline.length === 1 && Number.isInteger(mesaLlena.timeline[0]));
+ok("todas las manos tienen las mismas cartas", manosLlenas.every(n => n === manosLlenas[0] && n > 0 && n < 6));
+ok("queda mazo para robar", mesaLlena.deck.length > 0);
+
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);
