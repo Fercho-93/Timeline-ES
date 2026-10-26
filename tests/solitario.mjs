@@ -598,6 +598,33 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   w.close();
 }
 
+// Como el resto de formatos, una ronda no reparte dos cartas con el mismo valor, ni en sus
+// diez cartas ni en la reserva de las que coloca el tablero. Videojuegos y Longevidad tienen
+// muchos valores repetidos: sin el filtro, dos de cada tres rondas llevaban alguno.
+console.log("\nUna ronda no lleva dos cartas con el mismo valor");
+{
+  const w = boot({ "continuum-difficulty-v1": "normal" });
+  const CTw = w.CONTINUUM;
+  for (const modo of ["videogames", "lifespan"]) {
+    const porId = new Map(CTw.cards(modo).map(c => [c.id, c]));
+    const valor = id => CTw.sortValue(modo, porId.get(id));
+    let repetidas = 0;
+    for (let i = 0; i < 200; i++) {
+      const ronda = CTw.repartoRonda(modo, CTw.cards(modo).map(c => c.id)).map(valor);
+      if (new Set(ronda).size !== ronda.length) repetidas++;
+    }
+    ok(`${modo}: ninguna de 200 rondas repite valor`, repetidas === 0);
+  }
+  abreMazo(w, "cine", "videogames");
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
+  click(w, '[data-action="start-free"]');
+  const estado = JSON.parse(w.localStorage.getItem("hilo-solo-videogames-v1"));
+  const porId = new Map(CTw.cards("videogames").map(c => [c.id, c]));
+  const valores = [...estado.timeline, estado.current, ...estado.deck, ...estado.reserve].map(id => CTw.sortValue("videogames", porId.get(id)));
+  ok("la reserva tampoco repite ningún valor de la ronda ni entre sí", new Set(valores).size === valores.length);
+  w.close();
+}
+
 // Salir por el menú es una pausa pedida: la carta abierta estrena plazo al volver. Solo
 // cerrar la aplicación sin más la da por fallada (eso lo cubre tests/duelo.mjs).
 console.log("\n«Guardar y salir» con reloj no cuesta una vida");

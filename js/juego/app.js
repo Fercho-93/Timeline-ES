@@ -2814,8 +2814,16 @@
     const mezcla = items => shuffleWith(items, random);
     const nuevas = mezcla(ids.filter(id => !vistas.has(id)));
     const sabidas = mezcla(ids.filter(id => vistas.has(id)));
-    const ronda = [...nuevas, ...sabidas].slice(0, SOLO_ROUND_CARDS + 1);
     const byId = new Map(CT.cards(modeKey).map(card => [card.id, card]));
+    // Como en el resto de formatos, una ronda no lleva dos cartas con el mismo valor. De cada
+    // valor se queda la primera que aparece, y las nuevas van delante: se prefiere la no vista.
+    const valores = new Set();
+    const ronda = [...nuevas, ...sabidas].filter(id => {
+      const valor = CT.sortValue(modeKey, byId.get(id));
+      if (valores.has(valor)) return false;
+      valores.add(valor);
+      return true;
+    }).slice(0, SOLO_ROUND_CARDS + 1);
     const orden = [...ids].sort((a, b) => CT.sortValue(modeKey, byId.get(a)) - CT.sortValue(modeKey, byId.get(b)));
     const rango = new Map(orden.map((id, i) => [id, i]));
     const inicial = mezcla(ronda)[0];
@@ -2865,7 +2873,10 @@
     const timeline = [barajado.shift()];
     // Las cartas que el tablero coloca solo tras un acierto (Normal y más) no salen de la ronda,
     // que es fija, sino de una reserva con el resto del mazo. En la maratón salen del mazo.
-    const reserve = kind === "free" ? shuffle(ids.filter(id => !barajado.includes(id) && id !== timeline[0])) : null;
+    // Tampoco repite ningún valor de la ronda, ni dos entre sí.
+    const valor = id => CT.sortValue(selectedModeKey, cardsById.get(id));
+    const enRonda = new Set([...barajado, timeline[0]].map(valor));
+    const reserve = kind === "free" ? shuffle(CT.uniqueValueIds(selectedModeKey, ids.filter(id => !enRonda.has(valor(id))))) : null;
     const turnos = kind === "free" ? SOLO_ROUND_CARDS : ids.length;
     // La ronda y la maratón llevan el plazo que se eligió en su pantalla; el reto diario, ninguno.
     const ms = kind === "free" || kind === "marathon" ? CT.Ghost.level(selectedDifficulty).seconds * 1000 : 0;
