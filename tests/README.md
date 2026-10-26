@@ -118,6 +118,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `legal.mjs` | test | Condiciones de uso, aviso legal, soporte y página de borrado: enlaces y anclas, caché, app móvil, coherencia con la política y lista de huecos `[PENDIENTE: …]` por rellenar. |
 | `limpieza-tope.mjs` | test | La limpieza diaria del servidor tiene plazo mínimo de un día y tope de borrados por ejecución, y reanuda al día siguiente. |
 | `mano-carrusel-browser.mjs` | navegador | La mano en abanico gira como un carrusel con gestos táctiles reales y siempre deja una carta elegida en el centro. |
+| `mapa-proyecto.mjs` | test | `MAPA_DEL_PROYECTO.md` explica cada script de `js/` y cada hoja de `css/`, cada uno en la tabla de su carpeta, y no cita ninguno que ya no exista. |
 | `marca.mjs` | test | Nombre Continuum en la web, iOS, manifiesto, paquete, documentación y pantallas, sin la marca antigua. |
 | `mazos.mjs` | test | Integridad de todos los mazos: repeticiones, huecos, espaciado y cifras que el redondeo no confunda. |
 | `moderacion-reglas.mjs` | reglas | Nombres reservados, el nombre se libera al borrar el perfil, denuncias de solo escritura y topes de tamaño. |
@@ -170,7 +171,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `scroll-estable.mjs` | test | La entrada animada de una colección (`unrollCollection`) libera sus capas al terminar o al interrumpirse y, con movimiento reducido, no anima ni oculta el contenido. |
 | `service-worker.mjs` | test | Qué versión ve el móvil: caché por versión, refresco y precarga de todo lo que pide `index.html`. |
 | `sesion-local.mjs` | test | La sesión que une sala y transporte Wi-Fi, sin WebRTC real. |
-| `sintaxis.mjs` | test | Que todos los archivos del juego parsean; la única red que cubre `js/online/online.js`. |
+| `sintaxis.mjs` | test | Que todos los archivos del juego parsean, `js/online/online.js` incluido (ese lo ejecutan entero `fantasma-online.mjs` y `orden-salida-online.mjs` contra el emulador, y `online-e2e.mjs` en Chromium). |
 | `solitario.mjs` | test | Solitario, reto diario, confirmación al colocar y llegada animada de las cartas automáticas. |
 | `sorteo-online-reglas.mjs` | reglas | El sorteo de quién empieza en las salas online contra las reglas. |
 | `tablet-browser.mjs` | navegador | Tabletas en un navegador real: dos columnas con medidas reales en horizontal, mesa a escala en vertical y en móvil. |
@@ -219,10 +220,12 @@ entrar por una invitación, la primera instantánea de `onSnapshot` llega de la 
 incluye a quien acaba de entrar. Comprueba el SDK y la condición, no `js/online/online.js`, que no se puede
 importar desde Node porque carga el SDK de Firebase como módulo de navegador (`vendor/firebase/`).
 
-`service-worker.mjs` ejecuta el archivo real con un entorno de service worker simulado: se
-responde con la copia guardada pero se pide la del servidor por detrás, así que un archivo nuevo
-llega en el siguiente arranque aunque se olvide subir el número de la caché. La instalación fuerza
-una descarga actual y el refresco revalida la caché HTTP.
+`service-worker.mjs` ejecuta el archivo real con un entorno de service worker simulado. Cada
+versión responde con su propia copia guardada y no vuelve a pedir al servidor lo que ya tiene,
+para no mezclar código de dos despliegues: un archivo cambiado no llega a ningún móvil hasta que
+sube el número de `CACHE` (de ahí la regla de `CLAUDE.md` y `version-cache.mjs`). La instalación
+descarga todo de nuevo, saltándose la caché HTTP y con la versión en la URL; lo que no se
+precarga se guarda la primera vez que se pide.
 
 `movimiento.mjs` y las demás pruebas sobre DOM simulado son contratos: no miden fluidez ni
 sustituyen la inspección en un navegador o un iPhone. Para revisar a mano, `npm run dev` sirve los

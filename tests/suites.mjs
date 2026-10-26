@@ -47,6 +47,7 @@ export const SUITES = {
     "tests/service-worker.mjs",
     "tests/version-cache.mjs",
     "tests/readme-pruebas.mjs",
+    "tests/mapa-proyecto.mjs",
     "tests/mazos.mjs",
     "tests/valores-repetidos.mjs",
     "tests/imagenes-retos-rapidos.mjs",

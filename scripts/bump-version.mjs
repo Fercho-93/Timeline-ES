@@ -1,5 +1,5 @@
 // Sube la versión de caché en los tres sitios a la vez: `CACHE` del service worker, `CT.APP_VERSION` de
-// js/arranque/updates.js y los `?v=` de css/edition.css y css/tablet.css en index.html (tests/version-cache.mjs los vigila).
+// js/arranque/updates.js y el `?v=` de todas las hojas de css/ en index.html (tests/version-cache.mjs los vigila).
 //
 //   node scripts/bump-version.mjs          sube una sobre la mayor de la copia local y de origin/main
 //   node scripts/bump-version.mjs 812      fija esa versión (debe ser mayor que la actual)
@@ -17,7 +17,6 @@ const PATTERNS = {
   [SW]: /(const CACHE = "continuum-v)(\d+)(")/,
   [UPDATES]: /(CT\.APP_VERSION = "continuum-v)(\d+)(")/,
 };
-const SHEETS = ['edition', 'tablet'];
 
 const read = name => readFileSync(file(name), 'utf8');
 const versionIn = (text, pattern) => Number(text.match(pattern)?.[2] ?? NaN);
@@ -42,11 +41,7 @@ for (const name of [SW, UPDATES]) {
   if (!PATTERNS[name].test(text)) throw new Error(`No encuentro la versión en ${name}.`);
   writeFileSync(file(name), text.replace(PATTERNS[name], `$1${requested}$3`));
 }
-let index = read(INDEX);
-for (const sheet of SHEETS) {
-  const pattern = new RegExp(`(href="css/${sheet}\\.css\\?v=)\\d+(")`);
-  if (!pattern.test(index)) throw new Error(`No encuentro ${sheet}.css?v= en ${INDEX}.`);
-  index = index.replace(pattern, `$1${requested}$2`);
-}
-writeFileSync(file(INDEX), index);
+const index = read(INDEX), sheets = /(href="css\/[\w-]+\.css\?v=)\d+(")/g;
+if (!sheets.test(index)) throw new Error(`No encuentro ninguna hoja css/*.css?v= en ${INDEX}.`);
+writeFileSync(file(INDEX), index.replace(sheets, `$1${requested}$2`));
 console.log(`Versión de caché: continuum-v${requested} (antes v${highest}).`);

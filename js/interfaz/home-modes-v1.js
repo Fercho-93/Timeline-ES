@@ -494,11 +494,8 @@
 
   // El resumen del inicio habla el mismo idioma que el ranking: aciertos de hoy, de esta semana y la racha.
   function rankingSummary() {
-    const key = d => window.CONTINUUM.RetoDiario.clave(d);
-    const now = new Date(), monday = new Date(now), yesterday = new Date(now);
-    monday.setHours(12,0,0,0); monday.setDate(monday.getDate() - (monday.getDay() + 6) % 7);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const today = key(now), week = key(monday);
+    const Reto = window.CONTINUUM.RetoDiario, now = new Date();
+    const today = Reto.clave(now), week = Reto.lunes(now);
     let day = null, weekHits = 0, streak = 0;
     try {
       const records=JSON.parse((window.CONTINUUM?.Storage||localStorage).getItem('hilo-retos-v1')||'{}');
@@ -506,7 +503,7 @@
       const hits = entry => Math.max(0, Math.min(10, Number(entry?.hits) || 0));
       if (days[today]) day = hits(days[today]);
       for (const [date, result] of Object.entries(days)) if (date >= week && date <= today) weekHits += hits(result);
-      if (daily.lastDay === today || daily.lastDay === key(yesterday)) streak = Number(daily.streak) || 0;
+      streak = Reto.racha(daily, today);
     } catch {}
     return {day, weekHits, streak};
   }

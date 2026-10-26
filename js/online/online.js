@@ -4,7 +4,7 @@
 // (firestore.rules) validan campo a campo; local-room.js lleva las mismas reglas para el modo sin
 // conexión.
 //
-// Secciones, en este orden (cada una empieza con «// ==== Nombre ====»):
+// Secciones, en este orden (cada una empieza con «// ── Nombre ──»):
 //   - Estado de la sala
 //   - Presencia y conexión
 //   - Minijuego de quién empieza: datos
@@ -29,7 +29,7 @@ import { auth, db } from '../nube/firebase-client.js';
 import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, onSnapshot, runTransaction, serverTimestamp, setDoc, writeBatch } from "../../vendor/firebase/firebase-firestore.js";
 import { CLIENT_VERSION } from './public-matchmaking.js';
 
-// ==== Estado de la sala ==========================================================================
+// ── Estado de la sala ────────────────────────────────────────────────────────────────────────────
 const appEl = document.getElementById("app");
 // Las modalidades, sus ejes y estos ayudantes están en modes.js, que ya está cargado
 // cuando este módulo se descarga: se pide al entrar en el modo de varios móviles.
@@ -99,7 +99,7 @@ const starterListeners = new Map(), starterRecords = new Map();
 let starterBusy = false;
 let lastGameSignature = "";
 
-// ==== Presencia y conexión =======================================================================
+// ── Presencia y conexión ─────────────────────────────────────────────────────────────────────────
 function stopPresence() {
   clearInterval(presenceTimer); presenceTimer = null; presenceRoom = "";
   clearInterval(relayTimer); relayTimer = null; relayKick = null;
@@ -144,7 +144,7 @@ function ensurePresence() {
   for (const [uid, stop] of presenceListeners) if (!roomState.playerOrder.includes(uid)) { stop(); presenceListeners.delete(uid); presenceRecords.delete(uid); }
 }
 
-// ==== Minijuego de quién empieza: datos ==========================================================
+// ── Minijuego de quién empieza: datos ────────────────────────────────────────────────────────────
 function stopStarterListeners() {
   starterRoom = "";
   for (const stop of starterListeners.values()) stop();
@@ -221,7 +221,7 @@ async function submitStarterGuess() {
   finally { starterBusy = false; }
 }
 
-// ==== Caja de conexión y relevo del anfitrión ====================================================
+// ── Caja de conexión y relevo del anfitrión ──────────────────────────────────────────────────────
 function canClaimHost() {
   if (!roomState || !user || roomState.hostUid === user.uid || !navigator.onLine || roomState.status === "ended") return false;
   const now = CT.Session.now(), host = presenceRecords.get(roomState.hostUid);
@@ -269,7 +269,7 @@ async function claimHost(auto = false) {
   finally { busy = false; }
 }
 
-// ==== Mesas públicas: cola, tablón y relevo automático ===========================================
+// ── Mesas públicas: cola, tablón y relevo automático ─────────────────────────────────────────────
 // Mientras alguien espera en una mesa pública con plazas libres, su móvil renueva la cola:
 // así la búsqueda sabe que la mesa sigue viva. Una cola sin renovar en dos minutos se da
 // por abandonada y la siguiente búsqueda abre una mesa nueva (ver
@@ -340,7 +340,7 @@ async function reopenPublicQueue(code = roomCode, queueKey = roomState?.queueKey
   } catch (error) { console.warn("PUBLIC_QUEUE_REOPEN", error?.code || error); }
 }
 
-// ==== Ayudantes del mazo y de la pantalla ========================================================
+// ── Ayudantes del mazo y de la pantalla ──────────────────────────────────────────────────────────
 // La modalidad la manda la sala; solo antes de entrar en una vale la elegida en la portada.
 function modeKey() { return roomState?.mode || selectedModeKey; }
 
@@ -377,7 +377,7 @@ function categoryBadge(card) { return CT.categoryBadge(modeKey(), card); }
 // Un mapa por modalidad, no uno solo: la modalidad puede cambiar entre partidas (aunque
 // nunca a mitad de una) y cada mazo conserva sus propios identificadores. Se construye la
 // primera vez que se pide y se reutiliza después, en vez de recorrer el mazo entero —hasta
-// 673 cartas en Gran mezcla— en cada carta de la línea y de la mano, en cada instantánea
+// 769 cartas en Gran mezcla— en cada carta de la línea y de la mano, en cada instantánea
 // de la sala.
 const cardsByIdCache = new Map();
 function cardsById(key = modeKey()) {
@@ -406,7 +406,7 @@ function showGuide() {
   abreCapa(appEl.querySelector("[data-online-guide]"), true);
 }
 
-// ==== Códigos, enlaces y entrada en la sala ======================================================
+// ── Códigos, enlaces y entrada en la sala ────────────────────────────────────────────────────────
 function createRoomCode() { return CT.Links.roomCode(8); }
 
 function cleanCode(value) {
@@ -683,7 +683,7 @@ function connectToRoom(code) {
   });
 }
 
-// ==== Efectos y progreso de cada cambio de la sala ===============================================
+// ── Efectos y progreso de cada cambio de la sala ─────────────────────────────────────────────────
 function showTurnChangeSplash(nextUid, previousState = null) {
   CT.Effects.transition('turn');
   const nextName = roomState?.players?.[nextUid]?.name || "el siguiente jugador";
@@ -757,7 +757,7 @@ function anotaProgreso() {
   }
 }
 
-// ==== Sala de espera privada y minijuego =========================================================
+// ── Sala de espera privada y minijuego ───────────────────────────────────────────────────────────
 // El panel del minijuego de quién empieza, para el anfitrión y para el resto por igual:
 // mientras no hay carta, solo el anfitrión puede repartirla; en cuanto la hay, cada
 // persona adivina la suya y ve cuándo le toca esperar o ya puede empezar.
@@ -852,7 +852,7 @@ function renderLobby() {
   }
 }
 
-// ==== Mesa pública: sala de espera ===============================================================
+// ── Mesa pública: sala de espera ─────────────────────────────────────────────────────────────────
 // Mesa pública. Como en las salas públicas de otros juegos en línea: nadie organiza, el
 // juego lleva la mesa solo y nadie se queda esperando para siempre.
 // - Con una sola persona, se busca.
@@ -874,10 +874,9 @@ function publicSecondsLeft() {
 }
 function publicElapsed() {
   if (publicJoinedAt.room !== roomCode) publicJoinedAt = { room: roomCode, at: Date.now() };
-  const seconds = Math.floor((Date.now() - publicJoinedAt.at) / 1000);
-  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+  return CT.Tiempo.minutos((Date.now() - publicJoinedAt.at) / 1000);
 }
-const clockText = seconds => `0:${String(Math.max(0, seconds)).padStart(2, "0")}`;
+const clockText = seconds => CT.Tiempo.minutos(seconds);
 function answeredStarter(uid) {
   const cardId = starterCardId(), record = starterRecords.get(uid);
   return cardId != null && record?.cardId === cardId && record.value !== null && record.value !== undefined;
@@ -986,7 +985,7 @@ function managePublicStarter() {
   publicClock = setInterval(tick, 1000);
 }
 
-// ==== Competición ================================================================================
+// ── Competición ──────────────────────────────────────────────────────────────────────────────────
 function tournamentBoard(winners = []) {
   return CT.Tournament.board(roomState.tournament,roomState.playerOrder.map(id=>({id,name:roomState.players[id].name,hand:roomState.players[id].hand})),winners);
 }
@@ -1022,7 +1021,7 @@ async function nextTournamentRound() {
   finally {busy=false;}
 }
 
-// ==== Empezar la partida =========================================================================
+// ── Empezar la partida ───────────────────────────────────────────────────────────────────────────
 async function startRoom(withGhost = true) {
   if (busy || roomState.hostUid !== user.uid) return;
   const handSize = roomState.tournament?.handSize || Number(document.getElementById("online-hand-size")?.value || 4);
@@ -1079,7 +1078,7 @@ async function startRoom(withGhost = true) {
   } finally { busy = false; }
 }
 
-// ==== Partida: reloj, tablero y jugadas ==========================================================
+// ── Partida: reloj, tablero y jugadas ────────────────────────────────────────────────────────────
 function clearTurnTimer() {
   if (turnTimerHandle) { clearInterval(turnTimerHandle); turnTimerHandle = null; }
 }
@@ -1282,7 +1281,7 @@ async function placeCard(index) {
   } finally { busy = false; }
 }
 
-// ==== El Pulso y Fantasma ========================================================================
+// ── El Pulso y Fantasma ──────────────────────────────────────────────────────────────────────────
 // El Pulso en la sala compartida. Las reglas son las mismas que en un solo móvil, y están
 // explicadas en `app.js`. Lo propio de aquí es que se resuelve en dos transacciones y no
 // en una: entre lanzarlo y colocar la carta hay que enseñársela a quien reta, así que
@@ -1467,7 +1466,7 @@ function takeCard(deckInput, discardInput) {
   return CT.Engine.draw(deckInput, discardInput);
 }
 
-// ==== Fin de turno, desempate y final secreta ====================================================
+// ── Fin de turno, desempate y final secreta ──────────────────────────────────────────────────────
 async function finishTurn() {
   if (busy || roomState?.phase !== "reveal") return;
   busy = true;
@@ -1631,7 +1630,7 @@ async function nextOnlineFinal() {
   finally { busy = false; }
 }
 
-// ==== Fin de partida y menú de la sala ===========================================================
+// ── Fin de partida y menú de la sala ─────────────────────────────────────────────────────────────
 function renderWinner() {
   clearTurnTimer();
   const uids = (roomState.winners || [roomState.winner]).filter(uid => roomState.players[uid]);
@@ -1707,7 +1706,7 @@ function roomMenu() {
   abreCapa(appEl.querySelector("[data-room-overlay]"), true);
 }
 
-// ==== Salir, saltar turnos y expulsar ============================================================
+// ── Salir, saltar turnos y expulsar ──────────────────────────────────────────────────────────────
 // Dejar una mesa pública que todavía espera jugadores: se libera la plaza al momento y, si
 // se iba quien la llevaba, la lleva quien queda primero. Si no quedaba nadie, se cierra.
 async function leavePublicLobby() {
@@ -1833,7 +1832,7 @@ async function removePlayer(targetUid) {
   } finally { busy = false; }
 }
 
-// ==== Compartir, QR y cámara =====================================================================
+// ── Compartir, QR y cámara ───────────────────────────────────────────────────────────────────────
 async function shareRoom() {
   const url = invitationUrl();
   try {
@@ -1880,7 +1879,7 @@ async function scanRoomQr() {
   } catch (error) { console.error(error); showToast("No se pudo abrir la cámara. Revisa los permisos."); }
 }
 
-// ==== Cerrar la sala y navegar ===================================================================
+// ── Cerrar la sala y navegar ─────────────────────────────────────────────────────────────────────
 async function deleteRoom() {
   if (!roomRef || roomState?.hostUid !== user.uid) return;
   await deleteDoc(roomRef);
@@ -1955,7 +1954,7 @@ function navigateOnline(action) {
 }
 CT.onlineNavigate = navigateOnline;
 
-// ==== Reconexión y oyentes de la página ==========================================================
+// ── Reconexión y oyentes de la página ────────────────────────────────────────────────────────────
 // Un móvil que se bloquea, cambia de pestaña o pierde cobertura un momento puede dejar el
 // listener de Firestore colgado: la conexión persistente se corta y, en algunos
 // navegadores, no se reanuda sola hasta recargar. Al volver a primer plano o recuperar

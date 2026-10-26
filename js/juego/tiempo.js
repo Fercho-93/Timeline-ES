@@ -80,7 +80,9 @@
     return { stop() { parado = true; clearInterval(id); } };
   }
   const texto = s => (Number(s) ? `${Number(s)} s por carta` : "sin tiempo");
-  CT.Tiempo = { OPCIONES, get, set, field, chosen, bar, clock, valido, texto };
+  // «m:ss» para las cuentas atrás y el tiempo de espera de las mesas.
+  const minutos = segundos => { const s = Math.max(0, Math.floor(segundos)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+  CT.Tiempo = { OPCIONES, get, set, field, chosen, bar, clock, valido, texto, minutos };
 
   // Cartas iniciales por persona de las partidas en directo con amigos: se eligen en la pantalla
   // previa y la sala de espera (online o Wi-Fi) solo las enseña.

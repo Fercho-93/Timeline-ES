@@ -444,7 +444,7 @@
     clearInterval(publicClock);publicClock=null;
     const draft=app().querySelector('#quick-room-starter-input')?.value||'';
     const count=room.members.length, cap=room.capacity, left=()=>connection?.secondsLeft?.() ?? 30;
-    const clock=s=>`0:${String(Math.max(0,s)).padStart(2,'0')}`;
+    const clock=CT.Tiempo.minutos;
     const status=()=>count<2
       ? `<div class="public-status-title">Buscando jugadores…</div><p>En cuanto entre alguien más, empieza una cuenta atrás de 30 s.</p>`
       : left()===0 || count>=cap ? `<div class="public-status-title">Empezando la partida…</div><p>Preparando los retos.</p>`

@@ -448,7 +448,7 @@
     setup();
     document.getElementById('hand-size').value = String(pendingTournament.cards);
     document.getElementById('hand-size').closest('.field').insertAdjacentHTML('beforebegin', lengthField(pendingTournament.rounds));
-    if (CT.Storage.getItem(MULTI_COMP_KEY) && !app.querySelector('[data-action="competition-resume"]')) app.querySelector('.setup-section .panel').insertAdjacentHTML('beforebegin', '<button class="btn btn-secondary btn-block" data-action="competition-resume">Continuar competición multijugador guardada <span>→</span></button>');
+    if (CT.Storage.getItem(MULTI_COMP_KEY) && !app.querySelector('[data-action="competition-resume"]')) app.querySelector('.setup-section .panel').insertAdjacentHTML('beforebegin', '<button class="btn btn-secondary btn-block" data-action="competition-resume">Continuar la competición guardada <span>→</span></button>');
     app.querySelector('.setup-section h2').outerHTML = '<div class="eyebrow"><span class="eyebrow-line"></span> Competición</div><h2 data-focus tabindex="-1">Competición en un solo móvil</h2>';
     app.querySelector('.setup-section .lead').textContent = `Temas al azar de las Grandes colecciones, uno detrás de otro. Ganar un tema suma un punto; las cartas que te queden en la mano restan su número menos uno.`;
   }
@@ -2230,7 +2230,7 @@
 
   // La racha de hoy solo sigue viva si ayer también se jugó (o si hoy ya está jugado).
   function dailyStreak(records = dailyRecords()) {
-    return records.lastDay === today() || records.lastDay === yesterday() ? records.streak || 0 : 0;
+    return CT.RetoDiario.racha(records, today());
   }
 
   function loadDaily() {

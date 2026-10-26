@@ -1,7 +1,8 @@
 # Continuum — hoja de ruta
 
 Estado revisado el 11 de octubre de 2026; los pendientes de la beta y de las tiendas se reunieron
-aquí el 22 de octubre de 2026.
+aquí el 22 de octubre de 2026, y el 26 de octubre se corrigieron las incoherencias de juego, textos
+y documentación de la auditoría de ese día.
 
 Este documento es la referencia única del estado del proyecto y el único sitio con la lista de
 pendientes: distingue lo que está implementado en el repositorio de lo que requiere pruebas
@@ -20,7 +21,7 @@ criterio de publicación, en [TIENDAS.md](TIENDAS.md#criterio-de-publicación).
 
 ## 1. Ya implementado
 
-- Modos: solitario (cuatro dificultades), un solo móvil, competición por rondas, reto diario,
+- Modos: solitario (cuatro dificultades), un solo móvil, competición por temas, reto diario,
   Retos rápidos, duelo por enlace, duelos por turnos, salas online, mesas públicas y salas por
   Wi-Fi sin internet; poderes Pulso y Fantasma.
 - Salas online con turnos, presencia, abandono, relevo del anfitrión, final numérica validada

@@ -97,8 +97,8 @@ sin reescribir el juego ni duplicarlo por plataforma:
 
 - `npm run build` genera `dist/`, una copia literal de los archivos que el juego necesita
   (el juego se sirve como scripts clásicos, no como módulos, así que el build no empaqueta ni
-  transforma nada: copia lo que precarga `service-worker-258.js` y las páginas que no pasan por
-  él). `npm run build && npx cap sync` deja `android/` e `ios/` al día.
+  transforma nada: copia lo que precarga `service-worker-258.js`, las páginas que no pasan por
+  él y las carpetas `assets/` y `vendor/` enteras). `npm run build && npx cap sync` deja `android/` e `ios/` al día.
 - `capacitor.config.json` apunta `webDir` a `dist/`. El `appId` (`com.continuum.game`) es el que
   hay que mantener estable: las tiendas lo usan para reconocer la aplicación, así que cambiarlo
   equivaldría a crear una aplicación nueva.
@@ -106,7 +106,8 @@ sin reescribir el juego ni duplicarlo por plataforma:
   firma, permisos) y los plugins propios de `ios/App/App/`: Iniciar sesión con Apple, App Attest
   y salas cercanas.
 - Los iconos y la pantalla de apertura se generan con `npm run icons` (usa `sharp`; las fuentes en
-  alta resolución viven en `resources/`) a partir de `icon.svg` y del emblema.
+  alta resolución viven en `resources/`: `icon.png`, `splash.png` y `splash-dark.png`); `icon.svg`
+  es solo el icono de la web instalada.
 - El botón Atrás de Android y el gesto de deslizar para volver se explican en
   [docs/REGLAS_Y_MODOS.md](docs/REGLAS_Y_MODOS.md#manejo-en-el-móvil).
 - La versión de la beta (`0.1.1`, distinta del número de caché del service worker) vive en

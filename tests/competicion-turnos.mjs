@@ -27,6 +27,8 @@ w.CONTINUUM = {
   sortValue: (_, c) => c.year, formatValue: (_, c) => String(c.year), hiddenLabel: () => 'Oculto', timelineTitle: () => 'Línea',
   placementHint: () => '', timelineEnds: () => '', timelineMap: () => '',
   Accounts: { get user() { return { uid: me }; }, profile: { alias: 'Yo' } },
+  // Como CT.Storage en el juego: los duelos guardan por él (separado por cuenta).
+  Storage: { getItem: k => w.localStorage.getItem(k), setItem: (k, v) => (w.localStorage.setItem(k, v), true), removeItem: k => w.localStorage.removeItem(k) },
   Identidad: { propio: () => me === 'ana' ? 'Ana' : 'Bea' },
   Tournament: { create: rounds => ({ queue: ['alfa', 'beta'].slice(0, rounds) }) },
   Progreso: { cerradas: [], finishCompetition({ clave }) { this.cerradas.push(clave); return []; } },

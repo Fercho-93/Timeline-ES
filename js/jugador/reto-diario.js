@@ -22,6 +22,17 @@
 
   const vacio = () => ({ best: 0, streak: 0, lastDay: "", days: {} });
 
+  // El lunes de la semana de `fecha`: las semanas del ranking van de lunes a domingo.
+  function lunes(fecha = new Date()) {
+    const dia = new Date(fecha);
+    dia.setHours(12, 0, 0, 0);
+    dia.setDate(dia.getDate() - (dia.getDay() + 6) % 7);
+    return clave(dia);
+  }
+
+  // La racha sigue viva si el último reto fue hoy o ayer; si no, ya se cortó.
+  const racha = (registro, hoy = clave()) => registro?.lastDay === hoy || registro?.lastDay === anterior(hoy) ? Number(registro.streak) || 0 : 0;
+
   // Días desde el 1 de enero de 1970 para una clave AAAA-MM-DD: cuenta seguido de un mes al
   // siguiente, así que su paridad alterna de verdad cada día.
   function numero(dia) {
@@ -49,5 +60,5 @@
     return registro;
   }
 
-  CT.RetoDiario = { clave, anterior, vacio, registrar, numero, familia, DIAS_GUARDADOS };
+  CT.RetoDiario = { clave, anterior, vacio, registrar, numero, familia, lunes, racha, DIAS_GUARDADOS };
 })();

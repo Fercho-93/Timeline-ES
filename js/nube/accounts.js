@@ -44,9 +44,7 @@ const dateKey = date => CT.RetoDiario.clave(date);
 // Aciertos de hoy y de esta semana, leídos de los retos diarios guardados. Solo se suman aciertos:
 // un reto vale de 0 a 10 y la semana, como mucho, 70.
 function periods(records, now = new Date()) {
-  const today = dateKey(now), monday = new Date(now);
-  monday.setHours(12,0,0,0); monday.setDate(monday.getDate() - (monday.getDay() + 6) % 7);
-  const weekKey = dateKey(monday), days = records?.retoDiario?.days || {};
+  const today = dateKey(now), weekKey = CT.RetoDiario.lunes(now), days = records?.retoDiario?.days || {};
   const hitsOf = entry => Math.max(0, Math.min(DAILY_MAX, Number.isSafeInteger(entry?.hits) ? entry.hits : 0));
   // Lo que se tardó en cada reto desempata. Un reto jugado antes de medirlo cuenta como diez minutos.
   const msOf = entry => Math.max(0, Math.min(DAY_MS, Number.isSafeInteger(entry?.ms) ? entry.ms : 600000));
@@ -638,10 +636,11 @@ async function purgeServerData(uid, aliasKey) {
   batch.delete(r.ranking); batch.delete(doc(db, 'socialRanking', uid)); batch.delete(r.progress); batch.delete(r.profile);
   await batch.commit();
 }
-// Lo que los duelos guardan en este móvil fuera del espacio de cada cuenta (favoritos con los
-// identificadores de los rivales, jugadas pendientes, borradores, relojes de turno).
+// Lo que los duelos guardaron en este móvil antes de ir al espacio de cada cuenta (favoritos con
+// los identificadores de los rivales, jugadas pendientes, borradores) y que aún no se ha mudado.
+// Solo lo de esta cuenta: los relojes de turno de entonces no dicen de quién son y se quedan.
 function forgetLocalDuels(uid) {
-  try { for (const key of Object.keys(localStorage)) if (key.startsWith('continuum-duel-') && (key.includes(uid) || key.startsWith('continuum-duel-turn-start-'))) localStorage.removeItem(key); }
+  try { for (const key of Object.keys(localStorage)) if (key.startsWith('continuum-duel-') && key.includes(uid)) localStorage.removeItem(key); }
   catch { /* sin almacenamiento */ }
 }
 async function removeRankingRows() {

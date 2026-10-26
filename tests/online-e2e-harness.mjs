@@ -13,7 +13,7 @@ const TYPES = { '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'te
 const CLIENT = `import { initializeApp, getApps, getApp } from '/vendor/firebase/firebase-app.js';
 import { getAuth, connectAuthEmulator } from '/vendor/firebase/firebase-auth.js';
 import { getFirestore, connectFirestoreEmulator } from '/vendor/firebase/firebase-firestore.js';
-export const firebaseApp = getApps().length ? getApp() : initializeApp({ apiKey: 'demo-key', authDomain: 'timeline-es.firebaseapp.com', projectId: 'timeline-es', appId: '1:1:web:1' });
+export const firebaseApp = getApps().length ? getApp() : initializeApp({ apiKey: 'demo-key', authDomain: 'demo-continuum-e2e.firebaseapp.com', projectId: 'demo-continuum-e2e', appId: '1:1:web:1' });
 export const auth = getAuth(firebaseApp);
 export const db = getFirestore(firebaseApp);
 if (!globalThis.__emu) { globalThis.__emu = true; connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true }); connectFirestoreEmulator(db, '127.0.0.1', 8080); }

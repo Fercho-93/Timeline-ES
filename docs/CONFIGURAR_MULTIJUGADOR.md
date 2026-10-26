@@ -228,11 +228,11 @@ se puede renombrar; sustituirlo desconectaría salas y cuentas y exigiría una m
 1. Abre la web (`https://continuumjuego.es/`) o la app con conexión a internet.
 2. Jugar → **Jugar con amigos → Cada uno en su móvil → Crear partida**, elige un mazo y el ritmo
    **En directo**.
-3. Crea la sala y comparte el enlace, el código o el QR.
+3. Elige las cartas iniciales, el tiempo por carta (sin tiempo, 15, 20 o 30 s) y los poderes,
+   crea la sala y comparte el enlace, el código o el QR.
 4. En el segundo móvil: **Unirme a una partida** y escanea el QR o pega el enlace o el código.
-5. En la sala de espera, el anfitrión ajusta cartas, tiempo por turno (sin tiempo, 15, 20 o
-   30 s) y poderes, y pulsa **Empezar**. Antes de repartir se juega el minijuego de
-   quién empieza.
+5. En la sala de espera se ve lo que se eligió al crearla y el anfitrión pulsa **Empezar**.
+   Antes de repartir se juega el minijuego de quién empieza.
 
 Durante la partida, el menú de la sala permite compartir el enlace y el QR y, al anfitrión,
 saltar el turno de quien se haya quedado sin batería o expulsar a quien ya no juegue: sus cartas

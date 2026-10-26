@@ -20,6 +20,8 @@ w.CONTINUUM = {
   placementHint: () => 'Debía ir después de Primera.',
   timelineEnds: () => '', timelineMap: () => '', axis: () => ({ cifra: { negativos: true } }),
   Accounts: { user: { uid: 'me' }, profile: { alias: 'Yo' } },
+  // Como CT.Storage en el juego: los duelos guardan por él (separado por cuenta).
+  Storage: { getItem: k => w.localStorage.getItem(k), setItem: (k, v) => (w.localStorage.setItem(k, v), true), removeItem: k => w.localStorage.removeItem(k) },
   Duelo: { CARTAS: 2, reparto: () => [1,2,3], Cifras: { CARTAS: 2, reparto: () => [2,3], factorDe: () => 1, leer: (_, value) => Number(value), campo: (_, id) => `<input id="${id}">`, puntosCarta: () => 75, acierto: () => true, banda: () => ({ nombre: 'Muy cerca' }), formato: (_, v) => `${v} años`, regla: () => ({ anos: true }) } }
 };
 w.eval(fs.readFileSync('js/online/links.js', 'utf8'));

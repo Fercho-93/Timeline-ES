@@ -11,7 +11,8 @@ como comprobación técnica; eso no sustituye una prueba física.
 - **Subiendo a `main` un cambio en `.github/beta-request.json`.** Es la vía habitual (también
   desde una sesión sin acceso a `workflow_dispatch`). Compila Android e iOS y **sube el IPA a
   TestFlight**. El archivo es un registro de la petición (versión, caché y motivo); lo que dispara
-  el workflow es el cambio, no su contenido. Hacerlo solo cuando el titular pida una beta.
+  el workflow es el cambio, no su contenido: `platforms` y `upload_testflight` no los lee nadie, y
+  con un cambio en el archivo se compilan siempre las dos plataformas y se sube siempre a TestFlight. Hacerlo solo cuando el titular pida una beta.
 - **A mano**, desde Actions, eligiendo plataforma; ahí la subida a TestFlight es una opción
   desactivada por defecto.
 

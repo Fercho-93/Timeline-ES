@@ -75,7 +75,7 @@
   const AHORRO_POR_MAZO = 199;
   const precioColeccion = mazos => PRECIO_MAZO + (mazos - 1) * (PRECIO_MAZO - AHORRO_POR_MAZO);
 
-  // El catálogo entero se sale de esa cuenta a propósito: con dieciséis mazos daría una
+  // El catálogo entero se sale de esa cuenta a propósito: con todos los mazos daría una
   // cifra que nadie paga. Llevárselo todo de golpe es el mejor trato que hay, y por eso
   // su precio se pone a mano.
   const PRECIO_TODO = 1499;

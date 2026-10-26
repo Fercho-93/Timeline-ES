@@ -31,7 +31,9 @@
   }
 
   function idFor(seed) {
-    // FNV-1a: la misma identidad elige la misma ilustración en cualquier móvil.
+    // FNV-1a: la misma identidad elige la misma ilustración en cualquier móvil. Recorre puntos de
+    // código, no unidades UTF-16 como `fnv1a` de modes.js: con un emoji en el nombre darían
+    // resultados distintos, y pasarse a aquel cambiaría el avatar de quien ya lo tiene.
     let hash = 2166136261;
     for (const char of String(seed)) {
       hash ^= char.codePointAt(0);

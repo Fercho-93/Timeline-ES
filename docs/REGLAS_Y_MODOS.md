@@ -21,7 +21,7 @@ y 1.272 cartas (recuento de octubre de 2026; la cifra exacta la da `CT.cards(maz
 - **Historia mundial:** 117 hechos, de la unificación de Egipto a la invasión rusa de Ucrania,
   mirando más allá de España y dejando los hitos técnicos al mazo de al lado. Donde la fecha es
   tradicional o aproximada, lo dice el propio título.
-- **Inventos y descubrimientos:** 67 hitos de la técnica y la ciencia, de la escritura cuneiforme
+- **Inventos y descubrimientos:** 67 hitos de la técnica y la ciencia, de la rueda de alfarero
   al iPhone. Cada carta se fecha por un hecho concreto y datable: una patente, una publicación,
   una primera demostración.
 
@@ -80,9 +80,9 @@ Los Retos rápidos tienen su propio catálogo de temas cortos (ver [Retos rápid
 
 ## Formas de jugar
 
-- **Jugar solo:** una persona contra el mazo, con tres vidas: reto diario, ronda de 10 cartas,
-  maratón o competición (ver [Jugar solo](#jugar-solo)).
-- **Un solo móvil:** de 2 a 9 personas pasándose el teléfono. No necesita conexión y conserva las
+- **Jugar solo:** una persona contra el mazo: reto diario (sin vidas), ronda de 10 cartas,
+  maratón o competición, estas tres con tres vidas (ver [Jugar solo](#jugar-solo)).
+- **Un solo móvil:** de 2 a 9 jugadores (8 en Retos rápidos) pasándose el móvil. No necesita conexión y conserva las
   partidas localmente.
 - **Cada uno en su móvil:** en directo en una sala (por internet con Firebase, o por la misma
   Wi-Fi sin internet), por turnos en un duelo que cada uno juega cuando puede, o con las mismas
@@ -90,10 +90,10 @@ Los Retos rápidos tienen su propio catálogo de temas cortos (ver [Retos rápid
 - **Jugar online:** mesas públicas de 2 a 4 personas, eligiendo mesa en el tablón o con partida
   rápida (ver [MATCHMAKING_PUBLICO.md](MATCHMAKING_PUBLICO.md)).
 - **Competición:** un tema al azar tras otro, sin repetirse, con 3, 5 o todas las temáticas a elegir
-  (ver [Competición por rondas](#competición-por-rondas)).
+  (ver [Competición](#competición)).
 
 Cada juego conserva su propia partida local. El juego elegido también se guarda en las salas
-multijugador para que todos los participantes utilicen el mismo mazo.
+para que todos los jugadores utilicen el mismo mazo.
 
 ## Reglas comunes de una partida
 
@@ -107,8 +107,10 @@ gestión de sala.
   quien más se acerca y el turno avanza en ese orden.
 - Cada persona recibe cuatro cartas por defecto (cinco por tema en la competición); se puede elegir
   entre una y seis.
-- El tiempo por turno se elige al preparar la partida: sin tiempo, 15, 20 o 30 segundos, las
-  mismas opciones en todas las formas de jugar (`js/juego/tiempo.js`).
+- El tiempo por carta se elige al preparar una partida en grupo, un duelo o Retos rápidos: sin
+  tiempo, 15, 20 o 30 segundos (`js/juego/tiempo.js`). Jugando solo en Grandes colecciones (ronda,
+  maratón y competición) lo fija la dificultad (ver [Dificultades](#dificultades)), y el reto
+  diario no tiene reloj.
 - El dato que ordena el mazo —fecha, superficie, población, peso, longevidad, velocidad o
   distancia— permanece oculto hasta colocar la carta en un hueco de la línea.
 - La ilustración también. En la mano, todas las cartas enseñan el reverso de su colección
@@ -139,8 +141,8 @@ gestión de sala.
   no entra.
 - En el momento del fallo, mientras se ve el aviso, la línea de detrás señala el hueco exacto
   donde iba la carta, con una frase para quien usa un lector de pantalla.
-- La victoria se comprueba al final de cada ronda completa. Gana quien sea la única persona sin
-  cartas al acabar la ronda. Si hay varias, pasan a una final numérica con una carta neutral y
+- La victoria se comprueba al final de cada vuelta completa. Gana quien sea la única persona sin
+  cartas al acabar la vuelta. Si hay varias, pasan a una final numérica con una carta neutral y
   cifras secretas.
 - En la final se revelan las cifras cuando todos los finalistas responden. Gana la menor
   diferencia absoluta; si empatan, solo quienes comparten la mejor respuesta repiten con otra
@@ -171,16 +173,16 @@ Cuatro formatos, todos sin conexión y con la marca guardada en el propio móvil
   queda es una estrella; se guarda la mejor ronda por juego y dificultad. Se puede dejar a medias.
 - **Maratón:** el mazo entero y sin límite de cartas, hasta perder las tres vidas. Guarda tu
   mejor marca de cada juego y dificultad, y se puede dejar a medias y continuar después.
-- **Competición:** una ronda por tema; ver [Competición por rondas](#competición-por-rondas).
+- **Competición:** varios temas seguidos; ver [Competición](#competición).
 
 ### Dificultades
 
-| Nivel | Cartas automáticas tras cada acierto | Visibilidad |
-|---|---:|---|
-| Fácil | 0 | Visible |
-| Normal | 1 | Visible |
-| Difícil | 2 | Fantasma ocasional durante una jugada |
-| Experto | 2 | Oculto en todas las jugadas |
+| Nivel | Cartas automáticas tras cada acierto | Visibilidad | Tiempo por carta |
+|---|---:|---|---:|
+| Fácil | 0 | Visible | Sin tiempo |
+| Normal | 1 | Visible | 30 s |
+| Difícil | 2 | Fantasma ocasional durante una jugada | 20 s |
+| Experto | 2 | Oculto en todas las jugadas | 15 s |
 
 Las cartas automáticas entran al continuar y solo tras un acierto: cuando vas bien, el tablero se
 complica. Tras un fallo no entran, porque ya se pierde una vida y la carta fallada pasa a la línea.
@@ -204,30 +206,31 @@ Con reloj, «Guardar y salir» es una pausa: la carta que estaba abierta (o el t
 móvil) estrena plazo entero al volver. Cerrar la aplicación sin pasar por el menú no pausa nada.
 El duelo por enlace es la excepción: su reloj no se para nunca, y el propio aviso de salida lo dice.
 
-## Competición por rondas
+## Competición
 
 La Competición es el último panel de la lista de Grandes colecciones, en Jugar solo, Un solo móvil
-y Cada uno en su móvil. Se configuran 3, 5 o todas las temáticas y entre 1 y 6 cartas por ronda.
-Cada ronda usa un mazo al azar distinto, sin repetir ninguno; Gran mezcla se excluye porque combina
+y Cada uno en su móvil. Se configuran 3, 5 o todas las temáticas y entre 1 y 6 cartas por tema.
+Cada tema usa un mazo al azar distinto, sin repetir ninguno; Gran mezcla se excluye porque combina
 otros mazos.
 
-- **En solitario** se suman los aciertos, con tres vidas nuevas en cada ronda. La competición
-  individual elige un nivel de dificultad, conserva cinco decisiones humanas por tema y reserva
-  cartas adicionales para el tablero. Al terminar la última ronda se ve el marcador de todas juntas.
-- **En multijugador** se reparten las cartas elegidas a cada participante (ajustadas si el mazo es
-  pequeño), gana la ronda quien termine una vuelta completa sin cartas y se usa la final numérica
-  secreta si hay varios. Ganar una ronda suma un punto; quedarse con cartas en la mano al
-  terminarla penaliza con su número menos uno (una carta no resta nada, dos cartas restan un punto,
+- **En solitario** se suman los aciertos, con tres vidas nuevas en cada tema. La competición
+  individual elige un nivel de dificultad (que fija el tiempo por carta), juega en cada tema las
+  cartas elegidas (cinco si no se cambia) y reserva cartas adicionales para el tablero. Al terminar
+  el último tema se ve el marcador de todos juntos.
+- **En grupo** se reparten las cartas elegidas a cada jugador (ajustadas si el mazo es
+  pequeño), gana el tema quien termine una vuelta completa sin cartas y se usa la final numérica
+  secreta si hay varios. Ganar un tema suma un punto; quedarse con cartas en la mano al
+  terminarlo penaliza con su número menos uno (una carta no resta nada, dos cartas restan un punto,
   tres restan dos, y así sucesivamente). Quien acaba sin cartas pero pierde la final numérica no
   suma ni resta. Al terminar, el marcador muestra el ganador o el empate global en puntos.
 - **Guardado.** En un móvil, la competición se guarda en una clave propia, aparte de las partidas
   normales de cada mazo (`continuum-competition-v1` en solitario, `continuum-multi-competition-v1`
-  en un solo móvil): conserva dificultad, orden de temas, marcador, ronda y resultado pendiente.
-  «Salir» la deja en pausa, y «Continuar competición en solitario» (o «Continuar competición
-  multijugador guardada») la recupera sin repetir la carta resuelta ni sobrescribir el solitario
+  en un solo móvil): conserva dificultad, orden de temas, marcador, tema y resultado pendiente.
+  «Salir» la deja en pausa, y «Continuar competición en solitario» (o «Continuar la competición
+  guardada», en un solo móvil) la recupera sin repetir la carta resuelta ni sobrescribir el solitario
   de otro mazo.
-- **En varios móviles**, el anfitrión pasa al siguiente mazo dentro de la misma sala; se conservan
-  participantes e historial y se preparan nuevas manos. Se puede reconectar con el mismo código.
+- **Cada uno en su móvil**, el anfitrión pasa al siguiente tema dentro de la misma sala; se conservan
+  jugadores e historial y se preparan nuevas manos. Se puede reconectar con el mismo código.
   En la sala online lo admiten las reglas publicadas desde el cliente 42; en la sala Wi-Fi,
   `js/sin-conexion/local-room.js`.
 
@@ -251,7 +254,7 @@ turno; no reemplaza la colocación. Afecta a quien lo activa y a cada rival una 
 vuelta completa con valores visibles antes de otro Fantasma. No se pueden acumular ni combinar su
 activación con el Pulso en ese mismo turno. Un rival sí puede usar Pulso durante el efecto. Saltar
 un turno o abandonar la sala descuenta al participante afectado sin alargar la duración. Los empates
-y la victoria siguen comprobándose al final de la ronda, sin contar poderes.
+y la victoria siguen comprobándose al final de la vuelta, sin contar poderes.
 
 Mientras dura, se ocultan cifras, explicaciones y bandas de época/magnitud del tablero. El minimapa
 usa posiciones uniformes y números de orden, también en sus etiquetas accesibles. Los títulos
@@ -281,19 +284,19 @@ Su efecto es la única jugada que toca la mano de otra persona:
 - Después coloca quien defiende, sin ver la posición elegida por quien reta.
 - **Aciertan los dos:** la carta queda en la línea y ninguna mano cambia.
 - **Solo acierta quien reta:** la carta queda en la línea y pasa al defensor la carta de su mano
-  sorteada al lanzar el Pulso.
+  que eligió al lanzar el Pulso.
 - **Solo acierta quien defiende:** la carta queda en la línea y quien reta roba una.
 - **Fallan los dos:** la carta se descarta y quien reta roba una.
 - **Mazo y descarte agotados:** si corresponde robar pero no queda ninguna carta, no hay robo y el
   turno continúa. Si ambos fallaron, la carta del reto sí puede reciclarse.
 - Hacen falta **dos cartas** para lanzarlo. Con una sola, ganar el Pulso te dejaría a cero
   regalándola, sin haberla colocado nunca en la línea.
-- Quien recibe una carta **no puede volver a ser retado esa ronda**.
-- Sí se puede retar a quien ya está **a cero cartas** esperando ganar al final de la ronda:
+- Quien recibe una carta **no puede volver a ser retado en esa vuelta**.
+- Sí se puede retar a quien ya está **a cero cartas** esperando ganar al final de la vuelta:
   acertar mientras esa persona falla le quita la victoria, y es la jugada más tensa del mecanismo.
 
 Funciona en los dos modos. En un solo móvil, quien recibe la carta se entera al recoger el
-teléfono, en la pantalla de pasar el turno. En varios móviles todo el mundo ve el Pulso en
+móvil, en la pantalla de pasar el turno. Cada uno en su móvil, todo el mundo ve el Pulso en
 directo, pero el título de la carta que cambia de mano solo lo ven las dos personas
 implicadas: el resto se entera de que hubo trasvase, no de cuál era la carta.
 
@@ -345,7 +348,8 @@ la cuenta): la pantalla de solitario enseña lo descubierto de cada mazo y «Ver
 las cartas conseguidas y las que faltan. Cuentan las de solitario, el reto diario, el duelo por
 enlace y, en salas, las de la propia plaza; no las de un móvil compartido entre varios.
 
-Cada reto se juega con todas sus cartas barajadas; la primera hace de referencia y no puntúa.
+Con varias personas (sala, mesa pública, un solo móvil o duelo), cada reto se juega con 10 cartas
+al azar de su mazo (`QuickEngine.MULTI_CARDS`); la primera hace de referencia y no puntúa.
 En cada turno se elige una carta y se confirma su hueco en la línea. Acertar suma un punto
 provisional y pasa el turno. Qué pasa al fallar se elige al preparar la partida («Si alguien
 falla»):
@@ -386,8 +390,8 @@ debe mantenerla abierta.
 
 ### Un solo móvil
 
-De 2 a 9 personas se pasan el teléfono; no necesita conexión y conserva la partida en el propio
-móvil. El juego no sabe quién sostiene el teléfono, así que una partida en un solo móvil cuenta
+De 2 a 9 jugadores (8 en Retos rápidos) se pasan el móvil; no necesita conexión y conserva la partida en el propio
+móvil. El juego no sabe quién sostiene el móvil, así que una partida en un solo móvil cuenta
 como jugada, no como ganada (ver [Atlas](#atlas-perfil-estadísticas-y-logros)), y sus cartas no
 entran en la colección de Retos rápidos.
 
@@ -425,10 +429,10 @@ salirse de la aplicación— y solo se diferencian en qué se hace con cada cart
 
 - **Ordenar las cartas.** 15 cartas que se colocan en la línea. Gana quien más acierte.
 - **Escribir la cifra.** 10 cartas de las que se responde el número —los habitantes, los
-  años, los kilómetros—. Gana quien más puntos sume: puntúa lo cerca que se quede uno (por
-  porcentaje, o por años de diferencia en los mazos de fechas) y lo rápido que responda.
-  Los puntos que trae un enlace no se creen: se recalculan con las mismas cartas y tienen
-  que coincidir.
+  años, los kilómetros—. Una respuesta es un acierto si se queda lo bastante cerca (por
+  porcentaje, o por años de diferencia en los mazos de fechas). Gana quien tenga más aciertos;
+  si empatan, quien haya respondido más rápido. Los resultados que trae un enlace no se creen:
+  se recalculan con las mismas cartas y tienen que coincidir.
 
 Las dos se eligen con un control de dos pastillas, no con un desplegable: así se ve que hay
 dos maneras y cuál está elegida, en vez de enseñar una y esconder la otra.
@@ -626,7 +630,7 @@ todos los rincones lo respetan. Sin esa mitad, la cartera sería una función qu
 
 ## Ajustes
 
-Un botón de «Ajustes» en la cabecera, disponible en cualquier pantalla, elige cómo se ve
+La pestaña «Ajustes» de la barra inferior, disponible en cualquier pantalla, elige cómo se ve
 la aplicación. La elección se guarda y se aplica al instante, sin recargar, y con ella van
 también las dos etiquetas de color de la barra del navegador.
 

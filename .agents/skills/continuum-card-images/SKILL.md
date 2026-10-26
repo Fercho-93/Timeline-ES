@@ -27,11 +27,11 @@ Antes de generar nada, inspecciona siempre:
 - `assets/animal-cards/`
 - `assets/astronomy-cards/`
 - `assets/country-cards/`
-- `modes.js`
-- `styles.css`
+- `js/juego/modes.js`
+- `css/styles.css`
 - `tests/referencias-animales.mjs`
-- el archivo de datos del mazo que se vaya a completar (`animals.js`, `lifespan.js`,
-  `speed.js`, `astronomy.js`, `countries.js`, etc.)
+- el archivo de datos del mazo que se vaya a completar (`mazos/animals.js`,
+  `mazos/lifespan.js`, `mazos/speed.js`, `mazos/astronomy.js`, `mazos/countries.js`, etc.)
 
 Usa **3-6 imágenes existentes del mismo bloque** como referencias visuales directas antes
 de redactar el prompt de una imagen nueva.
@@ -135,7 +135,7 @@ Carpeta: `assets/country-cards/`
 Cruza:
 
 1. cartas declaradas en el archivo `.js` del mazo;
-2. mapeos de ilustración de `modes.js`;
+2. mapeos de ilustración de `js/juego/modes.js`;
 3. archivos realmente presentes en `assets/...-cards/`;
 4. precarga/cache en `service-worker-258.js` cuando aplique;
 5. tests existentes.
@@ -213,7 +213,7 @@ mapping existente tiene prioridad.
 Al añadir una ilustración nueva:
 
 1. guardar el WebP en la carpeta correcta;
-2. actualizar el mapping de `modes.js` si ese mazo lo necesita;
+2. actualizar el mapping de `js/juego/modes.js` si ese mazo lo necesita;
 3. actualizar `service-worker-258.js` si la estrategia de precarga actual exige enumerarla;
 4. ampliar tests para garantizar que la carta tiene archivo y mapping;
 5. comprobar que la UI usa la misma clase `animal-card-art`/mecanismo de lámina y no se

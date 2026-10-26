@@ -59,8 +59,8 @@ persona.
 ## Orden de juego y relevo del anfitrión
 
 - **Quién empieza.** Al completarse la mesa se juega el mismo minijuego que en las salas
-  privadas: el anfitrión técnico reparte una carta automáticamente y cada persona tiene 30
-  segundos para escribir su cifra. La mesa se sienta por orden de cercanía; quien no respondió
+  privadas: el anfitrión técnico reparte una carta automáticamente y cada persona tiene 20
+  segundos para escribir su cifra y el resultado se enseña 8 segundos. La mesa se sienta por orden de cercanía; quien no respondió
   juega al final.
 - **Relevo automático.** Si el anfitrión técnico deja de dar señales (15 s si dejó la pantalla de
   la sala o la app pasó a segundo plano, 90 s si simplemente dejó de responder), la primera

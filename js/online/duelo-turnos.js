@@ -216,13 +216,24 @@ async function submitCifra() {
   CT.Effects?.stamp();
   return queueMove({ respuesta: value });
 }
+// Lo que el duelo guarda en el móvil va por CT.Storage, que lo separa por cuenta (y al borrarla se
+// va con ella) y avisa si no se puede guardar. Lo guardado antes, sin separar, se lee una vez y se muda.
+function guardado(key) {
+  const value = CT.Storage.getItem(key);
+  if (value !== null) return value;
+  try {
+    const antiguo = localStorage.getItem(key);
+    if (antiguo !== null && CT.Storage.setItem(key, antiguo)) localStorage.removeItem(key);
+    return antiguo;
+  } catch { return null; }
+}
 const outboxKey = () => `continuum-duel-outbox-${uid()}`;
-function outbox() { try { return JSON.parse(localStorage.getItem(outboxKey()) || '{}'); } catch { return {}; } }
+function outbox() { try { return JSON.parse(guardado(outboxKey()) || '{}'); } catch { return {}; } }
 function pendingMove(gameId) { return outbox()[gameId]; }
 function savePending(gameId, move) {
   const saved = outbox();
   if (move) saved[gameId] = move; else delete saved[gameId];
-  localStorage.setItem(outboxKey(), JSON.stringify(saved));
+  CT.Storage.setItem(outboxKey(), JSON.stringify(saved));
 }
 async function queueMove(extra) {
   if (!current || !(firstTurnOf(current) || (current.status === 'playing' && current.turnUid === uid())) || pendingMove(current.id)) return;
@@ -294,8 +305,8 @@ async function create(mode, kind, back, competition = null) {
   const existing = competition ? null : (await list()).find(g => g.status === 'waiting' && !g.invitedUid && g.playersOrder[0] === uid() && g.mode === mode && g.kind === kind);
   if (existing) { shareLink = ''; subscribe(existing.id); return; }
   const draftKey = `continuum-duel-draft-${uid()}-${mode}-${kind}`;
-  const gameId = localStorage.getItem(draftKey) || id();
-  localStorage.setItem(draftKey, gameId);
+  const gameId = guardado(draftKey) || id();
+  CT.Storage.setItem(draftKey, gameId);
   // Las reglas admiten hasta 30 cartas por partida: en una competición, temas × cartas por tema.
   const total = competition ? compTotal(mode, competition.cards) : kind === 'cifras' ? CT.Duelo.Cifras.CARTAS : TOTAL;
   const seed = CT.Duelo.crearSemilla(), openingCard = competition ? themeDeal({ mode, seed, total }, 0)[0]?.id : kind === 'orden' ? CT.Duelo.reparto(mode, seed, total)[0] : null;
@@ -304,7 +315,7 @@ async function create(mode, kind, back, competition = null) {
   shareLink = CT.Links.invitation({turnDuel:gameId});
   await CT.creationSlot?.();
   await runTransaction(db, async tx => { const ref = doc(db, 'turnDuels', gameId); if (!(await tx.get(ref)).exists()) { tx.set(ref, game); tx.set(doc(db, 'creationQuota', uid()), { lastCreatedAt: serverTimestamp(), kind: 'turnDuel', target: gameId }); } });
-  localStorage.removeItem(draftKey);
+  CT.Storage.removeItem(draftKey);
   await navigator.clipboard?.writeText(shareLink).catch(() => {}); notify('Duelo creado. Comparte el enlace con tu rival.');
   subscribe(gameId);
   } finally { busy = false; }
@@ -331,9 +342,9 @@ function prepareTurn() {
   const key = `${current.id}-${current.turnIndex}`;
   if (preparingTurn !== key) {
     preparingTurn = key;
-    const saved = Number(localStorage.getItem(`continuum-duel-turn-start-${key}`));
+    const saved = Number(guardado(`continuum-duel-turn-start-${key}`));
     enteredAt = Number(current.seconds) > 0 && saved > 0 && saved <= Date.now() ? saved : Date.now();
-    if (Number(current.seconds) > 0) try { localStorage.setItem(`continuum-duel-turn-start-${key}`, String(enteredAt)); } catch { /* sin espacio: el reloj empieza ahora */ }
+    if (Number(current.seconds) > 0) CT.Storage.setItem(`continuum-duel-turn-start-${key}`, String(enteredAt));
   }
 }
 // La barra y el aviso del plazo del turno, si la partida lo lleva.
@@ -497,11 +508,11 @@ function profileMarkup(games, extras = []) {
   const archived = games.filter(g => archivedIds.has(g.id)), archivedQuick = extras.filter(x => archivedIds.has(x.code));
   return `<h2>Tus duelos</h2><h3>Cara a cara con tus amigos</h3>${standingsMarkup(games, extras)}${history || '<p>No tienes duelos abiertos.</p>'}${archived.length + archivedQuick.length ? `<details><summary>Archivados (${archived.length + archivedQuick.length})</summary>${rows(archived, archivedQuick)}</details>` : ''}${rivalRows ? `<details><summary>Rivales: retar, favoritos y bloqueos</summary><p class="hint">Victorias separadas por modalidad. Archivar solo cambia tu lista.</p>${rivalRows}</details>` : ''}${blockedPlayers.size ? `<details><summary>Rivales bloqueados</summary>${[...blockedPlayers].map(([player, name]) => `<p>${safe(name)} <button class="btn btn-ghost" data-action="unblock-duel-rival" data-rival-id="${safe(player)}">Desbloquear</button></p>`).join('')}</details>` : ''}`;
 }
-function favoriteIds() { try { const saved = JSON.parse(localStorage.getItem(`continuum-duel-favorites-${uid()}`) || '[]'); return Array.isArray(saved) ? saved.filter(id => typeof id === 'string') : []; } catch { return []; } }
+function favoriteIds() { try { const saved = JSON.parse(guardado(`continuum-duel-favorites-${uid()}`) || '[]'); return Array.isArray(saved) ? saved.filter(id => typeof id === 'string') : []; } catch { return []; } }
 function favorite(player) {
   const favorites = new Set(favoriteIds());
   favorites.has(player) ? favorites.delete(player) : favorites.add(player);
-  localStorage.setItem(`continuum-duel-favorites-${uid()}`, JSON.stringify([...favorites]));
+  CT.Storage.setItem(`continuum-duel-favorites-${uid()}`, JSON.stringify([...favorites]));
 }
 function rivals(games = cachedGames, quick = []) {
   const favorites = new Set(favoriteIds()), found = new Map();

@@ -969,17 +969,22 @@
   // recolocadas no son el mismo. La usan el duelo por enlace —para no comparar dos
   // partidas que no son la misma— y las salas compartidas —para no repartir ni empezar
   // con un móvil que lleva una versión distinta del juego.
-  function deckFingerprint(modeKey, deck = cards(modeKey)) {
+  // FNV-1a de 32 bits sobre las unidades UTF-16 del texto. La huella de los mazos y las semillas
+  // de las barajas dependen de que dé siempre lo mismo: cambiarlo rompería salas y retos.
+  function fnv1a(text) {
     let hash = 2166136261;
+    for (let i = 0; i < text.length; i++) {
+      hash ^= text.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+  }
+  function deckFingerprint(modeKey, deck = cards(modeKey)) {
     // Incluye el eje, el protocolo, el orden y los datos que se ven y se comparan.
     // Una corrección conservando el ID también debe cambiar la huella.
     const content = JSON.stringify([3, modeKey, mode(modeKey).axis, deck.map(card =>
       [card.id, sortValue(modeKey, card), card.title, card.detail, card.source || "", card.sourceMode || ""])]);
-    for (let i = 0; i < content.length; i++) {
-      hash ^= content.charCodeAt(i);
-      hash = Math.imul(hash, 16777619);
-    }
-    return `v3.${deck.length}.${(hash >>> 0).toString(36)}`;
+    return `v3.${deck.length}.${fnv1a(content).toString(36)}`;
   }
 
   function formatValue(modeKey, card) { return axis(modeKey).format(card); }
@@ -1192,12 +1197,7 @@
   // sostiene el reto diario —la semilla es la fecha— y el duelo por enlace, donde la
   // semilla viaja dentro del propio enlace.
   function seedFrom(text) {
-    let seed = 2166136261;
-    for (let i = 0; i < text.length; i++) {
-      seed ^= text.charCodeAt(i);
-      seed = Math.imul(seed, 16777619);
-    }
-    return seed >>> 0;
+    return fnv1a(text);
   }
 
   function seededRandom(seed) {

@@ -15,8 +15,9 @@ pieza y de qué otras depende.
    Firestore). Las reglas de quién puede leer o escribir cada dato están en `firestore.rules`.
 4. Unas pocas tareas automáticas corren en los servidores de Google (**Cloud Functions**, en
    `functions/`): avisos de duelos y limpieza diaria de datos caducados.
-5. Todo se guarda en GitHub. Cada vez que se sube un cambio a la rama `main`, unos **robots de
-   GitHub** (workflows, en `.github/workflows/`) pasan las pruebas y publican la web.
+5. Todo se guarda en GitHub. La web la publica GitHub Pages tal cual desde la rama `main`, sin
+   esperar a nada; a la vez, unos **robots de GitHub** (workflows, en `.github/workflows/`) pasan
+   las pruebas de cada subida y publican las reglas de Firestore cuando cambian.
 
 ## De un vistazo
 
@@ -36,15 +37,17 @@ ios/, android/        Los envoltorios de app   .github/   Los robots de GitHub
 Cómo se carga: `index.html` pide, en este orden, las hojas de `css/`, los mazos, los scripts de
 `js/` y por último `js/arranque/boot.js`, que abre el juego. Casi todos los scripts no se
 importan entre sí: cuelgan de un objeto común, `window.CONTINUUM` (abreviado `CT` en el código),
-así que **el orden de `index.html` importa**. Los que hablan con Firebase (cuentas, salas online,
-duelos por turnos, mesas públicas) son módulos que se piden con `import()` cuando hacen falta.
+así que **el orden de `index.html` importa**. Los que hablan con Firebase son módulos: tres se cargan al abrir
+(`js/online/duelo-turnos.js`, `js/nube/app-config.js` y `js/online/public-matchmaking-online.js`)
+y el resto (cuentas, salas online, mesas públicas, Retos rápidos en red) se piden con `import()`
+cuando hacen falta.
 
 ## La raíz: lo que tiene que estar ahí
 
 | Archivo | Qué es |
 | --- | --- |
 | `index.html` | La página principal: el esqueleto que el navegador abre primero y que carga todo lo demás, en orden. |
-| `service-worker-258.js` | Guarda una copia del juego para que funcione sin internet. Su número de versión (`continuum-vNNN`) se sube en cada cambio para que los móviles descarguen lo nuevo, y su lista `ASSETS` es también lo que lleva dentro la app móvil. Tiene que estar en la raíz (solo controla su carpeta y las de debajo) y llamarse así: el «258» es un accidente histórico, pero es la dirección que tienen registrada los móviles que ya lo instalaron. |
+| `service-worker-258.js` | Guarda una copia del juego para que funcione sin internet. Su número de versión (`continuum-vNNN`) se sube en cada cambio para que los móviles descarguen lo nuevo, y su lista `ASSETS` es también lo que lleva dentro la app móvil, más las carpetas `assets/` y `vendor/` enteras (`scripts/build.mjs`). Tiene que estar en la raíz (solo controla su carpeta y las de debajo) y llamarse así: el «258» es un accidente histórico, pero es la dirección que tienen registrada los móviles que ya lo instalaron. |
 | `invitation.html` | La página que abre un enlace de invitación en la app. |
 | `actualizar.html` | «Actualizar Continuum»: descarta la copia guardada sin borrar el perfil. |
 | `privacidad.html`, `terminos.html`, `aviso-legal.html`, `soporte.html`, `borrar-cuenta.html`, `licencias.html` | Páginas legales, de soporte y de licencias, con dirección pública (las enlazan las tiendas). `privacidad.html` cuenta lo mismo que `PRIVACIDAD.md`; `licencias.html` la genera `scripts/licencias.mjs`. `aviso-legal.html` identifica al titular (LSSI art. 10) sin NIF ni domicilio mientras el juego sea gratuito (ver `docs/TIENDAS.md`). |
@@ -82,7 +85,7 @@ duelos por turnos, mesas públicas) son módulos que se piden con `import()` cua
 | `engine.js` | Reglas puras de una partida: robar cartas, comprobar si un hueco es correcto. |
 | `final.js` | Cómo se decide el ganador cuando hay empate o final numérica, y quién empieza (`CT.Starter`). |
 | `ghost.js` | El modo «Fantasma» (cartas con poderes) y los niveles de dificultad. |
-| `tournament.js` | El modo Competición: varias rondas con mazos distintos. |
+| `tournament.js` | El modo Competición: varios temas seguidos, cada uno con un mazo distinto. |
 | `tiempo.js` | El tiempo por jugada (sin tiempo, 15, 20 o 30 segundos) y lo demás que se elige antes de una partida en directo: cartas iniciales, poderes y máximo de participantes (`CT.ManoInicial`). |
 | `session.js` | El reloj del servidor: que todos los móviles de una sala online midan igual el tiempo. |
 
@@ -91,6 +94,7 @@ duelos por turnos, mesas públicas) son módulos que se piden con `import()` cua
 | Archivo | Qué es |
 | --- | --- |
 | `home-modes-v1.js` | Las entradas ilustradas de la pantalla de Inicio y las pantallas de elección («Jugar solo», «Jugar con amigos»…). |
+| `starter-presentation.js` | La lámina del minijuego de quién empieza, la misma en Grandes colecciones, Retos rápidos y salas de amigos. |
 | `tutorial.js` | La guía en vídeo: escenas que se reproducen solas con subtítulos y un dedo que hace las jugadas. Se abre desde la Guía y desde «Ver el manual». |
 | `settings.js` | La pantalla de Ajustes. |
 | `a11y.js` | Pintar cada pantalla sin perder el foco del teclado, anunciar cambios al lector de pantalla, abrir las capas como diálogos, el aviso breve de abajo (`CT.toast`), las animaciones de las cartas y la ficha ampliada de una carta. |
@@ -106,12 +110,13 @@ duelos por turnos, mesas públicas) son módulos que se piden con `import()` cua
 | --- | --- |
 | `storage.js` | Guarda datos en el propio móvil y avisa si el guardado falla. |
 | `account-storage.js` | Separa lo guardado de cada cuenta, para que dos personas en el mismo móvil no se mezclen. |
+| `reto-diario.js` | El Reto diario: qué día es, qué familia toca (Grandes colecciones y Retos rápidos, en días alternos), la semana del ranking y cómo se apunta un resultado en la racha. |
 | `saves.js` | Guarda una partida a medias para poder seguirla después. |
 | `progreso.js` | Estadísticas del jugador: qué ha jugado, qué acierta y qué falla. |
 | `identidad.js`, `avatares.js` | El nombre y el dibujo (avatar) del jugador. |
 | `moderacion.js` | Filtro de nombres ofensivos o reservados y botón «Denunciar» junto a los nombres ajenos. |
 | `edad.js` | Pregunta una vez si quien juega tiene 14 años o más (o el permiso de sus padres). Sin permiso, el juego funciona sin conexión y sin ranking. |
-| `enciclopedia.js` | El Atlas: el álbum de cartas descubiertas. |
+| `enciclopedia.js` | La Enciclopedia: las cartas de cada mazo, con su lámina cuando ya se ha descubierto. |
 | `cartera.js` | Decide a qué mazos tiene acceso cada jugador. Hoy todos están abiertos. |
 | `recent-players.js` | Los nombres de las últimas personas con las que se jugó en el mismo móvil. |
 
@@ -142,7 +147,7 @@ duelos por turnos, mesas públicas) son módulos que se piden con `import()` cua
 | `quick-challenges.js`, `quick-challenges-engine.js` | Retos rápidos: la pantalla y sus reglas. |
 | `quick-room.js`, `quick-network.js`, `quick-online.js` | Retos rápidos con varias personas: las reglas de la sala, el enlace entre el juego y la red, y la sala por internet. |
 
-### `js/sin-conexion/` — varios móviles sin internet
+### `js/sin-conexion/` — cada uno en su móvil, sin internet
 
 | Archivo | Qué es |
 | --- | --- |
@@ -161,7 +166,7 @@ cambian (`edition.css` y `tablet.css`, en cada cambio).
 | --- | --- |
 | `splash.css` | La portada animada de apertura. |
 | `styles.css` | El estilo general: colores, letras, papel, botones. Es la única hoja que cargan las páginas legales. |
-| `edition.css` | La piel de la interfaz sobre `styles.css`, escrita por capas: empieza con un índice de sus 29 bloques. |
+| `edition.css` | La piel de la interfaz sobre `styles.css`, escrita por capas: empieza con un índice de sus bloques. |
 | `accounts.css` | Pantallas de cuenta, bienvenida y ranking. |
 | `quick-challenges.css` | Retos rápidos. |
 | `home-modes-v1.css` | Las entradas ilustradas de Inicio (va con `js/interfaz/home-modes-v1.js`). |
@@ -275,7 +280,28 @@ que en iPhone) y `res/` (iconos, pantallas de carga y textos).
 | `reglas-firestore.yml` | Al cambiar `firestore.rules` | Prueba las reglas y **las publica en producción**. |
 | `functions.yml` | Solo a mano | Prueba y publica las Cloud Functions. |
 | `borrar-cuenta.yml` | Solo a mano | Borra la cuenta de un jugador (moderación o petición por correo). |
-| `beta-firmada.yml` | Al cambiar `.github/beta-request.json` | Compila la app firmada y la sube a TestFlight. Solo cuando lo pida el titular. |
+| `beta-firmada.yml` | Al cambiar `.github/beta-request.json` | Compila Android e iOS firmadas y sube la de iOS a TestFlight. Solo cuando lo pida el titular. |
+
+## Convenciones
+
+Lo que ya está publicado o guardado en los móviles no se renombra, aunque hoy se llamaría de otra
+forma: cambiarlo rompería enlaces, cachés o partidas de jugadores.
+
+- **Idioma de los nombres.** Los archivos nuevos y lo que se escribe nuevo, en español
+  (`reto-diario.js`, `sonidos.js`, `-reglas.mjs`). Los que nacieron en inglés (`effects.js`,
+  `quick-room.js`, `-rules.mjs`) se quedan así.
+- **Claves del almacenamiento.** Las nuevas empiezan por `continuum-`; las `hilo-` son las del
+  nombre antiguo del juego y guardan progreso de jugadores, así que no se tocan. Todas pasan por
+  `CT.Storage`, que las separa por cuenta (`js/jugador/account-storage.js`).
+- **Sufijos de versión** (`home-modes-v1.js`, `hilo-retos-v1`): forman parte del nombre publicado
+  o de la clave guardada; una versión nueva de un formato guardado sube el número y migra.
+- **Mazos.** Cada uno tiene su archivo en `mazos/` (`cards.js`), su lista (`HISTORY_CARDS`), su
+  clave de modalidad (`history`) y su carpeta de láminas (`assets/history-cards/`). La clave de
+  modalidad es la que viaja en salas y enlaces: no se cambia.
+- **Cabeceras de sección** en el código: `// ── Nombre ──` en JavaScript y `/* ══ N · Nombre ══ */`
+  en `edition.css`, que numera sus bloques.
+- **Emuladores.** Las pruebas usan proyectos `demo-` (`demo-hilo`, `demo-continuum-e2e`), nunca
+  `timeline-es`, el proyecto real.
 
 ## Documentación
 
