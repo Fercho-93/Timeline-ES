@@ -21,7 +21,7 @@ La portada tiene tres puertas y un atajo:
 - **Unirme a una partida.** Atajo para quien recibe un QR, un enlace o un código.
 - **Reto diario.** Uno para todo el mundo: cada día se sortea un mazo con la fecha como
   semilla y de él salen las mismas 10 cartas en todos los móviles. Un día toca Grandes
-  colecciones y otro Retos rápidos. El mazo es sorpresa: en Grandes colecciones la portada
+  colecciones y al siguiente Retos rápidos, siempre alternando. El mazo es sorpresa: en Grandes colecciones la portada
   enseña solo la hoja de calendario del día y, al tocarla, una presentación de unos tres
   segundos pasa los nombres de los mazos hasta pararse en el de hoy. Un reto ya empezado se
   retoma sin presentación. Enseña la racha y, una vez jugado, el mazo que era y el resultado

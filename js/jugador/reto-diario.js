@@ -22,6 +22,18 @@
 
   const vacio = () => ({ best: 0, streak: 0, lastDay: "", days: {} });
 
+  // Días desde el 1 de enero de 1970 para una clave AAAA-MM-DD: cuenta seguido de un mes al
+  // siguiente, así que su paridad alterna de verdad cada día.
+  function numero(dia) {
+    const [a, m, d] = dia.split("-").map(Number);
+    return Math.floor(Date.UTC(a, m - 1, d) / 86400000);
+  }
+  // Qué familia toca cada día: un día Grandes colecciones y al siguiente Retos rápidos. Antes
+  // salía de la paridad de AAAAMMDD, que del 31 al 1 repetía Retos rápidos dos días seguidos;
+  // las dos reglas coinciden el día del cambio (26 de octubre de 2026), así que nadie ve
+  // cambiar el reto que ya tenía.
+  const familia = (dia = clave()) => numero(dia) % 2 === 0 ? "collections" : "quick";
+
   // Apunta el resultado de `dia` en `registro` (lo modifica y lo devuelve). Si ese día ya estaba
   // jugado no toca nada y devuelve null: el primer resultado del día es el que vale.
   // `resultado.hits` es lo que se anota como mejor marca; el resto se guarda tal cual en el día.
@@ -37,5 +49,5 @@
     return registro;
   }
 
-  CT.RetoDiario = { clave, anterior, vacio, registrar, DIAS_GUARDADOS };
+  CT.RetoDiario = { clave, anterior, vacio, registrar, numero, familia, DIAS_GUARDADOS };
 })();

@@ -1082,7 +1082,7 @@
     const hoy = window.CONTINUUM.dailyInfo?.();
     const dailyToday = hoy ? guideCard('◆','Hoy: '+escapeHtml(hoy.family),escapeHtml(hoy.title),escapeHtml(hoy.rules)+(hoy.done?' Hoy ya lo has jugado.':'')) : '';
     const daily = '<p>Encontrarás «Reto del día» en Inicio. Es independiente de las partidas que elijas en «Jugar solo».</p><div class="guide-cards">'+
-      guideCard('☼','Reto del día','Un único intento al día','Cada día juegas las mismas 10 cartas que el resto de jugadores. Los días pares del mes toca un mazo de Grandes colecciones, en Fácil; los impares, uno de Retos rápidos. No hay vidas ni límite de tiempo: aunque falles, sigues hasta el final. Tu resultado (por ejemplo, 7 de 10) cuenta para el ranking diario y semanal. Las demás partidas no suman puntos en ese ranking.')+
+      guideCard('☼','Reto del día','Un único intento al día','Cada día juegas las mismas 10 cartas que el resto de jugadores. Un día toca un mazo de Grandes colecciones, en Fácil, y al siguiente uno de Retos rápidos, siempre alternando. No hay vidas ni límite de tiempo: aunque falles, sigues hasta el final. Tu resultado (por ejemplo, 7 de 10) cuenta para el ranking diario y semanal. Las demás partidas no suman puntos en ese ranking.')+
       dailyToday+'</div>';
     const formats = '<p>En Inicio, abre «Jugar» y elige si quieres jugar solo, con amigos u online. En <b>Grandes colecciones</b> encontrarás mazos sobre historia, animales, países y otros temas. Los <b>Retos rápidos</b> son mazos más cortos, cada uno con su propia regla de orden. La verás antes de empezar.</p>'+
       '<h4>Jugar solo</h4><div class="guide-cards">'+

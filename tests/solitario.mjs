@@ -1,10 +1,10 @@
 import { ok, fail } from "./lib/comun.mjs";
 import { arrancarJuego } from "./lib/dom.mjs";
 // Modo solitario, reto diario y confirmación antes de colocar, sobre el DOM real.
-// El reto diario alterna cada día entre Grandes colecciones (días pares) y Retos rápidos
-// (impares). Esta prueba recorre el de colecciones: en un día impar se adelanta el reloj
+// El reto diario alterna cada día entre Grandes colecciones (días pares contados desde 1970) y
+// Retos rápidos (impares). Esta prueba recorre el de colecciones: en un día impar se adelanta el reloj
 // un día, en la prueba y en la ventana, para que el resultado no dependa de la fecha.
-const DESFASE = Number(new Date().toLocaleDateString("sv-SE").replaceAll("-", "")) % 2 ? 86400000 : 0;
+const DESFASE = Math.floor(Date.UTC(...new Date().toLocaleDateString("sv-SE").split("-").map((n, i) => Number(n) - (i === 1 ? 1 : 0))) / 86400000) % 2 ? 86400000 : 0;
 const relojDesfasado = Base => class extends Base { constructor(...a) { super(...(a.length ? a : [Base.now() + DESFASE])); } static now() { return Base.now() + DESFASE; } };
 if (DESFASE) globalThis.Date = relojDesfasado(globalThis.Date);
 

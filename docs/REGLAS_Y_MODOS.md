@@ -154,7 +154,7 @@ gestión de sala.
 Cuatro formatos, todos sin conexión y con la marca guardada en el propio móvil:
 
 - **Reto diario:** se entra desde la portada, no desde un mazo. Cada día sale un mazo —un día de
-  Grandes colecciones y otro de Retos rápidos, sorteado con la fecha— y de él las mismas 10 cartas
+  Grandes colecciones y al siguiente de Retos rápidos, alternando sin falta (`CT.RetoDiario.familia`)— y de él las mismas 10 cartas
   para todo el mundo, con un solo intento por perfil. Las cartas se barajan con la fecha local como
   semilla, así que no hace falta ningún servidor para que dos móviles reciban exactamente el mismo
   reto. Tiene su propio guardado, así que empezarlo no pisa una partida libre a medias del mismo

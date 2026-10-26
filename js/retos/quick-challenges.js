@@ -145,7 +145,7 @@
   // van rotando por el catálogo entero. El catálogo se baraja una vez con una semilla fija y cada día
   // toma el tramo siguiente, así que en una semana larga han salido todos y ninguno se repite antes.
   const QUICK_DAY_DECKS=4;
-  function dayNumber(dayValue) {const [y,m,d]=dayValue.split('-').map(Number);return Math.floor(Date.UTC(y,m-1,d)/86400000);}
+  const dayNumber=dayValue=>CT.RetoDiario.numero(dayValue);
   function todayDecks(dayValue=day()) {
     const order=CT.shuffleWith(CT.QuickCatalog.challenges,CT.seededRandom(CT.seedFrom('quick-rotation-v1')));
     const count=Math.min(QUICK_DAY_DECKS,order.length), start=(dayNumber(dayValue)*count)%order.length;

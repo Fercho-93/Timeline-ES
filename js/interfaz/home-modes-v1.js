@@ -34,8 +34,7 @@
   }
 
   function dailyFamily() {
-    const n=Number(window.CONTINUUM.RetoDiario.clave().replaceAll('-',''));
-    return n%2===0?'Grandes colecciones':'Retos rápidos';
+    return window.CONTINUUM.RetoDiario.familia()==='collections'?'Grandes colecciones':'Retos rápidos';
   }
 
   function restructureHome() {

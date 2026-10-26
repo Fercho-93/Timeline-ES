@@ -51,4 +51,13 @@ r = R.vacio();
 R.registrar(r, '2026-10-01', { hits: 3, total: 10, family: 'quick', challenge: 'poker', ms: 1234 });
 assert.deepEqual([r.days['2026-10-01'].family, r.days['2026-10-01'].challenge, r.days['2026-10-01'].ms], ['quick', 'poker', 1234]);
 
-console.log('Reto diario: racha, día repetido, saltos, recorte a 60 días y campos propios de cada modo: OK');
+// Un día Grandes colecciones y al siguiente Retos rápidos, sin falta: la paridad de AAAAMMDD
+// repetía Retos rápidos del 31 al 1. El día del cambio sigue tocando lo mismo que con la regla antigua.
+assert.equal(R.familia('2026-10-26'), 'collections', 'el día del cambio no cambia el reto de nadie');
+assert.equal(R.familia('2026-10-31'), 'quick');
+assert.equal(R.familia('2026-11-01'), 'collections', 'del 31 al 1 se alterna');
+for (let fecha = new Date(2026, 9, 26); fecha < new Date(2028, 0, 1); fecha.setDate(fecha.getDate() + 1)) {
+  const hoy = R.clave(fecha), ayer = R.anterior(hoy);
+  assert.notEqual(R.familia(hoy), R.familia(ayer), `${ayer} y ${hoy} no repiten familia`);
+}
+console.log('Reto diario: racha, día repetido, saltos, recorte a 60 días, campos propios de cada modo y alternancia de familias: OK');

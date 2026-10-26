@@ -2242,8 +2242,7 @@
   }
 
   function dailyFamily(day = today()) {
-    const n = Number(day.replaceAll('-', ''));
-    return n % 2 === 0 ? 'collections' : 'quick';
+    return CT.RetoDiario.familia(day);
   }
 
   // Qué reto toca hoy y con qué reglas, para la guía. Solo lee: no empieza ni guarda nada.
