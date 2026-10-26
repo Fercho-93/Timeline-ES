@@ -290,7 +290,7 @@
         <span class="collection-foil" aria-hidden="true"></span>
         <span class="collection-index" aria-hidden="true">Varios temas</span>
         <span class="collection-open" aria-hidden="true">→</span>
-        <span class="panel-label" aria-hidden="true"><i></i><strong>Competición</strong><small>Temas al azar; gana quien más puntos sume.</small></span>
+        <span class="panel-label" aria-hidden="true"><i></i><strong>Competición</strong><small>${audience === "solo" ? "Temas al azar; cuentan todos tus aciertos." : "Temas al azar; gana quien más puntos sume."}</small></span>
       </button></div>`;
   function gallery(competitionAudience = "") {
     return `<div class="gallery" role="group" aria-label="Elige una colección">${Object.values(CT.BLOCKS).map((item, index) => {
@@ -406,8 +406,8 @@
           <div class="field"><label for="competition-cards">Cartas por persona en cada tema</label><select id="competition-cards">${[1, 2, 3, 4, 5, 6].map(n => `<option${n === competitionConfig.cards ? " selected" : ""}>${n}</option>`).join("")}</select></div>
           <div class="solo-panel-head"><h3>Cómo jugáis</h3></div>
           ${grupo("comp-pace", "comp-pace-label", "Ritmo", [["directo", "En directo", "Todos a la vez, en una sala", "directo"], ["turnos", "Por turnos", "Cada uno cuando pueda", "turnos"]], ritmo)}
-          ${grupo("live-net", "comp-net-label", "Conexión", [["internet", "Por internet", "Cada uno donde esté", "internet"], ["wifi", "Sin internet", "Cerca, en la misma Wi‑Fi", "wifi"]], red, ` data-comp-net-field${ritmo === "turnos" ? " hidden" : ""}`)}
-          ${sinRed ? '<p class="hint" data-offline-note>No hay internet: jugaréis por la Wi‑Fi.</p>' : ""}
+          ${grupo("live-net", "comp-net-label", "Conexión", [["internet", "Por internet", "Cada uno donde esté", "internet"], ["wifi", "Sin internet", "Cerca, en la misma Wi-Fi", "wifi"]], red, ` data-comp-net-field${ritmo === "turnos" ? " hidden" : ""}`)}
+          ${sinRed ? '<p class="hint" data-offline-note>No hay internet: jugaréis por la Wi-Fi.</p>' : ""}
           <div data-comp-net-field${ritmo === "turnos" ? " hidden" : ""}>${CT.ManoInicial.maximoField()}</div>
           ${CT.Tiempo.field("amigos", { porDefecto: 15 })}
           <div class="field duel-identity-field">
@@ -478,7 +478,7 @@
       game=saved;selectedModeKey=game.mode;selectedBlockKey=CT.blockOf(game.mode).key;
       cardsById=new Map(game.savedDeck.map(c=>[c.id,c]));selectedCardId=null;pendingIndex=null;result=null;
       if(game.winners) renderWinner(game.players.filter(p=>game.winners.includes(p.id))); else if(game.tournamentIntro !== false) renderTournamentIntro(); else renderPass();
-    } catch { showToast('No se pudo recuperar la competición guardada.'); }
+    } catch { showToast('No se pudo recuperar la competición guardada'); }
   }
   function renderTournamentIntro() {
     screen = "tournament-intro";
@@ -488,7 +488,7 @@
       ${CT.Tournament.journey(game.tournament)}
       <div class="chapter-number">Tema ${game.tournament.index + 1} de ${game.tournament.queue.length}</div>
       <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Competición · tema ${game.tournament.index + 1}</span>${escapeHtml(mode.name)}</h2>
-      <button class="btn btn-block comp-splash-start" data-action="competition-round-start">Empezar el tema</button>
+      <button class="btn btn-block comp-splash-start" data-action="competition-round-start">Empezar</button>
     </div></section></div>`);
   }
 
@@ -615,7 +615,7 @@
       await guardaNombre(nombre);
       CT.Identidad.guarda({ nombre });
     } catch (error) {
-      bienvenida(error.message || "No se ha podido guardar el nombre.");
+      bienvenida(error.message || "No se pudo guardar el nombre.");
       document.getElementById("bienvenida-nombre")?.focus();
       return;
     }
@@ -841,7 +841,7 @@
       capa.innerHTML = `<div class="modal">
         <h2>Algo no ha ido bien</h2>
         <p>Vuelve al inicio y sigue jugando; tu progreso guardado no se pierde. Si quieres ayudarnos a arreglarlo, envía el informe por correo.</p>
-        <button type="button" class="btn btn-primary btn-block" data-crash-action="inicio">Volver al inicio</button>
+        <button type="button" class="btn btn-primary btn-block" data-crash-action="inicio">Ir al inicio</button>
         <button type="button" class="btn btn-secondary btn-block" style="margin-top:10px" data-crash-action="enviar">Enviar informe por correo</button>
         <details style="margin-top:10px"><summary>Ver el informe</summary>
           <div class="field"><textarea id="crash-detalle" rows="6" readonly>${escapeHtml(detalle)}</textarea></div>
@@ -1090,7 +1090,7 @@
     // El tope sale de este mazo, ya sin valores repetidos ni cartas del minijuego, como en
     // las salas: contar el mazo entero dejaba la línea sin carta inicial en los mazos pequeños.
     const handSize = Math.min(requestedHand, Math.floor((shuffled.length - 1) / names.length));
-    if (handSize < requestedHand) showToast(`Mazo pequeño: ${handSize} cartas por persona para reservar el tablero.`);
+    if (handSize < requestedHand) showToast(`Mazo pequeño: ${handSize} cartas por persona para reservar el tablero`);
     // `pulseUsed` y `shieldRound` solo los mira el Pulso; una partida guardada de antes
     // no los lleva, y sin ellos `undefined` se comporta como «no usado» y «sin escudo»,
     // que es justo lo que hace falta para que siga abriéndose sin migrarla.
@@ -1174,7 +1174,7 @@
       <h1 class="solo-lectores" data-focus tabindex="-1">${defending ? `Defiendes el Pulso de ${escapeHtml(currentPlayer().name)}, ${escapeHtml(player.name)}` : `Turno de ${escapeHtml(player.name)}, vuelta ${game.round}`}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${defending ? "⚡ Defensa del Pulso" : `${game.tournament ? `Competición · tema ${game.tournament.index + 1} de ${game.tournament.queue.length}` : `Vuelta ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}`}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
       <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores${game.players.length > 2 ? " · desliza →" : ""}</div><div class="scoreboard"${game.players.length > 2 ? ' aria-label="Jugadores; desliza para ver los demás"' : ""}>${game.players.map((p, i) => `<span class="score ${i === game.current ? "active" : ""}"${i === game.current ? ' aria-current="true"' : ""}><i class="score-avatar">${jugadorAvatar(p, 40)}</i><span class="score-copy"><b>${escapeHtml(p.name)}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(p.hand.length, game.players)}%"></i></span></span><em><strong>${p.hand.length}</strong><small>cartas</small></em></span>`).join("")}</div></section>
-      ${pulseCard ? `<div class="pulse-banner">⚡ Duelo · <b>${escapeHtml(currentPlayer().name)}</b> reta a <b>${escapeHtml(pulseTarget.name)}</b>${defending ? " · te toca defender" : ""}</div>` : ""}
+      ${pulseCard ? `<div class="pulse-banner">⚡ Pulso · <b>${escapeHtml(currentPlayer().name)}</b> reta a <b>${escapeHtml(pulseTarget.name)}</b>${defending ? " · te toca defender" : ""}</div>` : ""}
       ${localTimed() ? CT.Tiempo.bar(game.turnSeconds * 1000 - (Date.now() - localTurnStart()), game.turnSeconds * 1000) : ""}
       ${CT.Ghost.banner(game.ghost, game.players)}
       ${manoHtml}
@@ -1502,7 +1502,7 @@
     if (result.duel) {
       const marcador = jugada => `<div class="pulse-duel-row ${jugada.ok ? "pulse-duel-hit" : "pulse-duel-miss"}"><span class="pulse-duel-mark" aria-hidden="true">${jugada.ok ? "✓" : "×"}</span><span><b>${escapeHtml(jugada.name)}</b><small>${jugada.ok ? "Acierta" : "Falla"}: la puso ${jugada.donde}</small></span></div>`;
       overlay(`<div class="overlay" data-result-card="${correct || result.targetOk ? card.id : ''}"><div class="modal pulse-duel-modal">
-        <div class="eyebrow" aria-hidden="true">⚡ Duelo · ${escapeHtml(result.byName)} contra ${escapeHtml(result.targetName)}</div>
+        <div class="eyebrow" aria-hidden="true">⚡ Pulso · ${escapeHtml(result.byName)} contra ${escapeHtml(result.targetName)}</div>
         <h2>${escapeHtml(card.title)}</h2>
         <div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>
         <div class="pulse-duel-rows">
@@ -1835,7 +1835,7 @@
     return `<div class="panel">
       <div class="solo-stats perfil-stats">
         ${statBox(resumen.games, resumen.games === 1 ? "partida" : "partidas")}
-        ${statBox(resumen.cards, "cartas colocadas")}
+        ${statBox(resumen.cards, resumen.cards === 1 ? "carta colocada" : "cartas colocadas")}
         ${statBox(`${resumen.accuracy}%`, "de aciertos")}
         ${statBox(resumen.bestRun, "racha máxima de aciertos")}
         ${statBox(resumen.bestStreak, "días seguidos de reto")}
@@ -1849,7 +1849,7 @@
     return `<div class="section-label">Por juego <small>${filas.length} ${filas.length === 1 ? "mazo" : "mazos"}</small></div>
       <div class="games">${filas.map(fila => `<div class="game-row">
         <span class="game-name">${escapeHtml(fila.name)}</span>
-        <span class="game-meta">${fila.cards} ${fila.cards === 1 ? "carta" : "cartas"} · ${fila.accuracy}% de aciertos · ${fila.games} ${fila.games === 1 ? "partida" : "partidas"}</span>
+        <span class="game-meta">${fila.cards} ${fila.cards === 1 ? "carta" : "cartas"} · ${fila.accuracy} % de aciertos · ${fila.games} ${fila.games === 1 ? "partida" : "partidas"}</span>
       </div>`).join("")}</div>`;
   }
 
@@ -1859,7 +1859,7 @@
     if (!bandas.length && !cartas.length) return "";
     const filasBandas = bandas.map(banda => `<button type="button" class="weak-row" data-action="enc-band-view" data-mode="${escapeHtml(banda.mode)}" data-band="${escapeHtml(banda.band)}">
       <span class="weak-mark" aria-hidden="true">${escapeHtml(banda.symbol)}</span>
-      <span><b>${escapeHtml(banda.name)}</b><small>${escapeHtml(banda.modeName)} · ${banda.accuracy}% en ${banda.played} ${banda.played === 1 ? "carta" : "cartas"}</small></span>
+      <span><b>${escapeHtml(banda.name)}</b><small>${escapeHtml(banda.modeName)} · ${banda.accuracy} % en ${banda.played} ${banda.played === 1 ? "carta" : "cartas"}</small></span>
       <i aria-hidden="true">→</i>
     </button>`).join("");
     const filasCartas = cartas.map(carta => `<button type="button" class="weak-row" data-action="enc-view" data-mode="${escapeHtml(carta.mode)}" data-id="${carta.id}">
@@ -1944,7 +1944,7 @@
       perfilView();
       showToast("Nombre guardado");
     } catch (error) {
-      editaNombre(error.message || "No se ha podido guardar el nombre.", nombre);
+      editaNombre(error.message || "No se pudo guardar el nombre.", nombre);
     }
   }
 
@@ -1996,7 +1996,7 @@
   function perfilCopia() {
     return `<div class="section-label">Copia de seguridad</div>
       <div class="panel">
-        <p class="hint">El perfil se guarda solo en este móvil. Cópialo antes de cambiar de teléfono o de borrar los datos del navegador.</p>
+        <p class="hint">El perfil se guarda solo en este móvil. Cópialo antes de cambiar de móvil o de borrar los datos del navegador.</p>
         <div class="actions" style="margin-top:12px;justify-content:center">
           <button class="btn btn-secondary" data-action="perfil-export">Copiar mi perfil</button>
           <button class="btn btn-ghost" data-action="perfil-reset">Empezar de cero</button>
@@ -2041,7 +2041,7 @@
           <div class="atlas-territory" id="atlas-duels"><div class="atlas-territory-caption"><span>03 / TRAVESÍAS COMPARTIDAS</span><h2>Tu marcador de duelos</h2></div><section class="panel atlas-duels"><div><h3>Cara a cara</h3><p>Cuántas veces has ganado tú y cuántas cada amigo en los duelos por turnos.</p></div><div id="atlas-standings" aria-live="polite">${CT.Accounts?.ready ? '<p class="hint">Cargando tus duelos…</p>' : '<p class="hint">Necesitas conexión para ver tus duelos.</p>'}</div><button class="btn btn-secondary" data-action="duels-list">Ver Tus duelos <span aria-hidden="true">→</span></button></section></div>
           <div class="atlas-territory" id="atlas-journey"><div class="atlas-territory-caption"><span>04 / CUADERNO DE BITÁCORA</span><h2>Tu recorrido</h2></div>
             ${estrenado
-              ? `<p class="lead">${resumen.hits} ${resumen.hits === 1 ? "acierto" : "aciertos"} de ${resumen.cards} ${resumen.cards === 1 ? "carta" : "cartas"} colocadas.</p>`
+              ? `<p class="lead">${resumen.hits} ${resumen.hits === 1 ? "acierto" : "aciertos"} de ${resumen.cards} ${resumen.cards === 1 ? "carta colocada" : "cartas colocadas"}.</p>`
               : `<p class="lead">Todavía no hay nada que contar. Tu primera partida será el comienzo de tu recorrido.</p>`}
             ${perfilResumen(resumen)}
             ${CT.Quick?.stats ? '<button class="btn btn-secondary" data-action="quick-history">Historial de Retos rápidos <span aria-hidden="true">→</span></button>' : ""}
@@ -2655,7 +2655,7 @@
         <div class="field duel-kind-field">
           <span class="field-label" id="live-net-label">Conexión</span>
           <div class="segmented" role="radiogroup" aria-labelledby="live-net-label">
-            ${[["internet", "Por internet", "Cada uno donde esté"], ["wifi", "Sin internet", "Cerca, en la misma Wi‑Fi"]]
+            ${[["internet", "Por internet", "Cada uno donde esté"], ["wifi", "Sin internet", "Cerca, en la misma Wi-Fi"]]
               .map(([clave, titulo, pie]) => `<label class="segmented-option${clave === red ? " is-on" : ""}">
                 <input type="radio" name="live-net" value="${clave}"${clave === red ? " checked" : ""}>
                 <i class="duel-option-mark" aria-hidden="true">${glyph(GLYPHS[clave])}</i>
@@ -2663,7 +2663,7 @@
               </label>`).join("")}
           </div>
         </div>
-        ${sinRed ? '<p class="hint" data-offline-note style="margin-top:10px">No hay internet: jugaréis por la Wi‑Fi.</p>' : ""}
+        ${sinRed ? '<p class="hint" data-offline-note style="margin-top:10px">No hay internet: jugaréis por la Wi-Fi.</p>' : ""}
         ${CT.ManoInicial.maximoField()}
         ${CT.ManoInicial.field()}
         ${CT.ManoInicial.poderesField()}`)}
@@ -2673,20 +2673,20 @@
         <div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares.markup(duelName(), { size: 38, seed: CT.Avatares.ownSeed() })}</span><input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}"></div>
         <small class="field-help">Se usará automáticamente en el duelo. Puedes cambiarlo en Atlas.</small>
       </div>
-      ${bloque("directo", `<div class="duel-brief"><p>Una sala de hasta el máximo de jugadores que elijas: cada uno coloca desde su móvil y todos veis la línea avanzar a la vez. Quién empieza se decide en la sala de espera con un minijuego: cada uno adivina la cifra de una carta. Al crearla compartes el código, el enlace o el QR.</p></div>
+      ${bloque("directo", `<div class="duel-brief"><p>Una sala de hasta el máximo de jugadores que elijas: cada uno coloca desde su móvil y todos ven la línea avanzar a la vez. Quién empieza se decide en la sala de espera con un minijuego: cada uno adivina la cifra de una carta. Al crearla compartes el código, el enlace o el QR.</p></div>
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-live-room">Crear sala <span>→</span></button>`)}
       ${bloque("seguidos-orden", `<div class="duel-brief"><p>${CT.Duelo.CARTAS} cartas al azar de este mazo, y las colocas en la línea. Gana quien más acierte.</p>
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Con tiempo, el reloj no se para: si sales de la aplicación, la carta se da por fallada.</span></p></div>
         ${enOrden ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-solo">Continuar ${contra(solo) ? `el duelo contra ${escapeHtml(contra(solo))}` : "tu duelo"} <span>→</span></button>` : ""}
         <button class="btn ${enOrden ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-duel">${enOrden ? "Empezar otro duelo" : "Jugar y retar"} <span>→</span></button>`)}
-      ${regla ? bloque("seguidos-cifras", `<div class="duel-brief"><p>${Cifras.CARTAS} cartas de este mazo, y en cada una escribes el número. ${escapeHtml(regla.pregunta)} Si te acercas lo suficiente, es un acierto. Gana quien tenga más aciertos; si empatáis, quien haya respondido más rápido.</p>
+      ${regla ? bloque("seguidos-cifras", `<div class="duel-brief"><p>${Cifras.CARTAS} cartas de este mazo, y en cada una escribes el número. ${escapeHtml(regla.pregunta)} Si te acercas lo suficiente, es un acierto. Gana quien tenga más aciertos; si hay empate, quien haya respondido más rápido.</p>
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Con tiempo, el reloj no se para: si sales de la aplicación, la carta se cierra.</span></p></div>
         ${enCifras ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-cifras">Continuar ${contra(enCifras) ? `el duelo contra ${escapeHtml(contra(enCifras))}` : "tu duelo de cifras"} <span>→</span></button>` : ""}
         <button class="btn ${enCifras ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-cifras">${enCifras ? "Empezar otro duelo" : "Jugar y retar"} <span>→</span></button>`) : ""}
-      ${bloque("turnos-orden", `<div class="duel-brief"><p>Colocad una carta cada vez, desde vuestro propio móvil. Juegas tú primero y después le mandas el enlace a tu rival; en la revancha empieza él.</p>
+      ${bloque("turnos-orden", `<div class="duel-brief"><p>Una carta cada vez, cada uno desde su móvil. Juegas tú primero y después le mandas el enlace a tu rival; en la revancha empieza él.</p>
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Respondes cuando te toque. Con tiempo, el reloj empieza al abrir tu carta.</span></p></div>
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`)}
-      ${regla ? bloque("turnos-cifras", `<div class="duel-brief"><p>Responded una cifra cada vez, desde vuestro propio móvil. Juegas tú primero y después le mandas el enlace a tu rival; en la revancha empieza él.</p>
+      ${regla ? bloque("turnos-cifras", `<div class="duel-brief"><p>Una cifra cada vez, cada uno desde su móvil. Juegas tú primero y después le mandas el enlace a tu rival; en la revancha empieza él.</p>
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Respondes cuando te toque. Con tiempo, el reloj empieza al abrir tu carta.</span></p></div>
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`) : ""}
     </div>`;
@@ -2705,9 +2705,9 @@
     const sinRed = navigator.onLine === false;
     paint(`<div class="shell">${header("back-menu")}
       <section class="setup-section solo-home friends-join"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Cada uno en su móvil</div><h2 class="solo-title" data-focus tabindex="-1">Unirme a una partida</h2>
-        <p class="lead">Escanea el código QR que te enseñan, o pega el enlace o el código que te han pasado. Vale para todo: salas, duelos y Retos rápidos, por internet o por Wi‑Fi.</p></div>
+        <p class="lead">Escanea el código QR que te enseñan, o pega el enlace o el código que te han pasado. Vale para todo: salas, duelos y Retos rápidos, por internet o por Wi-Fi.</p></div>
         <form class="panel solo-panel" data-friends-join-form novalidate>
-          ${sinRed ? '<p class="hint" data-offline-note>No hay internet: puedes unirte a una sala por Wi‑Fi escaneando el código de quien la ha creado.</p>' : ""}
+          ${sinRed ? '<p class="hint" data-offline-note>No hay internet: puedes unirte a una sala por Wi-Fi escaneando el código de quien la ha creado.</p>' : ""}
           <div class="field"><label for="friends-join-code">Código o enlace</label><input id="friends-join-code" name="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD2345 o el enlace"></div>
           ${camara ? '<button type="button" class="btn btn-secondary btn-block" data-action="friends-join-scan">Escanear código QR</button>' : ""}
           <button type="submit" class="btn btn-primary btn-block">Unirme <span>→</span></button>
@@ -2718,7 +2718,7 @@
           </div>
         </form>
         ${cercanas ? `<div class="panel solo-panel"><div class="solo-panel-head"><h3>Salas cercanas</h3></div>
-          <p>Entre iPhones, sin escanear nada: basta con tener Bluetooth y Wi‑Fi activados.</p>
+          <p>Entre iPhones, sin escanear nada: basta con tener Bluetooth y Wi-Fi activados.</p>
           <button type="button" class="btn btn-secondary btn-block" data-action="friends-join-nearby">Buscar salas cercanas</button>
         </div>` : ""}
       </section>
@@ -2735,9 +2735,9 @@
     if (!texto) return;
     const nativa = !!window.Capacitor?.isNativePlatform?.();
     const iphone = /iPhone|iPad|iPod/.test(navigator.userAgent || "");
-    const donde = nativa ? "en los ajustes del teléfono, en Continuum › Cámara"
-      : iphone ? "en Ajustes › Safari › Cámara, o en «aA» › Ajustes del sitio web"
-      : "tocando el candado de la barra de direcciones › Permisos › Cámara";
+    const donde = nativa ? "en los ajustes del móvil, en Continuum → Cámara"
+      : iphone ? "en Ajustes → Safari → Cámara, o en «aA» → Ajustes del sitio web"
+      : "tocando el candado de la barra de direcciones → Permisos → Cámara";
     const mensajes = {
       granted: "Cámara activada: ya puedes escanear.",
       denied: `La cámara está bloqueada para el juego. Actívala ${donde} y vuelve a intentarlo.`,
@@ -2779,7 +2779,7 @@
     if (target) { openInvitation(target); return; }
     const aviso = !raw ? "Escribe o pega el código que te han pasado."
       : wifiSignalRole(raw) === "answer" ? "Ese código es la respuesta de otro móvil: lo escanea quien ha creado la sala."
-      : "No reconozco ese código. Comprueba que esté completo.";
+      : "Ese código no es válido. Comprueba que esté completo.";
     const box = document.getElementById("friends-join-error");
     if (box) box.textContent = aviso;
   }
@@ -3163,7 +3163,7 @@
       return {
         icono: "🎯", eyebrow: "Duelo listo",
         titular: `Has colocado bien <strong>${mio.hits}</strong> de ${total} cartas.`,
-        cuerpo: `<p class="lead" style="margin-inline:auto">Manda el enlace a quien quieras: recibirá estas mismas ${total} cartas, en el mismo orden, y al terminar verá vuestro cara a cara.</p>`,
+        cuerpo: `<p class="lead" style="margin-inline:auto">Manda el enlace a quien quieras: recibirá estas mismas ${total} cartas, en el mismo orden, y al terminar verá el cara a cara.</p>`,
         acciones: `<button class="btn btn-primary" data-action="share-duel">Mandar el reto <span>→</span></button>`
       };
     }
@@ -3566,7 +3566,7 @@
         <ul class="duelo-reglas">${reglas.map(linea => `<li>${linea}</li>`).join("")}</ul>
         <p class="solo-intro-rule">${!plazo ? "Sin tiempo: respondes con calma." : enTurnos ? `${plazo} segundos por carta desde que abres tu turno.` : `${plazo} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se ${cifrasEsta ? "cierra" : "da por fallada"}.`}</p>
         ${rival ? `<div class="solo-stats" style="grid-template-columns:1fr"><span><b>${cifrasEsta ? `${rival.aciertos} de ${duel.total}` : `${rival.hits} de ${duel.total}`}</b><small>la marca de ${escapeHtml(rival.nombre || "quien te reta")}</small></span></div>` : ""}
-        <button class="btn btn-primary btn-block duelo-jugar" data-action="duel-play">JUGAR <span>→</span></button>
+        <button class="btn btn-primary btn-block duelo-jugar" data-action="duel-play">Jugar <span>→</span></button>
       </div></section>
     </div>`);
   }
@@ -3869,8 +3869,10 @@
   // menú del solitario y leer las reglas de una partida entre varios no ayuda a nadie.
   function rules() {
     const returnTo = screen;
-    const enSolitario = ["solo-home", "duel-home", "solo", "solo-end", "cifras", "cifras-end", "duelo-intro"].includes(screen);
-    const context = comp ? "competition" : solo || enSolitario ? "solo" : "local";
+    const enSolitario = ["solo-home", "duel-home", "solo", "solo-end", "cifras", "cifras-end", "duelo-intro", "duelo-listo", "daily-intro", "comp-intro", "comp-end"].includes(screen);
+    const enGrupo = ["setup", "pass", "pulse-pass", "game", "winner", "final-local", "tournament-intro", "timeline-review"].includes(screen);
+    const entreMoviles = ["duelos", "friends-join", "competition-friends"].includes(screen);
+    const context = enSolitario ? (comp ? "competition" : "solo") : enGrupo ? "local" : entreMoviles ? "online" : "general";
     const modeKey = screen === 'solo' ? solo.mode : CT.UI.isPlaying(screen) ? (game?.mode || selectedModeKey) : selectedModeKey;
     overlay(`<div class="overlay" data-overlay="rules"><div class="modal rules"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-action="close-rules" aria-label="Cerrar guía">×</button></div><div class="guide-content">${CT.guideMarkup(modeKey, context, { pulse: !!game?.pulse, ghost: game ? !!game.ghost : true })}</div><button class="btn btn-primary btn-block" data-action="close-rules" data-return="${returnTo}">Entendido</button></div></div>`, true);
   }
@@ -4056,7 +4058,7 @@
       const detail = table?.code && (error?.code === "permission-denied" || /TABLE_(FULL|GONE)/.test(error?.message || ""))
         ? "Esa mesa ya está completa o ha empezado. Elige otra en la lista o crea la tuya."
         : error?.code === "permission-denied"
-        ? "No se ha podido crear la mesa pública. Inténtalo de nuevo en unos segundos."
+        ? "No se pudo crear la mesa pública. Inténtalo de nuevo en unos segundos."
         : error?.message === "AUTH_NOT_READY"
           ? "Tu perfil todavía no está preparado."
         : error?.message === "MATCH_TIMEOUT"
@@ -4075,7 +4077,7 @@
     } catch (error) {
       console.error(error);
       screen = "online-error";
-      paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">☁</div><h2 data-focus tabindex="-1">No se pudo conectar</h2><p class="lead" style="margin-inline:auto">Comprueba la conexión a internet y vuelve a intentarlo. No se ha borrado ninguna partida guardada.</p><button class="btn btn-primary btn-block" data-action="retry-online">Reintentar conexión</button><button class="btn btn-ghost btn-block" data-action="home">Volver al inicio</button></div></section></div>`);
+      paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">☁</div><h2 data-focus tabindex="-1">No se pudo conectar</h2><p class="lead" style="margin-inline:auto">Comprueba la conexión a internet y vuelve a intentarlo. No se ha borrado ninguna partida guardada.</p><button class="btn btn-primary btn-block" data-action="retry-online">Reintentar conexión</button><button class="btn btn-ghost btn-block" data-action="home">Ir al inicio</button></div></section></div>`);
     }
   }
 
@@ -4223,7 +4225,7 @@
       const modeKey = target.dataset.mode;
       const comprado = CT.Cartera.compraSimulada(target.dataset.paquete);
       CT.closeDialog();
-      if (!comprado) return showToast("No se ha podido simular la compra");
+      if (!comprado) return showToast("No se pudo simular la compra");
       showToast("Compra simulada: ya es tuyo");
       if (CT.has(modeKey)) openMode(modeKey); else home();
     }
@@ -4362,10 +4364,10 @@
       (mode === 'cancel' ? CT.Quick.cancelInvitation(code) : mode === 'decline' ? CT.Quick.declineInvite(code) : CT.Quick.resignDuel(code))
         .then(() => { showToast('Partida actualizada'); duelsRefresh(); }).catch(error => { target.disabled = false; showToast(error.code==='permission-denied' ? 'No se pudo actualizar el duelo: revisa los permisos de la cuenta.' : error.message || 'No se pudo actualizar el duelo. Comprueba tu conexión.'); duelsRefresh(); });
     }
-    else if (action === "reshare-quick-duel") { Promise.resolve(CT.Quick.reshare(target.dataset.quickCode)).catch(() => showToast('No se pudo compartir el enlace.')); }
+    else if (action === "reshare-quick-duel") { Promise.resolve(CT.Quick.reshare(target.dataset.quickCode)).catch(() => showToast('No se pudo compartir el enlace')); }
     else if (action === "open-turn-duel") { const back = screen === "duelos" ? duelsView : perfilView; turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: target.dataset.turnId, back })); }
     else if (action === 'favorite-duel-rival') { CT.TurnDuel.favorite(target.dataset.rivalId); duelsRefresh(); }
-    else if (action === 'rematch-turn-duel') { target.disabled = true; const back = screen === "duelos" ? duelsView : perfilView; turnDuelReady.then(() => CT.TurnDuel.challenge(target.dataset.turnId, back)).catch(() => showToast('No se pudo enviar la invitación.')).finally(() => { target.disabled = false; }); }
+    else if (action === 'rematch-turn-duel') { target.disabled = true; const back = screen === "duelos" ? duelsView : perfilView; turnDuelReady.then(() => CT.TurnDuel.challenge(target.dataset.turnId, back)).catch(() => showToast('No se pudo enviar la invitación')).finally(() => { target.disabled = false; }); }
     else if (action === "close-turn-duel") {
       if (!window.confirm(target.dataset.playing === 'true' ? '¿Rendirte? Tu rival ganará esta partida. Se conservará en el historial.' : '¿Cancelar esta invitación? No contará como derrota.')) return;
       target.disabled = true;
@@ -4373,14 +4375,14 @@
     }
     else if (action === 'archive-turn-duel') {
       target.disabled = true;
-      CT.TurnDuel.archive(target.dataset.turnId, target.dataset.restore === 'true').then(duelsRefresh).catch(() => { target.disabled = false; showToast('No se pudo cambiar el archivo.'); });
+      CT.TurnDuel.archive(target.dataset.turnId, target.dataset.restore === 'true').then(duelsRefresh).catch(() => { target.disabled = false; showToast('No se pudo cambiar el archivo'); });
     }
-    else if (action === 'reshare-turn-duel') { CT.TurnDuel.reshare(target.dataset.turnId).catch(() => showToast('No se pudo compartir el enlace.')); }
+    else if (action === 'reshare-turn-duel') { CT.TurnDuel.reshare(target.dataset.turnId).catch(() => showToast('No se pudo compartir el enlace')); }
     else if (action === 'block-duel-rival' || action === 'unblock-duel-rival') {
       const unblock = action === 'unblock-duel-rival';
       if (!unblock && !window.confirm('¿Bloquear los retos de este rival? No cancela las partidas en curso. Puedes deshacerlo desde «Tus duelos».')) return;
       target.disabled = true;
-      CT.TurnDuel.block(target.dataset.rivalId, target.dataset.rivalName, unblock).then(duelsRefresh).catch(() => { target.disabled = false; showToast('No se pudo cambiar el bloqueo.'); });
+      CT.TurnDuel.block(target.dataset.rivalId, target.dataset.rivalName, unblock).then(duelsRefresh).catch(() => { target.disabled = false; showToast('No se pudo cambiar el bloqueo'); });
     }
     else if (action === "duel-play") duelPlay();
     else if (action === "resume-cifras") resumeCifras();

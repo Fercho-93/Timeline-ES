@@ -83,7 +83,7 @@
   CT.Tiempo = { OPCIONES, get, set, field, chosen, bar, clock, valido, texto };
 
   // Cartas iniciales por persona de las partidas en directo con amigos: se eligen en la pantalla
-  // previa y la sala de espera (online o Wi‑Fi) solo las enseña.
+  // previa y la sala de espera (online o Wi-Fi) solo las enseña.
   const MANO = [1, 2, 3, 4, 5, 6], CLAVE_MANO = "continuum-live-hand-v1";
   function mano() {
     try { const v = Number(CT.Storage.getItem(CLAVE_MANO)); if (MANO.includes(v)) return v; } catch { /* sin almacenamiento */ }

@@ -118,7 +118,7 @@ await click('[data-action="friends-join"]');
 assert.equal(screen(), 'friends-join');
 app().querySelector('#friends-join-code').value = 'esto no es nada';
 app().querySelector('[data-friends-join-form]').dispatchEvent(new w.Event('submit', { bubbles: true, cancelable: true }));
-assert.match(app().querySelector('#friends-join-error').textContent, /No reconozco/);
+assert.match(app().querySelector('#friends-join-error').textContent, /no es válido/);
 assert.ok(!app().querySelector('[data-action="wifi-join"]'), 'el Wi-Fi no tiene botones aparte: se escanea o se pega igual');
 // El permiso de la cámara se puede pedir desde aquí: si se concede, desaparece el botón;
 // si está bloqueado, se explica dónde activarlo.

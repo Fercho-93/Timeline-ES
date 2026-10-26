@@ -154,7 +154,7 @@
 
   function recentMarkup(limit = 6) {
     const latest = recentDiscoveries(limit);
-    return `<section class="enc-recent" aria-labelledby="enc-recent-title"><div class="enc-album-heading"><div><span>Recién incorporadas</span><h2 id="enc-recent-title">Últimos descubrimientos</h2></div><small>${latest.length ? `${latest.length} láminas` : "Tu álbum empieza aquí"}</small></div>${latest.length
+    return `<section class="enc-recent" aria-labelledby="enc-recent-title"><div class="enc-album-heading"><div><span>Recién incorporadas</span><h2 id="enc-recent-title">Últimos descubrimientos</h2></div><small>${latest.length ? `${latest.length} ${latest.length === 1 ? "lámina" : "láminas"}` : "Todavía ninguna"}</small></div>${latest.length
       ? `<div class="enc-recent-strip">${latest.map(({modeKey, card}) => `<article class="enc-recent-card" data-action="enc-card" data-mode="${modeKey}" data-id="${card.id}" tabindex="0" role="button" aria-label="Abrir carta ${CT.escapeHtml(card.title)}"><div class="enc-recent-art">${CT.animalArt(modeKey, card)}</div><div><small>${CT.escapeHtml(CT.mode(modeKey).name)}</small><b>${CT.escapeHtml(card.title)}</b></div></article>`).join("")}</div>`
       : `<div class="enc-recent-empty"><span aria-hidden="true">✦</span><p>Acierta una carta con ilustración para colocar tu primera lámina.</p></div>`}</section>`;
   }

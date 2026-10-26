@@ -29,7 +29,7 @@ console.log("\nPantalla de fallo");
   ok("lleva la pantalla en la que estaba", /Pantalla: home/.test(detalle.value));
   ok("lleva el mazo abierto", /Mazo: history/.test(detalle.value));
   ok("lleva el mensaje del error", detalle.value.includes("algo raro pasó"));
-  ok("es un diálogo de verdad: el foco entra en «Volver al inicio»", w.document.activeElement?.dataset?.crashAction === "inicio");
+  ok("es un diálogo de verdad: el foco entra en «Ir al inicio»", w.document.activeElement?.dataset?.crashAction === "inicio");
   ok("el aviso no asusta: no dice «ha fallado» y el informe va plegado", !/ha fallado/i.test(w.document.querySelector(".modal").textContent.split("Ver el informe")[0]) && !!w.document.querySelector(".modal details"));
 
   // Un segundo error no debe apilar una segunda pantalla encima.
@@ -41,7 +41,7 @@ console.log("\nPantalla de fallo");
   // navegación de verdad; lo que sí puede comprobar esta prueba es que el botón está
   // conectado y no rompe nada al pulsarlo.
   click(w, '[data-crash-action="inicio"]');
-  ok("«Volver al inicio» no rompe nada al pulsarlo", true);
+  ok("«Ir al inicio» no rompe nada al pulsarlo", true);
 }
 
 console.log("\nUn ruido conocido del navegador no cuenta como fallo");

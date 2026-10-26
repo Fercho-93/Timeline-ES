@@ -338,7 +338,7 @@ assert.doesNotMatch(read('js/online/online.js'),/signInAnonymously/);
  // Sin red: se puede reintentar.
  fallo=Object.assign(Error('sin red'),{code:'unavailable'});
  abre();w.document.getElementById('report-send').click();await new Promise(r=>setTimeout(r,0));
- assert.match(w.document.getElementById('report-message').textContent,/No se ha podido enviar/);
+ assert.match(w.document.getElementById('report-message').textContent,/No se pudo enviar/);
  assert.equal(w.document.getElementById('report-send').disabled,false,'tras un fallo de red se puede volver a intentar');
  w.CONTINUUM.closeDialog?.();
  // Uno mismo no se denuncia.

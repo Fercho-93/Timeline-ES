@@ -183,7 +183,7 @@ function personDialog({ uid, alias, context }) {
       document.getElementById('person-report').hidden = true; button.hidden = true; document.getElementById('person-cancel').textContent = 'Cerrar';
       if (context === 'ranking') refreshRanking();
     } catch {
-      message.textContent = 'No se ha podido guardar. Comprueba tu conexión e inténtalo de nuevo.'; button.disabled = false;
+      message.textContent = 'No se pudo guardar. Comprueba tu conexión e inténtalo de nuevo.'; button.disabled = false;
     }
   };
 }
@@ -232,7 +232,7 @@ function reportDialog({ uid, alias, context }) {
     } catch (error) {
       // Las reglas solo dejan una denuncia por pareja: «sin permiso» aquí es «ya la enviaste».
       if (error?.code === 'permission-denied') { message.textContent = 'Ya habías denunciado a esta persona. Gracias.'; send.hidden = true; document.getElementById('report-cancel').textContent = 'Cerrar'; offerBlock(); }
-      else { message.textContent = 'No se ha podido enviar la denuncia. Comprueba tu conexión e inténtalo de nuevo.'; send.disabled = false; }
+      else { message.textContent = 'No se pudo enviar la denuncia. Comprueba tu conexión e inténtalo de nuevo.'; send.disabled = false; }
     }
   };
 }
@@ -360,7 +360,7 @@ const saveLabel=()=>CT.Storage.saveLabel?.()||'Descargar copia';
 function downloadProgress() {
   CT.Storage.saveFile('continuum-progreso.json',JSON.stringify({season,uid:identity?.uid,...payload()},null,2),'application/json')
     .then(result=>{if(result==='copied')syncNotice('Copia copiada al portapapeles: pégala en un mensaje o una nota para guardarla.');})
-    .catch(()=>syncNotice('No se ha podido guardar la copia en este dispositivo.'));
+    .catch(()=>syncNotice('No se pudo guardar la copia en este dispositivo.'));
 }
 // Pregunta con el mismo aspecto que el resto de diálogos del juego. Esta pantalla sale antes de que
 // cargue el resto de la interfaz, así que no puede depender de `CT.UI`: pinta su propia capa.
@@ -547,7 +547,7 @@ async function enter() {
     try { u=(await signInAnonymously(auth)).user; }
     catch(error) {
       if (isNetworkError(error)) { offlineFallback(); return; }
-      shell('<p>No hemos podido crear tu invitado. Conéctate a internet y vuelve a intentarlo.</p><button class="btn btn-primary" id="account-load">Reintentar</button><button class="btn btn-secondary" id="account-offline">Jugar sin conexión</button>');
+      shell('<p>No se pudo crear tu invitado. Conéctate a internet y vuelve a intentarlo.</p><button class="btn btn-primary" id="account-load">Reintentar</button><button class="btn btn-secondary" id="account-offline">Jugar sin conexión</button>');
       feedback(message(error));button('account-load',enter);button('account-offline',offlineFallback);return;
     }
   }
@@ -590,7 +590,7 @@ async function enter() {
     // Una temporada distinta no es falta de conexión: ahí no se entra sin cuenta (el progreso de este móvil
     // pertenece a otra). Cualquier otro fallo deja jugar sin conexión: partidas en un móvil y en solitario.
     const sinCuenta=error?.code==='account/wrong-season'?'':'<button class="btn btn-secondary" id="account-offline">Jugar sin conexión</button>';
-    shell('<h2>No hemos podido abrir tu progreso</h2><p>Necesitas conexión para abrir tu invitado. Tus datos no se han sustituido.</p><button class="btn btn-primary" id="account-load">Reintentar</button>'+sinCuenta);
+    shell('<h2>No se pudo abrir tu progreso</h2><p>Necesitas conexión para abrir tu invitado. Tus datos no se han sustituido.</p><button class="btn btn-primary" id="account-load">Reintentar</button>'+sinCuenta);
     feedback(message(error));button('account-load',enter);if(sinCuenta)button('account-offline',offlineFallback);
   }
 }
@@ -684,7 +684,7 @@ function accountCard() {
   const stats=payload(), dirty=metadata().dirty;
   return `<div class="account-card">
     <div class="account-hero"><span class="account-kicker">TU CUENTA</span><span class="account-save-state" role="status">${dirty ? '◌ Cambios pendientes' : '✓ Progreso guardado'}</span>
-    <div class="account-metrics"><div><b>${stats.day ? `${stats.dayHits}/${DAILY_MAX}` : '–'}</b><span>Reto de hoy</span></div><div><b>${stats.weekHits}</b><span>Aciertos esta semana</span></div><div><b>${stats.found}</b><span>Cartas descubiertas</span></div></div></div>
+    <div class="account-metrics"><div><b>${stats.day ? `${stats.dayHits}/${DAILY_MAX}` : '–'}</b><span>Reto diario de hoy</span></div><div><b>${stats.weekHits}</b><span>Aciertos esta semana</span></div><div><b>${stats.found}</b><span>Cartas descubiertas</span></div></div></div>
     <button class="account-ranking-link" data-account-action="ranking"><span class="account-action-icon" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8v6a4 4 0 0 1-8 0V3Z M8 5H4v2a4 4 0 0 0 4 4 M16 5h4v2a4 4 0 0 1-4 4 M12 13v5 M8 21h8 M9 18h6v3H9z"/></svg></span><span><small>EL RETO CONTINÚA</small><b>Ranking</b><span>Reto diario y cartas descubiertas</span></span><span aria-hidden="true">↗</span></button>
     ${appleControls()}
     <div class="account-actions"><button class="btn btn-secondary" data-account-action="sync"><span aria-hidden="true">↻</span> Guardar ahora</button></div>

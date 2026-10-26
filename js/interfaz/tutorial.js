@@ -256,7 +256,7 @@
         steps: [
           [0, c => { c.say("Algunas cartas dan poderes de un solo uso."); c.stagger(".tv-power", 400); }],
           [3200, c => { c.add('[data-power="ghost"]', "is-on"); c.say("Fantasma: durante una vuelta, las cartas ocultan su dato y su ilustración."); }],
-          [7000, c => { c.remove('[data-power="ghost"]', "is-on"); c.add('[data-power="pulse"]', "is-on"); c.say("Pulso: jugáis la misma carta. Si solo tú aciertas, le pasas una de tu mano."); }],
+          [7000, c => { c.remove('[data-power="ghost"]', "is-on"); c.add('[data-power="pulse"]', "is-on"); c.say("Pulso: los dos colocan la misma carta. Si solo tú aciertas, le pasas una de tu mano."); }],
           [9200, c => c.add(".tv-note", "is-in")]
         ] },
       blockIntro(2, "Jugar online", "Jugar online", "Con otras personas", "Encuentra una mesa pública",

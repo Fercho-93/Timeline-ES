@@ -44,7 +44,7 @@
   }
   function failed() {
     window.CONTINUUM_SPLASH?.finish();
-    app.innerHTML = '<section class="account-shell"><h1>Continuum</h1><p role="alert">No se ha podido conectar. Necesitas internet para preparar tu invitado.</p><button class="btn btn-primary" id="account-retry">Reintentar</button></section>';
+    app.innerHTML = '<section class="account-shell"><h1>Continuum</h1><p role="alert">No se pudo conectar. Necesitas internet para preparar tu invitado.</p><button class="btn btn-primary" id="account-retry">Reintentar</button></section>';
     document.getElementById('account-retry').onclick = start;
   }
   start();

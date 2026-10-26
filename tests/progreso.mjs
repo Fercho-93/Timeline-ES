@@ -285,7 +285,7 @@ console.log("\nLa pantalla del perfil");
   click(w, '[data-action="perfil"]');
   const banda = w.document.querySelector('.weak-row[data-action="enc-band-view"]');
   ok("el tramo con menos aciertos sale en «Puntos débiles»", banda?.dataset.band === "antigua" && banda.dataset.mode === "history");
-  ok("con su porcentaje real", /10%/.test(banda.textContent));
+  ok("con su porcentaje real", /10 %/.test(banda.textContent));
   banda.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
   ok("y abre la enciclopedia sin filtrar por el valor oculto", !!w.document.querySelector("#enc-mode-select") && !w.document.querySelector(".band-chip"));
   ok("con el mazo entero para no revelar el orden", w.document.querySelectorAll("[data-enc-card]").length === w.HISTORY_CARDS.length);

@@ -37,7 +37,7 @@
     protectedKeys.delete(key);
     if (!pending.size && !protectedKeys.size) document.getElementById("storage-notice")?.remove();
   }
-  function failed() { notice("No se ha podido guardar. El progreso sigue en esta pantalla: mantén la app abierta y reintenta o guarda una copia."); }
+  function failed() { notice("No se pudo guardar. El progreso sigue en esta pantalla: mantén la app abierta y reintenta o guarda una copia."); }
   function getItem(key) {
     if (pending.has(key)) return pending.get(key);
     try { return window.localStorage.getItem(key); }
@@ -90,7 +90,7 @@
     for (const [key, value] of pending) if (!CT.AccountStorage || CT.AccountStorage.ownsKey(key)) entries[key] = value;
     void saveFile("continuum-recuperacion.json", JSON.stringify({ format: "continuum-backup", version: 1, entries }, null, 2), "application/json")
       .then(result => { if (result === "copied") confirmed("Copia copiada al portapapeles: pégala en un mensaje o una nota para guardarla."); })
-      .catch(() => notice("No se ha podido guardar la copia en este dispositivo."));
+      .catch(() => notice("No se pudo guardar la copia en este dispositivo."));
   }
   // En el navegador se descarga un archivo; en la app (iPhone y Android) las descargas de enlaces `blob:` no
   // funcionan, así que se ofrece la hoja de compartir del sistema y, si no hay, se copia al portapapeles.

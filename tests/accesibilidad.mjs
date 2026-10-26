@@ -103,6 +103,9 @@ console.log("\nLas reglas se adaptan al mazo");
   const conPulso = w.CONTINUUM.guideMarkup("history", "local", { pulse: true });
   ok("el Pulso se explica fuera de solitario", /Pulso/.test(conPulso) && /Los dos colocáis/.test(conPulso));
   ok("y la guía dice si está en juego o no", /en juego/.test(conPulso) && /opcional/.test(w.CONTINUUM.guideMarkup("history", "local", { pulse: false })));
+  // Abierta fuera de una partida (desde Inicio), la guía no da por hecha ninguna forma de jugar.
+  const general = w.CONTINUUM.guideMarkup("history", "general", { pulse: true, ghost: true });
+  ok("abierta desde Inicio, no dice «Un solo móvil» ni pone poderes en juego", !/Un solo móvil ·/.test(general) && !/en juego/.test(general) && /En grupo · opcional/.test(general));
   ok("la guía empieza por el vídeo, con cuatro capítulos y Reto diario aparte", /data-tutorial=/.test(conPulso) && (conPulso.match(/class="tv-chapter"/g) || []).length === 4 && ["Lo básico", "Jugar solo", "En grupo", "Reto diario"].every(nombre => conPulso.includes(nombre)));
   // La Guía y el vídeo nombran los botones con su texto de verdad.
   const guia = w.CONTINUUM.guideMarkup("history", "solo");

@@ -389,7 +389,7 @@ assert.equal(w.document.querySelector('[data-action="quick-counts"]'), null, 'La
 assert.ok(w.document.querySelector('[data-action="jugar"]'));
 w.close();
 w = boot('{invalid'); openQuick();
-assert.match(w.document.querySelector('#app').textContent, /No se ha podido recuperar/);
+assert.match(w.document.querySelector('#app').textContent, /No se pudo recuperar/);
 assert.equal(w.document.querySelector('[data-quick="resume"]'), null);
 w.close();
 // El reto diario rápido guarda un solo resultado normalizable y la racha en

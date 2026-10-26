@@ -115,7 +115,7 @@
         ${hapticsSupported ? `<button class="btn btn-secondary" data-settings-action="test-haptics" ${s.haptics ? '' : 'disabled'}>Probar vibración</button>` : ''}
         <label class="opt-row"><span>Efectos de sonido</span><input type="checkbox" data-settings-action="sfx" aria-describedby="sfx-help" ${s.sfx === true ? "checked" : ""}></label>
         <div class="field settings-volume">
-          <label for="ajuste-volumen-efectos">Volumen de los efectos <output id="ajuste-volumen-efectos-valor">${Number(s.sfxVolume) || 0}%</output></label>
+          <label for="ajuste-volumen-efectos">Volumen de los efectos <output id="ajuste-volumen-efectos-valor">${Number(s.sfxVolume) || 0} %</output></label>
           <input id="ajuste-volumen-efectos" type="range" min="0" max="100" step="5" value="${Math.max(0, Math.min(100, Number(s.sfxVolume) || 0))}" data-settings-action="sfx-volume" aria-describedby="sfx-help">
           <p class="hint" id="sfx-help">Notas suaves al coger y colocar cartas, acertar o fallar. En iPhone respetan el modo silencio.</p>
         </div>
@@ -135,7 +135,7 @@
         <p class="hint" style="text-align:left"><a href="privacidad.html" target="_blank" rel="noopener noreferrer">Política de privacidad</a> · <a href="borrar-cuenta.html" target="_blank" rel="noopener noreferrer">Cómo borrar tus datos</a> (en el juego: Atlas → Tu cuenta y tus datos).</p>
       </div></details>` : ""}
 
-      <details class="settings-section settings-support"><summary><span><b>Ayuda y comentarios</b><small>Cuéntanos cómo mejorar tu experiencia</small></span><i aria-hidden="true">+</i></summary><div class="settings-support-body">
+      <details class="settings-section settings-support"><summary><span><b>Ayuda y comentarios</b><small>Ideas, dudas y errores</small></span><i aria-hidden="true">+</i></summary><div class="settings-support-body">
         ${window.CONTINUUM.Edad?.resumen?.() || ""}
         <p class="hint" style="text-align:left;margin-top:0"><a href="privacidad.html#arte" target="_blank" rel="noopener noreferrer">Privacidad, datos y procedencia del arte</a> · <a href="terminos.html" target="_blank" rel="noopener noreferrer">Condiciones de uso</a> · <a href="aviso-legal.html" target="_blank" rel="noopener noreferrer">Aviso legal</a> · <a href="soporte.html" target="_blank" rel="noopener noreferrer">Soporte</a> · <a href="licencias.html" target="_blank" rel="noopener noreferrer">Licencias de terceros</a></p>
         <div class="field">
@@ -160,12 +160,12 @@
     const accepted = await CT.Effects?.testHaptics?.();
     const help = document.getElementById('haptics-help');
     if (help) help.textContent = accepted
-      ? 'Prueba enviada. Si no la notas, revisa la vibración en los ajustes del teléfono.'
+      ? 'Prueba enviada. Si no la notas, revisa la vibración en los ajustes del móvil.'
       : 'No se pudo activar la vibración en este dispositivo.';
   }
 
   async function sendFeedback() {
-    if (!FEEDBACK_EMAIL) { showToast("Todavía no hay una dirección de contacto configurada."); return; }
+    if (!FEEDBACK_EMAIL) { showToast("Todavía no hay una dirección de contacto configurada"); return; }
     const detalle = await CT.appDiagnostics?.() ?? "";
     const nota = document.getElementById('feedback-note')?.value.trim() || 'Cuéntame qué ha pasado:';
     const cuerpo = encodeURIComponent(`${nota}\n\n---\n${detalle}`);
@@ -206,7 +206,7 @@
       const volume = Math.max(0, Math.min(100, Number(event.target.value) || 0));
       settings.sfxVolume = volume;
       const output = document.getElementById('ajuste-volumen-efectos-valor');
-      if (output) output.value = `${volume}%`;
+      if (output) output.value = `${volume} %`;
       save();
       CT.Sonidos?.test();
       return;
@@ -259,8 +259,8 @@
         const diagnostic = await CT.appDiagnostics?.() || '';
         try {
           const result = await CT.Storage.saveFile('continuum-comentario.txt', note + '\n\n' + diagnostic);
-          if (result === 'copied') showToast('Comentario copiado al portapapeles.');
-        } catch { showToast('No se ha podido guardar el comentario en este dispositivo.'); }
+          if (result === 'copied') showToast('Comentario copiado al portapapeles');
+        } catch { showToast('No se pudo guardar el comentario en este dispositivo'); }
       })();
     }
   });
@@ -269,7 +269,7 @@
   // «Aplicar» de Ajustes, porque la propia pantalla es la vista previa.
   CT.textSizePicker = () => {
     const actual = settings.textSize;
-    return `<fieldset class="bienvenida-letra"><legend>Tamaño de la letra</legend>
+    return `<fieldset class="bienvenida-letra"><legend>Tamaño del texto</legend>
       <div class="bienvenida-muestra" aria-hidden="true"><small>Carta de ejemplo</small><strong>Llegada de Colón a América</strong><b>1492</b></div>
       <div class="segmented bienvenida-letra-opciones">${TEXT_SIZES.map(([value, label]) => `<label class="segmented-option${value === actual ? " is-on" : ""}"><input type="radio" name="bienvenida-letra" value="${value}" data-text-size-pick${value === actual ? " checked" : ""}><span><b>${label}</b></span></label>`).join("")}</div>
       <p class="hint">Puedes cambiarlo luego en Ajustes.</p></fieldset>`;

@@ -217,7 +217,7 @@ async function submitStarterGuess() {
   starterBusy = true;
   try {
     await setDoc(doc(db, "rooms", roomCode, "starter", user.uid), { cardId, value, guessedAt: serverTimestamp() });
-  } catch { showToast("No se pudo enviar la respuesta."); }
+  } catch { showToast("No se pudo enviar la respuesta"); }
   finally { starterBusy = false; }
 }
 
@@ -264,7 +264,7 @@ async function claimHost(auto = false) {
     // En una mesa pública que todavía espera jugadores, quien se fue deja de ocupar su
     // plaza: se le saca de la mesa y la mesa vuelve a aparecer en la búsqueda.
     if (roomState?.matchmaking === "public") relayKick = previousHost;
-    if (auto) showToast("Quien creó la partida se ha ido: ahora la llevas tú.");
+    if (auto) showToast("Quien creó la partida se ha ido: ahora la llevas tú");
   } catch { if (!auto) showToast("El anfitrión ha vuelto o alguien ya tomó el relevo. La sala sigue guardada."); }
   finally { busy = false; }
 }
@@ -402,7 +402,7 @@ const showToast = message => CT.toast(message, 3000);
 
 function showGuide() {
   const mode = modeKey();
-  appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-online-guide><div class="modal rules"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-online-action="close-guide" aria-label="Cerrar guía">×</button></div><div class="guide-content">${CT.guideMarkup(mode, "online", { pulse: !!roomState?.pulse, ghost: roomState?.status === "playing" ? !!roomState.ghost : true })}</div><button class="btn btn-primary btn-block" data-online-action="close-guide">Entendido</button></div></div>`);
+  appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-online-guide><div class="modal rules"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-online-action="close-guide" aria-label="Cerrar guía">×</button></div><div class="guide-content">${CT.guideMarkup(mode, "online", { pulse: roomState?.status === "playing" ? !!roomState.pulse : !roomState?.tournament && !!lobbySettings.pulse, ghost: roomState?.status === "playing" ? !!roomState.ghost : !roomState?.tournament && !!lobbySettings.ghost })}</div><button class="btn btn-primary btn-block" data-online-action="close-guide">Entendido</button></div></div>`);
   abreCapa(appEl.querySelector("[data-online-guide]"), true);
 }
 
@@ -659,7 +659,7 @@ function connectToRoom(code) {
     else if (roomState.phase === "final") { clearTurnTimer(); void renderOnlineFinal(); }
     else if (roomState.phase === "tiebreak") {
       clearTurnTimer();
-      paint(`<div class="shell">${header()}<h1 data-focus tabindex="-1">Repartiendo el desempate</h1><p>Quedan ${roomState.tieQueue.length} cartas por repartir. La partida continúa cuando termine el reparto.</p><button class="btn btn-primary" data-online-action="continue-tie">Continuar reparto</button></div>`, 'online-tiebreak');
+      paint(`<div class="shell">${header()}<h1 data-focus tabindex="-1">Repartiendo el desempate</h1><p>${roomState.tieQueue.length === 1 ? "Queda 1 carta" : `Quedan ${roomState.tieQueue.length} cartas`} por repartir. La partida continúa cuando termine el reparto.</p><button class="btn btn-primary" data-online-action="continue-tie">Continuar reparto</button></div>`, 'online-tiebreak');
       if (!snapshot.metadata.fromCache) void continueTie();
     }
     else {
@@ -999,7 +999,7 @@ function renderCompetitionIntro() {
     ${CT.Tournament.journey(roomState.tournament)}
     <div class="chapter-number">Tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length}</div>
     <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Competición · tema ${roomState.tournament.index + 1}</span>${escapeHtml(mode.name)}</h2>
-    <button class="btn btn-block comp-splash-start" data-online-action="competition-round-start">Empezar el tema</button>
+    <button class="btn btn-block comp-splash-start" data-online-action="competition-round-start">Empezar</button>
   </div></section></div>`, "online-competition-intro");
 }
 
@@ -1162,7 +1162,7 @@ function renderGame() {
     <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, vuelta ${roomState.round}</h1>
     <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length}` : `Vuelta ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}`}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo restante para esta carta"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
     <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores</div><div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i class="score-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'uid:' + uid, id: uid === user.uid ? CT.Avatares.ownId() : player.avatarId })}</i><span class="score-copy"><b>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(player.hand.length)}%"></i></span></span><em><strong>${player.hand.length}</strong><small>cartas</small></em></span>`; }).join("")}</div></section>
-    ${pulsing ? `<div class="pulse-banner">⚡ Duelo · <b>${escapeHtml(currentPlayer.name)}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
+    ${pulsing ? `<div class="pulse-banner">⚡ Pulso · <b>${escapeHtml(currentPlayer.name)}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
     ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
     ${boardQuestion()}
     ${pulsing
@@ -1237,7 +1237,7 @@ function revealOverlay(currentUid) {
           ? `<b>${escapeHtml(reveal.targetName)}</b> se defiende y coloca la carta en la línea. <b>${escapeHtml(reveal.playerName)}</b> ${reveal.penaltySkipped ? "no roba: el mazo y el descarte están agotados" : "roba una por fallar el reto"}.`
           : `No la acierta ninguno de los dos: la carta va al descarte y <b>${escapeHtml(reveal.playerName)}</b> roba una por haber lanzado el reto.`;
     return `<div class="overlay" data-result-card="${reveal.correct || reveal.targetOk ? card.id : ''}"><div class="modal pulse-duel-modal">
-      <div class="eyebrow" aria-hidden="true">⚡ Duelo · ${escapeHtml(reveal.playerName)} contra ${escapeHtml(reveal.targetName)}</div>
+      <div class="eyebrow" aria-hidden="true">⚡ Pulso · ${escapeHtml(reveal.playerName)} contra ${escapeHtml(reveal.targetName)}</div>
       <h2>${escapeHtml(card.title)}</h2>
       ${fichaCarta}
       <div class="pulse-duel-rows">
@@ -1544,7 +1544,7 @@ async function continueTie(retries = 1) {
     try { latest=(await getDoc(roomRef)).data(); } catch { /* Se conserva la cola para reintentar con conexión. */ }
     if (latest && latest.version !== attemptedVersion && latest.playerOrder.includes(user.uid)) {
       retry = latest.phase === 'tiebreak' && retries > 0;
-      if (latest.phase === 'tiebreak' && !retry) showToast('Otra persona está continuando el reparto.');
+      if (latest.phase === 'tiebreak' && !retry) showToast('Otra persona está continuando el reparto');
     } else { console.error(error); showToast('El desempate sigue guardado. Pulsa Continuar reparto para reintentarlo.'); }
   }
   finally { busy=false; }
@@ -1696,12 +1696,12 @@ function roomMenu() {
       <button class="btn btn-secondary" data-online-action="qr">Mostrar QR</button>
       ${isHost && playing && !inFinal ? `<button class="btn btn-ghost" data-online-action="skip">Saltar el turno de ${escapeHtml(currentName)}</button>` : ""}
     </div>
-    ${isHost && others.length && !inFinal ? `<div class="manage-players"><div class="section-label">Participantes</div>${others.map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, roomState.matchmaking === 'public' ? 'mesa' : 'sala') || ''}<button class="kick-btn" data-online-action="kick" data-uid="${uid}">Expulsar</button></div>`).join("")}</div>` : ""}
-    ${!(isHost && others.length && !inFinal) && roomState?.playerOrder?.some(uid => uid !== user.uid) ? `<div class="manage-players"><div class="section-label">Participantes</div>${roomState.playerOrder.filter(uid => uid !== user.uid).map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, roomState.matchmaking === 'public' ? 'mesa' : 'sala') || ''}</div>`).join("")}</div>` : ""}
+    ${isHost && others.length && !inFinal ? `<div class="manage-players"><div class="section-label">Jugadores</div>${others.map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, roomState.matchmaking === 'public' ? 'mesa' : 'sala') || ''}<button class="kick-btn" data-online-action="kick" data-uid="${uid}">Expulsar</button></div>`).join("")}</div>` : ""}
+    ${!(isHost && others.length && !inFinal) && roomState?.playerOrder?.some(uid => uid !== user.uid) ? `<div class="manage-players"><div class="section-label">Jugadores</div>${roomState.playerOrder.filter(uid => uid !== user.uid).map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, roomState.matchmaking === 'public' ? 'mesa' : 'sala') || ''}</div>`).join("")}</div>` : ""}
     ${inFinal ? '<p>La final espera a todos los finalistas. Si alguien se desconecta, puede volver a entrar y responder.</p>' : ''}
     <div class="actions" style="display:grid">
       ${isHost && playing ? '<button class="btn btn-ghost" data-online-action="close-room">Terminar partida y cerrar sala</button>' : isHost ? '<button class="btn btn-ghost" data-online-action="close-room">Cerrar la sala</button>' : inFinal ? '<button class="btn btn-ghost" data-online-action="back">Ir al inicio</button>' : '<button class="btn btn-ghost" data-online-action="leave-room">Salir de la partida</button>'}
-      <button class="btn btn-primary" data-online-action="close-room-menu">Volver a la partida</button>
+      <button class="btn btn-primary" data-online-action="close-room-menu">Seguir jugando</button>
     </div>
   </div></div>`);
   abreCapa(appEl.querySelector("[data-room-overlay]"), true);
@@ -1861,7 +1861,7 @@ function roomCodeFromText(text) {
   } catch { return cleanCode(raw); }
 }
 async function scanRoomQr() {
-  if (!CT.QrScanner?.isSupported()) { showToast("Este navegador no permite usar la cámara aquí."); return; }
+  if (!CT.QrScanner?.isSupported()) { showToast("Este navegador no permite usar la cámara aquí"); return; }
   try {
     await CT.LocalShare.scanQr({
       title: "Escanear el QR de la sala", hint: "Encuadra el código QR que enseña quien creó la sala.",
@@ -1870,7 +1870,7 @@ async function scanRoomQr() {
         const quick = String(text).match(/quick-room=([^&#\s]+)/);
         if (quick && CT.openQuickChallenges) { CT.closeDialog?.(); location.hash = "quick-room=" + quick[1]; CT.openQuickChallenges(); return; }
         const code = roomCodeFromText(text);
-        if (code.length !== 8) { showToast("Ese código QR no es de una sala de Continuum."); return; }
+        if (code.length !== 8) { showToast("Ese código QR no es de una sala de Continuum"); return; }
         const codeInput = document.getElementById("online-code"), nameInput = document.getElementById("online-player-name");
         if (!codeInput) return;
         codeInput.value = code;
@@ -1888,7 +1888,7 @@ async function deleteRoom() {
 function closeRoom() {
   if (!roomRef || roomState?.hostUid !== user.uid) return;
   const jugando = roomState?.status === "playing";
-  CT.UI.confirmDialog(jugando ? "La partida no se guarda: se cerrará la sala para todos los participantes." : "Se cerrará la sala para todos los participantes.", () => { void deleteRoom(); }, { title: jugando ? "¿Salir de la partida?" : "¿Cerrar la sala?", confirmLabel: jugando ? "Salir sin guardar" : "Cerrar sala", cancelLabel: jugando ? "Seguir jugando" : "Seguir en la sala" });
+  CT.UI.confirmDialog(jugando ? "La partida no se guarda: se cerrará la sala para todos los jugadores." : "Se cerrará la sala para todos los jugadores.", () => { void deleteRoom(); }, { title: jugando ? "¿Salir de la partida?" : "¿Cerrar la sala?", confirmLabel: jugando ? "Salir sin guardar" : "Cerrar sala", cancelLabel: jugando ? "Seguir jugando" : "Seguir en la sala" });
 }
 // Salir de la sala: quien no organiza deja su plaza (sus cartas pasan al descarte si se estaba
 // jugando); en una mesa pública, además, es dejar de buscar.
@@ -1905,7 +1905,7 @@ function requestLeaveRoom() {
 function requestLobbyExit() {
   if (roomState?.hostUid !== user.uid) { requestLeaveRoom(); return; }
   CT.UI.askDialog({
-    title: "¿Salir de la sala?", message: "Puedes cerrarla para todos o dejarla abierta y volver a entrar con su código.", stay: "Quedarme en la sala",
+    title: "¿Salir de la sala?", message: "Puedes cerrarla para todos o dejarla abierta y volver a entrar con su código.", stay: "Seguir en la sala",
     actions: [{ label: "Salir sin cerrarla", proceed: () => navigateOnline("back") }, { label: "Cerrar sala para todos", kind: "ghost", proceed: () => { void deleteRoom(); } }]
   });
 }

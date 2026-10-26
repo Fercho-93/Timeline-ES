@@ -75,7 +75,7 @@
     try {
       const found = new Promise(resolve => {
         CT.QrScanner.start(layer.querySelector("video"), text => resolve(text), () => {
-          const status = layer.querySelector("[data-qr-status]"); if (status) status.textContent = "No se ha podido leer el código. Sigue encuadrándolo.";
+          const status = layer.querySelector("[data-qr-status]"); if (status) status.textContent = "No se pudo leer el código. Sigue encuadrándolo.";
         }).then(h => { handle = h; if (closed) h.stop(); }).catch(error => {
           const status = layer.querySelector("[data-qr-status]"); if (status) status.textContent = "No se pudo acceder a la cámara. Revisa los permisos y vuelve a intentarlo."; console.error(error);
         });

@@ -114,7 +114,7 @@
       let answer = false, chosen = false;
       const layer = document.createElement("div");
       layer.className = "overlay";
-      layer.innerHTML = '<div class="modal" role="alertdialog" aria-modal="true"><h2>¿Abrir la cámara unos segundos?</h2><p>Al crear o unirte a una sala por Wi-Fi, Continuum abre la cámara un momento para que los móviles se encuentren en tu red. No graba ni envía imágenes. Si todos jugáis con iPhone no hace falta.</p><div class="actions exit-actions"><button type="button" class="btn btn-primary btn-block" data-camera="si">Permitir</button><button type="button" class="btn btn-secondary btn-block" data-camera="no">Ahora no</button></div></div>';
+      layer.innerHTML = '<div class="modal" role="alertdialog" aria-modal="true"><h2>¿Abrir la cámara unos segundos?</h2><p>Al crear o unirte a una sala por Wi-Fi, Continuum abre la cámara un momento para que los móviles se encuentren en tu red. No graba ni envía imágenes. Si todos los móviles son iPhone, no hace falta.</p><div class="actions exit-actions"><button type="button" class="btn btn-primary btn-block" data-camera="si">Permitir</button><button type="button" class="btn btn-secondary btn-block" data-camera="no">Ahora no</button></div></div>';
       layer.addEventListener("click", event => {
         const button = event.target.closest("[data-camera]");
         if (!button) return;
@@ -144,7 +144,7 @@
   }
 
   async function warmUpCamera() {
-    if (!CT.QrScanner.isSupported()) { showToast("Este navegador no permite usar la cámara aquí."); return; }
+    if (!CT.QrScanner.isSupported()) { showToast("Este navegador no permite usar la cámara aquí"); return; }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
       stream.getTracks().forEach(track => track.stop());
@@ -165,7 +165,7 @@
   // transporte (`local-transport.js`) señalan con un código corto en inglés.
   function errorMessage(code) {
     const map = {
-      NOT_HOST: "Solo quien organiza la sala puede hacer eso",
+      NOT_HOST: "Solo el anfitrión puede hacer eso",
       BAD_PIN: "Código incorrecto. Pídele a quien ha creado la sala el código de 4 cifras que ve en su pantalla",
       INVALID_START: "Hacen falta al menos dos personas para empezar",
       INVALID_ROOM: "No se pudo crear la sala",
@@ -445,7 +445,7 @@
   }
   function nearbyListMarkup() {
     if (nearbyPending) return nearbyPinMarkup(nearbyPending);
-    if (!nearbyRooms.length) return `<div class="status status-waiting"><div class="spinner" aria-hidden="true"></div><span>Buscando salas cercanas… Que quien organiza haya creado ya la sala, y que los dos tengáis Bluetooth y Wi-Fi activados (no hace falta estar conectados a ninguna red).</span></div>`;
+    if (!nearbyRooms.length) return `<div class="status status-waiting"><div class="spinner" aria-hidden="true"></div><span>Buscando salas cercanas… Que el anfitrión haya creado ya la sala, y que los dos tengáis Bluetooth y Wi-Fi activados (no hace falta estar conectados a ninguna red).</span></div>`;
     return `<div class="nearby-list">${nearbyRooms.map(room => {
       const known = CT.has(room.mode), sameDeck = !room.fp || !known || room.fp === CT.deckFingerprint(room.mode);
       const usable = known && sameDeck;
@@ -546,7 +546,7 @@
   function renderUnirseCompartir() {
     screen = "local-unirse-compartir";
     paint(`<div class="shell online-shell">${header("leave")}
-      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Enséñale esto a quien organiza la sala</h2><p class="lead">Se incorporará sola en cuanto lo escanee con su cámara — no hace falta hacer nada más.</p></section>
+      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Enséñale esto al anfitrión</h2><p class="lead">Se incorporará sola en cuanto lo escanee con su cámara — no hace falta hacer nada más.</p></section>
       <div class="panel qr-panel"><div class="qr-frame"><canvas id="local-answer-qr" aria-label="Tu respuesta, en código QR"></canvas></div></div>
       <details class="panel qr-fallback"><summary>¿No puede usar la cámara?</summary>
         <button type="button" class="btn btn-primary btn-block" data-local-action="share-answer">${SHARE_ICON} Compartir mi respuesta</button>
@@ -557,7 +557,7 @@
       <small class="hint" id="local-conn-diag" hidden></small>
     </div>`, "local-unirse-compartir");
     try { CT.QrEncode.draw(document.getElementById("local-answer-qr"), pendingAnswerText); }
-    catch (error) { console.error(error); showToast("No se pudo generar el código QR; usa la opción de compartir a mano."); }
+    catch (error) { console.error(error); showToast("No se pudo generar el código QR; usa la opción de compartir a mano"); }
     // El invitado no sabe cuándo escanea el otro su respuesta: solo avisa pasado un minuto.
     watchConnection(guestSession?.peerConnection, { signalText: pendingAnswerText, qrText: pendingAnswerText, warnAfter: 60 });
   }
@@ -610,7 +610,7 @@
       <button type="button" class="btn btn-ghost btn-block" data-local-action="local-lobby">Ir al vestíbulo</button>
     </div>`, "local-invitar");
     try { CT.QrEncode.draw(document.getElementById("local-invite-qr"), pendingInvite?.inviteText || ""); }
-    catch (error) { console.error(error); showToast("No se pudo generar el código QR; usa la opción de compartir a mano."); }
+    catch (error) { console.error(error); showToast("No se pudo generar el código QR; usa la opción de compartir a mano"); }
     if (conectado) watchConnection(pendingInvite?.peerConnection, { signalText: pendingInvite?.offerSignal, qrText: pendingInvite?.inviteText || "", warnAfter: 15 });
   }
 
@@ -656,7 +656,7 @@
         const onResult = qrScanOnResult;
         stopCamera();
         onResult?.(text);
-      }, () => { if (statusEl) statusEl.textContent = "No se ha podido leer el código. Sigue encuadrándolo."; });
+      }, () => { if (statusEl) statusEl.textContent = "No se pudo leer el código. Sigue encuadrándolo."; });
     } catch (error) {
       console.error(error);
       if (statusEl) statusEl.textContent = "No se pudo acceder a la cámara. Revisa los permisos y vuelve a intentarlo.";
@@ -718,7 +718,7 @@ function starterPanelMarkupContent(isHost) {
   function nextThemeMarkup(isHost) {
     const t = roomState.tournament;
     const first = roomState.players[CT.LocalRoom.rotatedOrder(roomState)[0]];
-    return `${CT.Tournament.journey(t)}<h3>Tema ${t.index + 1} de ${t.queue.length}: ${escapeHtml(CT.mode(roomState.mode).name)}</h3><p>Empieza ${escapeHtml(first?.name || "el siguiente de la mesa")}.</p>${isHost ? '<button type="button" class="btn btn-primary btn-block" data-local-action="start">Empezar el tema <span>→</span></button>' : '<p class="hint">Esperando a que quien organiza empiece el tema.</p>'}`;
+    return `${CT.Tournament.journey(t)}<h3>Tema ${t.index + 1} de ${t.queue.length}: ${escapeHtml(CT.mode(roomState.mode).name)}</h3><p>Empieza ${escapeHtml(first?.name || "el siguiente jugador")}.</p>${isHost ? '<button type="button" class="btn btn-primary btn-block" data-local-action="start">Empezar el tema <span>→</span></button>' : '<p class="hint">Esperando a que el anfitrión empiece el tema.</p>'}`;
   }
 
   function renderLobby() {
@@ -741,8 +741,8 @@ function starterPanelMarkupContent(isHost) {
         ${CT.LocalRoom.laterRound(roomState) ? nextThemeMarkup(true) : roomState.playerOrder.length < 2 ? '<p class="hint">Esperando a alguien más…</p>' : starterPanelMarkup(true)}`
       : CT.LocalRoom.laterRound(roomState) ? nextThemeMarkup(false) : roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles a la vez.</p>` : starterPanelMarkup(false);
     paint(`<div class="shell online-shell">${header("leave")}
-      <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la sala</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${escapeHtml(roomState.roomCode)}</strong>${isHost ? `<div class="room-invite-actions"><button type="button" data-local-action="invite">${hostSession?.nearby ? "Invitar por QR (Android)" : "Invitar a alguien"}</button></div>` : ""}</div></section>
-      ${isHost && hostSession?.nearby ? `<p class="online-note" data-nearby-note>Sala visible para los iPhones cercanos: que pulsen «Unirme a una partida → Buscar salas cercanas» y escriban este código: <b class="nearby-pin">${escapeHtml(hostSession.nearbyPin)}</b>. Para un Android, usa el QR.</p>` : ""}
+      <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la sala</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${escapeHtml(roomState.roomCode)}</strong>${isHost ? `<div class="room-invite-actions"><button type="button" data-local-action="invite">${hostSession?.nearby ? "Invitar por QR" : "Invitar a alguien"}</button></div>` : ""}</div></section>
+      ${isHost && hostSession?.nearby ? `<p class="online-note" data-nearby-note>Sala visible para los iPhones cercanos: que pulsen «Unirme a una partida → Buscar salas cercanas» y escriban este código: <b class="nearby-pin">${escapeHtml(hostSession.nearbyPin)}</b>. Los demás móviles pueden entrar con el QR.</p>` : ""}
       <div class="online-lobby-grid">
         <section class="panel lobby-table-panel"><div class="section-label">Jugadores en la sala <small>${roomState.playerOrder.length}/${Number(roomState.capacity) || CT.LocalRoom.MAX_PLAYERS}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${roomState.playerOrder.length}</strong><small>${roomState.playerOrder.length === 1 ? "explorador" : "exploradores"}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
         <section class="panel lobby-settings">${settings}</section>
@@ -789,7 +789,7 @@ function starterPanelMarkupContent(isHost) {
   function doCloseRoom() {
     if (role !== "host") return;
     const jugando = roomState?.status === "playing";
-    CT.UI.confirmDialog(jugando ? "La partida no se guarda: se cerrará la sala para todos los participantes." : "Se cerrará la sala para todos los participantes.", () => leaveToEntrada(), { title: jugando ? "¿Salir de la partida?" : "¿Cerrar la sala?", confirmLabel: jugando ? "Salir sin guardar" : "Cerrar sala", cancelLabel: jugando ? "Seguir jugando" : "Seguir en la sala" });
+    CT.UI.confirmDialog(jugando ? "La partida no se guarda: se cerrará la sala para todos los jugadores." : "Se cerrará la sala para todos los jugadores.", () => leaveToEntrada(), { title: jugando ? "¿Salir de la partida?" : "¿Cerrar la sala?", confirmLabel: jugando ? "Salir sin guardar" : "Cerrar sala", cancelLabel: jugando ? "Seguir jugando" : "Seguir en la sala" });
   }
 
   // Salir de la sala: quien organiza la cierra para todos (se pide confirmación si ya hay
@@ -799,7 +799,7 @@ function starterPanelMarkupContent(isHost) {
     if (role === "host") {
       if (roomState && roomState.playerOrder.length > 1 && roomState.status !== "ended") {
         const jugando = roomState.status === "playing";
-        CT.UI.confirmDialog(jugando ? "La partida no se guarda: si sales, la sala se cierra para todos los participantes." : "Si sales, la sala se cierra para todos los participantes.", () => leaveToEntrada(), { title: jugando ? "¿Salir de la partida?" : "¿Salir y cerrar la sala?", confirmLabel: jugando ? "Salir sin guardar" : "Cerrar sala", cancelLabel: jugando ? "Seguir jugando" : "Quedarme en la sala" });
+        CT.UI.confirmDialog(jugando ? "La partida no se guarda: si sales, la sala se cierra para todos los jugadores." : "Si sales, la sala se cierra para todos los jugadores.", () => leaveToEntrada(), { title: jugando ? "¿Salir de la partida?" : "¿Salir y cerrar la sala?", confirmLabel: jugando ? "Salir sin guardar" : "Cerrar sala", cancelLabel: jugando ? "Seguir jugando" : "Seguir en la sala" });
         return;
       }
       leaveToEntrada();
@@ -850,7 +850,7 @@ function starterPanelMarkupContent(isHost) {
       <div class="big-icon" aria-hidden="true">${WIFI_ICON}</div>
       <div class="eyebrow">Sala ${escapeHtml(lastSeat?.roomCode || "")}</div>
       <h2 data-focus tabindex="-1">Se ha perdido la conexión</h2>
-      <p>Tu plaza y tus cartas siguen guardadas en el móvil de quien organiza la sala. Mientras no vuelvas, tus turnos se saltan.</p>
+      <p>Tu plaza y tus cartas siguen guardadas en el móvil del anfitrión. Mientras no vuelvas, tus turnos se saltan.</p>
       <p class="hint">Sin internet no hay forma de reengancharse sola: pídele que te invite otra vez (⋯ → Invitar a alguien) y escanea su código. Volverás a tu sitio, con tus cartas.</p>
       <button type="button" class="btn btn-primary btn-block" data-local-action="go-unirse">Volver a sentarme <span>→</span></button>
       <button type="button" class="btn btn-ghost btn-block" data-local-action="forget-seat">Salir de la partida</button>
@@ -897,7 +897,7 @@ function starterPanelMarkupContent(isHost) {
   }
 
   function showGuide() {
-    appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-local-guide><div class="modal rules"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-local-action="close-guide" aria-label="Cerrar guía">×</button></div><div class="guide-content">${CT.guideMarkup(modeKey, "online", { pulse: !!roomState?.pulse, ghost: roomState?.status === "playing" ? !!roomState.ghost : true })}</div><button class="btn btn-primary btn-block" data-local-action="close-guide">Entendido</button></div></div>`);
+    appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-local-guide><div class="modal rules"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-local-action="close-guide" aria-label="Cerrar guía">×</button></div><div class="guide-content">${CT.guideMarkup(modeKey, "online", { pulse: roomState?.status === "playing" ? !!roomState.pulse : !roomState?.tournament && !!lobbySettings.pulse, ghost: roomState?.status === "playing" ? !!roomState.ghost : !roomState?.tournament && !!lobbySettings.ghost })}</div><button class="btn btn-primary btn-block" data-local-action="close-guide">Entendido</button></div></div>`);
     CT.openDialog(appEl.querySelector("[data-local-guide]"), true);
   }
 
@@ -921,7 +921,7 @@ function starterPanelMarkupContent(isHost) {
       ${isHost && others.length ? `<div class="manage-players"><div class="section-label">Participantes</div>${others.map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'room:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}${roomState.players[uid].away ? " · desconectado" : ""}</strong><button class="kick-btn" data-local-action="kick" data-uid="${escapeHtml(uid)}">Expulsar</button></div>`).join("")}</div>` : ""}
       <div class="actions" style="display:grid">
         ${isHost ? '<button class="btn btn-ghost" data-local-action="close-room">Terminar partida y cerrar sala</button>' : '<button class="btn btn-ghost" data-local-action="leave">Salir de la partida</button>'}
-        <button class="btn btn-primary" data-local-action="close-room-menu">Volver a la partida</button>
+        <button class="btn btn-primary" data-local-action="close-room-menu">Seguir jugando</button>
       </div>
     </div></div>`);
     CT.openDialog(appEl.querySelector("[data-local-room-overlay]"), true);
@@ -995,7 +995,7 @@ function starterPanelMarkupContent(isHost) {
       <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, vuelta ${roomState.round}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length} · ` : ""}Vuelta ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo restante para esta carta"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
       <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores</div><div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i class="score-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'room:' + uid, id: esMio(uid) ? CT.Avatares.ownId() : player.avatarId })}</i><span class="score-copy"><b>${escapeHtml(player.name)}${uid === myPlayerId ? " · tú" : ""}${player.away ? " · desconectado" : ""}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(player.hand.length)}%"></i></span></span><em><strong>${player.hand.length}</strong><small>cartas</small></em></span>`; }).join("")}</div></section>
-      ${pulsing ? `<div class="pulse-banner">⚡ Duelo · <b>${escapeHtml(currentPlayer.name)}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
+      ${pulsing ? `<div class="pulse-banner">⚡ Pulso · <b>${escapeHtml(currentPlayer.name)}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
       ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
       ${boardQuestion()}
       ${handSection}
@@ -1053,7 +1053,7 @@ function starterPanelMarkupContent(isHost) {
             ? `<b>${escapeHtml(reveal.targetName)}</b> se defiende y coloca la carta en la línea. <b>${escapeHtml(reveal.playerName)}</b> ${reveal.penaltySkipped ? "no roba: el mazo y el descarte están agotados" : "roba una por fallar el reto"}.`
             : `No la acierta ninguno de los dos: la carta va al descarte y <b>${escapeHtml(reveal.playerName)}</b> roba una por haber lanzado el reto.`;
       return `<div class="overlay" data-result-card="${reveal.correct || reveal.targetOk ? card.id : ""}"><div class="modal pulse-duel-modal">
-        <div class="eyebrow" aria-hidden="true">⚡ Duelo · ${escapeHtml(reveal.playerName)} contra ${escapeHtml(reveal.targetName)}</div>
+        <div class="eyebrow" aria-hidden="true">⚡ Pulso · ${escapeHtml(reveal.playerName)} contra ${escapeHtml(reveal.targetName)}</div>
         <h2>${escapeHtml(card.title)}</h2>${fichaCarta}
         <div class="pulse-duel-rows">${fila(reveal.playerName, reveal.correct, reveal.byIndex)}${fila(reveal.targetName, reveal.targetOk, reveal.targetIndex)}</div>
         <p class="pulse-outcome">${cierre}</p>${seguir}
@@ -1111,7 +1111,7 @@ function starterPanelMarkupContent(isHost) {
     const puedeRevancha = isHost && roomState.playerOrder.filter(uid => !roomState.players[uid].away).length >= CT.LocalRoom.MIN_PLAYERS;
     const acciones = isHost
       ? `${puedeRevancha ? '<button class="btn btn-primary btn-block" data-local-action="rematch">Revancha con los mismos jugadores <span>→</span></button>' : ""}<button class="btn ${puedeRevancha ? "btn-secondary" : "btn-primary"} btn-block" data-local-action="close-room">Cerrar la sala</button>`
-      : `<p class="hint">Si quien organiza pide revancha, volveréis todos a la sala de espera.</p><button class="btn btn-secondary btn-block" data-local-action="leave">Salir de la sala</button>`;
+      : `<p class="hint">Si el anfitrión pide revancha, volveréis todos a la sala de espera.</p><button class="btn btn-secondary btn-block" data-local-action="leave">Salir de la sala</button>`;
     paint(`<div class="shell">${header("leave")}<section class="pass-screen"><div class="panel pass-card"><div class="eyebrow">Partida terminada · ${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"} en la mesa</div><h2 data-focus tabindex="-1">${title}</h2><p>${lead}</p>${reviewActions()}${acciones}</div></section></div>`, "local-final");
   }
 
@@ -1269,7 +1269,7 @@ function starterPanelMarkupContent(isHost) {
       if (!name) return showToast("Escribe tu nombre antes de escanear");
       if (rejectName(name)) return;
       openQrScan({
-        title: "Escanear invitación", hint: "Apunta la cámara al código que te enseñe quien organiza la sala.",
+        title: "Escanear invitación", hint: "Apunta la cámara al código que te enseñe el anfitrión.",
         onResult: text => { renderUnirseForm(); void doJoinWithOffer(name, text); },
         onBack: () => renderUnirseForm()
       });

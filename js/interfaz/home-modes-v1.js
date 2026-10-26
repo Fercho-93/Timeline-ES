@@ -285,7 +285,7 @@
   // Dos maneras de jugar con amigos: en un solo móvil o cada uno en el suyo. La sala, el
   // Wi-Fi local y los duelos ya no son puertas aparte: el ritmo se elige al crear la partida.
   const FRIEND_HUBS = {
-    local: ['hub-friends-local', 'Un solo móvil', 'Pasad el teléfono', 'menu-local.webp'],
+    local: ['hub-friends-local', 'Un solo móvil', 'Pasad el móvil', 'menu-local.webp'],
     online: ['hub-friends-online', 'Cada uno en su móvil', 'Juntos o a distancia', 'mode-walk-multi.webp']
   };
   // Cada uno en su móvil: por un lado unirse a lo que ya ha creado otro; por otro, crear (mazo, retos o competición).
@@ -300,7 +300,7 @@
     app.dataset.pendingHub = screen;
     hub(screen, title, eyebrow, [
       // Quien se une no elige mazo ni ritmo: la invitación ya lo lleva.
-      route === 'online' ? modeDoor('friends-join', 'menu-private.webp', 'Unirme a una partida', 'Escanea el QR o pega el enlace o el código. Por internet o por Wi‑Fi.', true, '', 'Unirme') : '',
+      route === 'online' ? modeDoor('friends-join', 'menu-private.webp', 'Unirme a una partida', 'Escanea el QR o pega el enlace o el código. Por internet o por Wi-Fi.', true, '', 'Unirme') : '',
       route === 'online' ? createRoomGroup(route) : [
         inlineCollections(route, 'Elegid un tema o combinad los ocho mazos cronológicos, o jugad una competición.'),
         modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: los mismos retos para todos.', false, `data-friend-quick="${route}"`, 'Preparar partida')
@@ -314,7 +314,7 @@
   function soloShortcuts() {
     const resumen = window.CONTINUUM?.soloResumen?.();
     if (!resumen) return '';
-    const pendientes = resumen.pendientes.map(p => `<button type="button" class="solo-shortcut solo-shortcut-resume" data-action="solo-open-deck" data-solo-deck="${p.mode}" data-resume="true"><span class="solo-shortcut-copy"><em>Partida guardada</em><b>Continuar ${escapeHtml(p.name)}</b><small>${p.kind === 'marathon' ? 'Maratón' : 'Ronda'} · ${escapeHtml(p.difficulty)}${p.total ? ` · carta ${Math.min(p.played + 1, p.total)} de ${p.total}` : ` · ${p.played} jugadas`}</small></span><span class="solo-resume-art" aria-hidden="true"><img class="solo-resume-illustration" src="assets/saved-journey-v1.webp" alt="" width="360" height="240" decoding="async"></span><span class="solo-shortcut-arrow" aria-hidden="true">→</span></button>`);
+    const pendientes = resumen.pendientes.map(p => `<button type="button" class="solo-shortcut solo-shortcut-resume" data-action="solo-open-deck" data-solo-deck="${p.mode}" data-resume="true"><span class="solo-shortcut-copy"><em>Partida guardada</em><b>Continuar ${escapeHtml(p.name)}</b><small>${p.kind === 'marathon' ? 'Maratón' : 'Ronda'} · ${escapeHtml(p.difficulty)}${p.total ? ` · carta ${Math.min(p.played + 1, p.total)} de ${p.total}` : ` · ${p.played} ${p.played === 1 ? "jugada" : "jugadas"}`}</small></span><span class="solo-resume-art" aria-hidden="true"><img class="solo-resume-illustration" src="assets/saved-journey-v1.webp" alt="" width="360" height="240" decoding="async"></span><span class="solo-shortcut-arrow" aria-hidden="true">→</span></button>`);
     const lastArt = window.CONTINUUM?.blockOf?.(resumen.ultimo?.mode)?.art;
     const lastCover = { history: 'history', entertainment: 'entertainment', science: 'science', nature: 'nature', globe: 'geography', mixed: 'mixed' }[lastArt] || 'mixed';
     const ultimo = resumen.ultimo && !resumen.pendientes.some(p => p.mode === resumen.ultimo.mode)
@@ -333,8 +333,8 @@
 
   function openFriendsHub() {
     hub('hub-friends', 'Jugar con amigos', 'Juntos', [
-      modeDoor('local-hub', 'menu-local.webp', 'Un solo móvil', 'Pasad un mismo teléfono en cada turno.'),
-      modeDoor('friend-hub', 'menu-private.webp', 'Cada uno en su móvil', 'En directo, por turnos o con las mismas cartas. Por internet o en la misma Wi‑Fi.', false, 'data-friend-hub="online"')
+      modeDoor('local-hub', 'menu-local.webp', 'Un solo móvil', 'Pasad un mismo móvil en cada turno.'),
+      modeDoor('friend-hub', 'menu-private.webp', 'Cada uno en su móvil', 'En directo, por turnos o con las mismas cartas. Por internet o en la misma Wi-Fi.', false, 'data-friend-hub="online"')
     ].join(''), modeArt['friends-hub']);
   }
 
@@ -518,7 +518,7 @@
     box.className='mode-ranking-summary';
     box.setAttribute('aria-label','Tus retos diarios');
     const trophy='<img src="assets/ranking-trophy-v1.webp" alt="" aria-hidden="true" width="80" height="80" decoding="async">';
-    box.innerHTML=`<div class="mode-ranking-head"><span class="mode-ranking-medallion">${trophy}</span><div class="mode-ranking-copy"><span class="mode-ranking-kicker">El reto de cada día</span><h3>Ranking</h3><p>Cada acierto deja huella.</p></div></div><div class="mode-ranking-stats"><span><b>${r.day===null?'–':`${r.day}/10`}</b><small>Hoy</small></span><span><b>${r.weekHits}</b><small>Esta semana</small></span><span><b>${r.streak}</b><small>${r.streak===1?'Día seguido':'Días seguidos'}</small></span></div>${window.CONTINUUM?.Accounts?.ready?'<button type="button" class="btn btn-secondary mode-ranking-link" data-account-action="ranking">Ver ranking</button>':''}`;
+    box.innerHTML=`<div class="mode-ranking-head"><span class="mode-ranking-medallion">${trophy}</span><div class="mode-ranking-copy"><span class="mode-ranking-kicker">Reto diario</span><h3>Ranking</h3><p>Cada acierto deja huella.</p></div></div><div class="mode-ranking-stats"><span><b>${r.day===null?'–':`${r.day}/10`}</b><small>Hoy</small></span><span><b>${r.weekHits}</b><small>Esta semana</small></span><span><b>${r.streak}</b><small>${r.streak===1?'Día seguido':'Días seguidos'}</small></span></div>${window.CONTINUUM?.Accounts?.ready?'<button type="button" class="btn btn-secondary mode-ranking-link" data-account-action="ranking">Ver ranking</button>':''}`;
     doors.append(box);
   }
 
