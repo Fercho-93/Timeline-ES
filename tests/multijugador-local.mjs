@@ -372,7 +372,7 @@ console.log("\nCompetición sin internet entre dos móviles");
   ok("la entrada de la competición solo ofrece crear la sala", /Competición sin internet/.test(html(h3)) && !h3.document.querySelector('[data-local-action="go-unirse"]'));
   h3.document.getElementById("local-name-host").value = "Fer";
   submit(h3, '[data-local-form="create"]');
-  ok("la sala empieza por el primer tema de la competición, no por el mazo de antes", /Competición: 2 temas · 1 cartas por persona/.test(html(h3)) && !h3.document.getElementById("wifi-hand-size"));
+  ok("la sala empieza por el primer tema de la competición, no por el mazo de antes", /Competición: 2 temas · 1 carta por persona/.test(html(h3)) && !h3.document.getElementById("wifi-hand-size"));
   g3.CONTINUUM.LocalMultiplayer.open({ modeKey: "movies", onBack: () => {} });
   await conecta(h3, g3);
   await until(() => pantalla(g3) === "local-lobby");
