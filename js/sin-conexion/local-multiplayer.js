@@ -718,7 +718,7 @@ function starterPanelMarkupContent(isHost) {
     const settings = isHost
       ? `<div class="section-label">Ajustes</div>
         <div class="field"><span class="field-label">Tiempo por carta</span><p class="hint">${CT.Tiempo.texto(CT.Tiempo.get("amigos", 15))} (lo elegiste al crear la partida).</p></div>
-        ${roomState.tournament ? `<p class="hint">Competición: ${roomState.tournament.queue.length} temas · ${roomState.tournament.handSize} cartas por persona.</p>` : `<div class="field"><span class="field-label">Cartas iniciales</span><p class="hint">${lobbySettings.handSize} por persona (lo elegiste al crear la partida).</p></div>`}
+        ${roomState.tournament ? `<p class="hint">Competición: ${roomState.tournament.queue.length} temas · ${roomState.tournament.handSize} ${roomState.tournament.handSize === 1 ? "carta" : "cartas"} por persona.</p>` : `<div class="field"><span class="field-label">Cartas iniciales</span><p class="hint">${lobbySettings.handSize} por persona (lo elegiste al crear la partida).</p></div>`}
         ${roomState.tournament ? "" : `<input type="checkbox" hidden id="wifi-pulse"${lobbySettings.pulse ? " checked" : ""}><input type="checkbox" hidden id="wifi-ghost"${lobbySettings.ghost ? " checked" : ""}>
         <div class="field"><span class="field-label">Poderes</span><p class="hint">${CT.ManoInicial?.poderesTexto?.({ pulse: lobbySettings.pulse, ghost: lobbySettings.ghost }) ?? "sin poderes"} (lo elegiste al crear la partida).</p></div>`}
         ${CT.LocalRoom.laterRound(roomState) ? nextThemeMarkup(true) : roomState.playerOrder.length < 2 ? '<p class="hint">Esperando a alguien más…</p>' : starterPanelMarkup(true)}`

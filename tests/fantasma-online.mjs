@@ -266,7 +266,9 @@ try {
  await seed(tournament);
  await clients[0].call('nextTournamentRound');
  await clients[0].call('nextTournamentRound');assert.equal((await snapshot()).tournament.index,1);
- await clients[0].call('renderLobby');assert.equal(clients[0].w.document.getElementById('online-hand-size').disabled,true);
+ await clients[0].call('renderLobby');
+ // Las cartas por persona las fija la competición: la sala de espera no enseña además las «Cartas iniciales» de la partida normal.
+ assert.equal(clients[0].w.document.getElementById('online-hand-size'),null);assert.doesNotMatch(clients[0].w.document.querySelector('.lobby-settings').textContent,/Cartas iniciales/);assert.match(clients[0].w.document.querySelector('.tournament-summary').textContent,/1 carta por persona/);
  assert.equal(clients[0].w.document.querySelectorAll('.table-seat.occupied').length,9);
  assert.equal(clients[0].w.document.querySelectorAll('.ready-seal').length,9);
  // La competición se juega sin poderes: la sala de espera no los ofrece y el reparto no los esconde.
