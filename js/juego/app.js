@@ -944,7 +944,7 @@
   function starterFieldMarkup() {
     const names = playerNames();
     if (!starterDraw || starterDraw.winner === null || starterDraw.names.length !== names.length) {
-      return `<span class="field-label">Quién empieza</span>${CT.StarterPresentation.drawInfo(CT.starterNoun(selectedModeKey))}`;
+      return `<span class="field-label">Quién empieza</span>${CT.StarterPresentation.drawButton('data-action="draw-starter"', CT.starterNoun(selectedModeKey))}`;
     }
     const ganador = escapeHtml(names[starterDraw.winner] ?? `Jugador ${starterDraw.winner + 1}`);
     const orden = (starterDraw.order || [starterDraw.winner]).map(i => escapeHtml(names[i] ?? `Jugador ${i + 1}`)).join(" → ");

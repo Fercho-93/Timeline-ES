@@ -5570,18 +5570,6 @@ html #app[data-screen] .local-setup .player-row input { min-width: 0; border: 0;
 #app .starter-draw-copy b { color: #fff4df; font: 500 1.35rem/1.05 var(--font-display); }
 #app .starter-draw-copy small { color: #f4e5cd; font: .68rem/1.4 var(--ui-font); }
 #app .starter-draw-cta .starter-draw-arrow { color: #f1d9ad; font-size: 1.1rem; }
-/* En «Un solo móvil» la lámina solo anuncia el minijuego: lo abre «Empezar». Por eso no
-   lleva el relleno de un botón, sino papel con filete discontinuo, como una nota. */
-#app .starter-draw-cta.starter-draw-info {
-  cursor: default; border: 1px dashed color-mix(in srgb, var(--scene-color) 55%, transparent); box-shadow: none;
-  background: color-mix(in srgb, var(--scene-color) 10%, var(--edition-surface)); color: var(--edition-ink);
-}
-#app .starter-draw-info::before { display: none; }
-#app .starter-draw-info .starter-draw-icon { color: var(--scene-color); }
-#app .starter-draw-info .starter-draw-copy .starter-draw-kicker { color: var(--edition-rust); }
-#app .starter-draw-info .starter-draw-copy b { color: var(--edition-ink); }
-#app .starter-draw-info .starter-draw-copy small { color: var(--edition-muted); }
-@media (hover: hover) and (pointer: fine) { #app .starter-draw-cta.starter-draw-info:hover { filter: none; } }
 html #app[data-screen] .local-setup .local-hand-size { display: grid; grid-template-columns: 50px minmax(0, 1fr) 62px; align-items: center; gap: 12px; padding: 16px 0; margin-top: 7px; border-bottom: 1px solid var(--opening-edge); }
 #app .local-hand-art { width: 50px; height: 58px; color: var(--opening-accent); }
 #app .local-hand-art svg { width: 100%; height: 100%; }

@@ -94,9 +94,9 @@ w = boot();
 click(irAJugar(w), '[data-block="historia"]');
 click(w, '[data-mode="history"]');
 (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('local');
-// La lámina anuncia el minijuego y lo abre «Empezar»: una sola llamada principal.
-ok("al principio se anuncia que hay que adivinar una cifra", !!w.document.querySelector('.starter-draw-info') && !w.document.querySelector('[data-action="draw-starter"]'));
-click(w, '[data-action="start"]');
+// Como en Retos rápidos, la lámina es el botón que abre el minijuego.
+ok("al principio hay un botón para adivinar la cifra", !!w.document.querySelector('button.starter-draw-cta[data-action="draw-starter"]'));
+click(w, '[data-action="draw-starter"]');
 ok("pide pasar el móvil al primer jugador, que lleva tu nombre", /Pasa el móvil a Prueba/.test(w.document.body.textContent));
 ok("el sorteo enseña la ilustración de la carta", !!w.document.querySelector('.starter-card-art img.animal-card-art'));
 ok("la ayuda está asociada a la respuesta", w.document.getElementById(w.document.getElementById("starter-guess-input").getAttribute("aria-describedby"))?.textContent.length > 0);
