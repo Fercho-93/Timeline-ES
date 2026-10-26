@@ -744,6 +744,9 @@ function anotaProgreso() {
     nuevos.push(...CT.Progreso.finishOnline({
       code: roomCode, version: roomState.version, mode: modeKey(), won: ganadores.includes(user.uid)
     }));
+    // El último tema de una competición la cierra entera (logro «Vuelta completa»).
+    const t = roomState.tournament;
+    if (t && t.index + 1 >= t.queue.length) nuevos.push(...CT.Progreso.finishCompetition({ clave: `${roomCode}:${t.queue.join(",")}` }));
   }
   if (nuevos.length) {
     sessionAchievements=[...new Map([...sessionAchievements,...nuevos].map(item=>[item.id||item.name,item])).values()];

@@ -244,6 +244,12 @@
     roomState = room;
     // En una competición el mazo cambia de una ronda a otra: se juega siempre el de la sala.
     if (room?.mode && room.mode !== modeKey && CT.has(room.mode)) modeKey = room.mode;
+    // El último tema de una competición la cierra entera (logro «Vuelta completa»).
+    const t = room.tournament;
+    if (room.status === "ended" && previous?.status !== "ended" && t && t.index + 1 >= t.queue.length) {
+      const logros = CT.Progreso?.finishCompetition?.({ clave: `wifi:${room.roomCode}:${t.queue.join(",")}` }) || [];
+      if (logros.length) { CT.Effects?.achievement?.(); showToast(logros.length === 1 ? `Logro: ${logros[0].name}` : `${logros.length} logros nuevos`); }
+    }
     // Cada partida (también cada tema de una competición o una revancha) repasa solo lo suyo.
     if (room.status === "playing" && previous?.status !== "playing") sessionFailed = new Map();
     if (room.phase === "reveal" && room.reveal) {

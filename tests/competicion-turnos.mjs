@@ -29,6 +29,7 @@ w.CONTINUUM = {
   Accounts: { get user() { return { uid: me }; }, profile: { alias: 'Yo' } },
   Identidad: { propio: () => me === 'ana' ? 'Ana' : 'Bea' },
   Tournament: { create: rounds => ({ queue: ['alfa', 'beta'].slice(0, rounds) }) },
+  Progreso: { cerradas: [], finishCompetition({ clave }) { this.cerradas.push(clave); return []; } },
   // Reparto fijo: el orden del mazo tal cual, tantas cartas como pida el tema más la de salida.
   Duelo: { CARTAS: 15, reparto: (mode, _seed, total) => decks[mode].slice(0, total + 1).map(c => c.id), crearSemilla: () => 'semilla', Cifras: { CARTAS: 10 } }
 };
@@ -47,7 +48,7 @@ w.__deps = {
 };
 w.navigator.clipboard = { writeText: async () => {} };
 w.eval(`const {auth,db,doc,Timestamp,serverTimestamp,runTransaction,onSnapshot}=window.__deps;\n${source}\nwindow.testComp={
-  create, localCard, timelineCards, gameLabel, modeAt, themeAt, compTotal, TOTAL, perTheme,
+  create, localCard, timelineCards, gameLabel, modeAt, themeAt, compTotal, TOTAL, perTheme, subscribe,
   show: game=>{current=game;prepareTurn();render();}, queueMove
 };`);
 const t = w.testComp;
@@ -127,5 +128,9 @@ assert.deepEqual(t.timelineCards(r.after, 0).map(c => c.title), ['Alfa 1', 'Alfa
 assert.equal(r.after.status, 'finished');
 assert.deepEqual(r.after.scores, { ana: 2, bea: 1 });
 assert.equal(r.after.timeline.length, 1 + 3, 'una carta guardada por cada acierto, más la de salida');
+// Al verla terminada, la competición se cierra entera para el logro «Vuelta completa», con
+// una clave por partida para que el perfil no la cuente dos veces.
+t.subscribe(id);
+assert.ok(w.CONTINUUM.Progreso.cerradas.includes(`turnos:${id}`), 'la competición por turnos cuenta para «Vuelta completa»');
 
 console.log('Competición por turnos: temas al azar, reparto por tema, líneas propias y documento válido para las reglas: OK');

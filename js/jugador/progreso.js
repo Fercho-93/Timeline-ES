@@ -398,9 +398,11 @@
   }
 
   // La competición se cuenta aparte: cada ronda ya pasó por `finishGame` con su propio
-  // mazo, y lo que premia el logro es haberlas jugado todas de seguido.
-  function finishCompetition() {
+  // mazo, y lo que premia el logro es haberlas jugado todas de seguido. En grupo, `clave`
+  // identifica la competición compartida, que llega en varias instantáneas de la sala.
+  function finishCompetition({ clave = null } = {}) {
     const profile = read();
+    if (clave && alreadySeen(profile, `comp:${clave}`)) return [];
     profile.marks.comps += 1;
     const nuevos = unlock(profile);
     save(profile);

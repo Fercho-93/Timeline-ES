@@ -405,6 +405,7 @@ console.log("\nCompetición sin internet entre dos móviles");
   ok("y empieza ella, la siguiente de la mesa", /Tu turno/.test(g3.document.querySelector(".turn-name").textContent));
   await juega([h3, g3], "inventions", [h3]);
   await until(() => [h3, g3].every(win => pantalla(win) === "local-final"));
+  ok("terminar la competición cuenta para «Vuelta completa» en los dos móviles, una sola vez", [h3, g3].every(win => win.CONTINUUM.Progreso.read().marks.comps === 1));
   ok("tras el último tema queda el resultado de la competición, sin «siguiente tema»", [h3, g3].every(win => /Resultado de la competición/.test(html(win))) && !h3.document.querySelector('[data-local-action="competition-next"]'));
 }
 

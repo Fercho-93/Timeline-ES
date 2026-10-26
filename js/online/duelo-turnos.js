@@ -11,6 +11,9 @@ const INACTIVE_DAYS = 7;
 // Quien crea el duelo juega su primera carta antes de que entre el rival (salvo en una revancha que empieza el otro).
 const firstTurnOf = game => game?.status === 'waiting' && game.playersOrder?.length === 1 && game.playersOrder[0] === uid() && !game.turnIndex && !game.starter;
 const ended = game => ['finished', 'cancelled', 'expired', 'resigned'].includes(game.status);
+// El recordatorio de las 48 horas llega como aviso al móvil: mientras estén apagados
+// (`nativePush` en js/nube/deployment.js), no se promete.
+const recordatorio = () => CT.Deployment?.nativePush === true;
 const inactive = game => !ended(game) && game.updatedAt?.seconds && Date.now() - game.updatedAt.seconds * 1000 >= INACTIVE_DAYS * 86400000;
 const asVisible = game => inactive(game) ? { ...game, status: 'expired', turnUid: null, resultText: 'Duelo caducado tras siete días sin actividad.' } : game;
 let cachedGames = [], busy = false;
@@ -186,7 +189,7 @@ function render() {
       ${active && !card ? '<p role="alert">No se pudo cargar la carta. Actualiza Continuum en los dos móviles.</p>' : ''}
       ${finished ? `<p class="turn-duel-status">${safe(current.resultText || 'Gracias por jugar.')}</p>` : ''}
       ${!active && (finished || nextTargets.length) ? `<div class="turn-duel-actions">${finished && current.playersOrder.length === 2 ? '<button class="btn btn-primary" data-turn-action="rematch">Revancha</button>' : ''}${nextTargets.length ? `<button class="btn btn-secondary" data-turn-action="next" aria-label="Ver tus duelos pendientes">Ver tus duelos pendientes <small>(${nextTargets.length})</small></button>` : ''}${finished && !nextTargets.length ? '<button class="btn btn-secondary" data-turn-action="next">Volver a mis duelos</button>' : ''}</div>` : ''}
-      ${!finished ? '<p class="hint">Un recordatorio tras 48 horas. Caduca a los 7 días sin actividad.</p>' : ''}
+      ${!finished ? `<p class="hint">${recordatorio() ? 'Un recordatorio tras 48 horas. ' : ''}Caduca a los 7 días sin actividad.</p>` : ''}
     </section></div>`;
   app.dataset.screen = 'turn-duel';
   app.innerHTML = html;
@@ -378,6 +381,11 @@ function subscribe(gameId) {
     current = asVisible({ ...next, id: gameId, shareLink });
     if (discoverOwnPlays(current) && ownPlay?.uid === uid()) CT.Effects?.discovery?.();
     if (justEnded) CT.Effects?.transition?.('end');
+    // Terminar una competición por turnos también la cierra entera (logro «Vuelta completa»).
+    if (current.status === 'finished' && compModes(current) && current.playersOrder.includes(uid())) {
+      const logros = CT.Progreso?.finishCompetition?.({ clave: `turnos:${gameId}` }) || [];
+      if (logros.length) { CT.Effects?.achievement?.(); notify(`Logro: ${logros[0].name}`); }
+    }
     if (previousTurn !== current.turnIndex) { pendingIndex = null; delivery = ''; }
     prepareTurn();
     if (wasPlayingAway && current.turnUid === uid() && !ended(current)) { CT.Effects?.transition?.('turn'); notify('Tu oponente ha colocado una carta. Te toca.'); }

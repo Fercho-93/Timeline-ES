@@ -175,6 +175,13 @@ console.log("\nLos logros que dependen del final de la partida");
   ok("una de 5 sí", P.finishGame({ mode: "history", kind: "local", players: 5 }).some(l => l.key === "mesa"));
   ok("terminar la competición entera da «Vuelta completa»", P.finishCompetition().some(l => l.key === "competicion"));
   ok("y no se repite en la siguiente", !P.finishCompetition().some(l => l.key === "competicion"));
+  // En grupo, la misma competición llega en varias instantáneas de la sala: se cuenta una vez.
+  const antes = P.read().marks.comps;
+  P.finishCompetition({ clave: "SALA1:history,world" });
+  P.finishCompetition({ clave: "SALA1:history,world" });
+  ok("una competición compartida cuenta una sola vez", P.read().marks.comps === antes + 1);
+  // Con los avisos al móvil apagados, la Guía no promete el recordatorio de las 48 horas.
+  ok("la Guía no promete un recordatorio que no llega", !/48 horas/.test(w.CONTINUUM.guideMarkup("history", "local")) && /7 días/.test(w.CONTINUUM.guideMarkup("history", "local")));
 }
 
 console.log("\nUna sala no cuenta dos veces la misma instantánea");

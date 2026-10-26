@@ -1574,7 +1574,10 @@
     vuelcaCartas(game);
     game.winners = winners.map(player => player.id);
     game.winner = game.winners[0];
-    anotaLogros(CT.Progreso.finishGame({ mode: game.mode, kind: "local", players: game.players.length }));
+    const logros = CT.Progreso.finishGame({ mode: game.mode, kind: "local", players: game.players.length });
+    // El último tema de una competición en grupo cierra la competición entera, como en solitario.
+    if (game.tournament && game.tournament.index + 1 >= game.tournament.queue.length) logros.push(...CT.Progreso.finishCompetition());
+    anotaLogros(logros);
     saveGame();
     renderWinner(winners);
     return true;

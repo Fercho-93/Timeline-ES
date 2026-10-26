@@ -61,6 +61,8 @@ for(let round=0;round<3;round++) {
  assert.equal(w.document.querySelectorAll('.chapter-stop.current').length,1);
  assert.ok(w.document.querySelector('.final-metrics'),'el cierre resume el resultado antes de las acciones');
  assert.equal(state().tournament.index,round);
+ // Terminar la competición en grupo también da «Vuelta completa», como en solitario; los temas de antes, no.
+ assert.equal(w.CONTINUUM.Progreso.read().marks.comps,round===2?1:0,'la competición de un solo móvil cuenta para el logro al acabar');
  const saved=w.localStorage.getItem(key);w.close();w=boot(saved);w.CONTINUUM.localNavigate('home');w.CONTINUUM.ModeHubs.refreshHome();w.CONTINUUM.ModeHubs.open('hub-friends-local');click('[data-action="competition-menu"]');click('[data-action="competition-resume"]');
  assert.ok(w.document.querySelector('.tournament-board'));
  if(round<2){const prior=state().mode;click('[data-action="competition-next"]');assert.notEqual(state().mode,prior);assert.ok(state().players.every(p=>p.hand.length===1));click('[data-action="competition-round-start"]');}
