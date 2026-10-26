@@ -32,7 +32,6 @@ html #app[data-screen][data-screen] .home-nav.atlas-nav::before {
   content: ""; position: absolute; inset: 4px; border: 1px solid var(--nav-hairline);
   border-radius: 0; background: none; box-shadow: none; pointer-events: none;
 }
-html #app[data-screen][data-screen] .home-nav.atlas-nav::after { content: none; }
 html #app[data-screen][data-screen] .home-nav.atlas-nav button,
 html #app[data-screen][data-screen] .home-nav.atlas-nav button[aria-current="page"] {
   position: relative; display: grid; align-content: center; justify-items: center;
@@ -42,8 +41,6 @@ html #app[data-screen][data-screen] .home-nav.atlas-nav button[aria-current="pag
   transform: none; --atlas-card-tilt: 0deg; cursor: pointer;
   transition: color 180ms ease;
 }
-html #app[data-screen][data-screen] .home-nav.atlas-nav button::before,
-html #app[data-screen][data-screen] .home-nav.atlas-nav button::after { content: none; }
 /* Separadores verticales, con una estrella diminuta en su centro. */
 html #app[data-screen][data-screen] .home-nav.atlas-nav button + button::before {
   content: ""; position: absolute; left: 0; top: 5px; bottom: 5px; width: 7px;
@@ -91,10 +88,6 @@ html #app[data-screen][data-screen] :is(.enc-modal, .settings-modal, .rules):has
 :root[data-theme="dark"] #app[data-screen][data-screen] .home-nav.atlas-nav button svg { filter: none; }
 @media (hover: hover) {
   html #app[data-screen][data-screen] .home-nav.atlas-nav button:not([aria-current]):hover span { background: color-mix(in srgb, var(--nav-brass) 10%, transparent); }
-}
-@media (prefers-reduced-motion: reduce) {
-  html #app[data-screen][data-screen] .home-nav.atlas-nav button,
-  html #app[data-screen][data-screen] .home-nav.atlas-nav button span { transition: none; }
 }
 @media (max-width: 350px) {
   html #app[data-screen][data-screen] .home-nav.atlas-nav { padding-inline: max(5px, env(safe-area-inset-left)); }

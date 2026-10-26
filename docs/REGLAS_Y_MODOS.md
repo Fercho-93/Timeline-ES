@@ -158,7 +158,9 @@ Cuatro formatos, todos sin conexión y con la marca guardada en el propio móvil
 
 - **Reto diario:** se entra desde la portada, no desde un mazo. Cada día sale un mazo —un día de
   Grandes colecciones y al siguiente de Retos rápidos, alternando sin falta (`CT.RetoDiario.familia`)— y de él las mismas 10 cartas
-  para todo el mundo, con un solo intento por perfil. Las cartas se barajan con la fecha local como
+  para todo el mundo, con un solo intento por perfil. Los dos tipos de día se presentan igual: una
+  ruleta de nombres que se para en el mazo de hoy, con su colección encima (o «Retos rápidos»), y
+  el botón para jugar; un reto ya empezado se retoma sin ella. Las cartas se barajan con la fecha local como
   semilla, así que no hace falta ningún servidor para que dos móviles reciban exactamente el mismo
   reto. Tiene su propio guardado, así que empezarlo no pisa una partida libre a medias del mismo
   mazo. Completar el reto un día detrás de otro encadena una racha, que además se ve como un

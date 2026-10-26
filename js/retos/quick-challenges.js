@@ -94,8 +94,9 @@
   function prepare(config) {
     pendingConfig=config; page='prepare'; state=null; record=null;
     const c=E.challenge(config.rounds[0].id);
-    shell(`<section class="setup-section quick-ready"><div class="eyebrow"><span class="eyebrow-line"></span> Reto preparado</div><h2 data-focus tabindex="-1">${esc(c.title)}</h2>${config.rounds.length === 1 ? '' : `<p class="lead">${config.rounds.length} mazos sorpresa, uno detrás de otro.</p>`}<div class="panel quick-ready-card"><div class="quick-ready-seal" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="29"/><circle cx="32" cy="32" r="23"/><path d="M32 9l3.2 19.8L55 32l-19.8 3.2L32 55l-3.2-19.8L9 32l19.8-3.2z"/><circle cx="32" cy="32" r="3.2"/></svg></div><span class="quick-ready-kicker">La regla del mazo</span><p class="quick-ready-rule">${esc(c.rule)}</p>${c.asOf ? `<p class="quick-ready-asof">Datos a ${esc(c.asOf)}</p>` : ''}<div class="quick-ready-divider" aria-hidden="true"><i></i><b>◆</b><i></i></div><p class="hint">Cuando estés preparado, empieza el reto. Los siguientes mazos seguirán ocultos hasta que lleguen.</p>${button('ready','Estoy preparado <span>→</span>','btn btn-primary btn-block')}<p id="quick-error" role="alert"></p></div></section>`);
-    deckSplash(config);
+    shell(`<section class="setup-section quick-ready"><div class="eyebrow"><span class="eyebrow-line"></span> Reto preparado</div><h2 data-focus tabindex="-1">${esc(c.title)}</h2>${config.rounds.length === 1 ? '' : `<p class="lead">${config.rounds.length} mazos sorpresa, uno detrás de otro.</p>`}<div class="panel quick-ready-card"><div class="quick-ready-seal" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="29"/><circle cx="32" cy="32" r="23"/><path d="M32 9l3.2 19.8L55 32l-19.8 3.2L32 55l-3.2-19.8L9 32l19.8-3.2z"/><circle cx="32" cy="32" r="3.2"/></svg></div><span class="quick-ready-kicker">La regla del mazo</span><p class="quick-ready-rule">${esc(c.rule)}</p>${c.asOf ? `<p class="quick-ready-asof">Datos a ${esc(c.asOf)}</p>` : ''}<div class="quick-ready-divider" aria-hidden="true"><i></i><b>◆</b><i></i></div><p class="hint">Cuando estés preparado, empieza el reto.${config.rounds.length === 1 ? '' : ' Los siguientes mazos seguirán ocultos hasta que lleguen.'}</p>${button('ready','Estoy preparado <span>→</span>','btn btn-primary btn-block')}<p id="quick-error" role="alert"></p></div></section>`);
+    // El reto diario ya tuvo su portada (la ruleta del reto diario, la misma de los días de colecciones).
+    if(config.kind!=='daily')deckSplash(config);
   }
   // Antes de la explicación, una portada breve con el mazo que toca. Es una capa sobre la
   // pantalla «Reto preparado» (que ya está pintada debajo): solo se retira con un toque.
@@ -877,6 +878,11 @@
     'spanish-tv': ['Más antiguo', 'Más reciente'], 'minimum-wages': ['Menor salario', 'Mayor salario'],
     poker: ['Más débil', 'Más fuerte']
   };
+  // El mismo rótulo que las mesas de colecciones: «Línea temporal» si el reto va de fechas
+  // y, si no, su regla («De menor a mayor altura…»), como «De más lento a más rápido».
+  function timelineTitle(c) {
+    return /antigu|reciente|fecha|reinado|salida al mercado|estreno/i.test(c.rule || '') ? 'Línea temporal' : c.rule || 'Línea temporal';
+  }
   function timelineEnds(c) {
     const m = /^De (.+?) a (.+)$/.exec(c.rule || '');
     const [left, right] = ENDS[c.id] || (m ? [m[1], m[2]] : ['Primero', 'Último']);
@@ -1031,10 +1037,10 @@
     }
     const gap = i => slot === i && selected ? `<div class="slot-confirm quick-confirm provisional-placement" data-index="${i}"><div class="slot-confirm-card"><small>Vista previa · sin confirmar</small><strong>${esc(get(selected).title)}</strong><span aria-hidden="true">Valor oculto</span></div>${button('confirm', 'Colocar carta →', 'btn btn-primary btn-block')}${button('cancel', 'Cambiar', 'btn btn-ghost btn-block')}</div>` : `<button class="slot" data-quick="slot" data-index="${i}" ${selected ? '' : 'disabled'} aria-label="${esc(i === 0 ? `Colocar antes de ${get(state.timeline[0]).title}` : i === state.timeline.length ? `Colocar después de ${get(state.timeline[i-1]).title}` : `Colocar entre ${get(state.timeline[i-1]).title} y ${get(state.timeline[i]).title}`)}"><span>${i === 0 ? '−' : '+'}</span></button>`;
     const ms=Number(state.config.seconds)*1000, timed=timedTurn(), startedAt=timed?turnStartedAt(turnKey()):0;
-    shell(`${heading}${timed?CT.Tiempo.bar(ms-(Date.now()-startedAt),ms):''}${lastNote()}<section><h3 class="solo-lectores">Cartas comunes</h3><div class="hand">${state.remaining.filter(id => !(slot !== null && selected === id)).map(id => `<button class="hand-card${selected === id ? ' selected' : ''}" data-quick="select" data-id="${id}" aria-pressed="${selected === id}"${room && !myTurn() ? ' disabled' : ''}><span class="hidden-date">Valor oculto</span>${CT.cardBack('quick')}<strong>${esc(get(id).title)}${get(id).artist?`<small class="quick-card-artist">${esc(get(id).artist)}</small>`:""}</strong><span class="card-arrow">→</span></button>`).join('')}</div>
+    shell(`${heading}${timed?CT.Tiempo.bar(ms-(Date.now()-startedAt),ms):''}${lastNote()}<section><div class="hand-title"><h3>${room ? 'Cartas comunes' : 'Tus cartas'}</h3></div><div class="hand">${state.remaining.filter(id => !(slot !== null && selected === id)).map(id => `<button class="hand-card${selected === id ? ' selected' : ''}" data-quick="select" data-id="${id}" aria-pressed="${selected === id}"${room && !myTurn() ? ' disabled' : ''}><span class="hidden-date">Valor oculto</span>${CT.cardBack('quick')}<strong>${esc(get(id).title)}${get(id).artist?`<small class="quick-card-artist">${esc(get(id).artist)}</small>`:""}</strong><span class="card-arrow">→</span></button>`).join('')}</div>
       <p class="hint">${selected ? 'Toca un hueco y confirma, o arrastra la carta hasta su lugar.' : 'Toca una carta o mantenla pulsada para arrastrarla hasta un hueco.'}</p></section>
-      <section class="board-timeline-section"><div class="hand-title"><h3>Línea de cartas</h3></div>${timelineEnds(c)}${CT.timelineMap(null, state.timeline)}
-      <div class="timeline-wrap"><div class="timeline" aria-label="Línea de cartas: orden de izquierda a derecha">${state.timeline.map((id, i) => gap(i) + cardMarkup(c, get(id))).join('')}${gap(state.timeline.length)}</div></div></section>`);
+      <section class="board-timeline-section"><div class="hand-title"><h3>${esc(timelineTitle(c))}</h3></div>${timelineEnds(c)}${CT.timelineMap(null, state.timeline)}
+      <div class="timeline-wrap"><div class="timeline" aria-label="${esc(timelineTitle(c))}: orden de izquierda a derecha">${state.timeline.map((id, i) => gap(i) + cardMarkup(c, get(id))).join('')}${gap(state.timeline.length)}</div></div></section>`);
     CT.enableDrag({cardSelector: '.quick-shell .hand-card', slotSelector: '.quick-shell .slot', parseCardId: id => id, onDrop(id, index) {
       if (!myTurn() || !app().querySelector('.quick-shell') || state?.phase !== 'turn' || !state.remaining.includes(id)) return;
       selected = id; slot = index; render(); focusPlacement();
@@ -1233,6 +1239,8 @@
     },
     // El mazo y la regla del reto rápido de un día, para enseñarlos en la guía sin empezar la partida.
     dailyChallenge(dayValue) {const c=E.challenge(dailyQuick(dayValue).rounds[0].id);return {id:c.id,title:c.title,rule:c.rule,asOf:c.asOf,cards:dailyQuick(dayValue).rounds[0].order.length};},
+    // ¿Hay un reto diario rápido de ese día empezado y sin terminar? Entonces se retoma sin portada.
+    dailyPending(dayValue) {const saved=load();return !!(saved?.config?.kind==='daily' && saved.config.day===dayValue && !saved.historySaved);},
     startDaily(dayValue, renderPage) {
       paint=renderPage; entry='prepare'; stopNetwork(); page='prepare'; state=null; record=null; selected=null; slot=null;
       const saved=load();

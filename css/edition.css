@@ -151,15 +151,6 @@ html body::before {
 .collection-decks .game-row.active { border-left-color: var(--edition-brass); }
 .collection-decks .game-name { font-size: 1.1rem; }
 .collection-decks .game-meta { color: var(--edition-muted); font: .875rem/1.5 var(--ui-font); }
-/* Anclada al borde inferior y a todo el ancho, no flotante: separada del borde dejaba
-   ver el contenido de la página por debajo, que es justo lo que una barra fija no debe
-   hacer. El relleno inferior absorbe la franja de gestos del teléfono. */
-html .home-nav { bottom: 0; min-height: 66px; padding: 5px 5px calc(5px + var(--safe-bottom)); border: 0; border-top: 1px solid var(--edition-line); border-radius: 0; background: var(--edition-surface); box-shadow: 0 -8px 32px #0002; }
-html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-surface) 94%, transparent); border-color: var(--edition-line); }
-.home-nav button { gap: 4px; padding: 7px 4px; border-radius: 7px; color: var(--edition-muted); }
-.home-nav small { font: .75rem/1.3 var(--ui-font); }
-.home-nav button[aria-current] { color: var(--edition-ink); background: color-mix(in srgb, var(--edition-brass) 13%, transparent); }
-.home-nav button[aria-current] span { color: var(--edition-brass); }
 .panel, .modal, .room-code-card { background: var(--edition-surface); border-color: var(--edition-line); box-shadow: var(--edition-shade); }
 .panel > h1, .panel > h2, .panel > p, .modal > h2, .modal > p, .settings-modal, .setup-section, .pass-screen { color: var(--edition-ink); }
 .field input, .field select, .modal textarea, .player-row input { background-color: var(--edition-surface); border-color: var(--edition-line); color: var(--edition-ink); }
@@ -267,7 +258,6 @@ html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-s
   .gallery-panel:hover .collection-foil::after { animation: foil-reveal 1100ms ease-out both; }
   .collection-decks .game-row:hover .deck-chapter i { transform: translate(3px, -3px); }
 }
-html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(--edition-brass) 24%, var(--edition-surface)); box-shadow: inset 0 1px 3px #0002; }
 .solo-home .solo-intro { margin-bottom: 14px; }
 .solo-home .solo-intro .lead { font-size: .9rem; line-height: 1.45; margin-block: 8px 14px; }
 .solo-home .solo-fold { padding: 0; margin-block: 12px; }
@@ -378,10 +368,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
    ancho fijo que solo cabría una. */
 #app .atlas-topbar-actions { grid-column: 3; justify-content: flex-end; }
 #app.atlas-has-nav > .shell { padding-bottom: calc(96px + var(--safe-bottom)); }
-#app .atlas-nav { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); width: 100%; max-width: none; left: 0; transform: none; background: var(--edition-surface); min-height: 64px; z-index: 30; }
-#app .atlas-nav button { min-height: 50px; min-width: 0; }
-#app .atlas-nav small { font: .67rem/1.3 var(--ui-font); }
-#app .atlas-nav svg { display: block; width: 22px; height: 22px; }
 #app .enc-modal { padding-bottom: calc(100px + var(--safe-bottom)); }
 #app .enc-modal .atlas-nav { position: fixed; }
 #app .atlas-landscape { position: absolute; inset: 0; z-index: -1; max-width: none; overflow: hidden; }
@@ -482,7 +468,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 /* Texto ampliado puede desplazar la página: jamás se recorta para forzarlo a caber. */
 :root:is([data-text-size="125"],[data-text-size="150"],[data-text-size="200"]) #app.atlas-board .hand { max-height: none; overflow: visible; }
 :root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board .hand { grid-template-columns: 1fr; }
-:root:is([data-text-size="150"],[data-text-size="200"]) #app .atlas-nav { position: static; grid-template-columns: repeat(4,minmax(0,1fr)); }
 :root:is([data-text-size="150"],[data-text-size="200"]) #app .placement-dock { position: static; }
 @media (prefers-reduced-motion: no-preference) {
   #app .gallery-panel img { animation: atlas-cover-breathe 12s ease-in-out 2 alternate; }
@@ -611,12 +596,8 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   #app .atlas-specimens figcaption { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 }
 
-/* Las modalidades se presentan como pequeños viajes sobre el mismo papel. */
-
-#app .modal .atlas-nav { position: fixed; inset: auto 0 0; }
-
-/* Las consultas se abren sin barra inferior y conservan sus controles de volver. */
-#app :is(.enc-modal, .settings-modal, .rules) .atlas-nav { display: none; }
+/* Las consultas (Enciclopedia, Ajustes, Guía) llevan la barra inferior: dejan sitio debajo
+   para que no tape su final. */
 #app :is(.enc-modal, .settings-modal, .rules):has(.atlas-nav) { padding-bottom: 26px; }
 
 /* Ritmo de lectura móvil: pequeñas láminas y espacios proporcionales. */
@@ -1073,7 +1054,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 .enc-card-large .enc-card .card-visual { min-height: 310px; }
 .enc-card-large .enc-card .card-content { padding: 18px; }
 .enc-card-large .enc-card .card-content h3 { font-size: 1.25rem; }
-.enc-image-overlay { z-index: 65; }
 @media (max-width: 560px) {
   #app .enc-toolbar-compact { grid-template-columns: 1fr; gap: 8px; }
   .enc-card-large .enc-card { grid-template-columns: 1fr; }
@@ -1103,7 +1083,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .enc-deck { overflow: hidden; border-color: color-mix(in srgb,var(--edition-brass) 32%,var(--edition-line)); }
 #app .enc-deck summary { display: grid; grid-template-columns: 78px minmax(0,1fr) 26px; align-items: center; gap: 12px; min-height: 86px; padding: 0 13px 0 0; }
 .enc-deck-cover { position: relative; align-self: stretch; min-height: 86px; overflow: hidden; background: var(--edition-paper); }
-.enc-deck-cover img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: var(--cover-position) center; filter: sepia(.18) saturate(.9); }
+.enc-deck-cover img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: var(--cover-position, 50%) 30%; filter: sepia(.18) saturate(.9); }
 .enc-deck-cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg,transparent 65%,var(--edition-surface)); }
 .enc-deck-cover i { position: absolute; z-index: 1; left: 8px; bottom: 7px; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #f8eededb; color: var(--edition-ink); font-style: normal; }
 #app .enc-deck summary .enc-deck-copy { display: block; min-width: 0; }
@@ -1427,28 +1407,7 @@ html #app .home-nav.atlas-nav::before {
   backdrop-filter: blur(5px) saturate(1.12);
   filter: none;
 }
-#app .home-nav.atlas-nav button:nth-child(2) span { box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #a8b5a6, 0 3px 6px #41544238, 0 0 0 2px #e9eee5c4; }
-#app .home-nav.atlas-nav button:nth-child(3) span { box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #b7a56f, 0 3px 6px #69572c35, 0 0 0 2px #f1ead6c4; }
-#app .home-nav.atlas-nav button:nth-child(4) span { box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #b69b98, 0 3px 6px #64454035, 0 0 0 2px #f1e6e2c4; }
 #app .home-nav.atlas-nav button:nth-child(5) span { box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #9ca5b4, 0 3px 6px #38465d35, 0 0 0 2px #e7eaf0c4; }
-#app .home-nav.atlas-nav svg { width: 20px; height: 20px; stroke-width: 1.7; }
-#app .home-nav.atlas-nav small {
-  color: inherit;
-  margin-top: 4px;
-  font: 600 clamp(.53rem, calc(1.9 * var(--vw)), .64rem)/1.05 var(--font-display);
-}
-#app .home-nav.atlas-nav button[aria-current] {
-  color: #fff1cf;
-  background: transparent;
-}
-#app .home-nav.atlas-nav button[aria-current] span {
-  border-color: #9b4f3a;
-  color: #fff8eb;
-  background:
-    radial-gradient(circle at 28% 18%, #ffe8d5bf 0 7%, transparent 31%),
-    linear-gradient(145deg, #cf8061e8, #914632ed 62%, #6f3025f2);
-  box-shadow: inset 1px 1px 0 #ffe8dcdb, inset -2px -2px 3px #59241d94, 0 4px 7px #7435224f, 0 0 0 3px #f0c7b38c, 0 0 12px #c86d4d3d;
-}
 
 /* Enciclopedia, Guía y Ajustes son también destinos de esta navegación. Conservan la
    barra visible y marcan su botón igual que Inicio y Perfil. */
@@ -1472,7 +1431,6 @@ html #app .home-nav.atlas-nav::before {
   box-shadow: none;
 }
 #app[data-screen="perfil"] > .shell { width: 100%; }
-#app :is(.enc-modal, .settings-modal, .rules) .home-nav.atlas-nav { display: grid; }
 #app .home-nav.atlas-nav button[aria-current] small {
   color: var(--terracota);
   text-decoration: underline;
@@ -1616,7 +1574,7 @@ html #app .home-nav.atlas-nav::before {
 #app .settings-volume { margin-top: 8px; }
 #app .settings-volume output { float: right; color: var(--edition-brass); font-variant-numeric: tabular-nums; }
 #app .settings-volume input[type="range"] { width: 100%; min-height: 28px; accent-color: var(--edition-brass); }
-#app .settings-reset { max-width: 340px; margin: 22px auto 0; }
+#app .settings-reset { display: block; width: 100%; max-width: 340px; margin: 22px auto 0; }
 #app .settings-reset-help { text-align: center; margin: 8px auto 0; max-width: 48ch; }
 #app .settings-layout .opt-row { padding-block: 16px; gap: 16px; }
 #app .settings-layout .hint { text-align: left; font-size: .78rem; line-height: 1.6; }
@@ -3683,35 +3641,11 @@ html:not(:has(#app[data-screen="home"]))::before {
 /* ══ 20 · Barra de navegación en cuatro fichas (la redefine navigation-nautical.css) ══ */
 /* Barra en cuatro fichas de atlas, también anterior a navigation-nautical.css: de ella
    solo quedan aquí las piezas que aquella hoja no redefine. */
-html #app .home-nav.atlas-nav {
-  align-items: end;
-}
 html #app .home-nav.atlas-nav button {
   transform-origin: 50% 100%;
 }
-html #app .home-nav.atlas-nav button:nth-child(1) { --atlas-card-tilt: -2deg; }
-html #app .home-nav.atlas-nav button:nth-child(2) { --atlas-card-tilt: -.7deg; }
-html #app .home-nav.atlas-nav button:nth-child(3) { --atlas-card-tilt: .7deg; }
-html #app .home-nav.atlas-nav button:nth-child(4) { --atlas-card-tilt: 2deg; }
 html #app .home-nav.atlas-nav button[aria-current="page"] {
   z-index: 3;
-}
-html #app .home-nav.atlas-nav button[aria-current="page"] small {
-  text-decoration: none;
-}
-
-/* Con texto muy ampliado, conserva la navegación en el flujo y en dos columnas,
-   igual que el ajuste de accesibilidad que ya tenía la pantalla. */
-@media (max-width: 480px) {
-  html:is([data-text-size="150"], [data-text-size="200"]) #app .home-nav.atlas-nav {
-    position: static;
-    inset: auto;
-    transform: none;
-    width: 100%;
-    max-width: none;
-    margin-top: 24px;
-    padding: 0;
-  }
 }
 
 /* Retos rápidos: el zoom de la línea va en la fila del título, sin robar una fila entera. */
@@ -4299,8 +4233,6 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 .quick-shell .quick-length-chip { min-width: 0; overflow-wrap: anywhere; }
 :root:is([data-text-size="150"], [data-text-size="200"]) #app .home-wordmark { font-size: min(3.2rem, calc(12.5 * var(--vw))); max-width: 100%; }
 :root:is([data-text-size="150"], [data-text-size="200"]) #app .home-door-copy { min-width: 0; }
-:root:is([data-text-size="150"], [data-text-size="200"]) #app .home-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-:root:is([data-text-size="150"], [data-text-size="200"]) #app .home-nav button { min-width: 0; }
 :root:is([data-text-size="150"], [data-text-size="200"]) #app .home-nav small { font-size: .625rem; overflow-wrap: anywhere; }
 
 /* El artista se lee también antes de revelar las ventas, sin modificar el tamaño de la carta. */
@@ -5121,12 +5053,13 @@ html #app[data-screen] .setup-art-panel .quick-length-more { min-height: 44px; b
    colgando bajo la esquina inferior derecha de la carta, fuera de su marco. Dentro no hay
    sitio: entre el emblema y el título quedan unos 5 px en cualquier tamaño, y el título apoya en el
    filete del borde. Solo en la carta del centro del abanico (o la única), y nunca mientras la carta
-   está en la línea como vista previa. */
+   está en la línea como vista previa. No se limita al ancho de la carta: a 10 px, en la carta
+   estrecha del abanico, se cortaba en «Arrastra o puls». Crece hacia la izquierda, bajo la carta. */
 #app .hand-card > .card-hint {
   position: absolute; z-index: 2; right: -4px; top: calc(100% + 10px); bottom: auto;
-  display: inline-flex; align-items: center; gap: 3px; max-width: calc(100% - 20px);
+  display: inline-flex; align-items: center; gap: 3px;
   margin: 0; padding: 0; color: #6f5230; opacity: 1; pointer-events: none;
-  font: 600 .625rem/1 var(--ui-font); letter-spacing: .02em; white-space: nowrap; overflow: hidden;
+  font: 600 .625rem/1 var(--ui-font); letter-spacing: .02em; white-space: nowrap;
 }
 #app .hand-card > .card-hint svg { flex: none; width: 11px; height: 11px; stroke-width: 2; }
 #app .hand-card > .card-hint small { font: inherit; }
@@ -5637,6 +5570,18 @@ html #app[data-screen] .local-setup .player-row input { min-width: 0; border: 0;
 #app .starter-draw-copy b { color: #fff4df; font: 500 1.35rem/1.05 var(--font-display); }
 #app .starter-draw-copy small { color: #f4e5cd; font: .68rem/1.4 var(--ui-font); }
 #app .starter-draw-cta .starter-draw-arrow { color: #f1d9ad; font-size: 1.1rem; }
+/* En «Un solo móvil» la lámina solo anuncia el minijuego: lo abre «Empezar». Por eso no
+   lleva el relleno de un botón, sino papel con filete discontinuo, como una nota. */
+#app .starter-draw-cta.starter-draw-info {
+  cursor: default; border: 1px dashed color-mix(in srgb, var(--scene-color) 55%, transparent); box-shadow: none;
+  background: color-mix(in srgb, var(--scene-color) 10%, var(--edition-surface)); color: var(--edition-ink);
+}
+#app .starter-draw-info::before { display: none; }
+#app .starter-draw-info .starter-draw-icon { color: var(--scene-color); }
+#app .starter-draw-info .starter-draw-copy .starter-draw-kicker { color: var(--edition-rust); }
+#app .starter-draw-info .starter-draw-copy b { color: var(--edition-ink); }
+#app .starter-draw-info .starter-draw-copy small { color: var(--edition-muted); }
+@media (hover: hover) and (pointer: fine) { #app .starter-draw-cta.starter-draw-info:hover { filter: none; } }
 html #app[data-screen] .local-setup .local-hand-size { display: grid; grid-template-columns: 50px minmax(0, 1fr) 62px; align-items: center; gap: 12px; padding: 16px 0; margin-top: 7px; border-bottom: 1px solid var(--opening-edge); }
 #app .local-hand-art { width: 50px; height: 58px; color: var(--opening-accent); }
 #app .local-hand-art svg { width: 100%; height: 100%; }

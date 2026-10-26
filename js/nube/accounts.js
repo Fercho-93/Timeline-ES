@@ -169,7 +169,7 @@ function personDialog({ uid, alias, context }) {
     <h2 id="person-title" tabindex="-1" data-dialog-focus>${esc(name)}</h2>
     <p id="person-text">${already() ? 'Has bloqueado a esta persona.' : 'Si su nombre es ofensivo o se hace pasar por otra persona, denúnciala. Si no quieres coincidir con ella, bloquéala: es privado y ella no lo sabrá.'}</p>
     <p id="person-message" class="hint" role="status"></p>
-    <div class="actions" style="display:grid"><button type="button" class="btn btn-secondary" id="person-report">Denunciar</button><button type="button" class="btn btn-secondary" id="person-block">${already() ? 'Desbloquear' : 'Bloquear'}</button><button type="button" class="btn btn-ghost" id="person-cancel" data-account-action="close">Cancelar</button></div>
+    <div class="actions actions-columna"><button type="button" class="btn btn-secondary" id="person-report">Denunciar</button><button type="button" class="btn btn-secondary" id="person-block">${already() ? 'Desbloquear' : 'Bloquear'}</button><button type="button" class="btn btn-ghost" id="person-cancel" data-account-action="close">Cancelar</button></div>
   </section></div>`);
   document.getElementById('person-report').onclick = () => { CT.closeDialog(true); reportDialog({ uid: target, alias: name, context }); };
   document.getElementById('person-block').onclick = async event => {
@@ -470,7 +470,7 @@ function chooseProgress(provider) {
     const layer = document.createElement('div'); layer.className = 'overlay';
     layer.innerHTML = `<section class="modal" role="alertdialog" aria-modal="true" aria-labelledby="choose-progress-title"><h2 id="choose-progress-title">Esta cuenta de ${esc(PROVIDERS[provider] || 'acceso')} ya tiene progreso</h2>
       <p>¿Con cuál te quedas? El otro se descarta.</p>
-      <div class="actions" style="display:grid;gap:10px"><button class="btn btn-primary" data-choose="cuenta">El de mi cuenta</button><button class="btn btn-secondary" data-choose="movil">El de este móvil</button><button class="btn btn-ghost" data-choose="">Cancelar</button></div></section>`;
+      <div class="actions actions-columna"><button class="btn btn-primary" data-choose="cuenta">El de mi cuenta</button><button class="btn btn-secondary" data-choose="movil">El de este móvil</button><button class="btn btn-ghost" data-choose="">Cancelar</button></div></section>`;
     layer.addEventListener('click', event => { const b = event.target.closest('[data-choose]'); if (!b) return; layer.remove(); resolve(b.dataset.choose || null); });
     app.append(layer); layer.querySelector('[data-choose="cuenta"]').focus();
   });
@@ -667,7 +667,7 @@ function askRanking() {
   accountDialog(`<div class="overlay"><section class="modal ranking-consent"><h2>¿Quieres aparecer en el ranking?</h2>
     <p>El ranking es público: lo ven los demás jugadores. Si aceptas, mostrará tu nombre de perfil, tu avatar, tus aciertos y tu tiempo en el reto diario (del día y de la semana) y cuántas cartas has descubierto.</p>
     <p class="hint">Puedes cambiarlo cuando quieras en Ajustes o en el Atlas.</p>
-    <div class="actions" style="display:grid;gap:10px"><button class="btn btn-primary" data-account-action="ranking-yes">Sí, aparecer en el ranking</button><button class="btn btn-ghost" data-account-action="ranking-no">Ahora no</button></div></section></div>`);
+    <div class="actions actions-columna"><button class="btn btn-primary" data-account-action="ranking-yes">Sí, aparecer en el ranking</button><button class="btn btn-ghost" data-account-action="ranking-no">Ahora no</button></div></section></div>`);
 }
 function rankingControls() {
   const publico = rankingPublico() === true;

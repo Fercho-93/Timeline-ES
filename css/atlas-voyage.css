@@ -86,9 +86,6 @@
 #app[data-screen="perfil"][data-screen] .perfil-section .account-action-icon img { display: block; width: 40px; height: 40px; object-fit: contain; }
 #app[data-screen="perfil"][data-screen] .perfil-section .account-card .account-actions { grid-template-columns: 1fr; }
 #app[data-screen="perfil"][data-screen] .perfil-section .account-details summary { min-height: 44px; }
-#app[data-screen="perfil"][data-screen] .home-nav.atlas-nav button[aria-current="page"] { border-color: var(--voyage-sea); color: var(--voyage-sea); background: linear-gradient(150deg, var(--voyage-paper), var(--voyage-wash)); }
-#app[data-screen="perfil"][data-screen] .home-nav.atlas-nav button[aria-current="page"] span { color: var(--voyage-sea); border-color: var(--voyage-line); background: var(--voyage-paper); }
-#app[data-screen="perfil"][data-screen] .home-nav.atlas-nav button[aria-current="page"] small { color: var(--voyage-sea); }
 @media (hover: hover) {
   #app[data-screen="perfil"][data-screen] .perfil-section .atlas-scale-nav a:hover { text-decoration: underline; text-underline-offset: 4px; }
   #app[data-screen="perfil"][data-screen] .perfil-section :is(.atlas-identidad, .atlas-territory) .btn-secondary:hover { background: var(--voyage-wash); }

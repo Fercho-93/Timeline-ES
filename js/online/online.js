@@ -1312,8 +1312,8 @@ function openPulse() {
   appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-pulse-overlay><div class="modal">
     <div class="eyebrow">Pulso</div>
     <h2>¿A quién retas?</h2>
-    <p class="lead" style="margin-inline:auto">${CT.pulseRules}</p>
-    <div class="actions" style="display:grid;margin-top:6px">${opciones}</div>
+    <p class="lead centrado">${CT.pulseRules}</p>
+    <div class="actions actions-columna" style="margin-top:6px">${opciones}</div>
     <button class="btn btn-ghost btn-block" style="margin-top:10px" data-online-action="close-pulse">Mejor no</button>
   </div></div>`);
   abreCapa(appEl.querySelector("[data-pulse-overlay]"), true);
@@ -1664,7 +1664,7 @@ function renderTimelineReview() {
     <div class="eyebrow">Línea de tiempo completa</div>
     <h1 data-focus tabindex="-1">${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta jugada" : "cartas jugadas"}</h1>
     <div class="review-grid">${roomState.timeline.map(reviewCard).join("")}</div>
-    <div class="actions" style="justify-content:center"><button class="btn btn-primary" data-online-action="back-from-timeline">Volver</button></div>
+    <div class="actions actions-centro"><button class="btn btn-primary" data-online-action="back-from-timeline">Volver</button></div>
   </section></div>`, "online-timeline-review");
 }
 // Las falladas de esta partida: las de su mazo, que en una competición es el del tema que acaba.
@@ -1675,7 +1675,7 @@ function renderFailedReview() {
     <div class="eyebrow">Repaso</div>
     <h1 data-focus tabindex="-1">${ids.length} ${ids.length === 1 ? "carta" : "cartas"} para recordar</h1>
     <div class="review-grid">${ids.map(reviewCard).join("")}</div>
-    <div class="actions" style="justify-content:center"><button class="btn btn-primary" data-online-action="back-from-timeline">Volver</button></div>
+    <div class="actions actions-centro"><button class="btn btn-primary" data-online-action="back-from-timeline">Volver</button></div>
   </section></div>`, "online-timeline-review");
 }
 
@@ -1688,7 +1688,7 @@ function roomMenu() {
   const others = (roomState?.playerOrder || []).filter(uid => uid !== roomState.hostUid);
   appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-room-overlay><div class="modal">
     <div class="eyebrow">Sala ${roomCode}</div><h2>Opciones de la partida</h2><p class="hint">La partida continúa mientras consultas este menú.</p>
-    <div class="actions" style="display:grid">
+    <div class="actions actions-columna">
       <button class="btn btn-secondary" data-online-action="guide">Guía</button>${CT.settingsButton()}
       <button class="btn btn-secondary" data-online-action="back">Volver a la pantalla anterior</button>
       <button class="btn btn-secondary" data-online-action="share">Compartir enlace</button>
@@ -1698,7 +1698,7 @@ function roomMenu() {
     ${isHost && others.length && !inFinal ? `<div class="manage-players"><div class="section-label">Jugadores</div>${others.map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, roomState.matchmaking === 'public' ? 'mesa' : 'sala') || ''}<button class="kick-btn" data-online-action="kick" data-uid="${uid}">Expulsar</button></div>`).join("")}</div>` : ""}
     ${!(isHost && others.length && !inFinal) && roomState?.playerOrder?.some(uid => uid !== user.uid) ? `<div class="manage-players"><div class="section-label">Jugadores</div>${roomState.playerOrder.filter(uid => uid !== user.uid).map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, roomState.matchmaking === 'public' ? 'mesa' : 'sala') || ''}</div>`).join("")}</div>` : ""}
     ${inFinal ? '<p>La final espera a todos los finalistas. Si alguien se desconecta, puede volver a entrar y responder.</p>' : ''}
-    <div class="actions" style="display:grid">
+    <div class="actions actions-columna">
       ${isHost && playing ? '<button class="btn btn-ghost" data-online-action="close-room">Terminar partida y cerrar sala</button>' : isHost ? '<button class="btn btn-ghost" data-online-action="close-room">Cerrar la sala</button>' : inFinal ? '<button class="btn btn-ghost" data-online-action="back">Ir al inicio</button>' : '<button class="btn btn-ghost" data-online-action="leave-room">Salir de la partida</button>'}
       <button class="btn btn-primary" data-online-action="close-room-menu">Seguir jugando</button>
     </div>
@@ -1844,7 +1844,7 @@ async function shareRoom() {
 }
 
 function showQr() {
-  document.body.insertAdjacentHTML("beforeend", `<div class="overlay qr-overlay" data-qr-overlay><div class="modal qr-modal"><div class="eyebrow">Invitación a la sala</div><h2>Escanea para entrar</h2><div class="qr-frame"><canvas id="room-qr" aria-label="Código QR de invitación a la sala"></canvas></div><div class="qr-room-code">${roomCode}</div><p>Abre la cámara del otro móvil y apunta al código. El enlace rellenará automáticamente la sala.</p><div class="actions" style="display:grid"><button class="btn btn-primary" data-online-action="share">Compartir enlace</button><button class="btn btn-primary btn-block" data-online-action="close-qr">Cerrar</button></div></div></div>`);
+  document.body.insertAdjacentHTML("beforeend", `<div class="overlay qr-overlay" data-qr-overlay><div class="modal qr-modal"><div class="eyebrow">Invitación a la sala</div><h2>Escanea para entrar</h2><div class="qr-frame"><canvas id="room-qr" aria-label="Código QR de invitación a la sala"></canvas></div><div class="qr-room-code">${roomCode}</div><p>Abre la cámara del otro móvil y apunta al código. El enlace rellenará automáticamente la sala.</p><div class="actions actions-columna"><button class="btn btn-primary" data-online-action="share">Compartir enlace</button><button class="btn btn-primary btn-block" data-online-action="close-qr">Cerrar</button></div></div></div>`);
   try { CT.QrEncode.draw(document.getElementById("room-qr"), invitationUrl()); }
   catch (error) { console.error(error); showToast("La dirección es demasiado larga para generar el QR"); }
   abreCapa(document.querySelector("[data-qr-overlay]"), true);

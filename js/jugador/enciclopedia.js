@@ -160,7 +160,12 @@
   }
 
   const COVER = { history:"hero-history", entertainment:"hero-entertainment", science:"hero-science", nature:"hero-nature", globe:"hero-geography", mixed:"hero-mixed" };
-  function deckCover(block, index) {
+  // Cada mazo con su propia portada: la lámina de su primera carta ilustrada, la misma que
+  // lo representa en la lista de colecciones. Solo un mazo sin láminas toma la portada de
+  // su colección, con un encuadre distinto para no repetir la de al lado.
+  function deckCover(block, deck, index) {
+    const ilustrada = CT.cards(deck.key).find(card => CT.cardArt(deck.key, card));
+    if (ilustrada) return `<span class="enc-deck-cover" aria-hidden="true">${CT.animalArt(deck.key, ilustrada)}<i>${block.icon}</i></span>`;
     const file = COVER[block.art] || COVER.history;
     return `<span class="enc-deck-cover" style="--cover-position:${18 + (index % 4) * 21}%" aria-hidden="true"><img src="assets/${file}-400.webp" alt="" width="400" height="560" loading="lazy" decoding="async"><i>${block.icon}</i></span>`;
   }
@@ -185,7 +190,7 @@
     return plegados + groups.map((block, blockIndex) => `<section class="enc-topic" aria-labelledby="enc-topic-${block.key}">
       <div class="enc-topic-divider"><span>Cuaderno ${String(blockIndex + 1).padStart(2, "0")}</span><h2 id="enc-topic-${block.key}"><i aria-hidden="true">${block.icon}</i> ${CT.escapeHtml(block.name)}</h2></div>
       ${block.decks.map((deck, deckIndex) => `<details class="enc-deck" data-enc-deck="${deck.key}"${searching ? ' open data-loaded="true"' : ''}>
-        <summary>${deckCover(block, deckIndex)}<span class="enc-deck-copy"><b>${CT.escapeHtml(deck.name)}</b><small>${deck.cards.length} ${deck.cards.length === 1 ? "carta" : "cartas"}${laminaResumen(deck.key, descubiertas)}</small></span><i class="enc-deck-chevron" aria-hidden="true">⌄</i></summary>
+        <summary>${deckCover(block, deck, deckIndex)}<span class="enc-deck-copy"><b>${CT.escapeHtml(deck.name)}</b><small>${deck.cards.length} ${deck.cards.length === 1 ? "carta" : "cartas"}${laminaResumen(deck.key, descubiertas)}</small></span><i class="enc-deck-chevron" aria-hidden="true">⌄</i></summary>
         <div class="enc-deck-cards">${searching ? resultsMarkup(deck.key, deck.cards, { descubiertas }) : ''}</div>
       </details>`).join('')}
     </section>`).join('');

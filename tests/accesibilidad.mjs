@@ -410,5 +410,17 @@ console.log("\nContraste de las bandas de época");
   ok(`todas llegan a 4,5:1${flojas.length ? ` (falla ${flojas.map(m => `${m[1]} ${razon(sobre(m[2]), m[2]).toFixed(2)}`).join(", ")})` : ""}`, !flojas.length);
 }
 
+// El aviso breve (#toast) es hermano de #app, y #app solo aísla sus capas en la portada:
+// en el resto de pantallas, una capa del juego con más z-index que el aviso lo tapa
+// justo cuando avisa de algo sobre ella. Por encima solo quedan los avisos del sistema.
+console.log("\nEl aviso breve queda por encima de las capas del juego");
+{
+  const hojas = ["styles", "edition", "accounts", "quick-challenges", "home-modes-v1", "atlas-voyage", "guide-journal", "tutorial", "navigation-nautical", "mesa-escala", "tablet"].map(h => read(`css/${h}.css`)).join("\n");
+  const aviso = Number(/\.toast \{[^}]*z-index: *(\d+)/.exec(hojas)?.[1]);
+  const capas = [...hojas.matchAll(/z-index: *(\d+)/g)].map(m => Number(m[1])).filter(z => z < 1000 && z !== aviso);
+  const vuela = Number(/zIndex: '(\d+)'/.exec(read("js/interfaz/immersion.js"))?.[1]);
+  ok(`el aviso (${aviso}) supera la capa más alta de las hojas (${Math.max(...capas)}) y la carta que vuela (${vuela})`, aviso > Math.max(...capas) && aviso > vuela);
+}
+
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);

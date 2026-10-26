@@ -119,3 +119,4 @@
 .report-modal h2 { margin-top: 0; }
 .report-reasons { margin: 12px 0; padding: 0; border: 0; }
 .report-modal .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.report-modal .actions.actions-columna { display: grid; }

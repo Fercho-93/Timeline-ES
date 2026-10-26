@@ -420,7 +420,7 @@ console.log("\nSalir del duelo de cifras no toca la partida local del mismo mazo
   const w = boot();
   abreMazo(w, "geografia", "population");
   w.CONTINUUM.openDeckAs("local");
-  click(w, '[data-action="draw-starter"]');
+  click(w, '[data-action="start"]');
   for (let i = 0; i < 12 && existe(w, "#starter-guess-input"); i++) {
     w.document.getElementById("starter-guess-input").value = "1000000";
     click(w, '[data-action="starter-guess-submit"]');

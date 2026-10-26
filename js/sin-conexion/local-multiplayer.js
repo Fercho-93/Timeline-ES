@@ -913,13 +913,13 @@ function starterPanelMarkupContent(isHost) {
     const ausentes = others.filter(uid => roomState.players[uid].away);
     appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-local-room-overlay><div class="modal">
       <div class="eyebrow">Sala ${escapeHtml(roomState.roomCode)}</div><h2>Opciones de la partida</h2><p class="hint">La partida continúa mientras consultas este menú.</p>
-      <div class="actions" style="display:grid">
+      <div class="actions actions-columna">
         <button class="btn btn-secondary" data-local-action="guide">Guía</button>
         ${isHost && playing ? `<button class="btn btn-secondary" data-local-action="invite">Invitar a alguien${ausentes.length ? ` · para que vuelva ${escapeHtml(ausentes.map(uid => roomState.players[uid].name).join(", "))}` : ""}</button>` : ""}
         ${isHost && playing && currentUid !== roomState.hostId && ["turn", "pulse"].includes(roomState.phase) ? `<button class="btn btn-ghost" data-local-action="skip">Saltar el turno de ${escapeHtml(currentName)}</button>` : ""}
       </div>
       ${isHost && others.length ? `<div class="manage-players"><div class="section-label">Participantes</div>${others.map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'room:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}${roomState.players[uid].away ? " · desconectado" : ""}</strong><button class="kick-btn" data-local-action="kick" data-uid="${escapeHtml(uid)}">Expulsar</button></div>`).join("")}</div>` : ""}
-      <div class="actions" style="display:grid">
+      <div class="actions actions-columna">
         ${isHost ? '<button class="btn btn-ghost" data-local-action="close-room">Terminar partida y cerrar sala</button>' : '<button class="btn btn-ghost" data-local-action="leave">Salir de la partida</button>'}
         <button class="btn btn-primary" data-local-action="close-room-menu">Seguir jugando</button>
       </div>
@@ -939,8 +939,8 @@ function starterPanelMarkupContent(isHost) {
     appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-pulse-overlay><div class="modal">
       <div class="eyebrow">Pulso</div>
       <h2>¿A quién retas?</h2>
-      <p class="lead" style="margin-inline:auto">${CT.pulseRules}</p>
-      <div class="actions" style="display:grid;margin-top:6px">${opciones}</div>
+      <p class="lead centrado">${CT.pulseRules}</p>
+      <div class="actions actions-columna" style="margin-top:6px">${opciones}</div>
       <button class="btn btn-ghost btn-block" style="margin-top:10px" data-local-action="close-room-menu">Mejor no</button>
     </div></div>`);
     CT.openDialog(appEl.querySelector("[data-pulse-overlay]"), true);
@@ -1134,7 +1134,7 @@ function starterPanelMarkupContent(isHost) {
         const era = eraForCard(card);
         return `<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content">${categoryBadge(card)}<div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
       }).join("")}</div>
-      <div class="actions" style="justify-content:center"><button class="btn btn-primary" data-local-action="back-from-review">Volver</button></div>
+      <div class="actions actions-centro"><button class="btn btn-primary" data-local-action="back-from-review">Volver</button></div>
     </section></div>`, "local-review");
   }
 

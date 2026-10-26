@@ -97,12 +97,14 @@ async function flows(vp) {
   // Reto diario: día de retos rápidos (impar) y de colecciones (par)
   for (const date of ['2026-09-27T10:00:00', '2026-09-28T10:00:00']) {
     await session(vp, date, async ({click, back, at, screen, pg}) => {
+      // Los dos días abren la misma portada; Volver desde ella lleva al inicio.
       await click('[data-action="daily-start"]');
-      const s = await screen();
+      await at('daily-intro');
       await back('home');
       await click('[data-action="daily-start"]');
-      if (s === 'quick-challenges') { await click('[data-quick="ready"]'); await at('quick-game'); await back('home'); }
-      else { await pg.waitForSelector('[data-action="daily-play"]:not([hidden])', {timeout: 8000}); await click('[data-action="daily-play"]'); await at('solo'); await back('home'); }
+      await pg.waitForSelector('[data-action="daily-play"]:not([hidden])', {timeout: 8000}); await click('[data-action="daily-play"]');
+      if (await screen() === 'quick-challenges') { await click('[data-quick="ready"]'); await at('quick-game'); await back('home'); }
+      else { await at('solo'); await back('home'); }
     });
   }
 }

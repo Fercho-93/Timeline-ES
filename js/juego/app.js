@@ -943,7 +943,7 @@
   function starterFieldMarkup() {
     const names = playerNames();
     if (!starterDraw || starterDraw.winner === null || starterDraw.names.length !== names.length) {
-      return `<span class="field-label">Quién empieza</span>${CT.StarterPresentation.drawButton('data-action="draw-starter"', CT.starterNoun(selectedModeKey))}`;
+      return `<span class="field-label">Quién empieza</span>${CT.StarterPresentation.drawInfo(CT.starterNoun(selectedModeKey))}`;
     }
     const ganador = escapeHtml(names[starterDraw.winner] ?? `Jugador ${starterDraw.winner + 1}`);
     const orden = (starterDraw.order || [starterDraw.winner]).map(i => escapeHtml(names[i] ?? `Jugador ${i + 1}`)).join(" → ");
@@ -1022,7 +1022,7 @@
     renderStarterDialog(`${CT.StarterPresentation.winner(starterDraw.names[winner])}
       ${CT.StarterPresentation.plate(selectedModeKey, card, true)}
       ${starterOrderList(order.map(i => ({ name: starterDraw.names[i], value: Cifras.formato(selectedModeKey, starterDraw.guesses[i]) })))}
-      <div class="actions" style="display:grid"><button class="btn btn-primary btn-block" data-action="starter-start">Empezar la partida <span aria-hidden="true">→</span></button><button class="btn btn-ghost btn-block" data-action="close-menu">Volver a la preparación</button></div>`);
+      <div class="actions actions-columna"><button class="btn btn-primary btn-block" data-action="starter-start">Empezar la partida <span aria-hidden="true">→</span></button><button class="btn btn-ghost btn-block" data-action="close-menu">Volver a la preparación</button></div>`);
   }
 
   // El resultado del minijuego, ya en orden de juego: la primera fila empieza.
@@ -1476,8 +1476,8 @@
     overlay(`<div class="overlay"><div class="modal">
       <div class="eyebrow">Pulso</div>
       <h2>¿A quién retas?</h2>
-      <p class="lead" style="margin-inline:auto">${CT.pulseRules}</p>
-      <div class="actions" style="display:grid;margin-top:6px">${opciones}</div>
+      <p class="lead centrado">${CT.pulseRules}</p>
+      <div class="actions actions-columna" style="margin-top:6px">${opciones}</div>
       ${protegidos.length ? `<p class="hint" style="margin-top:12px">Ya recibieron una carta en esta vuelta: ${protegidos.map(player => escapeHtml(player.name)).join(", ")}.</p>` : ""}
       <button class="btn btn-ghost btn-block" style="margin-top:10px" data-action="close-menu">Mejor no</button>
     </div></div>`, true);
@@ -1649,7 +1649,7 @@
         const era = CT.eraForCard(mode, card);
         return `<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${CT.formatValue(mode, card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p><button type="button" class="enc-link" data-action="enc-view" data-mode="${mode}" data-id="${id}">Ver en la enciclopedia <span aria-hidden="true">→</span></button></div></article>`;
       }).join("")}</div>
-      <div class="actions" style="justify-content:center">${actionsHtml}</div>
+      <div class="actions actions-centro">${actionsHtml}</div>
     </section></div>`);
   }
 
@@ -1673,7 +1673,7 @@
         const era = CT.eraForCard(mode, card);
         return `<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${CT.formatValue(mode, card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p>${veces > 1 ? `<p class="review-count">Fallada ${veces} veces</p>` : ""}<button type="button" class="enc-link" data-action="enc-view" data-mode="${mode}" data-id="${id}">Ver en la enciclopedia <span aria-hidden="true">→</span></button></div></article>`;
       }).join("")}</div>` : `<p class="lead">Partida perfecta.</p>`}
-      <div class="actions" style="justify-content:center">${actionsHtml}</div>
+      <div class="actions actions-centro">${actionsHtml}</div>
     </section></div>`);
   }
 
@@ -1900,7 +1900,7 @@
         <label for="identidad-nombre">Nombre de tu perfil</label>
         <input id="identidad-nombre" type="text" autocomplete="nickname" maxlength="${CT.Identidad.MAX}" value="${escapeHtml(valor)}" aria-describedby="identidad-error">
         <p id="identidad-error" class="bienvenida-error" role="alert">${escapeHtml(error)}</p>
-        <div class="actions" style="display:grid"><button class="btn btn-primary" type="submit">Guardar</button><button class="btn btn-secondary" type="button" data-action="close-menu">Cancelar</button></div>
+        <div class="actions actions-columna"><button class="btn btn-primary" type="submit">Guardar</button><button class="btn btn-secondary" type="button" data-action="close-menu">Cancelar</button></div>
       </form></div></div>`, true);
   }
 
@@ -1997,7 +1997,7 @@
     return `<div class="section-label">Copia de seguridad</div>
       <div class="panel">
         <p class="hint">El perfil se guarda solo en este móvil. Cópialo antes de cambiar de móvil o de borrar los datos del navegador.</p>
-        <div class="actions" style="margin-top:12px;justify-content:center">
+        <div class="actions actions-centro" style="margin-top:12px">
           <button class="btn btn-secondary" data-action="perfil-export">Copiar mi perfil</button>
           <button class="btn btn-ghost" data-action="perfil-reset">Empezar de cero</button>
         </div>
@@ -2116,8 +2116,8 @@
     overlay(`<div class="overlay"><div class="modal">
       <div class="eyebrow">Empezar de cero</div>
       <h2>¿Borrar todo el progreso?</h2>
-      <p class="lead" style="margin-inline:auto">Se pierden las estadísticas y los logros de este móvil, y no hay manera de recuperarlos. El reto diario y sus rachas no se tocan.</p>
-      <div class="actions" style="display:grid">
+      <p class="lead centrado">Se pierden las estadísticas y los logros de este móvil, y no hay manera de recuperarlos. El reto diario y sus rachas no se tocan.</p>
+      <div class="actions actions-columna">
         <button class="btn btn-primary" data-action="close-menu">Mejor no</button>
         <button class="btn btn-ghost exit-discard" data-action="perfil-reset-confirm">Sí, borrar el perfil</button>
       </div>
@@ -2259,8 +2259,7 @@
   function startDaily() {
     if (dailyRecords().days?.[today()]) { home(); return; }
     if (dailyFamily() === 'quick') {
-      screen = 'quick-challenges';
-      CT.Quick.startDaily(today(), (html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); });
+      if (CT.Quick.dailyPending(today())) playQuickDaily(); else dailyIntro();
       return;
     }
     const pendiente = loadDaily();
@@ -2269,46 +2268,58 @@
     dailyIntro();
   }
 
-  // La presentación del reto: el mazo del día es sorpresa hasta aquí. Los nombres de los
-  // mazos pasan cada vez más despacio hasta pararse en el de hoy (unos tres segundos), y
-  // entonces aparece su colección y el botón para jugar. Con movimiento reducido se
-  // desvela sin ruleta.
+  function playQuickDaily() {
+    screen = 'quick-challenges';
+    CT.Quick.startDaily(today(), (html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); });
+  }
+
+  // La presentación del reto, la misma los días de colecciones y los de Retos rápidos: el
+  // mazo del día es sorpresa hasta aquí. Los nombres de los mazos pasan cada vez más
+  // despacio hasta pararse en el de hoy (unos tres segundos), y entonces aparecen su
+  // colección y el botón para jugar. Con movimiento reducido se desvela sin ruleta.
   let dailyReelTimer = null;
   function dailyIntro() {
     clearTimeout(dailyReelTimer);
     screen = "daily-intro";
-    const dia = today(), modeKey = dailyModeKey(dia), mode = CT.mode(modeKey);
+    const dia = today(), rapido = dailyFamily(dia) === 'quick';
+    const modeKey = rapido ? null : dailyModeKey(dia), reto = rapido ? CT.Quick.dailyChallenge(dia) : null;
+    const nombre = rapido ? reto.title : CT.mode(modeKey).name;
+    const coleccion = rapido ? "Retos rápidos" : CT.blockOf(modeKey).name;
+    const cartas = rapido ? reto.cards - 1 : DAILY_CARDS;
     const fecha = new Date(`${dia}T12:00:00`).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" });
     paint(`<div class="shell">${header("back-menu")}<section class="pass-screen"><div class="panel pass-card comp-splash daily-splash">
       <div class="chapter-art daily-splash-art" aria-hidden="true">${dailyMysteryArt()}</div>
       <div class="chapter-number">Reto diario · ${escapeHtml(fecha)}</div>
       <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Hoy toca</span><span class="daily-reel-stage" aria-hidden="true"><span class="daily-reel-kicker">Seleccionando mazo</span><span class="daily-reel-window"><span class="daily-reel">·&nbsp;·&nbsp;·</span></span></span><span class="solo-lectores" id="daily-reveal" aria-live="polite"></span></h2>
-      <p class="daily-splash-rule" hidden>${DAILY_CARDS} cartas, las mismas para todo el mundo. Un intento.</p>
+      <p class="daily-splash-rule" hidden>${cartas} cartas, las mismas para todo el mundo. Un intento.</p>
       <button class="btn btn-block comp-splash-start" data-action="daily-play" hidden>Jugar <span aria-hidden="true">→</span></button>
     </div></section></div>`);
     const reel = app.querySelector(".daily-reel");
     const revela = () => {
       if (screen !== "daily-intro" || !reel.isConnected) return;
       reel.classList.remove("is-ticking");
-      reel.textContent = mode.name;
+      reel.textContent = nombre;
       reel.classList.add("is-revealed");
       const splash = app.querySelector(".daily-splash");
       splash?.classList.add("is-revealed");
+      // Encima del mazo, su colección: «Hoy toca» ya dice que es el de hoy.
       const kicker = app.querySelector(".daily-reel-kicker");
-      if (kicker) kicker.textContent = "Mazo de hoy";
+      if (kicker) kicker.textContent = coleccion;
       const arte = app.querySelector(".daily-splash-art");
-      arte.innerHTML = blockArt(CT.blockOf(modeKey).art, true);
+      arte.innerHTML = rapido ? '<img src="assets/menu-quick.webp" alt="" width="600" height="900" decoding="async" fetchpriority="high">' : blockArt(CT.blockOf(modeKey).art, true);
       arte.classList.add("is-revealed");
-      CT.Scene.apply(modeKey, "daily-reveal");
+      if (!rapido) CT.Scene.apply(modeKey, "daily-reveal");
       app.querySelector(".daily-splash-rule").hidden = false;
       const jugar = app.querySelector('[data-action="daily-play"]');
       jugar.hidden = false;
-      app.querySelector("#daily-reveal").textContent = `Hoy toca ${mode.name}.`;
+      app.querySelector("#daily-reveal").textContent = `Hoy toca ${nombre}, de ${coleccion}.`;
       jugar.focus({ preventScroll: true });
     };
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { revela(); return; }
     // Los otros nombres, barajados, para que la ruleta no pase siempre en el mismo orden.
-    const otros = shuffle(CT.Cartera.diarios().filter(key => CT.has(key) && key !== modeKey).map(key => CT.mode(key).name));
+    const otros = shuffle(rapido
+      ? CT.QuickCatalog.challenges.map(c => c.title).filter(t => t !== nombre)
+      : CT.Cartera.diarios().filter(key => CT.has(key) && key !== modeKey).map(key => CT.mode(key).name));
     let paso = 0, transcurrido = 0;
     const gira = () => {
       if (screen !== "daily-intro" || !reel.isConnected) return;
@@ -2327,8 +2338,9 @@
 
   function playDaily() {
     clearTimeout(dailyReelTimer);
-    if (dailyFamily() === 'quick') { startDaily(); return; }
-    if (loadDaily() || dailyRecords().days?.[today()]) { startDaily(); return; }
+    if (dailyRecords().days?.[today()]) { home(); return; }
+    if (dailyFamily() === 'quick') { playQuickDaily(); return; }
+    if (loadDaily()) { startDaily(); return; }
     // `setMode` pinta la puerta cerrada si el mazo no es suyo; el bote del reto son los
     // gratuitos, así que no debería pasar, pero si pasa se queda en esa explicación.
     if (!setMode(dailyModeKey())) return;
@@ -2558,12 +2570,12 @@
       <section class="pass-screen"><div class="panel">
         <div class="big-icon">🔒</div>
         <div class="eyebrow">Todavía no es tuyo</div>
-        <h1 data-focus tabindex="-1" style="font-size:clamp(1.8rem,7vw,2.6rem)">${escapeHtml(juego.name)}</h1>
-        <p class="lead" style="margin-inline:auto">${vias.length > 1 ? "Dos maneras de conseguirlo." : escapeHtml(juego.blurb)}</p>
+        <h1 data-focus tabindex="-1">${escapeHtml(juego.name)}</h1>
+        <p class="lead centrado">${vias.length > 1 ? "Dos maneras de conseguirlo." : escapeHtml(juego.blurb)}</p>
         ${vias.length
           ? `${opcionesDeCompra(vias, modeKey)}
              <button class="btn btn-ghost btn-block" style="margin-top:8px" data-action="home">Ir al inicio</button>`
-          : `<p class="lead" style="margin-inline:auto">${escapeHtml(razon.texto)}</p>
+          : `<p class="lead centrado">${escapeHtml(razon.texto)}</p>
              <button class="btn btn-primary btn-block" style="margin-top:14px" data-action="home">Ir al inicio</button>`}
         <p class="hint" style="margin-top:14px">Lo que ya hayas descubierto de este mazo sigue siendo tuyo y te espera dentro.</p>
       </div></section>
@@ -2585,7 +2597,7 @@
     overlay(`<div class="overlay"><div class="modal">
       <div class="eyebrow">Simulación · no se cobra nada</div>
       <h2>${escapeHtml(suyo.nombre)}</h2>
-      <p class="lead" style="margin-inline:auto">Aquí se abriría la ventana de pago del propio móvil, con la cuenta que ya tengas configurada. Continuum no llega a ver la tarjeta: solo recibe un sí o un no.</p>
+      <p class="lead centrado">Aquí se abriría la ventana de pago del propio móvil, con la cuenta que ya tengas configurada. Continuum no llega a ver la tarjeta: solo recibe un sí o un no.</p>
       <p class="hint">${cuantos} · ${escapeHtml(suyo.precio || "precio por decidir")} · pago único</p>
       <button class="btn btn-primary btn-block" style="margin-top:10px" data-dialog-focus data-action="compra-simular" data-paquete="${suyo.clave}" data-mode="${modeKey || ""}">Simular que sale bien</button>
       <button class="btn btn-ghost btn-block" style="margin-top:8px" data-action="close-menu">Cancelar</button>
@@ -3163,7 +3175,7 @@
       return {
         icono: "🎯", eyebrow: "Duelo listo",
         titular: `Has colocado bien <strong>${mio.hits}</strong> de ${total} cartas.`,
-        cuerpo: `<p class="lead" style="margin-inline:auto">Manda el enlace a quien quieras: recibirá estas mismas ${total} cartas, en el mismo orden, y al terminar verá el cara a cara.</p>`,
+        cuerpo: `<p class="lead centrado">Manda el enlace a quien quieras: recibirá estas mismas ${total} cartas, en el mismo orden, y al terminar verá el cara a cara.</p>`,
         acciones: `<button class="btn btn-primary" data-action="share-duel">Mandar el reto <span>→</span></button>`
       };
     }
@@ -3176,7 +3188,7 @@
       icono: empate ? "🤝" : gano ? "🏆" : "🎯",
       eyebrow: empate ? "Empate" : gano ? "Has ganado el duelo" : "Duelo perdido",
       titular: `${mio.hits} <span style="opacity:.6">a</span> ${rival.hits}`,
-      cuerpo: `<p class="lead" style="margin-inline:auto">${empate ? `Habéis acertado lo mismo que ${escapeHtml(quien)}.` : gano ? `Has superado a ${escapeHtml(quien)}.` : `${escapeHtml(quien)} te ha ganado esta vez.`}</p>
+      cuerpo: `<p class="lead centrado">${empate ? `Habéis acertado lo mismo que ${escapeHtml(quien)}.` : gano ? `Has superado a ${escapeHtml(quien)}.` : `${escapeHtml(quien)} te ha ganado esta vez.`}</p>
         ${duelGridMarkup(quien, rival.sequence, mio.sequence)}`,
       acciones: `<button class="btn btn-primary" data-action="start-duel">Devolver el reto <span>→</span></button><button class="btn btn-secondary" data-action="share-duel">Compartir el resultado</button>`
     };
@@ -3495,7 +3507,7 @@
     let icono = "🎯", eyebrow = "Duelo de cifras listo", titular = `<strong>${aciertos}</strong> de ${total} aciertos.`, cuerpo = "", acciones = "";
     if (!rival) {
       lastDuelShare = Cifras.invitacion({ modeName, nombre: duelName(), aciertos, total, payload, ms: cifras.ms });
-      cuerpo = `<p class="lead" style="margin-inline:auto">Manda el enlace a quien quieras: recibirá estas mismas ${total} cartas, ${cifras.ms ? `con los mismos ${Math.round(cifras.ms / 1000)} segundos para cada una` : "también sin tiempo"}.</p>`;
+      cuerpo = `<p class="lead centrado">Manda el enlace a quien quieras: recibirá estas mismas ${total} cartas, ${cifras.ms ? `con los mismos ${Math.round(cifras.ms / 1000)} segundos para cada una` : "también sin tiempo"}.</p>`;
       acciones = `<button class="btn btn-primary" data-action="share-duel">Mandar el reto <span>→</span></button>`;
     } else {
       const empate = resultado === 0, porTiempo = !empate && aciertos === rival.aciertos;
@@ -3504,7 +3516,7 @@
       icono = empate ? "🤝" : gano ? "🏆" : "🎯";
       eyebrow = empate ? "Empate" : gano ? "Has ganado el duelo" : "Duelo perdido";
       titular = `${aciertos} <span style="opacity:.6">a</span> ${rival.aciertos}`;
-      cuerpo = `<p class="lead" style="margin-inline:auto">${empate ? `Mismos aciertos y mismo tiempo que ${escapeHtml(quien)}.` : porTiempo ? (gano ? `Mismos aciertos, pero has respondido más rápido que ${escapeHtml(quien)}.` : `Mismos aciertos, pero ${escapeHtml(quien)} respondió más rápido.`) : gano ? `Has superado a ${escapeHtml(quien)}.` : `${escapeHtml(quien)} te ha ganado esta vez.`}</p>
+      cuerpo = `<p class="lead centrado">${empate ? `Mismos aciertos y mismo tiempo que ${escapeHtml(quien)}.` : porTiempo ? (gano ? `Mismos aciertos, pero has respondido más rápido que ${escapeHtml(quien)}.` : `Mismos aciertos, pero ${escapeHtml(quien)} respondió más rápido.`) : gano ? `Has superado a ${escapeHtml(quien)}.` : `${escapeHtml(quien)} te ha ganado esta vez.`}</p>
         ${cifrasGridMarkup(quien, rival.jugadas, jugadas, mode, cifras.cartas, plazo)}`;
       acciones = `<button class="btn btn-primary" data-action="start-cifras">Devolver el reto <span>→</span></button><button class="btn btn-secondary" data-action="share-duel">Compartir el resultado</button>`;
     }
@@ -3514,11 +3526,11 @@
     cifras = null;
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel">
       <div class="big-icon">${icono}</div><div class="eyebrow">${eyebrow}</div>
-      <h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${titular}</h1>
+      <h1 data-focus tabindex="-1" class="titular-marcador">${titular}</h1>
       ${cuerpo}
       ${salidas ? `<p class="hint">${salidas === 1 ? "Una carta se cerró" : `${salidas} cartas se cerraron`} por salir de la aplicación.</p>` : ""}
       ${logrosMarkup(sessionLogros)}
-      <div class="actions" style="justify-content:center">${acciones}<button class="btn btn-secondary" data-action="duel-home">Preparar otro duelo</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div>
+      <div class="actions actions-centro">${acciones}<button class="btn btn-secondary" data-action="duel-home">Preparar otro duelo</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div>
     </div></section></div>`);
   }
 
@@ -3628,8 +3640,8 @@
       <section class="pass-screen"><div class="panel">
         <div class="big-icon">${esCifras ? "⏱️" : "⚔️"}</div>
         <div class="eyebrow">${esCifras ? "Duelo de cifras" : "Duelo"}</div>
-        <h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${escapeHtml(quien)} te reta</h1>
-        <p class="lead" style="margin-inline:auto">${escapeHtml(juego.name)} · ${total} cartas, las mismas que ha jugado ${escapeHtml(quien)}${esCifras ? `. En cada una escribes la cifra` : " y en el mismo orden"}.</p>
+        <h1 data-focus tabindex="-1" class="titular-marcador">${escapeHtml(quien)} te reta</h1>
+        <p class="lead centrado">${escapeHtml(juego.name)} · ${total} cartas, las mismas que ha jugado ${escapeHtml(quien)}${esCifras ? `. En cada una escribes la cifra` : " y en el mismo orden"}.</p>
         ${conReloj
           ? `<p class="solo-intro-rule">${Math.round(pendingDuel.ms / 1000)} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se ${esCifras ? "cierra" : "da por fallada"}.</p>`
           : `<p class="solo-intro-rule">Sin tiempo: se juega sin plazo, como lo jugó ${escapeHtml(quien)}.</p>`}
@@ -3666,8 +3678,8 @@
       <section class="pass-screen"><div class="panel">
         <div class="big-icon">${cerrado ? "🔒" : "🔗"}</div>
         <div class="eyebrow">Duelo</div>
-        <h1 data-focus tabindex="-1" style="font-size:clamp(1.8rem,7vw,2.8rem)">${cerrado ? "Te falta el mazo" : "Este enlace no vale"}</h1>
-        <p class="lead" style="margin-inline:auto">${cerrado ? `El reto es de ${escapeHtml(CT.mode(modeKey).name)}. ${escapeHtml(razon?.texto || "")}` : DUELO_MOTIVOS[motivo] || DUELO_MOTIVOS.roto}</p>
+        <h1 data-focus tabindex="-1">${cerrado ? "Te falta el mazo" : "Este enlace no vale"}</h1>
+        <p class="lead centrado">${cerrado ? `El reto es de ${escapeHtml(CT.mode(modeKey).name)}. ${escapeHtml(razon?.texto || "")}` : DUELO_MOTIVOS[motivo] || DUELO_MOTIVOS.roto}</p>
         ${razon?.precio
           ? `<button class="btn btn-primary btn-block" style="margin-top:14px" data-action="mazo-desbloquear" data-paquete="${razon.paquete}" data-mode="${modeKey}">Desbloquear · ${escapeHtml(razon.precio)}</button>
              <button class="btn btn-ghost btn-block" style="margin-top:8px" data-action="home">Ir al inicio</button>`
@@ -3855,10 +3867,10 @@
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel">
       <div class="big-icon">🏆</div>
       <div class="eyebrow">Competición terminada</div>
-      <h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${comp.totalHits} de ${totalCards} en total</h1>
+      <h1 data-focus tabindex="-1" class="titular-marcador">${comp.totalHits} de ${totalCards} en total</h1>
       <ul class="comp-summary">${filas}</ul>
       ${logrosMarkup(logros)}
-      <div class="actions" style="justify-content:center">${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-comp">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="start-competition">Jugar otra vez</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div>
+      <div class="actions actions-centro">${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-comp">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="start-competition">Jugar otra vez</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div>
     </div></section></div>`);
   }
 
@@ -3942,7 +3954,7 @@
     // En la competición, salir sin guardar borra el progreso de todas las rondas, no solo
     // del intento actual (`abandon-solo` lo pregunta con su propio mensaje).
     const puedeSalirSinGuardar = !!solo;
-    overlay(`<div class="overlay"><div class="modal"><h2>Opciones de la partida</h2><div class="actions" style="display:grid">
+    overlay(`<div class="overlay"><div class="modal"><h2>Opciones de la partida</h2><div class="actions actions-columna">
       <button class="btn btn-primary" data-action="close-menu">Seguir jugando</button>
       <button class="btn btn-secondary" data-action="rules">Guía</button>${CT.settingsButton()}
       <button class="btn btn-secondary" data-action="solo-menu">Guardar y salir</button>
@@ -3963,7 +3975,7 @@
     if (soloSlot === "daily") { soloSlot = "mode"; home(); } else if (eraDuelo) duelHome(); else soloHome();
   }
   function gameMenu() {
-    overlay(`<div class="overlay"><div class="modal"><h2>Opciones de la partida</h2><div class="actions" style="display:grid"><button class="btn btn-primary" data-action="close-menu">Seguir jugando</button><button class="btn btn-secondary" data-action="rules">Guía</button>${CT.settingsButton()}<button class="btn btn-secondary" data-action="ui-back">Guardar y salir</button><button class="btn btn-ghost exit-discard" data-action="abandon">Salir sin guardar</button></div></div></div>`, true);
+    overlay(`<div class="overlay"><div class="modal"><h2>Opciones de la partida</h2><div class="actions actions-columna"><button class="btn btn-primary" data-action="close-menu">Seguir jugando</button><button class="btn btn-secondary" data-action="rules">Guía</button>${CT.settingsButton()}<button class="btn btn-secondary" data-action="ui-back">Guardar y salir</button><button class="btn btn-ghost exit-discard" data-action="abandon">Salir sin guardar</button></div></div></div>`, true);
   }
 
   const showToast = message => CT.toast(message);
@@ -4064,7 +4076,7 @@
         : error?.message === "MATCH_TIMEOUT"
           ? "La conexión con el servidor tarda demasiado. Comprueba tu internet e inténtalo de nuevo."
           : "No se pudo crear ni encontrar una mesa pública.";
-      paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">☁️</div><h2 data-focus tabindex="-1">No se pudo preparar la partida</h2><p class="lead" style="margin-inline:auto">${detail}</p>${table ? '<button class="btn btn-primary btn-block" data-action="online-hub">Ver mesas abiertas</button>' : '<button class="btn btn-primary btn-block" data-action="public-match">Buscar otra vez</button>'}<button class="btn btn-ghost btn-block" data-action="public-match-back">Volver</button></div></section></div>`);
+      paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">☁️</div><h2 data-focus tabindex="-1">No se pudo preparar la partida</h2><p class="lead centrado">${detail}</p>${table ? '<button class="btn btn-primary btn-block" data-action="online-hub">Ver mesas abiertas</button>' : '<button class="btn btn-primary btn-block" data-action="public-match">Buscar otra vez</button>'}<button class="btn btn-ghost btn-block" data-action="public-match-back">Volver</button></div></section></div>`);
     }
   }
 
@@ -4077,7 +4089,7 @@
     } catch (error) {
       console.error(error);
       screen = "online-error";
-      paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">☁️</div><h2 data-focus tabindex="-1">No se pudo conectar</h2><p class="lead" style="margin-inline:auto">Comprueba la conexión a internet y vuelve a intentarlo. No se ha borrado ninguna partida guardada.</p><button class="btn btn-primary btn-block" data-action="retry-online">Reintentar conexión</button><button class="btn btn-ghost btn-block" data-action="home">Ir al inicio</button></div></section></div>`);
+      paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">☁️</div><h2 data-focus tabindex="-1">No se pudo conectar</h2><p class="lead centrado">Comprueba la conexión a internet y vuelve a intentarlo. No se ha borrado ninguna partida guardada.</p><button class="btn btn-primary btn-block" data-action="retry-online">Reintentar conexión</button><button class="btn btn-ghost btn-block" data-action="home">Ir al inicio</button></div></section></div>`);
     }
   }
 

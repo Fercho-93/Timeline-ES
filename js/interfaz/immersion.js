@@ -73,7 +73,7 @@
     const app = document.getElementById('app');
     if (!app || !cards.length) return;
     const layer = document.createElement('div'); layer.className = 'overlay'; layer.dataset.pulseGiftDialog = '';
-    layer.innerHTML = `<div class="modal"><div class="eyebrow">Pulso</div><h2>¿Qué carta podrías pasar?</h2><p class="lead" style="margin-inline:auto">Si aciertas tú y falla ${CT.escapeHtml(targetName)}, se la pasas. La eliges ahora, antes de colocar, y no se cambia.</p><div class="actions" style="display:grid;margin-top:6px">${cards.map((card, i) => `<button class="btn btn-secondary btn-block" data-pulse-gift="${i}"><b>${CT.escapeHtml(card.title)}</b></button>`).join('')}</div><button class="btn btn-ghost btn-block" style="margin-top:10px" data-pulse-gift-cancel>Mejor no</button></div>`;
+    layer.innerHTML = `<div class="modal"><div class="eyebrow">Pulso</div><h2>¿Qué carta podrías pasar?</h2><p class="lead centrado">Si aciertas tú y falla ${CT.escapeHtml(targetName)}, se la pasas. La eliges ahora, antes de colocar, y no se cambia.</p><div class="actions actions-columna" style="margin-top:6px">${cards.map((card, i) => `<button class="btn btn-secondary btn-block" data-pulse-gift="${i}"><b>${CT.escapeHtml(card.title)}</b></button>`).join('')}</div><button class="btn btn-ghost btn-block" style="margin-top:10px" data-pulse-gift-cancel>Mejor no</button></div>`;
     layer.querySelector('[data-pulse-gift-cancel]').addEventListener('click', () => CT.closeDialog());
     layer.querySelectorAll('[data-pulse-gift]').forEach(button => button.addEventListener('click', () => { CT.closeDialog(); onPick?.(cards[Number(button.dataset.pulseGift)].id); }));
     app.append(layer); CT.openDialog(layer, true);

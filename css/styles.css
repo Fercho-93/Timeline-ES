@@ -132,8 +132,12 @@ button { touch-action: manipulation; color: inherit; }
 h1, h2, h3, p { margin-top: 0; }
 h1 { max-width: 640px; margin-bottom: 20px; font-family: var(--font-display); font-weight: 400; font-size: clamp(2rem, calc(6 * var(--vw)), 2.75rem); line-height: 1.05; letter-spacing: -.035em; }
 h1 em { color: var(--accent); font-weight: 400; }
+/* El titular de un marcador («7 de 10», «Ana te reta»): el mismo tamaño en todos los
+   resultados, en vez de uno escrito a mano en cada pantalla. */
+h1.titular-marcador { font-size: clamp(2rem, calc(9 * var(--vw)), 3.4rem); }
 h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65rem, calc(5 * var(--vw)), 2.2rem); line-height: 1.08; letter-spacing: -.03em; margin-bottom: 10px; }
 .lead { color: var(--muted); font-size: .96rem; line-height: 1.55; max-width: 560px; }
+.lead.centrado { margin-inline: auto; }
 .panel-history { background: #704537; }
 .panel-entertainment { background: #4d304d; }
 .panel-science { background: #1f5361; }
@@ -164,6 +168,9 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
 .btn-ghost { background: transparent; }
 .btn-block { width: 100%; }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+/* Variantes de la fila de botones: uno debajo de otro, o centrados. */
+.actions.actions-columna { display: grid; }
+.actions.actions-centro { justify-content: center; }
 /* Apiladas de mayor a menor prioridad: seguir jugando (lo más probable), guardar y
    salir, y, aparte, la salida sin guardar. Un margen y una línea propios la distinguen
    del resto en vez de dejarla flotando como un tercer botón cualquiera. */
@@ -298,7 +305,9 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
 .timeline-card { width: 174px; min-height: 244px; border: 1px solid var(--line); position: relative; overflow: hidden; }
 .card-visual { height: 74px; padding: 12px 13px; display: flex; align-items: flex-end; justify-content: space-between; color: rgba(255,255,255,.92); position: relative; overflow: hidden; }
 .card-visual span { font: 700 1.6rem var(--font-display); position: relative; z-index: 1; }
-.card-visual small { max-width: 90px; text-align: right; font-size: .56rem; line-height: 1.1; text-transform: uppercase; letter-spacing: .08em; position: relative; z-index: 1; }
+/* La época ocupa lo que deja el símbolo, no un ancho fijo: «España contemporánea» se cortaba
+   en el repaso, donde la carta es ancha. Si aun así no cabe, parte la palabra con guion. */
+.card-visual small { min-width: 0; max-width: calc(100% - 2.4rem); hyphens: auto; overflow-wrap: break-word; text-align: right; font-size: .56rem; line-height: 1.1; text-transform: uppercase; letter-spacing: .08em; position: relative; z-index: 1; }
 .card-content { padding: 13px; }
 /* El sello de tema de «Gran mezcla temporal»: de qué mazo viene la carta, para
    ubicarse entre los ocho que se mezclan. No aparece en el resto de modalidades,
@@ -657,8 +666,13 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
    un porcentaje a secas no basta: vacío mide lo que su relleno, 24 px, y un 150% son 36,
    que no alcanzan a tapar los 18 px de separación; asomaban seis píxeles de barrita
    oscura en el borde inferior de todas las pantallas. Y como nunca se pulsa, tampoco
-   recibe toques: en esa franja se los estaba tragando. */
-.toast { position: fixed; z-index: 50; left: 50%; bottom: max(18px, var(--safe-bottom)); opacity: 0; transform: translate(-50%, calc(100% + max(18px, var(--safe-bottom)) + 4px)) scale(.98); width: max-content; max-width: calc(100% - 36px); padding: 12px 16px; font-weight: 650; box-shadow: var(--shadow); pointer-events: none; transition: transform var(--motion-base) var(--ease-spring), opacity var(--motion-fast) ease; }
+   recibe toques: en esa franja se los estaba tragando.
+   Va por encima de todas las capas del juego (diálogos 20, láminas 60–65, portada de
+   Retos rápidos 70, ficha de la línea y cambio de turno 80, la carta que vuela al
+   colocarla 90): #app solo aísla sus capas en la portada, y en el resto de pantallas un
+   aviso tapado por la capa que lo provoca no avisa de nada. Solo los avisos del sistema
+   (#system-notices) quedan encima. */
+.toast { position: fixed; z-index: 95; left: 50%; bottom: max(18px, var(--safe-bottom)); opacity: 0; transform: translate(-50%, calc(100% + max(18px, var(--safe-bottom)) + 4px)) scale(.98); width: max-content; max-width: calc(100% - 36px); padding: 12px 16px; font-weight: 650; box-shadow: var(--shadow); pointer-events: none; transition: transform var(--motion-base) var(--ease-spring), opacity var(--motion-fast) ease; }
 .toast.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
 .online-shell { padding-bottom: 45px; }
 .online-intro { max-width: 680px; margin: 34px 0 26px; }
@@ -977,7 +991,7 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   .timeline-card { width: 130px; }
   .card-visual { height: 48px; padding: 8px 10px; }
   .card-visual span { font-size: 1.15rem; }
-  .card-visual small { max-width: 66px; font-size: .52rem; }
+  .card-visual small { max-width: calc(100% - 1.8rem); font-size: .52rem; }
   .card-content { padding: 10px; }
   .timeline-card .year { font-size: 1.2rem; }
   .timeline-card h3 { font-size: .82rem; margin: 6px 0 0; }
@@ -1203,17 +1217,6 @@ body::before {
 .game-row { border-left-width: 4px; background: var(--fila); }
 .game-row.active { border-left-color: var(--accent); background: var(--fila-activa); }
 .game-name { font-family: var(--font-display); }
-
-.home-nav {
-  position: fixed;
-  z-index: 15;
-  left: 50%;
-  width: min(100%, 980px);
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  transform: translateX(-50%);
-  backdrop-filter: blur(12px);
-}
 .home-nav button { min-height: 48px; display: grid; place-items: center; border: 0; background: transparent; cursor: pointer; }
 .home-nav span { font-size: 1.25rem; line-height: 1; }
 /* En móvil la marca y las acciones dejan de disputarse una sola línea. Los botones
@@ -1538,7 +1541,6 @@ body::before {
   --estante: rgba(35,23,14,.9);
 }
 :root[data-theme="dark"] body { background: radial-gradient(circle at 50% -10%, #3b2817, #18110b 58%, #100b07 100%); }
-:root[data-theme="dark"] .home-nav { background: rgba(35,23,14,.98); border-color: #80613a; }
 
 .system-notice { position:relative; z-index:10000; display:flex; flex-wrap:wrap; align-items:center; }
 .system-notice span { flex:1 1 240px; }
@@ -1580,13 +1582,6 @@ body::before {
   .settings-modal { padding: 16px; }
   .settings-modal .opt-row { gap: 8px; }
   :root[data-text-size="200"] .hand { grid-template-columns: minmax(0, 1fr); }
-}
-@media (max-width: 480px) {
-  :root[data-text-size="150"] .home-nav,
-  :root[data-text-size="200"] .home-nav {
-    position: static; transform: none; grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-top: 24px; width: 100%; border-radius: 12px;
-  }
 }
 
 .turn-change-splash { z-index: 80; background: rgba(35, 23, 12, .78); backdrop-filter: blur(7px) sepia(.16); animation: turn-splash-in 180ms ease-out both; }
