@@ -356,7 +356,7 @@
       ${cameraNote()}
       <div class="online-entry-grid${createOnly ? " online-entry-single" : ""}">
         ${createOnly ? "" : '<div class="panel online-form"><span class="form-number">01</span><h3>Unirme a una partida</h3><p>Alguien ya ha creado una y te ha pasado su código.</p><button type="button" class="btn btn-primary btn-block" data-local-action="go-unirse">Unirme <span>→</span></button></div>'}
-        <form class="panel online-form" data-local-form="create">${createOnly ? "" : '<span class="form-number">02</span>'}<h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código.</p>${hostNameField()}<button class="btn btn-secondary btn-block" type="submit">Crear sala</button></form>
+        <form class="panel online-form" data-local-form="create">${createOnly ? "" : '<span class="form-number">02</span>'}<h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código.</p>${hostNameField()}<button class="btn ${createOnly ? "btn-primary" : "btn-secondary"} btn-block" type="submit">Crear sala</button></form>
       </div>
       <p class="online-note">No necesita conexión a internet en ningún momento.</p>
     </div>`, "local-entrada");

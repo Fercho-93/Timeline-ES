@@ -48,6 +48,11 @@
   /* Un punto más oscuro que el latón de origen (#92703c): con aquel, el lema, los
      capítulos y el resto de rótulos pequeños se quedaban en 3,9:1 sobre el papel. */
   --edition-brass: #866430;
+  /* Terracota de rótulos y foco, y los colores de error y de acierto. Cada uno tiene su
+     versión de noche: los tonos pensados para el papel no se leen sobre cuero oscuro. */
+  --edition-rust: #8a3f2f;
+  --edition-danger: #9a3b2a;
+  --edition-success: #2f7d4f;
   --edition-shade: 0 18px 45px #352a1710;
   --scene-color: #745039;
   --scene-wash: #bda27a;
@@ -67,6 +72,7 @@
   --edition-paper: #18110b; --edition-surface: #2a1d11;
   --edition-ink: #f3e7cf; --edition-muted: #c8b995;
   --edition-line: #6d5435; --edition-brass: #d4bb8b;
+  --edition-rust: #eba582; --edition-danger: #f2a08b; --edition-success: #8fd3a5;
   --edition-shade: 0 20px 48px #0008;
 }
 html { background: var(--edition-paper); }
@@ -647,7 +653,9 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app[data-screen="mazo-cerrado"] .big-icon { font-size: 2.6rem; line-height: 1; margin-bottom: 8px; }
 #app .solo-intro { position: relative; isolation: isolate; padding: 16px 0 18px; }
 #app .solo-intro::before { content: ''; position: absolute; z-index: -1; inset: -8px -8px 0 35%; background: url('../assets/mode-walk-solo.webp') right center / cover no-repeat; opacity: .3; mix-blend-mode: multiply; -webkit-mask-image: radial-gradient(ellipse,#000 25%,transparent 72%); mask-image: radial-gradient(ellipse,#000 25%,transparent 72%); }
-#app .solo-intro .lead { margin: 10px 0; font: .95rem/1.4 var(--ui-font); }
+#app :is(.solo-intro, .online-intro) .lead { margin: 10px 0; font: .95rem/1.4 var(--ui-font); }
+/* Los avisos de la sala Wi-Fi, con la letra del resto de explicaciones (no la de los titulares). */
+#app .wifi-note p { font: .875rem/1.5 var(--ui-font); }
 #app .solo-intro-rule { max-width: 37ch; margin: 0; color: var(--edition-muted); font: .77rem/1.45 var(--ui-font); }
 #app .solo-fold summary { display: flex; align-items: center; gap: 12px; list-style: none; }
 #app .solo-fold summary::-webkit-details-marker { display: none; }
@@ -1081,7 +1089,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 .placement-correction-card {
   position: fixed; z-index: 80; left: 0; top: 0; width: 126px; min-height: 78px; box-sizing: border-box;
   display: grid; align-content: center; gap: 3px; padding: 9px 10px; border: 1px solid #b88d4d;
-  border-radius: 9px; color: var(--edition-ink); background: #f6ead0;
+  border-radius: 9px; color: #302d27; background: #f6ead0;
   box-shadow: 0 16px 30px #36210d35, inset 0 0 0 3px #fff8e9; pointer-events: none;
 }
 .placement-correction-card small { color: #944e35; font: 600 .52rem/1.2 var(--ui-font); letter-spacing: .08em; text-transform: uppercase; }
@@ -1271,7 +1279,8 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 .final-score,.final-stat { min-width: 0; min-height: 76px; display: grid; place-items: center; align-content: center; padding: 8px 5px; border: 1px solid var(--edition-line); border-radius: 9px; background: color-mix(in srgb,var(--edition-brass) 7%,var(--edition-surface)); }
 .final-score { border-color: color-mix(in srgb,var(--edition-brass) 60%,var(--edition-line)); background: linear-gradient(145deg,#f8edcf,#e9d09c); }
 .final-score strong { color: #744c25; font: 600 clamp(2.2rem,calc(10 * var(--vw)),3.5rem)/.86 var(--font-display); }
-.final-score span,.final-stat small { margin-top: 6px; color: var(--edition-muted); font: 700 .5rem/1.15 var(--ui-font); letter-spacing: .06em; text-transform: uppercase; }
+.final-score span,.final-stat small { margin-top: 6px; color: var(--edition-muted); font: 700 .625rem/1.15 var(--ui-font); letter-spacing: .04em; text-transform: uppercase; }
+.final-score span { color: #6b4f2c; }
 .final-stat b { max-width: 100%; color: var(--edition-ink); font: 600 .88rem/1.05 var(--font-display); overflow-wrap: anywhere; }
 #app .final-composition .logros-nuevos { margin: 8px auto 12px; }
 #app .final-composition .logro-chip { padding: 7px 10px; }
@@ -1289,7 +1298,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   .final-metrics { grid-template-columns: 1.15fr repeat(3,1fr); gap: 5px; }
   .final-score,.final-stat { min-height: 68px; padding-inline: 3px; }
   .final-stat b { font-size: .72rem; }
-  .final-score span,.final-stat small { font-size: .43rem; letter-spacing: .03em; }
+  .final-score span,.final-stat small { font-size: .5625rem; letter-spacing: .02em; }
   #app .final-actions { grid-template-columns: 1fr 1fr; }
 }
 
@@ -1869,7 +1878,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .bienvenida-form { display: grid; gap: 10px; width: 100%; }
 #app .bienvenida-form input, #app .identidad-modal input { width: 100%; min-height: 52px; padding: 12px 14px; border: 1px solid var(--edition-line); border-radius: 8px; background: var(--edition-surface); color: var(--edition-ink); font: 1.1rem var(--ui-font); text-align: center; }
 #app .bienvenida-form input:focus-visible, #app .identidad-modal input:focus-visible { outline: 3px solid var(--edition-brass); outline-offset: 1px; }
-#app .bienvenida-error { min-height: 1.2em; margin: 0; color: #9a3b2a; font: .85rem/1.4 var(--ui-font); }
+#app .bienvenida-error { min-height: 1.2em; margin: 0; color: var(--edition-danger); font: .85rem/1.4 var(--ui-font); }
 #app .bienvenida-error:empty { min-height: 0; }
 #app .bienvenida .hint { margin: 0; color: var(--edition-muted); font: .8rem/1.4 var(--ui-font); }
 #app .bienvenida-avatar { animation: comp-splash-pop 380ms var(--ease-out) both; }
@@ -3259,6 +3268,8 @@ html:not(:has(#app[data-screen="home"]))::before {
   box-shadow: 0 7px 12px #51351d33;
   opacity: .8; animation: none;
 }
+/* Sin el contorno de siempre, la carta de la mano necesita el suyo al llegar con el teclado. */
+#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card:focus-visible { outline: 3px solid var(--edition-rust); outline-offset: 2px; }
 #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan:not(.hand-placement-pending) .hand-card.fan-center {
   opacity: 1; border: 2px solid #a75438; outline: 1px solid #a7543880; outline-offset: 2px;
   box-shadow: 0 3px 0 #734632, 0 12px 22px #663b2d59;
@@ -3807,7 +3818,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 /* Retos rápidos: mesa que cabe entera sin desplazarse. Título del mazo en rojizo y más grande,
    regla y marcador en una sola fila (el jugador a la derecha), mano grande y sin recortar,
    y láminas de la línea enteras con su etiqueta debajo, como en las colecciones. */
-#app.atlas-board .quick-shell .game-head .turn-label { color: #8a3f2f; font: 700 .8rem/1.2 var(--font-display); letter-spacing: .03em; text-transform: uppercase; }
+#app.atlas-board .quick-shell .game-head .turn-label { color: var(--edition-rust); font: 700 .8rem/1.2 var(--font-display); letter-spacing: .03em; text-transform: uppercase; }
 #app.atlas-board[data-board-fit="tight"] .quick-shell .game-head .turn-label { font-size: .78rem; line-height: 1.15; }
 #app.atlas-board .quick-shell .timeline .timeline-card > .card-category { display: none; }
 #app.atlas-board .quick-shell .timeline .timeline-card:has(.animal-card-art) .card-content h3 { font: 400 .82rem/1.15 var(--font-display); }
@@ -3816,7 +3827,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 /* Retos rápidos: título del mazo pegado a la línea divisoria y extremos de la línea de cartas. */
 #app.atlas-board .quick-shell .game-head { align-items: end; }
 #app.atlas-board .quick-shell .game-head .turn-label { margin: 0; }
-#app.atlas-board .quick-shell .timeline-ends { display: flex; justify-content: space-between; gap: 8px; margin: 0 2px 2px; color: #8a3f2f; font: 700 .68rem/1.2 var(--font-display); letter-spacing: .06em; text-transform: uppercase; }
+#app.atlas-board .quick-shell .timeline-ends { display: flex; justify-content: space-between; gap: 8px; margin: 0 2px 2px; color: var(--edition-rust); font: 700 .68rem/1.2 var(--font-display); letter-spacing: .06em; text-transform: uppercase; }
 
 /* ══ 20 · Barra de navegación en cuatro fichas (la redefine navigation-nautical.css) ══ */
 /* Barra en cuatro fichas de atlas, también anterior a navigation-nautical.css: de ella
@@ -3865,7 +3876,7 @@ html #app .home-nav.atlas-nav button[aria-current="page"] small {
 /* Mazos de una colección como un camino: una línea con un punto por mazo, y cada mazo en una
    tarjeta cuya ilustración forma parte del propio fondo (se difumina hacia el texto). */
 #app #deck-collection .collection-decks { padding: 4px 0 12px; background: transparent; border: 0; box-shadow: none; }
-#app #deck-collection .collection-decks .lead { margin: 2px 0 10px; text-align: center; font: 600 .7rem/1.3 var(--ui-font); letter-spacing: .14em; text-transform: uppercase; color: #8a3f2f; }
+#app #deck-collection .collection-decks .lead { margin: 2px 0 10px; text-align: center; font: 600 .7rem/1.3 var(--ui-font); letter-spacing: .14em; text-transform: uppercase; color: var(--edition-rust); }
 #app #deck-collection .collection-decks .games { position: relative; display: grid; }
 #app #deck-collection .collection-decks .games::before { content: ""; position: absolute; }
 #app #deck-collection .collection-decks .game-row { position: relative; display: block; margin: 0; text-align: left; }
@@ -3942,7 +3953,7 @@ html #app .home-nav.atlas-nav button[aria-current="page"] small {
 #app.atlas-board .timeline-zoom .zoom-menu[hidden] { display: none; }
 #app.atlas-board .timeline-zoom .zoom-menu [data-zoom-level] { min-height: 34px; height: auto; padding: 6px 12px; border: 0; border-radius: 8px; background: transparent; color: #4a3626; font: 600 .82rem/1 var(--ui-font); text-align: right; }
 #app.atlas-board .timeline-zoom .zoom-menu [data-zoom-level][aria-pressed="true"] { background: #8a3f2f; color: #fff6e8; }
-#app.atlas-board .timeline-ends { display: flex; justify-content: space-between; gap: 8px; margin: 4px 2px 2px; color: #8a3f2f; font: 700 .66rem/1.2 var(--font-display); letter-spacing: .06em; text-transform: uppercase; }
+#app.atlas-board .timeline-ends { display: flex; justify-content: space-between; gap: 8px; margin: 4px 2px 2px; color: var(--edition-rust); font: 700 .66rem/1.5 var(--font-display); letter-spacing: .06em; text-transform: uppercase; }
 /* Los extremos van siempre en una línea: si un rótulo no cabe, se corta con puntos suspensivos. */
 #app.atlas-board .timeline-ends > span { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 #app.atlas-board[data-platform][data-screen] .timeline-zoom button.zoom-toggle { width: auto !important; height: 30px !important; min-width: 0 !important; min-height: 30px !important; padding: 0 11px !important; border-radius: 999px !important; aspect-ratio: auto !important; font-size: .74rem !important; }
@@ -4012,7 +4023,7 @@ html #app .home-nav.atlas-nav button[aria-current="page"] small {
    Barra superior: ← · título del mazo · sonido y menú. Debajo, una sola franja: cartas
    pendientes a la izquierda; jugadores a la derecha (a su propia fila si son más de dos). La lupa del zoom vive en
    la cabecera de la línea, que es lo que amplía. */
-#app .atlas-topbar .topbar-title { min-width: 0; text-align: center; color: #8a3f2f; font: 700 .78rem/1.2 var(--font-display); letter-spacing: .08em; text-transform: uppercase; text-wrap: balance; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+#app .atlas-topbar .topbar-title { min-width: 0; text-align: center; color: var(--edition-rust); font: 700 .78rem/1.2 var(--font-display); letter-spacing: .08em; text-transform: uppercase; text-wrap: balance; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 #app.atlas-board .quick-shell .quick-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 2px 0 6px; padding-bottom: 6px; border-bottom: 1px solid color-mix(in srgb, var(--edition-line, #cdb994) 70%, transparent); }
 #app.atlas-board .quick-shell .quick-left { flex: none; color: var(--edition-muted, #7a6a58); font: .74rem/1.2 var(--ui-font); letter-spacing: .02em; white-space: nowrap; }
 #app.atlas-board .quick-shell .quick-left b { color: #4a3626; font: 700 1rem/1 var(--font-display); margin-right: 2px; }
@@ -4033,7 +4044,7 @@ html #app .home-nav.atlas-nav button[aria-current="page"] small {
 #app.atlas-board .quick-shell .quick-score-copy small.quick-score-state { padding: 0; background: none; font-size: .72rem; }
 #app.atlas-board .quick-shell .quick-score.is-banked .quick-score-state { color: #2b6a47; }
 #app.atlas-board .quick-shell .quick-score.is-out { opacity: .6; }
-#app.atlas-board .quick-shell .quick-score.is-out .quick-score-state { color: #8a3f2f; }
+#app.atlas-board .quick-shell .quick-score.is-out .quick-score-state { color: var(--edition-rust); }
 #app.atlas-board .quick-shell .quick-score.is-active { background: linear-gradient(135deg, #a84a37, #7d3223); border-color: #7d3223; color: #fff6e8; box-shadow: 0 2px 6px #7d322340; }
 #app.atlas-board .quick-shell .quick-score.is-active small { background: #fff3; color: #fff6e8; }
 #app.atlas-board .quick-shell .quick-score.is-active.is-banked .quick-score-state, #app.atlas-board .quick-shell .quick-score.is-active.is-out .quick-score-state { color: #fff6e8; }
@@ -5547,6 +5558,7 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
   --fila-activa: rgba(216,174,104,.62); --reja: rgba(130,81,35,.3); --estante: rgba(242,216,164,.64);
   --edition-paper: #f3eee4; --edition-surface: #fcfaf5; --edition-ink: #302d27; --edition-muted: #5e584d;
   --edition-line: #d7cbb6; --edition-brass: #7a5a26; --atlas-selection: #9b452b;
+  --edition-rust: #8a3f2f; --edition-danger: #9a3b2a; --edition-success: #2f7d4f;
 }
 :root[data-theme="dark"] :is(#app .atlas-final-page, #app .board-result-layer .modal.board-result, #app .timeline-detail-modal) { color: var(--edition-ink); }
 
@@ -5621,6 +5633,42 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
    (que de noche es crema apagado). */
 :root[data-theme="dark"] .chapter-stop.current > span { background: var(--edition-surface); border-color: var(--edition-brass); color: var(--edition-brass); }
 :root[data-theme="dark"] .chapter-stop.current > :is(b, small) { color: var(--edition-brass); }
+
+/* Piezas que se quedaban en papel claro de noche, entre pantallas oscuras: el diálogo de
+   salir de la partida (el único crema), la portada de Retos rápidos y del Reto diario, la
+   cabecera del Atlas, el zoom de la mesa, los avisos de las mesas públicas y los campos de
+   la cuenta. Siguen el tema como el resto de diálogos y paneles. */
+:root[data-theme="dark"] #app [data-exit-dialog] .modal {
+  border-color: var(--edition-line); color: var(--edition-ink);
+  background: radial-gradient(ellipse at 50% 0%, #d4bb8b1f, transparent 70%), var(--modal-fondo, #25180e);
+  box-shadow: var(--edition-shade), inset 0 1px 0 #d4bb8b1a;
+}
+:root[data-theme="dark"] #app [data-exit-dialog] .modal::before { border-color: #d4bb8b2e; }
+:root[data-theme="dark"] #app [data-exit-dialog] .modal h2 { color: var(--edition-ink); }
+:root[data-theme="dark"] #app [data-exit-dialog] .modal h2::after { color: var(--edition-rust); }
+:root[data-theme="dark"] #app [data-exit-dialog] .modal p { color: var(--edition-muted); }
+:root[data-theme="dark"] #app [data-exit-dialog] .exit-actions .btn-secondary { border-color: var(--edition-line); background: var(--edition-surface); color: var(--edition-ink); box-shadow: none; }
+:root[data-theme="dark"] #app [data-exit-dialog] .exit-actions .exit-discard { color: var(--edition-rust); }
+:root[data-theme="dark"] .quick-splash { background: radial-gradient(ellipse at 50% 32%, #3a2818 0, #24170d 55%, #18110b 100%); color: var(--edition-ink); }
+:root[data-theme="dark"] .quick-splash .eyebrow { color: var(--edition-brass); }
+:root[data-theme="dark"] .quick-splash-hint { color: var(--edition-muted); }
+:root[data-theme="dark"] .quick-splash-fan img { border-color: #3a2818; }
+:root[data-theme="dark"] #app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading {
+  border-color: var(--voyage-line);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--voyage-paper) 96%, transparent) 0%, color-mix(in srgb, var(--voyage-paper) 90%, transparent) 43%, color-mix(in srgb, var(--voyage-paper) 25%, transparent) 76%), url("../assets/atlas-ocean-v1.webp") right 18% / 100% auto no-repeat, var(--voyage-paper);
+  box-shadow: 0 12px 26px #0006, inset 0 0 0 6px #ffffff08, inset 0 0 0 7px #ddc38e40;
+}
+:root[data-theme="dark"] #app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading .eyebrow { color: var(--voyage-sea); }
+:root[data-theme="dark"] #app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading h1 { color: var(--edition-ink); }
+:root[data-theme="dark"] #app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading p { color: var(--voyage-muted); }
+:root[data-theme="dark"] #app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading::after { color: var(--voyage-brass); }
+:root[data-theme="dark"] #app.atlas-board .timeline-zoom :is(.zoom-toggle, .zoom-menu) { border-color: var(--edition-line); background: var(--edition-surface); color: var(--edition-ink); }
+:root[data-theme="dark"] #app.atlas-board .timeline-zoom .zoom-menu [data-zoom-level] { color: var(--edition-ink); }
+:root[data-theme="dark"] #app.atlas-board .timeline-zoom :is(.zoom-toggle[aria-expanded="true"], .zoom-menu [data-zoom-level][aria-pressed="true"]) { border-color: #a24f39; background: #a24f39; color: #fff6e8; }
+:root[data-theme="dark"] #app .public-board-alert { color: #ffd6c8; background: #4a2016; }
+:root[data-theme="dark"] #app .public-quick-hint { color: var(--edition-muted); }
+:root[data-theme="dark"] #app .mode-section-title, :root[data-theme="dark"] #app .mode-section-title small { color: var(--edition-brass); }
+:root[data-theme="dark"] .account-shell :is(input, select) { border-color: var(--edition-line); background: var(--edition-surface); color: var(--edition-ink); }
 
 /* ══ 30 · La mesa de siempre y el minijuego de apertura ══ */
 /* Papel, tinta y grabados: una lámina continua, sin encajonar otra vez la carta. */

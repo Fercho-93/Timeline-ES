@@ -740,7 +740,8 @@
         : ['menu-private.webp', 'voyage-duels-v1.webp', 'menu-collections.webp'];
       const art = choices.find(file => !usedArt.has(file)) || 'hero-geography-400.webp';
       usedArt.add(art);
-      const kicker = competition ? 'Cada tema cuenta' : alone ? 'A tu ritmo' : joining ? 'Tu sitio en la mesa' : 'La mesa os espera';
+      // «Mesa» solo para las públicas (Jugar online); las demás son salas o un móvil compartido.
+      const kicker = competition ? 'Cada tema cuenta' : alone ? 'A tu ritmo' : joining ? 'Te han invitado' : screen === 'hub-online-create' ? 'La mesa os espera' : 'Para jugar juntos';
       panel.style.setProperty('--setup-illustration', `url("assets/${art}")`);
       if (panel.matches('.solo-fold')) return; // el desplegable ya conserva su cabecera
       let head = panel.querySelector(':scope > .solo-panel-head');

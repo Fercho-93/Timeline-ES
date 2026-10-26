@@ -662,7 +662,8 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .toast.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
 .online-shell { padding-bottom: 45px; }
 .online-intro { max-width: 680px; margin: 34px 0 26px; }
-.online-intro h2 { font-size: clamp(2.7rem, calc(10 * var(--vw)), 5rem); line-height: .92; }
+/* El mismo tamaño que el titular de las demás pantallas de preparación (.solo-title). */
+.online-intro h2 { font-size: clamp(1.7rem, calc(7 * var(--vw)), 2.1rem); line-height: 1.12; }
 .online-entry-grid { display: grid; gap: 14px; }
 .online-form { position: relative; overflow: hidden; }
 .online-form h3 { margin: 5px 0 8px; font: 800 1.55rem var(--font-display); letter-spacing: -.02em; }
@@ -1910,8 +1911,8 @@ body::before {
 .public-seat-copy { display: grid; min-width: 0; }
 .public-seat-copy b { overflow-wrap: anywhere; line-height: 1.2; }
 .public-seat-copy small { color: var(--muted); font-size: .78rem; }
-.public-seat.is-done small { color: #2f7d4f; }
-.public-seat.is-silent small { color: #b3402f; }
+.public-seat.is-done small { color: var(--edition-success, #2f7d4f); }
+.public-seat.is-silent small { color: var(--edition-danger, #b3402f); }
 .public-you { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); margin-left: 4px; }
 .public-answered { margin: 10px 0 0; text-align: center; }
 .public-leave { margin-top: 2px; }
