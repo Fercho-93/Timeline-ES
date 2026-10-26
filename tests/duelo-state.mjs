@@ -18,11 +18,13 @@ w.CONTINUUM = {
   categoryBadge: () => '', animalArt: () => '', cardBack: () => '', sortValue: (_, c) => c.year,
   formatValue: (_, c) => String(c.year), hiddenLabel: () => 'Año oculto', timelineTitle: () => 'Cronología',
   placementHint: () => 'Debía ir después de Primera.',
-  timelineEnds: () => '', timelineMap: () => '',
+  timelineEnds: () => '', timelineMap: () => '', axis: () => ({ cifra: { negativos: true } }),
   Accounts: { user: { uid: 'me' }, profile: { alias: 'Yo' } },
-  Duelo: { CARTAS: 2, reparto: () => [1,2,3], Cifras: { CARTAS: 2, reparto: () => [2,3], leer: (_, value) => Number(value), campo: (_, id) => `<input id="${id}">`, puntosCarta: () => 75, acierto: () => true, banda: () => ({ nombre: 'Muy cerca' }), formato: (_, v) => `${v} años`, regla: () => ({ anos: true }) } }
+  Duelo: { CARTAS: 2, reparto: () => [1,2,3], Cifras: { CARTAS: 2, reparto: () => [2,3], factorDe: () => 1, leer: (_, value) => Number(value), campo: (_, id) => `<input id="${id}">`, puntosCarta: () => 75, acierto: () => true, banda: () => ({ nombre: 'Muy cerca' }), formato: (_, v) => `${v} años`, regla: () => ({ anos: true }) } }
 };
 w.eval(fs.readFileSync('js/online/links.js', 'utf8'));
+// El duelo de cifras pinta la carta con la lámina común del minijuego.
+w.eval(fs.readFileSync('js/interfaz/starter-presentation.js', 'utf8'));
 w.__deps = {
   auth: { currentUser: { uid: 'me' } }, db: {}, doc: (_, ...args) => args.at(-1), Timestamp: { now: () => ({ seconds: now / 1000 }) }, serverTimestamp: () => ({ seconds: now / 1000 }),
   runTransaction: async (_, callback) => {
