@@ -46,3 +46,22 @@ assert.equal(normalizePublicCapacity(2),2);
 assert.equal(normalizePublicCapacity(4),4);
 assert.throws(()=>normalizePublicCapacity(1));
 assert.throws(()=>normalizePublicCapacity(5));
+
+// «Buscar mesa al azar»: si no hay ninguna mesa esperando se abre la del primer mazo de la
+// lista, así que la lista se baraja antes; sin barajar, la mesa era siempre de Historia.
+{
+  const fuente = fs.readFileSync(new URL('../js/online/public-matchmaking-online.js', import.meta.url), 'utf8')
+    .replace(/^import .*;\r?\n/gm, '').replace(/^export .*;\r?\n?/gm, '');
+  const esperando = new Set();
+  const ventana = { CONTINUUM: { MODES: { history: {}, world: {}, movies: {}, mixed: {} }, deckFingerprint: () => 'fp', shuffle: lista => [...lista].reverse() } };
+  const buscar = new Function('window', 'auth', 'db', 'doc', 'getDoc', 'runTransaction', 'serverTimestamp', 'publicQueueKey', 'isJoinablePublicRoom', 'makePublicRoomCode', 'normalizePublicCapacity', 'queueFresh', 'CLIENT_VERSION',
+    `${fuente}\nfindFlexible = async (mode, capacity) => ({ code: 'MESA-' + mode, capacity });\nreturn findAcrossModes;`)(
+    ventana, {}, {}, (_, coleccion, clave) => clave, async clave => ({ exists: () => esperando.has(clave.split(':')[0]), data: () => ({ status: 'waiting', updatedAt: { toMillis: () => Date.now() } }) }),
+    async () => {}, () => null, publicQueueKey, isJoinablePublicRoom, makePublicRoomCode, normalizePublicCapacity, () => true, 1);
+  const sinMesas = await buscar(['history', 'world', 'movies', 'mixed'], 4);
+  assert.equal(sinMesas.code, 'MESA-movies', 'sin mesas esperando se abre la del mazo que sale primero al barajar');
+  esperando.add('world');
+  const conMesa = await buscar(['history', 'world', 'movies'], 4);
+  assert.equal(conMesa.code, 'MESA-world', 'si un mazo tiene mesa esperando se entra en ella');
+}
+console.log('Mesa al azar: baraja los mazos antes de abrir una: OK');

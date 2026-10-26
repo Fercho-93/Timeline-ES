@@ -151,8 +151,10 @@ async function findFlexible(mode, capacityInput) {
   return {code:await findOrCreate(mode,4),capacity:4};
 }
 
+// Se baraja antes de buscar: sin mesa esperando, se abre la del primer mazo de la lista, y
+// sin barajar ese era siempre Historia de España aunque la pantalla prometa «al azar».
 async function findAcrossModes(modes, capacityInput) {
-  const pool=[...new Set(modes.filter(mode=>CT.MODES?.[mode] && mode!=='mixed'))];
+  const pool=CT.shuffle([...new Set(modes.filter(mode=>CT.MODES?.[mode] && mode!=='mixed'))]);
   if(!pool.length) throw Error('NO_PUBLIC_MODES');
   const capacities=capacityOrder(capacityInput);
   for(const capacity of capacities){
