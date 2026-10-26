@@ -6,6 +6,13 @@ se sigue en **Tus partidas**. El código está en `js/online/duelo-turnos.js` (G
 colección `turnDuels`) y en `js/retos/quick-challenges.js` / `js/retos/quick-online.js` para los duelos de Retos
 rápidos (salas de dos en `quickRooms`). Los dos ejes del juego siguen igual: ordenar o cifras.
 
+Las cartas se alternan una a una, así que el total es siempre par y los dos juegan las mismas:
+16 al ordenar (8 cada uno) y 10 en cifras (5 cada uno). En la competición por turnos se eligen
+las cartas de cada persona en cada tema, y cada tema reparte el doble; con el tope de 30 cartas
+que admiten las reglas, con 5 temas son como mucho 3 por persona. Hasta la v816 un duelo de
+ordenar tenía 15 y quien lo creaba jugaba una más; los que ya estaban empezados terminan con
+el total que guardaron.
+
 ## Organización
 
 - Revancha desde el historial o al terminar: mismo rival, mazo y modalidad, nueva semilla. El

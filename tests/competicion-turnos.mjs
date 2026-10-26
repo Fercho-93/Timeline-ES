@@ -47,12 +47,12 @@ w.__deps = {
 };
 w.navigator.clipboard = { writeText: async () => {} };
 w.eval(`const {auth,db,doc,Timestamp,serverTimestamp,runTransaction,onSnapshot}=window.__deps;\n${source}\nwindow.testComp={
-  create, localCard, timelineCards, gameLabel, modeAt, themeAt,
+  create, localCard, timelineCards, gameLabel, modeAt, themeAt, compTotal, TOTAL, perTheme,
   show: game=>{current=game;prepareTurn();render();}, queueMove
 };`);
 const t = w.testComp;
 
-await t.create('history', 'orden', null, { rounds: 2, cards: 2 });
+await t.create('history', 'orden', null, { rounds: 2, cards: 1 });
 // Además del duelo se escribe su registro de cuota (`creationQuota/<uid>`).
 const duels = created.filter(key => key !== me);
 assert.equal(duels.length, 1, 'se crea un único duelo');
@@ -62,7 +62,17 @@ let game = games.get(id);
 assert.deepEqual(Object.keys(game).sort(), ['createdAt', 'id', 'kind', 'mode', 'playersOrder', 'players', 'plays', 'scores', 'seconds', 'seed', 'status', 'timeline', 'total', 'turnIndex', 'turnUid', 'updatedAt'].sort(), 'los mismos campos que admiten las reglas');
 assert.equal(game.mode, 'comp:alfa,beta', 'los temas viajan en el campo del mazo');
 assert.equal(game.kind, 'orden');
-assert.equal(game.total, 4, 'dos temas por dos cartas');
+assert.equal(game.total, 4, 'dos temas, una carta por persona en cada uno');
+// Las cartas se alternan una a una: el total tiene que ser par para que las dos jueguen las mismas.
+assert.equal(t.TOTAL % 2, 0, 'el duelo por turnos reparte un número par de cartas');
+assert.equal(t.compTotal('comp:a,b', 2), 8, 'dos cartas por persona en dos temas son ocho');
+assert.equal(t.compTotal('comp:a,b,c,d,e', 6), 30, 'con cinco temas se recorta a tres por persona: las reglas admiten 30');
+for (let temas = 1; temas <= 5; temas++) for (let cartas = 1; cartas <= 6; cartas++) {
+  const total = t.compTotal(`comp:${'x,'.repeat(temas - 1)}x`, cartas);
+  assert.ok(total % (2 * temas) === 0 && total <= 30, `${temas} temas × ${cartas} cartas: cada tema reparte un número par`);
+}
+// La revancha de una competición antigua con un total impar (un tema de 5 cartas) pasa a repartir por igual.
+assert.equal(t.compTotal('comp:alfa', Math.ceil(t.perTheme({ mode: 'comp:alfa', total: 5 }) / 2)), 6);
 assert.deepEqual(game.timeline, [1], 'la línea empieza con la carta de salida del primer tema');
 assert.equal(t.gameLabel(game), 'Competición · 2 temas');
 

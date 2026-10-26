@@ -424,7 +424,7 @@
   // Qué pasa con cada ritmo, dicho en una frase.
   function compBrief(ritmo) {
     return ritmo === "turnos"
-      ? `Entre dos, cada uno desde su móvil y cuando pueda: temas al azar (hasta ${COMP_TURN_THEMES}), una carta cada vez. Creas la partida, haces tu primera jugada y le mandas el enlace a tu rival.`
+      ? `Entre dos, cada uno desde su móvil y cuando pueda: temas al azar (hasta ${COMP_TURN_THEMES}), una carta cada vez y las mismas para cada uno. Creas la partida, haces tu primera jugada y le mandas el enlace a tu rival.`
       : "Una sala para varias personas: un tema al azar por ronda. Ganar la ronda suma un punto; las cartas que te queden restan su número menos uno. Quién empieza se decide en la sala de espera con un minijuego.";
   }
   function startCompFriends() {

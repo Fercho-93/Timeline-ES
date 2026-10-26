@@ -18,7 +18,10 @@ let preparingTurn = null;
 let archivedIds = new Set(), blockedPlayers = new Map();
 const sending = new Set();
 let retryTimer = null, delivery = '';
-const TOTAL = CT.Duelo.CARTAS;
+// Se alternan carta a carta, así que el total tiene que ser par para que los dos jueguen las
+// mismas: con las 15 del duelo por enlace, quien creaba el duelo jugaba una más. Los duelos ya
+// empezados guardan su `total` y terminan con el que tenían.
+const TOTAL = 16;
 let stop = null, current = null, onBack = null, enteredAt = 0, shareLink = '', pendingIndex = null;
 
 const safe = value => CT.escapeHtml(String(value ?? ''));
@@ -38,7 +41,8 @@ function notify(text) {
 // semilla, y su línea se rehace a partir de las jugadas: la guardada en `timeline` solo crece
 // una carta por acierto, que es lo que las reglas aceptan.
 const COMP = 'comp:', MAX_CARDS = 30, MAX_THEMES = 5;
-const compTotal = (mode, cards) => { const themes = mode.slice(COMP.length).split(',').length; return themes * Math.max(1, Math.min(Number(cards) || 1, Math.floor(MAX_CARDS / themes))); };
+// `cards` son las de cada persona en cada tema: el tema reparte el doble y siempre queda par.
+const compTotal = (mode, cards) => { const themes = mode.slice(COMP.length).split(',').length; return themes * 2 * Math.max(1, Math.min(Number(cards) || 1, Math.floor(MAX_CARDS / (2 * themes)))); };
 const compModes = game => typeof game?.mode === 'string' && game.mode.startsWith(COMP) ? game.mode.slice(COMP.length).split(',').filter(key => CT.has(key)) : null;
 const perTheme = game => { const themes = compModes(game); return themes?.length ? Math.max(1, Math.floor(game.total / themes.length)) : game.total; };
 const themeAt = (game, turn = game.turnIndex) => { const themes = compModes(game); return themes?.length ? Math.min(themes.length - 1, Math.floor(turn / perTheme(game))) : 0; };
@@ -524,7 +528,8 @@ async function challenge(sourceId, back = onBack) {
     const existing = games.find(g => g.status === 'waiting' && g.mode === source.mode && g.kind === source.kind && ((g.invitedUid === invitedUid && g.playersOrder[0] === uid()) || (g.invitedUid === uid() && g.playersOrder[0] === invitedUid)));
     if (existing) { open({ gameId: existing.id, back }); return; }
     let round = 0, gameId;
-    const seed = CT.Duelo.crearSemilla(), total = compModes(source) ? source.total : source.kind === 'cifras' ? CT.Duelo.Cifras.CARTAS : TOTAL;
+    // Una revancha de una competición anterior a la v817 podía traer un total impar: se rehace por persona.
+    const seed = CT.Duelo.crearSemilla(), total = compModes(source) ? compTotal(source.mode, Math.ceil(perTheme(source) / 2)) : source.kind === 'cifras' ? CT.Duelo.Cifras.CARTAS : TOTAL;
     // Un identificador acotado evita que los enlaces de revancha crezcan sin fin. Una invitación
     // terminada pasa a la ronda siguiente; dos toques seguidos siguen apuntando al mismo documento.
     const previous = games.filter(g => g.sourceDuel === sourceId && g.playersOrder[0] === uid() && Number.isInteger(g.invitationRound));
