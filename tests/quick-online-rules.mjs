@@ -122,6 +122,7 @@ try {
   // Con todas las respuestas, la mesa deja ver 8 s quién empieza antes de arrancar (STARTER_RESULT_MS en quick-online.js).
   await wait(()=>publicRooms.guest?.phase==='turn',12000);
   assert.equal(publicRooms.guest.config.first,R.starterOrder(publicRooms.guest)[0],'empieza quien más se acercó');
+  assert.equal(publicRooms.guest.config.seconds,30,'la partida rápida va con 30 s por carta, como la de Grandes colecciones');
   assert.deepEqual(failures,[]);
   first.close();second.close();
   // Mesa abandonada: quien la abrió se fue y su cola lleva más de dos minutos sin

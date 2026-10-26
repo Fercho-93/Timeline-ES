@@ -94,8 +94,9 @@ async function publicConnect(options) {
     throw error;
   });
   if(code===null)return publicConnect({...options,allowStale:true});
-  // La partida rápida juega sin tiempo, como siempre.
-  return watchPublic({...options,uid,code,seconds:0,length:3,keep:false,queueRef:qref});
+  // La partida rápida va con 30 s por carta, como la de Grandes colecciones: con desconocidos,
+  // sin plazo una mesa puede quedarse esperando a quien ya no está.
+  return watchPublic({...options,uid,code,seconds:30,length:3,keep:false,queueRef:qref});
 }
 async function watchPublic({uid,code,seconds,length,keep,queueRef:qref=null,onChange,onError}) {
   const ref=doc(db,'quickRooms',code);

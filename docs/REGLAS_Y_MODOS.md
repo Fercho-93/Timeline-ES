@@ -105,7 +105,8 @@ gestión de sala.
 - Antes de repartir se juega el minijuego de quién empieza: todos dicen la cifra de la misma
   carta y la mesa se sienta por orden de cercanía (`CT.Starter`, en `js/juego/final.js`). Empieza
   quien más se acerca y el turno avanza en ese orden.
-- Cada persona recibe cuatro cartas por defecto; se puede elegir entre una y seis.
+- Cada persona recibe cuatro cartas por defecto (cinco por tema en la competición); se puede elegir
+  entre una y seis.
 - El tiempo por turno se elige al preparar la partida: sin tiempo, 15, 20 o 30 segundos, las
   mismas opciones en todas las formas de jugar (`js/juego/tiempo.js`).
 - El dato que ordena el mazo —fecha, superficie, población, peso, longevidad, velocidad o

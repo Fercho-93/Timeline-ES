@@ -544,7 +544,8 @@ async function createRoom(name) {
       status: "lobby",
       phase: "lobby",
       version: 1,
-      handSize: tournament?.handSize || 4, turnSeconds: (CT.Tiempo?.get?.("amigos", 15) ?? 15),
+      handSize: tournament?.handSize || (CT.ManoInicial?.get?.() ?? 4), turnSeconds: (CT.Tiempo?.get?.("amigos", 15) ?? 15),
+      ...(tournament ? {} : { poderes: (() => { const p = CT.ManoInicial?.poderes?.() ?? {}; return { pulse: !!p.pulse, ghost: !!p.ghost }; })() }),
       capacity: CT.ManoInicial?.maximo?.() ?? 9,
       playerOrder: [user.uid],
       players: { [user.uid]: { name, avatarId: CT.Avatares.ownId(), hand: [], joinedAt: Date.now(), clientVersion: CLIENT_VERSION } },
@@ -814,13 +815,16 @@ function seatSilent(uid) {
 // lo que eligió en «Partida con amigos» y se leen una vez por sala: la sala de espera se repinta con
 // cada persona que entra o sale y con cada respuesta del minijuego, y solo los enseña. `startRoom`
 // los recoge de los campos ocultos que pinta `renderLobby`.
-const LOBBY_DEFAULTS = { turnSeconds: "30", handSize: "4", pulse: false, ghost: false };
+const LOBBY_DEFAULTS = { turnSeconds: "15", handSize: "4", pulse: false, ghost: false };
 const lobbySettings = { room: "", ...LOBBY_DEFAULTS };
 
 function renderLobby() {
   clearTurnTimer();
   // La sala privada arranca con el tiempo, las cartas y los poderes elegidos en «Partida con amigos».
-  if (lobbySettings.room !== roomCode) Object.assign(lobbySettings, LOBBY_DEFAULTS, { room: roomCode, turnSeconds: String((CT.Tiempo?.get?.("amigos", 15) ?? 15)), handSize: String(CT.ManoInicial?.get?.() ?? 4), ...(() => { const p = CT.ManoInicial?.poderes?.() ?? {}; return { pulse: !!p.pulse, ghost: !!p.ghost }; })() });
+  // Lo elegido al crear la sala viaja en ella (`poderes` marca las salas que lo guardan): si
+  // cambia el anfitrión, el nuevo enseña y usa eso mismo, no sus propias preferencias.
+  const deSala = roomState.poderes ? { turnSeconds: String(roomState.turnSeconds ?? 15), handSize: String(roomState.handSize ?? 4), pulse: !!roomState.poderes.pulse, ghost: !!roomState.poderes.ghost } : null;
+  if (lobbySettings.room !== roomCode) Object.assign(lobbySettings, LOBBY_DEFAULTS, { room: roomCode, ...(deSala || { turnSeconds: String((CT.Tiempo?.get?.("amigos", 15) ?? 15)), handSize: String(CT.ManoInicial?.get?.() ?? 4), ...(() => { const p = CT.ManoInicial?.poderes?.() ?? {}; return { pulse: !!p.pulse, ghost: !!p.ghost }; })() }) });
   if (roomState.matchmaking === "public") return renderPublicLobby();
   // Cada respuesta ajena repinta la sala de espera: lo que se estaba escribiendo en el
   // minijuego no se pierde por eso.

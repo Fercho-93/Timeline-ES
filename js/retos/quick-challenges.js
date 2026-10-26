@@ -358,10 +358,10 @@
       <div class="online-entry-grid${only?' online-entry-single':''}">
         ${only==='create'?'<textarea id="quick-net-code" hidden></textarea>':`<section class="panel online-form">${only?'':'<span class="form-number">01</span>'}<h3>${net?'Entrar en una sala':'Unirme a una sala'}</h3><p>${net?'Usa el código, el enlace o el QR de quien creó la sala.':'Pega la invitación o escanea su código QR.'}</p>
           <div class="field"><label for="quick-net-code">${net?'Código o enlace de sala':'Invitación recibida'}</label><textarea id="quick-net-code" rows="2"></textarea></div>
-          <div class="field"><label for="quick-net-name-join">Tu nombre</label><input id="quick-net-name-join" maxlength="24" value="${ownName}"></div>
+          <div class="field"><label for="quick-net-name-join">Tu nombre</label><input id="quick-net-name-join" maxlength="18" value="${ownName}"></div>
           ${button('scan-code','Escanear código QR','btn btn-secondary btn-block')}${button('join-room','Unirme a la partida <span>→</span>','btn btn-primary btn-block')}</section>`}
         ${only==='join'?'':`<section class="panel online-form">${only?'':'<span class="form-number">02</span>'}<h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código, el enlace o el QR.</p>
-          <div class="field"><label for="quick-net-name">Tu nombre</label><input id="quick-net-name" maxlength="24" value="${ownName}"></div>${capacity===2?'':`<div class="field"><label for="quick-net-players">Participantes</label><select id="quick-net-players">${[2,3,4,5,6,7,8].map(n=>`<option value="${n}"${n===capacity?' selected':''}>${n} jugadores</option>`).join('')}</select></div>`}<div class="field"><label for="quick-net-length">Duración de la partida</label><select id="quick-net-length"><option value="1">1 reto · partida rápida</option><option value="3" selected>3 retos · partida estándar</option><option value="5">5 retos · partida larga</option></select></div>
+          <div class="field"><label for="quick-net-name">Tu nombre</label><input id="quick-net-name" maxlength="18" value="${ownName}"></div>${capacity===2?'':`<div class="field"><label for="quick-net-players">Participantes</label><select id="quick-net-players">${[2,3,4,5,6,7,8].map(n=>`<option value="${n}"${n===capacity?' selected':''}>${n} jugadores</option>`).join('')}</select></div>`}<div class="field"><label for="quick-net-length">Duración de la partida</label><select id="quick-net-length"><option value="1">1 reto · partida rápida</option><option value="3" selected>3 retos · partida estándar</option><option value="5">5 retos · partida larga</option></select></div>
           ${button('create-room',only?'Crear sala <span>→</span>':'Crear sala',only?'btn btn-primary btn-block':'btn btn-secondary btn-block')}</section>`}
       </div>
       ${net && readJSON(NET) ? button('reconnect','Volver a mi sala','btn btn-secondary btn-block') : ''}
@@ -539,7 +539,7 @@
     shell(`<section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 data-focus tabindex="-1">Entrando en la partida…</h2>
       <section class="panel lobby-settings"><div class="waiting-orbit"><span></span></div><p>Te estás uniendo con el enlace que te han mandado. Verás la última jugada y seguirás tú.</p>
         <textarea id="quick-net-code" hidden>${esc(roomCodeFromText(code))}</textarea>
-        <div class="field" id="quick-link-name" hidden><label for="quick-net-name-join">Tu nombre</label><input id="quick-net-name-join" maxlength="24" value="${esc(known())}" autocomplete="nickname"></div>
+        <div class="field" id="quick-link-name" hidden><label for="quick-net-name-join">Tu nombre</label><input id="quick-net-name-join" maxlength="18" value="${esc(known())}" autocomplete="nickname"></div>
         <div id="quick-link-go" hidden>${button('join-room','Entrar en la partida <span>→</span>','btn btn-primary btn-block')}</div>
         <p id="quick-error" role="alert"></p></section></section>`);
     // El perfil puede tardar un instante en cargar: se espera un poco antes de pedir el nombre.
@@ -824,7 +824,7 @@
     if (!solo) {refreshStarterField(); app().querySelector('#quick-names')?.addEventListener('input', () => {if (starter && starter.key !== quickNames().join('|')) {starter = null;} refreshStarterField();});}
   }
   function nameFields(count, names = []) {
-    return Array.from({length: count}, (_, i) => `<div class="player-row"><input id="quick-name-${i}" data-quick-name aria-label="Nombre del jugador o equipo ${i + 1}" maxlength="24" value="${esc(names[i] ?? `Jugador ${i + 1}`)}" autocomplete="off"><button class="remove" data-quick="remove-player" data-index="${i}" aria-label="Quitar jugador ${i + 1}" ${count <= 2 ? 'disabled' : ''}>×</button></div>`).join('');
+    return Array.from({length: count}, (_, i) => `<div class="player-row"><input id="quick-name-${i}" data-quick-name aria-label="Nombre del jugador o equipo ${i + 1}" maxlength="18" value="${esc(names[i] ?? `Jugador ${i + 1}`)}" autocomplete="off"><button class="remove" data-quick="remove-player" data-index="${i}" aria-label="Quitar jugador ${i + 1}" ${count <= 2 ? 'disabled' : ''}>×</button></div>`).join('');
   }
   function save() {
     if(room)return;

@@ -35,7 +35,7 @@
       ...(tournament ? { tournament } : {}),
       hostId, status: "lobby", phase: "lobby", version: 1,
       capacity: Number.isInteger(capacity) && capacity >= MIN_PLAYERS && capacity <= MAX_PLAYERS ? capacity : MAX_PLAYERS,
-      handSize: tournament?.handSize || 4, turnSeconds: 30,
+      handSize: tournament?.handSize || 4, turnSeconds: 15,
       playerOrder: [hostId],
       players: { [hostId]: { name: hostName, ...(avatarId ? { avatarId } : {}), hand: [], joinedAt: now } },
       deck: [], discard: [], timeline: [], current: 0, starter: hostId,

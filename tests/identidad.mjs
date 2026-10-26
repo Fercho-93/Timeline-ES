@@ -145,6 +145,11 @@ console.log("\nEl nombre que se propone al jugar es siempre el del perfil");
   for (const archivo of ["js/online/online.js", "js/sin-conexion/local-multiplayer.js", "js/retos/quick-challenges.js", "js/online/duelo-turnos.js", "js/online/public-matchmaking-online.js"]) {
     ok(`${archivo} no propone el alias de la cuenta por delante del perfil`, !/profile\?\.alias \|\|/.test(read(archivo)));
   }
+  // El nombre admite los mismos caracteres en todas las pantallas que lo piden (CT.Identidad.MAX).
+  for (const archivo of ["js/online/online.js", "js/sin-conexion/local-multiplayer.js", "js/retos/quick-challenges.js", "js/juego/app.js"]) {
+    const largos = [...read(archivo).matchAll(/maxlength="(\d+)"/g)].map(m => Number(m[1])).filter(n => n > 18 && n < 40);
+    ok(`${archivo}: ningún campo de nombre admite más de 18 caracteres`, largos.length === 0);
+  }
 }
 
 console.log(`\n${fail} fallos`);

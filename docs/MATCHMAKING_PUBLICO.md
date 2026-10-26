@@ -7,7 +7,8 @@ privadas ni el modo Wi-Fi. Tiene dos caminos en la misma pantalla:
   plazas y tiempo, y la mesa aparece en «Mesas abiertas»; los demás eligen dónde sentarse.
 - **Partida rápida:** sin elegir mesa, te sientan en la primera libre. Se elige el tamaño de
   mesa («Cualquier mesa», hasta 2, 3 o 4) y el contenido: **Grandes colecciones** (hasta tres
-  temas o ninguno, o un mazo al azar) o **Retos rápidos**.
+  temas o ninguno, o un mazo al azar) o **Retos rápidos**. En los dos casos, con 30 s por carta
+  (hasta la v825, la de Retos rápidos iba sin tiempo).
 
 | Pieza | Archivo |
 | --- | --- |

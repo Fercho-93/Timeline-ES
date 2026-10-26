@@ -100,6 +100,28 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
     click(w,'.home-nav [data-action="home-top"]');assert.equal(screen(w),'home');
   } finally {w.close();}
 }
+// Si cambia el anfitrión en la sala de espera, el nuevo enseña y usa lo que se eligió al crear
+// la sala (guardado en ella), no sus propias preferencias de «Partida con amigos».
+{
+  const w=boot();
+  try {
+    w.localStorage.setItem('continuum-tiempo-amigos-v1','30');
+    w.eval(`(() => {
+      const initializeApp=()=>({}),getAuth=()=>({}),getFirestore=()=>({}),firebaseApp={},auth={},db={};
+      const deleteDoc=async()=>{},disableNetwork=async()=>{},enableNetwork=async()=>{},doc=()=>({}),getDoc=async()=>({exists:()=>false,data:()=>null}),onSnapshot=()=>()=>{},runTransaction=async()=>{},serverTimestamp=()=>null,setDoc=async()=>{},writeBatch=()=>({set(){},update(){},delete(){},commit:async()=>{}});
+      ${read('js/online/online.js').replace(/^import .*;$/gm,'').replace('export async function','async function')}
+      user={uid:'ana'};selectedModeKey='history';roomCode='RELEVO234';roomRef={};
+      roomState={mode:'history',status:'lobby',phase:'lobby',hostUid:'ana',playerOrder:['ana','fer'],players:{ana:{name:'Ana',hand:[]},fer:{name:'Fer',hand:[]}},timeline:[],deck:[],discard:[],round:1,version:3,
+        turnSeconds:20,handSize:3,poderes:{pulse:true,ghost:false}};
+      CT.onlineActive=true;renderLobby();
+    })()`);
+    assert.equal(w.document.getElementById('online-turn-seconds').value,'20','el tiempo es el de la sala, no el del nuevo anfitrión');
+    assert.equal(w.document.getElementById('online-hand-size').value,'3');
+    assert.equal(w.document.getElementById('online-pulse').checked,true);
+    assert.equal(w.document.getElementById('online-ghost').checked,false);
+    await new Promise(resolve=>setTimeout(resolve,50));
+  } finally {w.close();}
+}
 // Al terminar una sala online se repasa lo fallado, como en un solo móvil: un fallo de
 // cualquiera de la mesa entra en «Ver lo que se falló»; un acierto, no.
 {
