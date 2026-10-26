@@ -414,6 +414,15 @@ console.log("\nCerrar la aplicación no devuelve el plazo");
   ok("volver enseguida deja seguir con la carta", !existe(rapida, ".overlay") && partida(rapida).played === 0);
 }
 
+console.log("\n«Guardar y salir» en un duelo avisa de que su reloj no se para");
+{
+  const w = boot();
+  await abreDuelo(w);
+  click(w, '[data-action="solo-options"]');
+  click(w, '[data-action="solo-menu"]');
+  ok("el aviso dice que la carta abierta contará como fallada", /no se para.*fallada/.test(w.document.querySelector("[data-exit-dialog]")?.textContent || ""));
+}
+
 console.log("\nLas reglas viajan en la versión del enlace");
 {
   const w = boot();

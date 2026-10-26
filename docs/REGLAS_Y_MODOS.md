@@ -198,6 +198,10 @@ de ella.
 La ronda y la maratón permiten los cuatro niveles, conservan partidas y separan récords por mazo y
 dificultad. La competición individual también elige un nivel.
 
+Con reloj, «Guardar y salir» es una pausa: la carta que estaba abierta (o el turno, en un solo
+móvil) estrena plazo entero al volver. Cerrar la aplicación sin pasar por el menú no pausa nada.
+El duelo por enlace es la excepción: su reloj no se para nunca, y el propio aviso de salida lo dice.
+
 ## Competición por rondas
 
 La Competición es el último panel de la lista de Grandes colecciones, en Jugar solo, Un solo móvil

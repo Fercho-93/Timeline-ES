@@ -598,5 +598,54 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   w.close();
 }
 
+// Salir por el menú es una pausa pedida: la carta abierta estrena plazo al volver. Solo
+// cerrar la aplicación sin más la da por fallada (eso lo cubre tests/duelo.mjs).
+console.log("\n«Guardar y salir» con reloj no cuesta una vida");
+{
+  const w = boot({ "continuum-difficulty-v1": "normal" });
+  const ahora = w.Date.now.bind(w.Date);
+  let desfase = 0;
+  w.Date.now = () => ahora() + desfase;
+  const partida = () => JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
+  abreMazo(w, "historia", "history");
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
+  click(w, '[data-action="start-free"]');
+  ok("en Normal la carta lleva reloj", partida().ms > 0 && Number.isFinite(partida().cartaEmpezadaEn));
+  click(w, '[data-action="solo-options"]');
+  click(w, '[data-action="solo-menu"]');
+  ok("el aviso promete guardar la partida", /quedará guardada/.test(w.document.querySelector("[data-exit-dialog]").textContent));
+  click(w, '[data-exit-confirm]');
+  desfase = 5 * 60000;
+  click(w, '[data-action="resume-solo"]');
+  ok("al volver cinco minutos después no se pierde ninguna vida", partida().lives === 3 && partida().played === 0 && !existe(w, ".overlay"));
+  ok("y la carta estrena plazo", partida().cartaEmpezadaEn >= ahora() + desfase - 1000 && existe(w, ".reloj-bar"));
+  w.close();
+}
+{
+  const clave = "continuum-competition-v1";
+  const w = boot({ "continuum-competition-difficulty-v1": "normal" });
+  const ahora = w.Date.now.bind(w.Date);
+  let desfase = 0;
+  w.Date.now = () => ahora() + desfase;
+  const competicion = () => JSON.parse(w.localStorage.getItem(clave));
+  irAInicio(w); w.CONTINUUM.ModeHubs.open('hub-solo');
+  click(w, '[data-action="competition-menu"]');
+  click(w, '[data-action="start-competition"]');
+  click(w, '[data-action="comp-next-round"]');
+  ok("la ronda de competición en Normal lleva reloj", existe(w, ".reloj-bar"));
+  click(w, '[data-action="solo-options"]');
+  click(w, '[data-action="solo-menu"]');
+  click(w, '[data-exit-confirm]');
+  ok("se guarda sin hora de inicio", competicion().solo && competicion().solo.cartaEmpezadaEn === null);
+  desfase = 5 * 60000;
+  irAInicio(w); w.CONTINUUM.ModeHubs.open('hub-solo');
+  click(w, '[data-action="competition-menu"]');
+  click(w, '[data-action="resume-competition"]');
+  click(w, '[data-action="comp-confirm-resume"]');
+  ok("al volver a la competición, la carta sigue abierta con plazo nuevo",
+    competicion().solo.played === 0 && competicion().solo.cartaEmpezadaEn >= ahora() + desfase - 1000 && existe(w, ".reloj-bar"));
+  w.close();
+}
+
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);

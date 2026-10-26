@@ -110,8 +110,15 @@
       // más que el margen de gracia, se cierra en vez de estrenar plazo. Cerrar la
       // aplicación no es una manera de pedir tiempo muerto.
       if (enDueloConReloj() && solo.cartaEmpezadaEn && Date.now() - solo.cartaEmpezadaEn > CT.Duelo.GRACIA_MS) cierraCartaDuelo("salida");
-      else soloView();
+      else { estrenaPlazoTrasPausa(saveSolo); soloView(); }
     }
+  }
+  // «Guardar y salir» deja la carta sin hora de inicio (ver returnFromPlay): al volver, el
+  // plazo empieza entero en vez de dar la carta por fallada.
+  function estrenaPlazoTrasPausa(guardar) {
+    if (!enDueloConReloj() || solo.cartaEmpezadaEn) return;
+    solo.cartaEmpezadaEn = Date.now();
+    guardar();
   }
   // Y las capas se abren como diálogos: foco dentro, tabulador atrapado, Escape cierra.
   // `cerrable` distingue las capas que se pueden descartar —las reglas, el menú— de las
@@ -3757,7 +3764,7 @@
     if (solo.pendingResult) {
       result = { correct: solo.pendingResult.correct, card: cardsById.get(solo.pendingResult.cardId), solo: true };
       soloResult();
-    } else soloView();
+    } else { estrenaPlazoTrasPausa(saveCompetition); soloView(); }
   }
   function startCompetition() {
     if (loadCompetition()) { resumeCompetition(); return; }
@@ -3859,6 +3866,10 @@
   function returnFromPlay() {
     // «Guardar y salir»: lo jugado hasta aquí ya cuenta en el perfil.
     if (screen === 'solo') vuelcaCartas(solo); else vuelcaCartas(game);
+    // Salir por el menú es una pausa pedida: la carta o el turno estrenan plazo al volver.
+    // El duelo por enlace no se pausa, porque su reloj no se para nunca (lo avisa requestPlayExit).
+    if (screen === 'solo' && solo && solo.kind !== 'duel' && !solo.pendingResult) solo.cartaEmpezadaEn = null;
+    if (screen !== 'solo' && game) delete game.turnClock;
     if ((screen === 'solo' && solo?.kind === 'comp') || screen === 'comp-intro') {
       saveCompetition(); solo = null; comp = null; competitionMenu(); return;
     }
@@ -3901,7 +3912,10 @@
           : game
             ? { label: 'Salir sin guardar', proceed: () => { game = null; saveGame(); home(); } }
             : null;
-    CT.UI.confirmExit('Tu partida quedará guardada para continuar después.', returnFromPlay, undefined, undefined, discard);
+    const cartaDeDuelo = screen === 'solo' && solo?.kind === 'duel' && enDueloConReloj() && solo.cartaEmpezadaEn && !solo.pendingResult;
+    CT.UI.confirmExit(cartaDeDuelo
+      ? 'Tu duelo quedará guardado, pero su reloj no se para: la carta que tienes delante contará como fallada.'
+      : 'Tu partida quedará guardada para continuar después.', returnFromPlay, undefined, undefined, discard);
   }
   function uiBack() {
     if (["quick-game","quick-lobby"].includes(screen)) { app.querySelector('[data-quick="exit"]')?.click(); return; }

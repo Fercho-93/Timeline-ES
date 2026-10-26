@@ -145,6 +145,34 @@ ok("el diálogo de salir ofrece también abandonar la partida", !!w.document.que
 click(w, '[data-exit-discard]');
 ok("no queda partida guardada", !w.localStorage.getItem("hilo-game-history-v1"));
 
+console.log("\n«Guardar y salir» con tiempo por turno no hace perder el turno");
+{
+  w = arrancarJuego({ almacen: { "continuum-tiempo-local-v1": "15" }, antes: w => { w.Element.prototype.scrollIntoView = () => {}; } });
+  const ahora = w.Date.now.bind(w.Date);
+  let desfase = 0;
+  w.Date.now = () => ahora() + desfase;
+  click(irAJugar(w), '[data-block="historia"]');
+  click(w, '[data-mode="history"]');
+  w.CONTINUUM.openDeckAs('local');
+  click(w, '[data-action="add-player"]');
+  click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
+  click(w, '[data-action="ready"]');
+  const guardada = () => JSON.parse(w.localStorage.getItem("hilo-game-history-v1"));
+  ok("el turno lleva reloj", guardada().turnSeconds === 15 && Number.isFinite(guardada().turnClock?.at));
+  click(w, '[data-action="ui-back"]');
+  click(w, '[data-exit-confirm]');
+  ok("se guarda sin la hora de inicio del turno", guardada() && !guardada().turnClock);
+  desfase = 5 * 60000;
+  w.sessionStorage.setItem('continuum-entry-route', 'local');
+  w.CONTINUUM.openDeckAs('local');
+  click(w, '[data-action="continue"]');
+  if (w.document.querySelector('[data-action="ready"]')) click(w, '[data-action="ready"]');
+  await new Promise(resolve => w.setTimeout(resolve, 400));
+  ok("al volver, el turno sigue en juego con plazo nuevo",
+    !/Se acabó el tiempo/.test(w.document.body.textContent) && guardada().turnClock?.at >= ahora() + desfase - 1000);
+  w.close();
+}
+
 console.log("\nMesa llena en un mazo pequeño");
 // Velocidad tiene valores repetidos: el tope de la mano se calcula sobre el mazo que se
 // reparte de verdad, no sobre todas sus cartas, o la línea empezaba sin carta.
