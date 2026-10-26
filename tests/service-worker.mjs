@@ -81,8 +81,8 @@ console.log("\nService worker");
   sw.listeners.message({data:{type:"ACTIVATE_UPDATE"},waitUntil:p=>{tarea=p;}});
   await tarea;
   ok("la petición antigua también puede activar desde una pestaña", sw.activaciones() === 2);
-  // Casi cien archivos y 5,5 MB: quien nunca abre Naturaleza no debería pagar esa
-  // descarga solo por instalar la aplicación. Se cachean por demanda, no al instalar.
+  // 163 archivos y 7,2 MB: quien nunca abre Naturaleza no debería pagar esa descarga
+  // solo por instalar la aplicación. Se cachean por demanda, no al instalar.
   const animalAssets = fs.readdirSync(path.join(REPO, "assets", "animal-cards"))
     .filter(file => file.endsWith(".webp"))
     .map(file => `./assets/animal-cards/${file}`);
@@ -215,6 +215,18 @@ console.log("\nService worker");
     [...fs.readFileSync(path.join(REPO, hoja), "utf8").matchAll(/url\(["']?(?!data:|https?:|#)([^"')]+)["']?\)/g)]
       .map(m => path.posix.join(path.posix.dirname(hoja), m[1])).filter(f => !fs.existsSync(path.join(REPO, f))));
   ok(`las url() de las hojas apuntan a archivos que existen${rotas.length ? ` (rotas: ${rotas.join(", ")})` : ""}`, !rotas.length);
+  // Y se precargan: los adornos de la portada faltaban y, sin conexión, Inicio salía sin ellos.
+  const urlsSinPrecargar = [...pedidos].filter(f => f.endsWith(".css")).flatMap(hoja =>
+    [...fs.readFileSync(path.join(REPO, hoja), "utf8").matchAll(/url\(["']?(?!data:|https?:|#)([^"')]+)["']?\)/g)]
+      .map(m => path.posix.join(path.posix.dirname(hoja), m[1]))).filter(f => !precargados.includes(`./${f}`));
+  ok(`y también se precargan${urlsSinPrecargar.length ? ` (falta ${[...new Set(urlsSinPrecargar)].join(", ")})` : ""}`, !urlsSinPrecargar.length);
+  // Las carpetas que se precargan enteras (la política del comentario de service-worker-258.js):
+  // una lámina nueva que se olvide en la lista sale sin imagen al jugar sin conexión.
+  for (const carpeta of ["avatars", "texturas", "quick-cards", "country-cards", "population-cards", "language-cards"]) {
+    const faltan = fs.readdirSync(path.join(REPO, "assets", carpeta)).filter(f => !f.startsWith("."))
+      .map(f => `./assets/${carpeta}/${f}`).filter(f => !precargados.includes(f));
+    ok(`assets/${carpeta} se precarga entera${faltan.length ? ` (faltan ${faltan.length}: ${faltan.slice(0, 5).join(", ")}…)` : ""}`, !faltan.length);
+  }
 
   // Y lo mismo con las carátulas, que se piden por su nombre montado a mano.
   const app = fs.readFileSync(path.join(REPO, "js/juego/app.js"), "utf8");
