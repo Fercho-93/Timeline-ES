@@ -1,6 +1,6 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v836";
+const CACHE = "continuum-v837";
 // Qué se precarga (lo comprueba tests/service-worker.mjs y lo cuenta asset-budget.json):
 // todo lo que pide la página y sus hojas, los avatares, las texturas y las láminas enteras
 // de Retos rápidos, Superficie, Población e Idiomas. Las del resto de mazos —animales,

@@ -57,8 +57,9 @@
   let lastPaintedScreen = 'home';
   let previousView = null, navigatingBack = false;
   const navigationTrail = [];
-  // Pantallas de paso: una espera o un aviso de error no son un sitio al que volver.
-  const TRANSIENT_SCREENS = ['online-loading', 'online-error', 'public-match-error'];
+  // Pantallas de paso: una espera, un aviso de error o la portada del reto diario no son un
+  // sitio al que volver (desde la partida del reto se vuelve al inicio, no a su ruleta).
+  const TRANSIENT_SCREENS = ['online-loading', 'online-error', 'public-match-error', 'daily-intro'];
   // Y los resultados solo se recuerdan para volver desde su propio repaso.
   const RESULT_SCREENS = ['solo-end', 'cifras-end', 'comp-end', 'winner'];
   // Retos rápidos lleva su propia navegación interna: para el rastro es una sola pantalla.
