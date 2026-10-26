@@ -64,6 +64,7 @@ for(let round=0;round<3;round++) {
 }
 assert.equal(w.document.querySelector('[data-action="competition-next"]'),null);
 assert.match(w.document.querySelector('.tournament-board').textContent,/3 puntos/);
+assert.match(w.document.querySelector('.tournament-board').textContent,/0 puntos/,'quien pierde las tres finales no suma');
 assert.equal(w.document.querySelectorAll('.chapter-stop.complete').length,2);
 w.close();
 // La pantalla de resultado no puede ensancharse más que el móvil: sin una pista de rejilla acotada, el recorrido de
@@ -84,6 +85,15 @@ assert.equal(solo.cardsPerRound,2);assert.equal(solo.solo.total,2);
   assert.ok(html.includes(CTw.mode(modos[0]).name), 'el capítulo actual sí dice su mazo');
   for (const pendiente of modos.slice(1)) assert.ok(!html.includes(CTw.mode(pendiente).name), 'un capítulo pendiente no debe decir su mazo');
   assert.ok(html.includes('Por descubrir'));
+}
+{ // Solo suma quien gana la ronda: perder la final con la mano vacía deja a cero.
+  const CTw = w.CONTINUUM, modos = CTw.Tournament.modes().slice(0, 2);
+  const t = { queue: modos, index: 1, handSize: 3, history: [{ mode: modos[0], winners: [1], hands: { 1: 0, 2: 0, 3: 2 } }] };
+  const mesa = [{ id: 1, name: 'Ana', hand: [] }, { id: 2, name: 'Luis', hand: [] }, { id: 3, name: 'Eva', hand: [7, 8, 9] }];
+  const puntos = html => Object.fromEntries([...html.matchAll(/<strong>(\w+)<\/strong><span>(-?\d+) punto/g)].map(m => [m[1], Number(m[2])]));
+  assert.deepEqual(puntos(CTw.Tournament.board(t, mesa, [2])), { Ana: 1, Luis: 1, Eva: -3 });
+  // Una ronda que acaba sin ganador cuenta las manos, pero no regala el punto a nadie.
+  assert.deepEqual(puntos(CTw.Tournament.board(t, mesa, [], true)), { Ana: 1, Luis: 0, Eva: -3 });
 }
 w.close();
 console.log('Competición: tres formatos, mazos sin repetir, cartas configurables, tres rondas locales, desempate, marcador y recuperación: OK');

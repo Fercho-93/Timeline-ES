@@ -216,8 +216,8 @@ otros mazos.
   pequeño), gana la ronda quien termine una vuelta completa sin cartas y se usa la final numérica
   secreta si hay varios. Ganar una ronda suma un punto; quedarse con cartas en la mano al
   terminarla penaliza con su número menos uno (una carta no resta nada, dos cartas restan un punto,
-  tres restan dos, y así sucesivamente). Al terminar, el marcador muestra el ganador o el empate
-  global en puntos.
+  tres restan dos, y así sucesivamente). Quien acaba sin cartas pero pierde la final numérica no
+  suma ni resta. Al terminar, el marcador muestra el ganador o el empate global en puntos.
 - **Guardado.** En un móvil, la competición se guarda en una clave propia, aparte de las partidas
   normales de cada mazo (`continuum-competition-v1` en solitario, `continuum-multi-competition-v1`
   en un solo móvil): conserva dificultad, orden de temas, marcador, ronda y resultado pendiente.

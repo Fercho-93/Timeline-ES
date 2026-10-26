@@ -1084,7 +1084,7 @@ function starterPanelMarkupContent(isHost) {
     if (t) {
       // Competición: el marcador de todos los temas y, si quedan, el siguiente.
       const quedan = t.index + 1 < t.queue.length;
-      const board = CT.Tournament.board(t, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name, hand: roomState.players[id].hand })), uids.length ? uids : [roomState.playerOrder[0]]);
+      const board = CT.Tournament.board(t, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name, hand: roomState.players[id].hand })), uids, true);
       const siguiente = quedan
         ? (isHost ? '<button class="btn btn-primary btn-block" data-local-action="competition-next">Siguiente tema <span>→</span></button><button class="btn btn-secondary btn-block" data-local-action="close-room">Cerrar la sala</button>' : '<p class="hint">Quien organiza pondrá en marcha el siguiente tema.</p><button class="btn btn-secondary btn-block" data-local-action="leave">Salir de la sala</button>')
         : (isHost ? '<button class="btn btn-primary btn-block" data-local-action="close-room">Cerrar la sala</button>' : '<button class="btn btn-secondary btn-block" data-local-action="leave">Salir de la sala</button>');
