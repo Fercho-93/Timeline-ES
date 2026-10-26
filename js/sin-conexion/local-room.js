@@ -108,7 +108,8 @@
     const sameTable = Array.isArray(order) && order.length === state.playerOrder.length && state.playerOrder.every(id => order.includes(id));
     if (!sameTable) throw new Error("INVALID_START");
     const deck = [...shuffledDeck];
-    const actualHand = Math.min(handSize, Math.floor((deck.length - 1) / order.length));
+    // Una carta para la línea y al menos una para robar, como en un solo móvil.
+    const actualHand = Math.min(handSize, Math.floor((deck.length - 2) / order.length));
     const powers = CT.Powers && (ghost || pulse) ? CT.Powers.create(deck, order.length, actualHand, ghost, pulse, random) : { ghost: null, pulsePower: null };
     const players = {};
     order.forEach(id => { players[id] = { ...state.players[id], hand: deck.splice(0, actualHand), pulseUsed: false, shieldRound: 0, away: false }; });

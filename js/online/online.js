@@ -1051,7 +1051,8 @@ async function startRoom(withGhost = true) {
       // La carta que se adivinó ya se ha visto de sobra: se aparta del mazo antes de
       // repartir, así nadie vuelve a encontrársela en la partida.
       const deck = shuffle(CT.uniqueValueIds(data.mode || "history", modeCards(data.mode || "history").map(card => card.id).filter(id => id !== starterCard)));
-      const actualHand = Math.min(handSize, Math.floor((deck.length - 1) / data.playerOrder.length));
+      // Una carta para la línea y al menos una para robar, como en un solo móvil.
+      const actualHand = Math.min(handSize, Math.floor((deck.length - 2) / data.playerOrder.length));
       const powers = CT.Powers.create(deck, data.playerOrder.length, actualHand, enableGhost, pulse);
       const players = { ...data.players };
       data.playerOrder.forEach(uid => { players[uid] = { ...players[uid], hand: deck.splice(0, actualHand), pulseUsed: false, shieldRound: 0 }; });

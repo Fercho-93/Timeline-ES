@@ -459,7 +459,7 @@
     selectedBlockKey = CT.blockOf(selectedModeKey).key;
     cardsById = new Map(CT.cards(selectedModeKey).map(c=>[c.id,c]));
     const deck = shuffle(CT.uniqueValueIds(selectedModeKey, CT.cards(selectedModeKey).map(c=>c.id).filter(id => id !== excludedCardId)));
-    const handSize = Math.min(t.handSize, Math.floor((deck.length-1)/players.length));
+    const handSize = Math.min(t.handSize, Math.floor((deck.length-2)/players.length));
     const powers = CT.Powers.create(deck,players.length,handSize,false,false);
     const roster = players.map(p=>({id:p.id,name:p.name,hand:deck.splice(0,handSize),pulseUsed:false,shieldRound:0}));
     const timeline=[deck.shift()];
@@ -1090,7 +1090,9 @@
     const shuffled = shuffle(CT.uniqueValueIds(selectedModeKey, currentMode().cards.map(card => card.id).filter(id => !drawnIds.includes(id))));
     // El tope sale de este mazo, ya sin valores repetidos ni cartas del minijuego, como en
     // las salas: contar el mazo entero dejaba la línea sin carta inicial en los mazos pequeños.
-    const handSize = Math.min(requestedHand, Math.floor((shuffled.length - 1) / names.length));
+    // Se reservan dos cartas, la de la línea y al menos una para robar: con un mazo justo,
+    // repartirlo todo dejaba la partida sin cartas que robar desde el primer fallo.
+    const handSize = Math.min(requestedHand, Math.floor((shuffled.length - 2) / names.length));
     if (handSize < requestedHand) showToast(`Mazo pequeño: ${handSize} cartas por persona para reservar el tablero`);
     // `pulseUsed` y `shieldRound` solo los mira el Pulso; una partida guardada de antes
     // no los lleva, y sin ellos `undefined` se comporta como «no usado» y «sin escudo»,
