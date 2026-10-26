@@ -282,13 +282,13 @@
   // La competición es una forma de jugar con las colecciones: se muestra al final de la lista con la misma
   // carátula y la misma sangría, pero abre su propia pantalla de ajustes en lugar de desplegar mazos.
   const competitionArt = '<img src="assets/competition-engraving.webp" alt="" width="1000" height="667" decoding="async" loading="lazy">';
-  const competitionPanel = audience => `<div class="collection-extra"><button class="gallery-panel panel-competition" data-action="competition-menu" data-competition-audience="${audience}" aria-label="Competición: varias rondas con temas al azar de las colecciones">
+  const competitionPanel = audience => `<div class="collection-extra"><button class="gallery-panel panel-competition" data-action="competition-menu" data-competition-audience="${audience}" aria-label="Competición: varios temas al azar de las colecciones">
         <span class="panel-backdrop" aria-hidden="true">${competitionArt}</span>
         <span class="panel-depth-light" aria-hidden="true"></span>
         <span class="panel-art" aria-hidden="true">${competitionArt}</span>
         <span class="panel-depth-ground" aria-hidden="true"></span>
         <span class="collection-foil" aria-hidden="true"></span>
-        <span class="collection-index" aria-hidden="true">Varias rondas</span>
+        <span class="collection-index" aria-hidden="true">Varios temas</span>
         <span class="collection-open" aria-hidden="true">→</span>
         <span class="panel-label" aria-hidden="true"><i></i><strong>Competición</strong><small>Temas al azar; gana quien más puntos sume.</small></span>
       </button></div>`;
@@ -399,7 +399,7 @@
     </div>`;
     paint(`<div class="shell">${header("back-menu")}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Competición</div><h2 class="solo-title" data-focus tabindex="-1">Competición con amigos</h2>
-        <p class="lead">Cada uno desde su móvil. Se juega por rondas, todos a la vez y con puntos. Temas al azar de las Grandes colecciones y gana quien más sume al final.</p></div>
+        <p class="lead">Cada uno en su móvil. Se juegan varios temas al azar de las Grandes colecciones, todos a la vez y con puntos, y gana quien más sume al final.</p></div>
         <div class="panel solo-panel">
           <div class="solo-panel-head"><h3>Qué jugáis</h3></div>
           ${lengthField(temas, { all: todosVisible })}
@@ -413,7 +413,7 @@
           <div class="field duel-identity-field">
             <label for="duel-name">Tu nombre de perfil</label>
             <div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares.markup(duelName(), { size: 38, seed: CT.Avatares.ownSeed() })}</span><input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}"></div>
-            <small class="field-help">Se usará automáticamente en la competición. Puedes cambiarlo desde tu perfil.</small>
+            <small class="field-help">Se usará automáticamente en la competición. Puedes cambiarlo en Atlas.</small>
           </div>
           <div class="duel-brief" data-comp-brief><p>${compBrief(ritmo)}</p></div>
           <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="comp-friends-start">Empezar competición <span>→</span></button>
@@ -424,8 +424,8 @@
   // Qué pasa con cada ritmo, dicho en una frase.
   function compBrief(ritmo) {
     return ritmo === "turnos"
-      ? `Entre dos, cada uno desde su móvil y cuando pueda: temas al azar (hasta ${COMP_TURN_THEMES}), una carta cada vez y las mismas para cada uno. Creas la partida, haces tu primera jugada y le mandas el enlace a tu rival.`
-      : "Una sala para varias personas: un tema al azar por ronda. Ganar la ronda suma un punto; las cartas que te queden restan su número menos uno. Quién empieza se decide en la sala de espera con un minijuego.";
+      ? `Entre dos, cada uno en su móvil y cuando pueda: temas al azar (hasta ${COMP_TURN_THEMES}), una carta cada vez y las mismas para cada uno. Creas la partida, haces tu primera jugada y le mandas el enlace a tu rival.`
+      : "Una sala para varias personas: varios temas al azar, uno detrás de otro. Ganar un tema suma un punto; las cartas que te queden restan su número menos uno. Quién empieza se decide en la sala de espera con un minijuego.";
   }
   function startCompFriends() {
     const opciones = competitionOptions(), ritmo = compPace();
@@ -450,7 +450,7 @@
     document.getElementById('hand-size').closest('.field').insertAdjacentHTML('beforebegin', lengthField(pendingTournament.rounds));
     if (CT.Storage.getItem(MULTI_COMP_KEY) && !app.querySelector('[data-action="competition-resume"]')) app.querySelector('.setup-section .panel').insertAdjacentHTML('beforebegin', '<button class="btn btn-secondary btn-block" data-action="competition-resume">Continuar competición multijugador guardada <span>→</span></button>');
     app.querySelector('.setup-section h2').outerHTML = '<div class="eyebrow"><span class="eyebrow-line"></span> Competición</div><h2 data-focus tabindex="-1">Competición en un solo móvil</h2>';
-    app.querySelector('.setup-section .lead').textContent = `Temas al azar de las Grandes colecciones, uno por ronda. Ganar la ronda suma un punto; las cartas que te queden en la mano restan su número menos uno.`;
+    app.querySelector('.setup-section .lead').textContent = `Temas al azar de las Grandes colecciones, uno detrás de otro. Ganar un tema suma un punto; las cartas que te queden en la mano restan su número menos uno.`;
   }
   // La competición se juega sin poderes, como dice la Guía: ni Fantasma ni Pulso en ningún tema.
   function startTournamentRound(t, players, starter, excludedCardId = null) {
@@ -487,8 +487,8 @@
       <div class="chapter-art" aria-hidden="true">${blockArt(CT.blockOf(game.mode).art, true)}</div>
       ${CT.Tournament.journey(game.tournament)}
       <div class="chapter-number">Tema ${game.tournament.index + 1} de ${game.tournament.queue.length}</div>
-      <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Competición · ronda ${game.tournament.index + 1}</span>${escapeHtml(mode.name)}</h2>
-      <button class="btn btn-block comp-splash-start" data-action="competition-round-start">Empezar ronda</button>
+      <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Competición · tema ${game.tournament.index + 1}</span>${escapeHtml(mode.name)}</h2>
+      <button class="btn btn-block comp-splash-start" data-action="competition-round-start">Empezar el tema</button>
     </div></section></div>`);
   }
 
@@ -749,7 +749,7 @@
     screen = "duelos";
     paint(`<div class="shell">${header("back-menu")}
       <section class="setup-section perfil-section">
-        <header class="atlas-page-heading"><div class="eyebrow">Retos entre amigos</div><h1 data-focus tabindex="-1">Tus partidas</h1><p>Tus duelos por turnos: en qué punto está cada uno y a quién le toca.</p></header>
+        <header class="atlas-page-heading"><div class="eyebrow">Cara a cara</div><h1 data-focus tabindex="-1">Tus duelos</h1><p>Tus duelos por turnos: en qué punto está cada uno y a quién le toca.</p></header>
         <section class="panel turn-duel-profile" id="turn-duels-list"><p role="status">Cargando tus duelos…</p></section>
       </section>
       ${homeNav()}
@@ -759,7 +759,7 @@
     const quickDuels = Promise.resolve(CT.Quick?.duels?.() || []).catch(() => []);
     Promise.all([turnDuelReady.then(() => CT.TurnDuel?.list?.() || []).catch(error => quickDuels.then(q => { if (q.length) return []; throw error; })), quickDuels]).then(([partidas, quick]) => {
       if (!box?.isConnected || screen !== "duelos") return;
-      box.innerHTML = CT.TurnDuel.profileMarkup(partidas, quick).replace(/^<h2>Mis duelos<\/h2>/, "");
+      box.innerHTML = CT.TurnDuel.profileMarkup(partidas, quick).replace(/^<h2>Tus duelos<\/h2>/, "");
     }).catch(() => { if (box?.isConnected && screen === "duelos") box.innerHTML = '<p>No se pudieron cargar los duelos. Comprueba tu conexión y vuelve a intentarlo.</p>'; });
   }
 
@@ -1041,7 +1041,7 @@
     const active = [...document.querySelectorAll("#players input")].map(input => input.value);
     const names = CT.RecentPlayers.available(active);
     host.hidden = !names.length;
-    host.innerHTML = names.length ? `<div class="recent-players-head"><div><span class="recent-players-kicker">Vuelve a reunir a tu mesa</span><strong>Jugadores recientes</strong></div><button type="button" data-action="clear-recent-players">Borrar lista</button></div><div class="recent-player-list">${names.map(name => {
+    host.innerHTML = names.length ? `<div class="recent-players-head"><div><span class="recent-players-kicker">Vuelve a reunir a tu grupo</span><strong>Jugadores recientes</strong></div><button type="button" data-action="clear-recent-players">Borrar lista</button></div><div class="recent-player-list">${names.map(name => {
       const encoded = encodeURIComponent(name);
       return `<span class="recent-player"><button type="button" data-action="add-recent-player" data-recent-name="${encoded}" aria-label="Añadir a ${escapeHtml(name)}"><span class="recent-player-seal" aria-hidden="true">${escapeHtml(Array.from(name.trim())[0] || "✦")}</span><span class="recent-player-name">${escapeHtml(name)}</span><span class="recent-player-add" aria-hidden="true">+</span></button><button type="button" data-action="remove-recent-player" data-recent-name="${encoded}" aria-label="Olvidar a ${escapeHtml(name)}">×</button></span>`;
     }).join("")}</div>` : "";
@@ -1124,7 +1124,7 @@
       ? `<p class="pulse-gift">⚡ <b>${escapeHtml(game.pulseGift.from)}</b> te ha pasado <b>${escapeHtml(cardsById.get(game.pulseGift.cardId).title)}</b> con su Pulso.</p>`
       : "";
     paint(`<div class="shell">${header()}
-      <section class="pass-screen"><div class="panel pass-card"><div class="player-medallion player-medallion-avatar">${jugadorAvatar(player, 76)}</div><div class="eyebrow">${game.tournament ? `Competición · ronda ${game.tournament.index + 1} de ${game.tournament.queue.length}` : `Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}</div><h2 data-focus tabindex="-1">El turno es de<br>${escapeHtml(player.name)}</h2><p>Pásale el móvil. Las fechas siguen ocultas hasta colocar una carta.</p>${regalo}<button class="btn btn-primary btn-block" data-action="ready">Empezar mi turno <span>→</span></button></div></section>
+      <section class="pass-screen"><div class="panel pass-card"><div class="player-medallion player-medallion-avatar">${jugadorAvatar(player, 76)}</div><div class="eyebrow">${game.tournament ? `Competición · tema ${game.tournament.index + 1} de ${game.tournament.queue.length}` : `Vuelta ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}</div><h2 data-focus tabindex="-1">El turno es de<br>${escapeHtml(player.name)}</h2><p>Pásale el móvil. Las fechas siguen ocultas hasta colocar una carta.</p>${regalo}<button class="btn btn-primary btn-block" data-action="ready">Empezar mi turno <span>→</span></button></div></section>
     </div>`);
   }
 
@@ -1168,11 +1168,11 @@
         ? `Colócala tú también. Si aciertas, no te llevas ninguna carta de ${escapeHtml(currentPlayer().name)}`
         : `Colócala. Si aciertas y ${escapeHtml(pulseTarget.name)} falla, le pasas una carta tuya`;
     const manoHtml = pulseCard
-      ? `<section><div class="hand-title"><h3>Carta del duelo</h3><small>${defending ? `te reta ${escapeHtml(currentPlayer().name)}` : `contra ${escapeHtml(pulseTarget.name)}`}</small></div>${pendingIndex === null ? `<div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}">${categoryBadge(pulseCard)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(pulseCard.title)}</strong></div></div>` : `<p class="hint provisional-hand-note">La carta está en la línea como vista previa.</p>`}<p class="hint">${pistaPulso()}</p></section>`
+      ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>${defending ? `te reta ${escapeHtml(currentPlayer().name)}` : `contra ${escapeHtml(pulseTarget.name)}`}</small></div>${pendingIndex === null ? `<div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}">${categoryBadge(pulseCard)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(pulseCard.title)}</strong></div></div>` : `<p class="hint provisional-hand-note">La carta está en la línea como vista previa.</p>`}<p class="hint">${pistaPulso()}</p></section>`
       : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${handCards.length} en mano</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${pendingIndex === null && selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${pendingIndex === null && selectedCardId === card.id}">${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco"}</p>${!game.pulsePower && pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
     paint(`<div class="shell">${header()}
-      <h1 class="solo-lectores" data-focus tabindex="-1">${defending ? `Defiendes el Pulso de ${escapeHtml(currentPlayer().name)}, ${escapeHtml(player.name)}` : `Turno de ${escapeHtml(player.name)}, ronda ${game.round}`}</h1>
-      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${defending ? "⚡ Defensa del Pulso" : `${game.tournament ? `Competición · ronda ${game.tournament.index + 1} de ${game.tournament.queue.length}` : `Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}`}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
+      <h1 class="solo-lectores" data-focus tabindex="-1">${defending ? `Defiendes el Pulso de ${escapeHtml(currentPlayer().name)}, ${escapeHtml(player.name)}` : `Turno de ${escapeHtml(player.name)}, vuelta ${game.round}`}</h1>
+      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${defending ? "⚡ Defensa del Pulso" : `${game.tournament ? `Competición · tema ${game.tournament.index + 1} de ${game.tournament.queue.length}` : `Vuelta ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}`}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
       <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores${game.players.length > 2 ? " · desliza →" : ""}</div><div class="scoreboard"${game.players.length > 2 ? ' aria-label="Jugadores; desliza para ver los demás"' : ""}>${game.players.map((p, i) => `<span class="score ${i === game.current ? "active" : ""}"${i === game.current ? ' aria-current="true"' : ""}><i class="score-avatar">${jugadorAvatar(p, 40)}</i><span class="score-copy"><b>${escapeHtml(p.name)}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(p.hand.length, game.players)}%"></i></span></span><em><strong>${p.hand.length}</strong><small>cartas</small></em></span>`).join("")}</div></section>
       ${pulseCard ? `<div class="pulse-banner">⚡ Duelo · <b>${escapeHtml(currentPlayer().name)}</b> reta a <b>${escapeHtml(pulseTarget.name)}</b>${defending ? " · te toca defender" : ""}</div>` : ""}
       ${localTimed() ? CT.Tiempo.bar(game.turnSeconds * 1000 - (Date.now() - localTurnStart()), game.turnSeconds * 1000) : ""}
@@ -1478,7 +1478,7 @@
       <h2>¿A quién retas?</h2>
       <p class="lead" style="margin-inline:auto">${CT.pulseRules}</p>
       <div class="actions" style="display:grid;margin-top:6px">${opciones}</div>
-      ${protegidos.length ? `<p class="hint" style="margin-top:12px">Ya recibieron una carta esta ronda: ${protegidos.map(player => escapeHtml(player.name)).join(", ")}.</p>` : ""}
+      ${protegidos.length ? `<p class="hint" style="margin-top:12px">Ya recibieron una carta en esta vuelta: ${protegidos.map(player => escapeHtml(player.name)).join(", ")}.</p>` : ""}
       <button class="btn btn-ghost btn-block" style="margin-top:10px" data-action="close-menu">Mejor no</button>
     </div></div>`, true);
   }
@@ -1625,11 +1625,11 @@
     const lead = CT.Final.verdict({ ganadores: names.length, final: !!game.final, quedan: game.players.length });
     const fallosUnicos = new Set(game.failed || []).size;
     const earned=game.earnedAchievements||[];
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel final-composition"><div class="eyebrow">Fin de la partida</div><h1 class="final-title" data-focus tabindex="-1">${title}</h1><p class="final-lead">${lead}</p>${finalMetrics(game.timeline.length,'láminas jugadas',`Ronda ${game.round||1}`,'mejor tramo',game.newDiscoveries||0,earned.length)}${logrosMarkup(earned)}<div class="actions final-actions"><button class="btn btn-ghost" data-action="review-timeline">Ver las ${game.timeline.length} ${game.timeline.length === 1 ? "carta" : "cartas"} jugadas</button>${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-game">Ver lo que se falló (${fallosUnicos})</button>` : ""}${game.tournament ? "" : '<button class="btn btn-primary" data-action="rematch-local">Revancha · mismos jugadores</button>'}<button class="btn ${game.tournament ? "btn-primary" : "btn-secondary"}" data-action="setup">${game.tournament ? "Otra partida" : "Cambiar jugadores o ajustes"}</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`);
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel final-composition"><div class="eyebrow">Fin de la partida</div><h1 class="final-title" data-focus tabindex="-1">${title}</h1><p class="final-lead">${lead}</p>${finalMetrics(game.timeline.length,game.timeline.length===1?'carta en la línea':'cartas en la línea',game.round||1,'vueltas',game.newDiscoveries||0,earned.length)}${logrosMarkup(earned)}<div class="actions final-actions"><button class="btn btn-ghost" data-action="review-timeline">Ver las ${game.timeline.length} ${game.timeline.length === 1 ? "carta" : "cartas"} jugadas</button>${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-game">Ver lo que se falló (${fallosUnicos})</button>` : ""}${game.tournament ? "" : '<button class="btn btn-primary" data-action="rematch-local">Revancha · mismos jugadores</button>'}<button class="btn ${game.tournament ? "btn-primary" : "btn-secondary"}" data-action="setup">${game.tournament ? "Otra partida" : "Cambiar jugadores o ajustes"}</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`);
     if (game.tournament) {
       app.querySelector('.pass-screen').insertAdjacentHTML('afterbegin',CT.Tournament.board(game.tournament,game.players,game.winners));
       const button=app.querySelector('[data-action="setup"]');
-      if (game.tournament.index+1<game.tournament.queue.length) { button.dataset.action='competition-next';button.textContent='Siguiente ronda · nuevo mazo'; }
+      if (game.tournament.index+1<game.tournament.queue.length) { button.dataset.action='competition-next';button.textContent='Siguiente tema'; }
       else { button.dataset.action='home';button.textContent='Elegir otra competición'; }
     }
   }
@@ -1724,7 +1724,7 @@
     }
     screen = "enciclopedia";
     const all = encMode === "all";
-    const mode = all ? {name: "Álbum de láminas"} : CT.mode(encMode);
+    const mode = all ? {name: "Todas las cartas"} : CT.mode(encMode);
     const bands = []; // No se filtra el álbum por la respuesta oculta.
     const cards = all
       ? CT.Enciclopedia.catalogGroups(encQuery, { lock: encLock }).flatMap(group => group.decks.flatMap(deck => deck.cards))
@@ -1737,7 +1737,7 @@
     paint(`<div class="enc-background" data-background-screen="${encBackgroundScreen}" inert aria-hidden="true">${encBackground}</div><div class="overlay" data-overlay="encyclopedia"><div class="modal settings-modal enc-modal">
       <button class="btn btn-secondary" data-action="enc-back" data-dialog-focus>Cerrar enciclopedia</button>
       <section class="setup-section enc-section">
-        <header class="atlas-page-heading"><div class="eyebrow">El atlas de Continuum</div><h1 data-focus tabindex="-1">Enciclopedia</h1><p>Explora las cartas. Completa tu colección, una partida a la vez.</p></header><div class="enc-selection-heading"><h2>${escapeHtml(mode.name)}</h2><p id="enc-count" role="status">${encCountText(encMode, cards.length)}</p></div>
+        <header class="atlas-page-heading"><div class="eyebrow">Tu Atlas</div><h1 data-focus tabindex="-1">Enciclopedia</h1><p>Explora las cartas. Completa tu colección, una partida a la vez.</p></header><div class="enc-selection-heading"><h2>${escapeHtml(mode.name)}</h2><p id="enc-count" role="status">${encCountText(encMode, cards.length)}</p></div>
         <div class="panel enc-toolbar enc-toolbar-compact">
           <div class="field enc-topic-select">
             <label for="enc-mode-select">Explorar temática</label>
@@ -2029,7 +2029,7 @@
           <span class="atlas-chart-compass" aria-hidden="true">✦<small>N</small></span>
           <a class="atlas-chart-stop atlas-stop-collection" href="#atlas-collection"><i aria-hidden="true">01</i><b>Las láminas</b><small>${descubiertas} descubiertas</small></a>
           <a class="atlas-chart-stop atlas-stop-daily" href="#atlas-daily"><i aria-hidden="true">02</i><b>El reto diario</b><small>Racha y ranking</small></a>
-          <a class="atlas-chart-stop atlas-stop-duels" href="#atlas-duels"><i aria-hidden="true">03</i><b>Tus duelos</b><small>Cara a cara</small></a>
+          <a class="atlas-chart-stop atlas-stop-duels" href="#atlas-duels"><i aria-hidden="true">03</i><b>Duelos</b><small>Tu marcador</small></a>
           <a class="atlas-chart-stop atlas-stop-journey" href="#atlas-journey"><i aria-hidden="true">04</i><b>Tu recorrido</b><small>${resumen.games} ${resumen.games === 1 ? "partida" : "partidas"}</small></a>
           <a class="atlas-chart-stop atlas-stop-achievements" href="#atlas-achievements"><i aria-hidden="true">05</i><b>Los logros</b><small>${resumen.unlocked} de ${resumen.total}</small></a>
           <span class="atlas-chart-landfall" aria-hidden="true">Rumbo al Nuevo Mundo</span>
@@ -2038,7 +2038,7 @@
         <div class="atlas-territories">
           <div class="atlas-territory" id="atlas-collection"><div class="atlas-territory-caption"><span>01 / HALLAZGOS DE LA TRAVESÍA</span><h2>Las láminas</h2></div>${atlasColeccion()}</div>
           <div class="atlas-territory" id="atlas-daily"><div class="atlas-territory-caption"><span>02 / EL RUMBO DE CADA DÍA</span><h2>El reto diario</h2></div>${atlasRetoDiario()}</div>
-          <div class="atlas-territory" id="atlas-duels"><div class="atlas-territory-caption"><span>03 / TRAVESÍAS COMPARTIDAS</span><h2>Tus duelos</h2></div><section class="panel atlas-duels"><div><h3>Cara a cara</h3><p>Cuántas veces has ganado tú y cuántas cada amigo en los duelos por turnos.</p></div><div id="atlas-standings" aria-live="polite">${CT.Accounts?.ready ? '<p class="hint">Cargando tus duelos…</p>' : '<p class="hint">Necesitas conexión para ver tus duelos.</p>'}</div><button class="btn btn-secondary" data-action="duels-list">Ver tus duelos <span aria-hidden="true">→</span></button></section></div>
+          <div class="atlas-territory" id="atlas-duels"><div class="atlas-territory-caption"><span>03 / TRAVESÍAS COMPARTIDAS</span><h2>Tu marcador de duelos</h2></div><section class="panel atlas-duels"><div><h3>Cara a cara</h3><p>Cuántas veces has ganado tú y cuántas cada amigo en los duelos por turnos.</p></div><div id="atlas-standings" aria-live="polite">${CT.Accounts?.ready ? '<p class="hint">Cargando tus duelos…</p>' : '<p class="hint">Necesitas conexión para ver tus duelos.</p>'}</div><button class="btn btn-secondary" data-action="duels-list">Ver Tus duelos <span aria-hidden="true">→</span></button></section></div>
           <div class="atlas-territory" id="atlas-journey"><div class="atlas-territory-caption"><span>04 / CUADERNO DE BITÁCORA</span><h2>Tu recorrido</h2></div>
             ${estrenado
               ? `<p class="lead">${resumen.hits} ${resumen.hits === 1 ? "acierto" : "aciertos"} de ${resumen.cards} ${resumen.cards === 1 ? "carta" : "cartas"} colocadas.</p>`
@@ -2469,7 +2469,7 @@
     const pendiente = solo && (solo.kind === "free" || solo.kind === "marathon");
     const progreso = dominadas(selectedModeKey);
     paint(`<div class="shell">${header("back-menu")}
-      <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${mode.name}</div><h2 class="solo-title" data-focus tabindex="-1">Jugar en solitario</h2>
+      <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${mode.name}</div><h2 class="solo-title" data-focus tabindex="-1">Jugar solo</h2>
         <p class="lead">Ordena, descubre y supera tu marca.</p><p class="hint solo-dominadas" data-solo-dominadas>Dominadas ${progreso.hechas} de ${progreso.total} ${mode.cardLabel}.</p></div>${vidasAviso("por ronda")}
         ${pendiente ? `<button class="btn btn-primary btn-block" data-action="resume-solo">Continuar ${solo.kind === "marathon" ? "la maratón" : "la ronda"} · ${CT.Ghost.level(solo.difficulty).name} <span>→</span></button>` : ""}
         <div class="panel solo-panel">
@@ -2515,8 +2515,8 @@
     solo = loadSolo();
     pendingIndex = null;
     paint(`<div class="shell">${header("back-menu")}
-      <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2 class="solo-title" data-focus tabindex="-1">Partida con amigos</h2>
-        <p class="lead">Cada uno desde su móvil. Elige cómo jugáis: todos a la vez, por turnos o con las mismas cartas.</p></div>
+      <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2 class="solo-title" data-focus tabindex="-1">Cada uno en su móvil</h2>
+        <p class="lead">Elige cómo jugáis: todos a la vez, por turnos o con las mismas cartas.</p></div>
         ${duelPanel()}
       </section>
     </div>`);
@@ -2671,18 +2671,18 @@
       <div class="field duel-identity-field">
         <label for="duel-name">Tu nombre de perfil</label>
         <div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares.markup(duelName(), { size: 38, seed: CT.Avatares.ownSeed() })}</span><input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}"></div>
-        <small class="field-help">Se usará automáticamente en el duelo. Puedes cambiarlo desde tu perfil.</small>
+        <small class="field-help">Se usará automáticamente en el duelo. Puedes cambiarlo en Atlas.</small>
       </div>
-      ${bloque("directo", `<div class="duel-brief"><p>Una sala de hasta el máximo de personas que elijas: cada uno coloca desde su móvil y todos veis la línea avanzar a la vez. Quién empieza se decide en la sala de espera con un minijuego: cada uno adivina la cifra de una carta. Al crearla compartes el código, el enlace o el QR.</p></div>
+      ${bloque("directo", `<div class="duel-brief"><p>Una sala de hasta el máximo de jugadores que elijas: cada uno coloca desde su móvil y todos veis la línea avanzar a la vez. Quién empieza se decide en la sala de espera con un minijuego: cada uno adivina la cifra de una carta. Al crearla compartes el código, el enlace o el QR.</p></div>
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-live-room">Crear sala <span>→</span></button>`)}
       ${bloque("seguidos-orden", `<div class="duel-brief"><p>${CT.Duelo.CARTAS} cartas al azar de este mazo, y las colocas en la línea. Gana quien más acierte.</p>
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Con tiempo, el reloj no se para: si sales de la aplicación, la carta se da por fallada.</span></p></div>
         ${enOrden ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-solo">Continuar ${contra(solo) ? `el duelo contra ${escapeHtml(contra(solo))}` : "tu duelo"} <span>→</span></button>` : ""}
-        <button class="btn ${enOrden ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-duel">${enOrden ? "Empezar otro duelo" : "Crear un duelo"} <span>→</span></button>`)}
+        <button class="btn ${enOrden ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-duel">${enOrden ? "Empezar otro duelo" : "Jugar y retar"} <span>→</span></button>`)}
       ${regla ? bloque("seguidos-cifras", `<div class="duel-brief"><p>${Cifras.CARTAS} cartas de este mazo, y en cada una escribes el número. ${escapeHtml(regla.pregunta)} Si te acercas lo suficiente, es un acierto. Gana quien tenga más aciertos; si empatáis, quien haya respondido más rápido.</p>
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Con tiempo, el reloj no se para: si sales de la aplicación, la carta se cierra.</span></p></div>
         ${enCifras ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-cifras">Continuar ${contra(enCifras) ? `el duelo contra ${escapeHtml(contra(enCifras))}` : "tu duelo de cifras"} <span>→</span></button>` : ""}
-        <button class="btn ${enCifras ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-cifras">${enCifras ? "Empezar otro" : "Crear un duelo de cifras"} <span>→</span></button>`) : ""}
+        <button class="btn ${enCifras ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-cifras">${enCifras ? "Empezar otro duelo" : "Jugar y retar"} <span>→</span></button>`) : ""}
       ${bloque("turnos-orden", `<div class="duel-brief"><p>Colocad una carta cada vez, desde vuestro propio móvil. Juegas tú primero y después le mandas el enlace a tu rival; en la revancha empieza él.</p>
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Respondes cuando te toque. Con tiempo, el reloj empieza al abrir tu carta.</span></p></div>
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`)}
@@ -3142,7 +3142,7 @@
     saveSolo();
     solo = null;
     const fallosUnicos = new Set(soloFailedForReview.map(item => item.id)).size;
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel final-composition"><div class="eyebrow">${duelo ? duelo.eyebrow : soloKind === "free" ? (superado ? `Ronda superada · ${estrellas(finalLives)}` : "Se acabaron las vidas") : superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 class="final-title" data-focus tabindex="-1">${duelo ? duelo.titular : 'Tu resultado'}</h1>${finalMetrics(finalHits,finalHits===1?'acierto':'aciertos',bestNow,bestLabel,newDiscoveries,sessionLogros.length)}${duelo ? duelo.cuerpo : `<p class="final-lead">${resumen}</p>`}${logrosMarkup(sessionLogros)}<div class="actions final-actions">${duelo ? duelo.acciones : ""}${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${compartir && CT.Accounts?.ready ? `<button class="btn btn-secondary" data-account-action="ranking">Ver ranking</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}${soloKind === "daily" ? '<button class="btn btn-primary" data-action="home">Ir al inicio</button>' : `<button class="btn ${duelo ? "btn-secondary" : "btn-primary"}" data-action="${duelo ? "duel-home" : "solo"}">${duelo ? "Volver a los duelos" : "Volver a solitario"}</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`}</div></div></section></div>`);
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel final-composition"><div class="eyebrow">${duelo ? duelo.eyebrow : soloKind === "free" ? (superado ? `Ronda superada · ${estrellas(finalLives)}` : "Se acabaron las vidas") : superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 class="final-title" data-focus tabindex="-1">${duelo ? duelo.titular : 'Tu resultado'}</h1>${finalMetrics(finalHits,finalHits===1?'acierto':'aciertos',bestNow,bestLabel,newDiscoveries,sessionLogros.length)}${duelo ? duelo.cuerpo : `<p class="final-lead">${resumen}</p>`}${logrosMarkup(sessionLogros)}<div class="actions final-actions">${duelo ? duelo.acciones : ""}${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${compartir && CT.Accounts?.ready ? `<button class="btn btn-secondary" data-account-action="ranking">Ver ranking</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}${soloKind === "daily" ? '<button class="btn btn-primary" data-action="home">Ir al inicio</button>' : `<button class="btn ${duelo ? "btn-secondary" : "btn-primary"}" data-action="${duelo ? "duel-home" : "solo"}">${duelo ? "Preparar otro duelo" : "Elegir otra partida"}</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`}</div></div></section></div>`);
     lastShareText = compartir;
   }
 
@@ -3518,7 +3518,7 @@
       ${cuerpo}
       ${salidas ? `<p class="hint">${salidas === 1 ? "Una carta se cerró" : `${salidas} cartas se cerraron`} por salir de la aplicación.</p>` : ""}
       ${logrosMarkup(sessionLogros)}
-      <div class="actions" style="justify-content:center">${acciones}<button class="btn btn-secondary" data-action="duel-home">Volver a los duelos</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div>
+      <div class="actions" style="justify-content:center">${acciones}<button class="btn btn-secondary" data-action="duel-home">Preparar otro duelo</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div>
     </div></section></div>`);
   }
 
@@ -3560,7 +3560,7 @@
          enTurnos ? `Cada uno juega desde su propio móvil: recibirás un aviso cuando el rival juegue.` : `Gana quien más acierte. No se gastan vidas: se juegan todas.`];
     paint(`<div class="shell">${header("back-menu")}
       <section class="pass-screen"><div class="panel duelo-listo">
-        <div class="eyebrow">Duelo por enlace</div>
+        <div class="eyebrow">${enTurnos ? "Por turnos" : "Mismas cartas"}</div>
         <h1 data-focus tabindex="-1" class="duelo-listo-titulo">${cifrasEsta ? "Escribir la cifra" : "Ordenar las cartas"}</h1>
         ${demoMarkup(cifrasEsta)}
         <ul class="duelo-reglas">${reglas.map(linea => `<li>${linea}</li>`).join("")}</ul>
@@ -4068,7 +4068,7 @@
 
   async function launchOnline(roomCode = "", competition = null, { createOnly = false } = {}) {
     screen = "online-loading";
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">Conectando la sala</h2><p>Preparando el modo multijugador…</p></div></section></div>`);
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">Conectando la sala</h2><p>Preparando la sala…</p></div></section></div>`);
     try {
       const online = await import("../online/online.js");
       await online.openOnlineMode({ roomCode, modeKey: selectedModeKey, competition, createOnly, onBack: backMenu });
@@ -4378,7 +4378,7 @@
     else if (action === 'reshare-turn-duel') { CT.TurnDuel.reshare(target.dataset.turnId).catch(() => showToast('No se pudo compartir el enlace.')); }
     else if (action === 'block-duel-rival' || action === 'unblock-duel-rival') {
       const unblock = action === 'unblock-duel-rival';
-      if (!unblock && !window.confirm('¿Bloquear los retos de este rival? No cancela las partidas en curso. Puedes deshacerlo desde tu perfil.')) return;
+      if (!unblock && !window.confirm('¿Bloquear los retos de este rival? No cancela las partidas en curso. Puedes deshacerlo desde «Tus duelos».')) return;
       target.disabled = true;
       CT.TurnDuel.block(target.dataset.rivalId, target.dataset.rivalName, unblock).then(duelsRefresh).catch(() => { target.disabled = false; showToast('No se pudo cambiar el bloqueo.'); });
     }
@@ -4407,7 +4407,7 @@
     else if (action === "starter-start") { CT.closeDialog(); startGame(); }
     else if (action === "abandon" && screen === "cifras") salirDeCifras();
     else if (action === "abandon") CT.UI.confirmExit('Se borrará la partida actual y no contará nada de ella: ni cartas, ni aciertos, ni láminas. Esta acción no se puede deshacer.', game?.tournament ? discardMultiCompetition : () => { game = null; saveGame(); home(); }, '¿Salir sin guardar?', 'Salir sin guardar');
-    else if (action === "abandon-solo" && solo?.kind === "comp") CT.UI.confirmExit('Se borrará la competición en curso, con todas sus rondas, y no podrás continuarla después. Esta acción no se puede deshacer.', discardCompetition, '¿Salir sin guardar?', 'Salir sin guardar');
+    else if (action === "abandon-solo" && solo?.kind === "comp") CT.UI.confirmExit('Se borrará la competición en curso, con todos sus temas, y no podrás continuarla después. Esta acción no se puede deshacer.', discardCompetition, '¿Salir sin guardar?', 'Salir sin guardar');
     else if (action === "abandon-solo") CT.UI.confirmExit('Se borrará el intento actual y no contará nada de él: ni cartas, ni aciertos, ni láminas, ni la racha. Esta acción no se puede deshacer.', abandonSolo, '¿Salir sin guardar?', 'Salir sin guardar');
     else if (action === "pulse-open") pulseTargetMenu();
     else if (action === "pulse-defend") { game.pulseTurn.stage = PULSE_DEFENSA; pendingIndex = null; saveGame(); gameView(); }
@@ -4415,7 +4415,7 @@
     else if (action === "pulse-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, game.timeline.length); gameView(); }
     else if (action === "review-game") reviewScreen((game.failed || []).map(id => ({ id, mode: game.mode })), `<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button>`);
     else if (action === "review-timeline") timelineReviewScreen(game.timeline, game.mode, `<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button>`);
-    else if (action === "review-solo") reviewScreen(soloFailedForReview, `<button class="btn btn-primary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`);
+    else if (action === "review-solo") reviewScreen(soloFailedForReview, `<button class="btn btn-primary" data-action="solo">Elegir otra partida</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`);
     else if (action === "share-daily") compartir(lastShareText, "Resultado copiado");
     else if (action === "review-comp") reviewScreen(comp.totalFailed, `<button class="btn btn-primary" data-action="start-competition">Jugar otra vez</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`);
     else if (action === "resume-competition") resumeCompetition();

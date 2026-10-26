@@ -264,7 +264,7 @@ async function claimHost(auto = false) {
     // En una mesa pública que todavía espera jugadores, quien se fue deja de ocupar su
     // plaza: se le saca de la mesa y la mesa vuelve a aparecer en la búsqueda.
     if (roomState?.matchmaking === "public") relayKick = previousHost;
-    if (auto) showToast("Quien abrió la mesa se ha ido: ahora la llevas tú.");
+    if (auto) showToast("Quien creó la partida se ha ido: ahora la llevas tú.");
   } catch { if (!auto) showToast("El anfitrión ha vuelto o alguien ya tomó el relevo. La sala sigue guardada."); }
   finally { busy = false; }
 }
@@ -511,16 +511,16 @@ function renderEntry(invited = "") {
   // este móvil todavía no tiene perfil.
   const ownName = escapeHtml(CT.Identidad?.propio?.() || known?.name || "");
   paint(`<div class="shell online-shell">${header()}
-    <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${joinOnly ? "Sala privada" : CT.mode(selectedModeKey).name}</div><h2 data-focus tabindex="-1">Una mesa,<br>varias pantallas</h2><p class="lead">Cada persona juega desde su móvil y todos ven la línea temporal avanzar en directo.</p></section>
+    <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${joinOnly ? "Sala privada" : CT.mode(selectedModeKey).name}</div><h2 data-focus tabindex="-1">Cada uno<br>en su móvil</h2><p class="lead">Todos ven la línea avanzar en directo, estén donde estén.</p></section>
     <div class="online-entry-grid${invited ? " online-entry-invited" : ""}${!invited && createOnly ? " online-entry-single" : ""}">
-      ${!invited && createOnly ? "" : `<form class="panel online-form" data-online-form="join"><span class="form-number">01</span><h3>${invited ? "Te han invitado a una sala" : "Entrar en una sala"}</h3><p>${invited ? "Introduce tu nombre para unirte a la partida compartida." : "Usa el código que aparece en el móvil anfitrión."}</p><div class="field"><label for="online-code">Código de sala</label><input id="online-code" name="code" class="room-code-input" maxlength="8" required placeholder="ABCD2345" value="${escapeHtml(invited)}" autocapitalize="characters" autocomplete="off"></div><div class="field"><label for="online-player-name">Tu nombre</label><input id="online-player-name" name="name" maxlength="18" required placeholder="Ej. Lucía" autocomplete="name" value="${ownName}"></div>${invited ? "" : '<button class="btn btn-secondary btn-block" type="button" data-online-action="scan-qr">Escanear código QR</button>'}<button class="btn btn-primary btn-block" type="submit">Unirme a la partida <span>→</span></button></form>`}
+      ${!invited && createOnly ? "" : `<form class="panel online-form" data-online-form="join"><span class="form-number">01</span><h3>${invited ? "Te han invitado a una sala" : "Entrar en una sala"}</h3><p>${invited ? "Introduce tu nombre para unirte a la partida compartida." : "Usa el código que aparece en el móvil anfitrión."}</p><div class="field"><label for="online-code">Código de sala</label><input id="online-code" name="code" class="room-code-input" maxlength="8" required placeholder="ABCD2345" value="${escapeHtml(invited)}" autocapitalize="characters" autocomplete="off"></div><div class="field"><label for="online-player-name">Tu nombre</label><input id="online-player-name" name="name" maxlength="18" required placeholder="Ej. Lucía" autocomplete="name" value="${ownName}"></div>${invited ? "" : '<button class="btn btn-secondary btn-block" type="button" data-online-action="scan-qr">Escanear código QR</button>'}<button class="btn btn-primary btn-block" type="submit">Unirme <span>→</span></button></form>`}
       ${invited || joinOnly ? "" : `<form class="panel online-form" data-online-form="create">${createOnly ? "" : '<span class="form-number">02</span>'}<h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código, el enlace o el QR.</p><div class="field"><label for="online-host-name">Tu nombre</label><input id="online-host-name" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name" value="${ownName}"></div><button class="btn ${createOnly ? "btn-primary" : "btn-secondary"} btn-block" type="submit">Crear sala${createOnly ? " <span>→</span>" : ""}</button></form>`}
     </div>
     <p class="online-note">Necesita conexión a internet durante la partida compartida.</p>
   </div>`, "online-entry");
   if (competitionOptions && !invited) {
-    appEl.querySelector('.online-intro .eyebrow').textContent='Competición multijugador';
-    appEl.querySelector('.online-intro .lead').textContent=`${competitionOptions.rounds} rondas con mazos aleatorios de las grandes colecciones, ${competitionOptions.cards} cartas por persona. Ganar la ronda suma un punto; las cartas que te queden restan su número menos uno.`;
+    appEl.querySelector('.online-intro .eyebrow').textContent='Competición con amigos';
+    appEl.querySelector('.online-intro .lead').textContent=`${competitionOptions.rounds} temas al azar de las Grandes colecciones, ${competitionOptions.cards} cartas por persona. Ganar un tema suma un punto; las cartas que te queden restan su número menos uno.`;
   }
 }
 
@@ -593,7 +593,7 @@ async function joinRoom(code, name) {
     updateRoomAddress(code);
     connectToRoom(code);
   } catch (error) {
-    const messages = { ROOM_NOT_FOUND: "No existe ninguna sala con ese código", ALREADY_STARTED: "La partida ya ha comenzado", ROOM_FULL: "La sala ya tiene el máximo de participantes", DECK_MISMATCH: "Tu móvil lleva una versión distinta del juego. Actualiza la aplicación para poder entrar." };
+    const messages = { ROOM_NOT_FOUND: "No existe ninguna sala con ese código", ALREADY_STARTED: "La partida ya ha comenzado", ROOM_FULL: "La sala ya tiene el máximo de jugadores", DECK_MISMATCH: "Tu móvil lleva una versión distinta del juego. Actualiza la aplicación para poder entrar." };
     console.error(error);
     showToast(messages[error.message] || roomErrorMessage(error, "No se pudo entrar en la sala. Vuelve a intentarlo; si persiste, comunica el error."));
   } finally { busy = false; }
@@ -765,7 +765,7 @@ function starterPanelMarkup(isHost) { return `<div class="starter-presentation s
 function starterPanelMarkupContent(isHost) {
   if ((roomState.tournament?.index || 0) > 0) {
     const next = roomState.players[roomState.playerOrder[roomState.tournament.index % roomState.playerOrder.length]];
-    const aviso = `<p>Empieza <b>${escapeHtml(next?.name || "")}</b>: el orden de la primera ronda se mantiene y el turno de empezar rota en cada ronda.</p>`;
+    const aviso = `<p>Empieza <b>${escapeHtml(next?.name || "")}</b>: el orden del primer tema se mantiene y el turno de empezar rota en cada tema.</p>`;
     return isHost ? `${aviso}<button class="btn btn-primary btn-block" data-online-action="start">Empezar <span>→</span></button>` : `${aviso}<p class="hint">Esperando al anfitrión para empezar.</p>`;
   }
   const cardId = starterCardId();
@@ -838,8 +838,8 @@ function renderLobby() {
     return `<div class="table-seat occupied${uid===user.uid?' is-you':''}" data-seat="${index+1}"><span class="seat-avatar">${CT.Avatares.markup(player.name,{size:44,seed:'uid:'+uid,id:uid===user.uid?CT.Avatares.ownId():player.avatarId})}</span><strong>${escapeHtml(player.name)}${uid===user.uid?' · tú':''}</strong><small>${uid===roomState.hostUid?'Anfitrión':`Plaza ${index+1}`}</small><i class="ready-seal">Listo</i>${isHost&&uid!==roomState.hostUid?`<button class="kick-btn" data-online-action="kick" data-uid="${uid}" aria-label="Expulsar a ${escapeHtml(player.name)}">×</button>`:''}</div>`;
   }).join('');
   paint(`<div class="shell online-shell">${header(`<button class="icon-btn" data-online-action="guide">Guía</button><button class="icon-btn" data-online-action="lobby-exit">Salir</button>`)}
-    <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${roomCode}</strong><div class="room-invite-actions"><button data-online-action="share">Compartir enlace</button><button data-online-action="qr">Mostrar QR</button></div></div></section>
-    <div class="online-lobby-grid"><section class="panel lobby-table-panel"><div class="section-label">Mesa de exploradores <small>${people.length}/${capacity}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${people.length}</strong><small>${people.length===1?'explorador':'exploradores'}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
+    <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la sala</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${roomCode}</strong><div class="room-invite-actions"><button data-online-action="share">Compartir enlace</button><button data-online-action="qr">Mostrar QR</button></div></div></section>
+    <div class="online-lobby-grid"><section class="panel lobby-table-panel"><div class="section-label">Jugadores en la sala <small>${people.length}/${capacity}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${people.length}</strong><small>${people.length===1?'explorador':'exploradores'}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
       <section class="panel lobby-settings">${isHost ? `<div class="section-label">Ajustes</div><input type="hidden" id="online-turn-seconds" value="${lobbySettings.turnSeconds}"><div class="field"><span class="field-label">Tiempo por carta</span><p class="hint">${CT.Tiempo?.texto?.(lobbySettings.turnSeconds) ?? lobbySettings.turnSeconds + " s"} (lo elegiste al crear la partida).</p></div>${roomState.tournament ? "" : `<input type="hidden" id="online-hand-size" value="${lobbySettings.handSize}"><div class="field"><span class="field-label">Cartas iniciales</span><p class="hint">${lobbySettings.handSize} por persona (lo elegiste al crear la partida).</p></div>`}${roomState.tournament ? "" : `<input type="checkbox" hidden id="online-pulse"${lobbySettings.pulse ? " checked" : ""}><input type="checkbox" hidden id="online-ghost"${lobbySettings.ghost ? " checked" : ""}><div class="field"><span class="field-label">Poderes</span><p class="hint">${CT.ManoInicial?.poderesTexto?.({ pulse: lobbySettings.pulse, ghost: lobbySettings.ghost }) ?? "sin poderes"} (lo elegiste al crear la partida).</p></div>`}${people.length < 2 ? `<p class="hint">Esperando a alguien más…</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(true)}</div>`}` : `${roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(false)}</div>`}`}</section>
     </div>
   </div>`, "online-lobby");
@@ -848,7 +848,7 @@ function renderLobby() {
     // En la sala de espera no se enseña qué mazos vienen: cada ronda se descubre en su cartel. Solo
     // el resumen de la competición, sin nombres.
     const t = roomState.tournament;
-    appEl.querySelector('.lobby-head').insertAdjacentHTML('afterend', `<section class="panel tournament-board tournament-summary"><div class="tournament-score-head"><div><span>Competición</span><h2>${t.queue.length} ${t.queue.length === 1 ? 'ronda' : 'rondas'} con mazos sorpresa</h2></div><p>${t.handSize} ${t.handSize === 1 ? 'carta' : 'cartas'} por persona. Ganar la ronda suma un punto; las cartas restantes restan su número menos uno.</p></div></section>`);
+    appEl.querySelector('.lobby-head').insertAdjacentHTML('afterend', `<section class="panel tournament-board tournament-summary"><div class="tournament-score-head"><div><span>Competición</span><h2>${t.queue.length} ${t.queue.length === 1 ? 'tema' : 'temas'} al azar</h2></div><p>${t.handSize} ${t.handSize === 1 ? 'carta' : 'cartas'} por persona. Ganar un tema suma un punto; las cartas restantes restan su número menos uno.</p></div></section>`);
   }
 }
 
@@ -998,8 +998,8 @@ function renderCompetitionIntro() {
     <div class="chapter-art" aria-hidden="true"><img src="assets/${art[0]}-700.webp" alt="" width="700" height="${art[1]}" decoding="async" fetchpriority="high"></div>
     ${CT.Tournament.journey(roomState.tournament)}
     <div class="chapter-number">Tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length}</div>
-    <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Competición · ronda ${roomState.tournament.index + 1}</span>${escapeHtml(mode.name)}</h2>
-    <button class="btn btn-block comp-splash-start" data-online-action="competition-round-start">Empezar ronda</button>
+    <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Competición · tema ${roomState.tournament.index + 1}</span>${escapeHtml(mode.name)}</h2>
+    <button class="btn btn-block comp-splash-start" data-online-action="competition-round-start">Empezar el tema</button>
   </div></section></div>`, "online-competition-intro");
 }
 
@@ -1018,7 +1018,7 @@ async function nextTournamentRound() {
       for(const key of ['ghost','pulsePower','final','tieQueue','turnStartedAt']) delete next[key];
       tx.set(reference,next);
     });
-  } catch(error) {console.error(error);showToast('No se pudo abrir la siguiente ronda. La sala y el resultado siguen guardados.');}
+  } catch(error) {console.error(error);showToast('No se pudo abrir el siguiente tema. La sala y el resultado siguen guardados.');}
   finally {busy=false;}
 }
 
@@ -1159,19 +1159,19 @@ function renderGame() {
   // vuelve a empezar de cero en su pantalla.
   const secondsLeft = roomState.phase === "turn" && turnSeconds() ? (turnRemaining() ?? turnSeconds()) : null;
   paint(`<div class="shell">${header()}
-    <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, ronda ${roomState.round}</h1>
-    <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · ronda ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length}` : `Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}`}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo para jugar"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
+    <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, vuelta ${roomState.round}</h1>
+    <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length}` : `Vuelta ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}`}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo restante para esta carta"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
     <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores</div><div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i class="score-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'uid:' + uid, id: uid === user.uid ? CT.Avatares.ownId() : player.avatarId })}</i><span class="score-copy"><b>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(player.hand.length)}%"></i></span></span><em><strong>${player.hand.length}</strong><small>cartas</small></em></span>`; }).join("")}</div></section>
     ${pulsing ? `<div class="pulse-banner">⚡ Duelo · <b>${escapeHtml(currentPlayer.name)}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
     ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
     ${boardQuestion()}
     ${pulsing
-      ? `<section><div class="hand-title"><h3>Carta del duelo</h3><small>${defensa ? `te reta ${escapeHtml(currentPlayer.name)}` : `contra ${escapeHtml(pulseTargetName)}`}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}">${categoryBadge(pulseCard)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${myPulse
+      ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>${defensa ? `te reta ${escapeHtml(currentPlayer.name)}` : `contra ${escapeHtml(pulseTargetName)}`}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}">${categoryBadge(pulseCard)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${myPulse
         ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro"
           : defensa ? `Colócala tú también. Si aciertas, no te llevas ninguna carta de ${escapeHtml(currentPlayer.name)}`
           : `Colócala. Si aciertas y ${escapeHtml(pulseTargetName)} falla, le pasas una carta tuya`)
         : defensa ? `${escapeHtml(pulseTargetName)} está colocando la misma carta…`
-        : `${escapeHtml(currentPlayer.name)} está colocando la carta del duelo…`}</p></section>`
+        : `${escapeHtml(currentPlayer.name)} está colocando la carta del Pulso…`}</p></section>`
       : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${pendingIndex === null && selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" aria-pressed="${pendingIndex === null && selectedCardId === id}" ${myTurn ? "" : "disabled"}>${categoryBadge(card)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p>${myTurn && pulseAvailable() ? `<button class="btn btn-secondary btn-block pulse-btn" data-online-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`}
     <section class="board-timeline-section"><div class="hand-title"><h3>${timelineTitle()}</h3></div>${CT.timelineEnds(modeKey())}${CT.timelineMap(modeKey(), timelineCards, { hidden: !!roomState.ghost?.pending.length })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
     ${!pulsing && roomState.phase !== "reveal" ? CT.Ghost.power(roomState.ghost, user.uid, roomState.timeline.length, me.hand.length, 'data-online-action="ghost-use"', myTurn) : ""}
@@ -1644,12 +1644,12 @@ function renderWinner() {
   if(roomState.tournament) {
     const section=appEl.querySelector('.pass-screen');
     section.insertAdjacentHTML('afterbegin',tournamentBoard(uids));
-    if(roomState.tournament.index+1<roomState.tournament.queue.length) section.insertAdjacentHTML('beforeend',roomState.hostUid===user.uid ? '<button class="btn btn-primary btn-block" data-online-action="competition-next">Siguiente ronda · nuevo mazo</button>' : '<p role="status">Esperando al anfitrión para pasar al siguiente mazo.</p>');
+    if(roomState.tournament.index+1<roomState.tournament.queue.length) section.insertAdjacentHTML('beforeend',roomState.hostUid===user.uid ? '<button class="btn btn-primary btn-block" data-online-action="competition-next">Siguiente tema</button>' : '<p role="status">Esperando a que el anfitrión pase al siguiente tema.</p>');
   }
 }
 
 function onlineFinalMetrics(cards,newPlates,achievements) {
-  return `<div class="final-metrics"><div class="final-score"><strong>${cards}</strong><span>láminas jugadas</span></div><div class="final-stat"><small>Mejor tramo</small><b>Ronda ${roomState.round||1}</b></div><div class="final-stat"><small>Láminas nuevas</small><b>${newPlates}</b></div><div class="final-stat"><small>Logros</small><b>${achievements}</b></div></div>`;
+  return `<div class="final-metrics"><div class="final-score"><strong>${cards}</strong><span>${cards === 1 ? "carta en la línea" : "cartas en la línea"}</span></div><div class="final-stat"><small>Vueltas</small><b>${roomState.round||1}</b></div><div class="final-stat"><small>Láminas nuevas</small><b>${newPlates}</b></div><div class="final-stat"><small>Logros</small><b>${achievements}</b></div></div>`;
 }
 
 // Igual que en el juego local: quien gana su partida también quiere repasar la línea
@@ -1697,7 +1697,7 @@ function roomMenu() {
       ${isHost && playing && !inFinal ? `<button class="btn btn-ghost" data-online-action="skip">Saltar el turno de ${escapeHtml(currentName)}</button>` : ""}
     </div>
     ${isHost && others.length && !inFinal ? `<div class="manage-players"><div class="section-label">Participantes</div>${others.map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, roomState.matchmaking === 'public' ? 'mesa' : 'sala') || ''}<button class="kick-btn" data-online-action="kick" data-uid="${uid}">Expulsar</button></div>`).join("")}</div>` : ""}
-    ${!(isHost && others.length && !inFinal) && roomState?.playerOrder?.some(uid => uid !== user.uid) ? `<div class="manage-players"><div class="section-label">Jugadores de la mesa</div>${roomState.playerOrder.filter(uid => uid !== user.uid).map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, roomState.matchmaking === 'public' ? 'mesa' : 'sala') || ''}</div>`).join("")}</div>` : ""}
+    ${!(isHost && others.length && !inFinal) && roomState?.playerOrder?.some(uid => uid !== user.uid) ? `<div class="manage-players"><div class="section-label">Participantes</div>${roomState.playerOrder.filter(uid => uid !== user.uid).map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, roomState.matchmaking === 'public' ? 'mesa' : 'sala') || ''}</div>`).join("")}</div>` : ""}
     ${inFinal ? '<p>La final espera a todos los finalistas. Si alguien se desconecta, puede volver a entrar y responder.</p>' : ''}
     <div class="actions" style="display:grid">
       ${isHost && playing ? '<button class="btn btn-ghost" data-online-action="close-room">Terminar partida y cerrar sala</button>' : isHost ? '<button class="btn btn-ghost" data-online-action="close-room">Cerrar la sala</button>' : inFinal ? '<button class="btn btn-ghost" data-online-action="back">Ir al inicio</button>' : '<button class="btn btn-ghost" data-online-action="leave-room">Salir de la partida</button>'}

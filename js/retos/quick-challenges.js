@@ -73,7 +73,7 @@
   }
   function guide() {
     const layer=document.createElement('div'); layer.className='overlay';
-    layer.innerHTML=`<div class="modal rules quick-guide-modal"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-quick="close-menu" aria-label="Cerrar guía">×</button></div><div class="guide-content"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2>Cómo se juega</h2><section><h3>Un reto, una línea</h3><p>Comienza con una carta de referencia y coloca cada carta nueva en el hueco que le corresponde. El dato se revela al confirmar.</p></section><section><h3>Si juegas solo (o en un duelo por enlace)</h3><p>Cada carta bien colocada suma un acierto. Un fallo cuenta como fallo, pero sigues hasta terminar el reto: no te echa.</p></section><section><h3>Si juegas con amigos</h3><p>En un solo móvil, en una sala o por turnos, quien prepara la partida elige qué pasa al fallar. «Arriesgar o plantarse»: cada acierto es provisional y puedes plantarte para asegurarlo; si fallas, pierdes los provisionales de ese reto y quedas fuera hasta el siguiente. «Seguir hasta el final»: un fallo no suma, pero se juega todo el reto y gana quien acierte más. Quien crea una sala puede echar a alguien mientras esperan, con la «×» de su plaza.</p></section><section><h3>Mesa pública</h3><p>La partida rápida son tres retos sorpresa con desconocidos, arriesgando o plantándote. Quien crea una mesa elige cuántos retos se juegan y qué pasa al fallar.</p></section><section><h3>Mazos sorpresa</h3><p>Los mazos se sortean automáticamente. Solo conocerás la temática cuando empiece el reto; los siguientes permanecen ocultos.</p></section><section><h3>Turnos justos</h3><p>El primer turno rota en cada reto. En partidas por Internet o por enlace, siempre juega una persona cada vez.</p></section></div><button class="btn btn-primary btn-block" data-quick="close-menu">Entendido</button></div>`;
+    layer.innerHTML=`<div class="modal rules quick-guide-modal"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-quick="close-menu" aria-label="Cerrar guía">×</button></div><div class="guide-content"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2>Guía</h2><section><h3>Un reto, una línea</h3><p>Comienza con una carta de referencia y coloca cada carta nueva en el hueco que le corresponde. El dato se revela al confirmar.</p></section><section><h3>Si juegas solo (o en un duelo por enlace)</h3><p>Cada carta bien colocada suma un acierto. Un fallo cuenta como fallo, pero sigues hasta terminar el reto: no te echa.</p></section><section><h3>Si juegas con amigos</h3><p>En un solo móvil, en una sala o por turnos, quien prepara la partida elige qué pasa al fallar. «Arriesgar o plantarse»: cada acierto es provisional y puedes plantarte para asegurarlo; si fallas, pierdes los provisionales de ese reto y quedas fuera hasta el siguiente. «Seguir hasta el final»: un fallo no suma, pero se juega todo el reto y gana quien acierte más. Quien crea una sala puede echar a alguien mientras esperan, con la «×» de su plaza.</p></section><section><h3>Mesa pública</h3><p>La partida rápida son tres retos sorpresa con desconocidos, arriesgando o plantándote. Quien crea una mesa elige cuántos retos se juegan y qué pasa al fallar.</p></section><section><h3>Mazos sorpresa</h3><p>Los mazos se sortean automáticamente. Solo conocerás la temática cuando empiece el reto; los siguientes permanecen ocultos.</p></section><section><h3>Turnos justos</h3><p>El primer turno rota en cada reto. En partidas por Internet o por enlace, siempre juega una persona cada vez.</p></section></div><button class="btn btn-primary btn-block" data-quick="close-menu">Entendido</button></div>`;
     app().append(layer); CT.openDialog(layer,true);
   }
   function myTurn() {return !room || room.actor === myId;}
@@ -114,8 +114,8 @@
     CT.Effects?.transition?.('open');
   }
   // Duraciones de Retos rápidos: las cortas valen para todo; las largas, para jugar en un solo móvil.
-  const SHORT_LENGTHS=[[1,'Partida rápida'],[3,'Partida estándar'],[5,'Partida larga']];
-  const LONG_LENGTHS=[...SHORT_LENGTHS,[10,'Maratón'],[15,'Gran maratón'],[20,'Resistencia']];
+  const SHORT_LENGTHS=[[1,'Corta'],[3,'Media'],[5,'Larga']];
+  const LONG_LENGTHS=[...SHORT_LENGTHS,[10,'Muy larga'],[15,'Extra larga'],[20,'Resistencia']];
   // Se enseñan las tres duraciones de siempre (1, 3 y 5); las largas quedan tras «Más duraciones».
   function lengthChips(id,options,label,attrs='',illustrated=true) {
     const art=n=> {
@@ -173,7 +173,7 @@
     const modeCard=(key,title,text,tag,art)=>`<button type="button" class="quick-mode-card quick-mode-${key}${mode===key?' is-selected':''}" role="radio" aria-checked="${mode===key}" data-quick="solo-mode" data-mode="${key}"><span class="quick-mode-visual" aria-hidden="true"><img src="assets/${key==='day'?'menu-daily':'menu-quick'}.webp" alt="" decoding="async">${art}</span><span class="quick-mode-copy"><b>${title}</b><small>${text}</small><em>${tag}</em></span></button>`;
     const sunArt='<svg class="quick-mode-art" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="10" y="14" width="44" height="40" rx="6" fill="var(--quick-card-paper, #fffaf0)" stroke="currentColor" stroke-width="2"/><path d="M10 25h44M21 9v10M43 9v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="32" cy="39" r="6" fill="currentColor" fill-opacity=".75"/><path d="M32 29v3M32 46v3M22 39h3M39 39h3M25 32l2 2M37 44l2 2M25 46l2-2M37 34l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
     const diceArt='<svg class="quick-mode-art" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><g transform="rotate(-12 26 34)"><rect x="12" y="20" width="28" height="36" rx="4" fill="var(--quick-card-paper, #fffaf0)" stroke="currentColor" stroke-width="2"/><text x="26" y="45" text-anchor="middle" font-size="20" font-family="Georgia, serif" fill="currentColor">?</text></g><g transform="rotate(12 40 30)"><rect x="26" y="12" width="28" height="36" rx="4" fill="var(--quick-card-paper, #fffaf0)" stroke="currentColor" stroke-width="2"/><text x="40" y="37" text-anchor="middle" font-size="20" font-family="Georgia, serif" fill="currentColor">?</text></g></svg>';
-    shell(`<section class="setup-section solo-home quick-free-setup"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 class="solo-title" data-focus tabindex="-1">Jugar en solitario</h2>
+    shell(`<section class="setup-section solo-home quick-free-setup"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 class="solo-title" data-focus tabindex="-1">Jugar solo</h2>
         <p class="lead">Ordena cada mazo entero: un fallo no te echa.</p>
         <p class="hint solo-dominadas">Tu colección: ${found} de ${cards} cartas descubiertas.</p>${button('collection','Ver tu colección','btn btn-ghost quick-collection-link')}</div>
         ${pendiente ? button('resume','Continuar partida guardada <span>→</span>','btn btn-primary btn-block') : ''}
@@ -323,7 +323,7 @@
     // Conexión y máximo solo cuentan en directo: van antes de la duración, el tiempo y el nombre.
     const pre=body=>`<div data-quick-duel-pre${pace==='directo'?'':' hidden'}>${body}</div>`;
     shell(`<section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 class="solo-title" data-focus tabindex="-1">Retos rápidos con amigos</h2>
-        <p class="lead">Cada uno desde su móvil, con los mismos retos sorpresa. Gana quien acierte más.</p></div>
+        <p class="lead">Cada uno en su móvil, con los mismos retos sorpresa. Gana quien acierte más.</p></div>
       <div class="panel solo-panel">
         <div class="solo-panel-head"><h3>Cómo jugáis</h3></div>
         <div class="field duel-kind-field"><span class="field-label" id="quick-pace-label">Ritmo</span>
@@ -332,18 +332,18 @@
           <div class="field duel-kind-field"><span class="field-label" id="quick-net-label">Conexión</span>
             <div class="segmented" role="radiogroup" aria-labelledby="quick-net-label">${[['internet','Por internet','Cada uno donde esté'],['wifi','Sin internet','Cerca, en la misma Wi‑Fi']].map(([key,title,foot])=>`<label class="segmented-option${key===net?' is-on':''}"><input type="radio" name="quick-live-net" value="${key}"${key===net?' checked':''}><i class="duel-option-mark" aria-hidden="true">${soloGlyph(PACE_GLYPH[key])}</i><span><b>${title}</b><small>${foot}</small></span></label>`).join('')}</div></div>
           ${offline?'<p class="hint" data-offline-note>No hay internet: jugaréis por la Wi‑Fi.</p>':''}
-          <div class="field"><label for="quick-net-players">Máximo de participantes</label><select id="quick-net-players">${[2,3,4,5,6,7,8].map(n=>`<option value="${n}"${n===4?' selected':''}>${n} jugadores</option>`).join('')}</select></div>
+          <div class="field"><label for="quick-net-players">Máximo de jugadores</label><select id="quick-net-players">${[2,3,4,5,6,7,8].map(n=>`<option value="${n}"${n===4?' selected':''}>${n} jugadores</option>`).join('')}</select></div>
         `)}
         ${lengthChips('quick-free-length',SHORT_LENGTHS,'Retos')}
         ${keepField(` data-quick-keep-field${pace==='seguidos'?' hidden':''}`)}
         ${CT.Tiempo.field('amigos',{porDefecto:15})}
         ${identityField()}
-        ${block('directo',`<div class="duel-brief"><p>Una sala de 2 a 8 personas: todos jugáis a la vez, cada uno desde su móvil. Quién empieza se decide en la sala de espera con un minijuego: cada uno adivina la cifra de una carta. Al crearla compartes el código, el enlace o el QR.</p></div>${button('live-room','Crear sala <span>→</span>','btn btn-primary btn-block')}`)}
+        ${block('directo',`<div class="duel-brief"><p>Una sala de 2 a 8 jugadores: todos jugáis a la vez, cada uno en su móvil. Quién empieza se decide en la sala de espera con un minijuego: cada uno adivina la cifra de una carta. Al crearla compartes el código, el enlace o el QR.</p></div>${button('live-room','Crear sala <span>→</span>','btn btn-primary btn-block')}`)}
         ${block('seguidos',`<div class="duel-brief"><p>Juegas tú ahora y le mandas un enlace a tu amigo: juega los mismos retos cuando quiera, sin coincidir contigo. Un fallo no suma, pero se juega todo el reto.</p></div>
           ${button('start-duel','Jugar y retar <span>→</span>','btn btn-primary btn-block')}`)}
         ${block('turnos',`<div class="duel-brief"><p>Cada uno juega desde su móvil, por turnos. Creas el duelo, haces tú la primera jugada y después le mandas el enlace: tu amigo entra directo en la partida, ve tu última jugada y sigue él. En la revancha empieza el otro. La partida se guarda entre turnos.</p></div>
-          ${button('create-room','Crear duelo <span>→</span>','btn btn-primary btn-block')}
-          ${readJSON(NET)?button('duels-list','Volver a mis duelos','btn btn-ghost btn-block'):''}`)}
+          ${button('create-room','Crear duelo por turnos <span>→</span>','btn btn-primary btn-block')}
+          ${readJSON(NET)?button('duels-list','Volver a Tus duelos','btn btn-ghost btn-block'):''}`)}
         <p id="quick-error" role="alert"></p>
       </div></section>`);
   }
@@ -526,7 +526,7 @@
     paint=renderPage;entry='duel-setup';backTo=back||null;previewCode=code;
     shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Duelo con un amigo · Retos rápidos</div><h2 data-focus tabindex="-1">${esc(row.rival)} te ha retado</h2></div></section>
       <section class="panel lobby-settings"><p>Duelo por turnos de Retos rápidos: ${row.length} ${row.length===1?'mazo':'mazos'}. ${row.keep?'Quien falla no suma esa carta, pero se juega todo el mazo.':'Quien falla pierde lo provisional y no juega más ese reto.'}</p><p class="hint">${esc(row.rival)} ya ha hecho su jugada: al aceptar verás cuál fue y seguirás tú.</p>
-        ${button('accept-invite','Aceptar el reto <span>→</span>','btn btn-primary btn-block')}${button('decline-invite','Rechazar','btn btn-ghost btn-block exit-discard')}${button('back-invite','Volver a mis duelos','btn btn-secondary btn-block')}<p id="quick-error" role="alert"></p></section>`);
+        ${button('accept-invite','Aceptar el reto <span>→</span>','btn btn-primary btn-block')}${button('decline-invite','Rechazar','btn btn-ghost btn-block exit-discard')}${button('back-invite','Volver a Tus duelos','btn btn-secondary btn-block')}<p id="quick-error" role="alert"></p></section>`);
   }
   async function resignDuel(code) {await CT.QuickNetwork.actOnce(code,{type:'resign'});}
   async function cancelInvitation(code) {await CT.QuickNetwork.cancelRoom(code);}
@@ -565,7 +565,7 @@
     shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Duelo con un amigo · Retos rápidos</div><h2 data-focus tabindex="-1">Duelo en marcha</h2></div></section><section class="panel lobby-settings duel-invite"><div class="waiting-orbit"><span></span></div><h3>Le toca a ${invited?friend:'tu amigo'}</h3>
       <p>${jugadas?'Ya has hecho tu jugada. ':''}${invited?`El reto ya le aparece en su lista de duelos. Si quieres, mándale también el enlace.`:'Mándale el enlace por WhatsApp, correo o como quieras: al abrirlo entra directo en la partida, ve tu última jugada y sigue desde ahí.'}</p>
       ${code?button('share-room','Compartir enlace','btn btn-primary btn-block'):''}
-      ${button('duels-list','Volver a mis duelos','btn btn-secondary btn-block')}
+      ${button('duels-list','Volver a Tus duelos','btn btn-secondary btn-block')}
       <p class="hint">La partida ya está en juego y se guarda: la verás en «Tus duelos», con a quién le toca.</p><p id="quick-error" role="alert"></p></section>`);
   }
   function duelWaiting(code,host) {
@@ -592,15 +592,15 @@
     });
     const length=roomLength||3;
     const side=host
-      ? `<div class="section-label">Partida</div><p>${length} ${length===1?'reto':'retos'} con las mismas cartas para toda la mesa. El primer turno rota en cada reto.</p>
+      ? `<div class="section-label">Partida</div><p>${length} ${length===1?'reto':'retos'} con las mismas cartas para toda la sala. El primer turno rota en cada reto.</p>
         ${count<2?'<div class="waiting-orbit"><span></span></div><p class="hint">Esperando a alguien más…</p>':''}
         <div class="field starter-field">${roomStarterMarkup(false)}</div>
         ${button('start-room','Empezar <span>→</span>','btn btn-primary btn-block')}
         ${connection?.kind==='local'?button('invite-peer','Invitar otro móvil','btn btn-secondary btn-block'):''}`
       : `<div class="field starter-field">${roomStarterMarkup(false)}</div><div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>`;
-    shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera · Retos rápidos</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div>
+    shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera · Retos rápidos</div><h2 data-focus tabindex="-1">Preparando la sala</h2></div>
       <div class="room-code-card"><small>${code?'Código de sala':'Red Wi-Fi local'}</small><strong>${code?esc(code):count+'/'+cap}</strong>${code?`<div class="room-invite-actions"><button data-quick="share-room">Compartir enlace</button><button data-quick="qr-room">Mostrar QR</button></div>`:''}</div></section>
-      <div class="online-lobby-grid"><section class="panel lobby-table-panel"><div class="section-label">Mesa de exploradores <small>${count}/${cap}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${count}</strong><small>${count===1?'explorador':'exploradores'}</small></div>${table.join('')}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
+      <div class="online-lobby-grid"><section class="panel lobby-table-panel"><div class="section-label">Jugadores en la sala <small>${count}/${cap}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${count}</strong><small>${count===1?'explorador':'exploradores'}</small></div>${table.join('')}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
         <section class="panel lobby-settings">${side}<p id="quick-error" role="alert"></p></section></div>`);
     if(draft){const input=app().querySelector('#quick-room-starter-input');if(input&&!input.value)input.value=draft;}
     const start=app().querySelector('[data-quick="start-room"]');if(start)start.disabled=count<2;
@@ -995,7 +995,7 @@
     if (room?.resigned) {
       const yo = room.resigned === myId, rival = esc(state.players.find((_, i) => room.members[i] !== myId)?.name || 'Tu rival');
       shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Duelo con un amigo · Retos rápidos</div><h2 data-focus tabindex="-1">${yo ? 'Te has rendido' : `${rival} se ha rendido`}</h2></div></section>
-        <section class="panel quick-panel"><p>${yo ? `${rival} gana este duelo. Se queda en tu historial.` : '¡Has ganado el duelo! Se queda en tu historial.'}</p>${rematchButton()}${button('duels-list', 'Volver a mis duelos', 'btn btn-secondary btn-block')}</section>`);
+        <section class="panel quick-panel"><p>${yo ? `${rival} gana este duelo. Se queda en tu historial.` : '¡Has ganado el duelo! Se queda en tu historial.'}</p>${rematchButton()}${button('duels-list', 'Volver a Tus duelos', 'btn btn-secondary btn-block')}</section>`);
       return;
     }
     const waitingFriend = room && state.phase === 'turn' && room.members.length < state.players.length;

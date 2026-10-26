@@ -72,7 +72,7 @@
   // `quedan` es cuánta gente sigue en la mesa: si los demás se marcharon, no ganó por cartas.
   function verdict({ ganadores, final, quedan }) {
     if (final) return ganadores > 1 ? "Han empatado en la final con la misma diferencia." : "Ha ganado la final con la cifra más cercana.";
-    if (quedan === 1) return "Es la última persona que queda en la mesa.";
+    if (quedan === 1) return "Es la última persona que queda en la partida.";
     return ganadores > 1 ? "Han terminado la vuelta empatadas sin cartas." : "Ha sido la única persona en terminar la vuelta sin cartas.";
   }
   CT.Final = {factor, parse, create, rank, value, question, form, results, targetOf, valid, verdict};

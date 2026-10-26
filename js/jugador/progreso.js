@@ -276,7 +276,7 @@
     { key: "pulso", group: "Oficio", name: "Pulso firme", desc: "Acierta la carta de un Pulso que hayas lanzado tú.", have: p => p.marks.pulseHits, goal: 1 },
     { key: "fantasma", group: "Oficio", name: "A ciegas", desc: "Acierta una carta con los valores ocultos por el Fantasma.", have: p => p.marks.ghostHits, goal: 1 },
     { key: "experto", group: "Oficio", name: "Nivel experto", desc: "Completa un mazo entero en Maratón y en Experto.", have: p => p.marks.expertClears, goal: 1 },
-    { key: "sala", group: "Oficio", name: "Ganar en sala", desc: "Gana una partida de varios móviles.", have: p => p.marks.onlineWins, goal: 1 },
+    { key: "sala", group: "Oficio", name: "Ganar en sala", desc: "Gana una partida en la que cada uno juega en su móvil.", have: p => p.marks.onlineWins, goal: 1 },
     { key: "duelo", group: "Oficio", name: "Duelo ganado", desc: "Supera la marca de quien te retó por enlace.", have: p => p.marks.duelWins, goal: 1 },
     { key: "habitual", group: "Oficio", name: "Cincuenta partidas", desc: "Termina cincuenta partidas, del formato que sea.", have: p => p.totals.games, goal: 50 }
   ];

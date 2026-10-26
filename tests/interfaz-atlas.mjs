@@ -101,7 +101,7 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
   } finally {w.close();}
 }
 // Si cambia el anfitrión en la sala de espera, el nuevo enseña y usa lo que se eligió al crear
-// la sala (guardado en ella), no sus propias preferencias de «Partida con amigos».
+// la sala (guardado en ella), no sus propias preferencias de «Cada uno en su móvil».
 {
   const w=boot();
   try {

@@ -117,7 +117,7 @@
   // eligen dónde sentarse. La partida rápida sigue ahí para quien no quiere elegir.
   function openOnlineHub() {
     hub('hub-online', 'Jugar online', 'Mesas públicas', [
-      modeDoor('public-create', modeArt['public-create'], 'Crear mesa', 'Elige el juego, las plazas y el tiempo. Los demás la verán en la lista y se sentarán.', true, '', 'Crear'),
+      modeDoor('public-create', modeArt['public-create'], 'Crear mesa', 'Elige el juego, cuántos jugadores y el tiempo. Los demás la verán en la lista y se sentarán.', true, '', 'Crear'),
       `<section class="public-board" aria-labelledby="public-board-title"><h2 class="mode-section-title" id="public-board-title">Mesas abiertas <small data-board-count></small></h2>
         <ul class="public-board-list" data-public-board aria-live="polite"><li class="public-board-empty">Buscando mesas…</li></ul></section>`,
       `<h2 class="mode-section-title public-quick-label">Partida rápida</h2><p class="hint public-quick-hint">Sin elegir mesa: te sentamos en la primera libre.</p>`,
@@ -305,7 +305,7 @@
         inlineCollections(route, 'Elegid un tema o combinad los ocho mazos cronológicos, o jugad una competición.'),
         modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: los mismos retos para todos.', false, `data-friend-quick="${route}"`, 'Preparar partida')
       ].join(''),
-      route === 'online' ? modeDoor('duels-list', 'mode-walk-duel.webp', 'Tus partidas', 'Los duelos por turnos en curso y a quién le toca.', false, '', 'Ver') : ''
+      route === 'online' ? modeDoor('duels-list', 'mode-walk-duel.webp', 'Tus duelos', 'Los duelos por turnos en curso y a quién le toca.', false, '', 'Ver') : ''
     ].join(''), art);
   }
   const openLocalHub = () => openFriendHub('local');

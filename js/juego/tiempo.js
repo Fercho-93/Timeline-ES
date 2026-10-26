@@ -26,7 +26,7 @@
   function field(contexto, { porDefecto = 0, etiqueta = "Tiempo por carta", attrs = "", valor = null, nombre = `tiempo-${contexto}` } = {}) {
     const actual = valor !== null && valido(valor) ? Number(valor) : get(contexto, porDefecto), id = `${nombre}-label`;
     return `<div class="field duel-kind-field tiempo-field"${attrs}>
-      <div class="tiempo-caption" aria-hidden="true">${icono}<span>Marca tu ritmo</span></div>
+      <div class="tiempo-caption" aria-hidden="true">${icono}<span>Reloj</span></div>
       <span class="field-label" id="${id}">${etiqueta}</span>
       <div class="segmented tiempo-segmented" role="radiogroup" aria-labelledby="${id}">${OPCIONES.map(s => `<label class="segmented-option${s === actual ? " is-on" : ""}">
         <input type="radio" name="${nombre}" value="${s}" data-tiempo="${contexto}"${s === actual ? " checked" : ""}>
@@ -49,7 +49,7 @@
   // la pone en hora sin repintar la pantalla.
   function bar(restanteMs, totalMs) {
     const s = Math.ceil(Math.max(0, restanteMs) / 1000);
-    return `<div class="reloj" data-tiempo-reloj><progress class="reloj-bar ${restanteMs <= 3000 ? "reloj-apura" : ""}" max="${totalMs}" value="${Math.max(0, restanteMs)}" aria-label="Tiempo restante"></progress><span class="reloj-left" aria-live="off">${s} s</span></div>`;
+    return `<div class="reloj" data-tiempo-reloj><progress class="reloj-bar ${restanteMs <= 3000 ? "reloj-apura" : ""}" max="${totalMs}" value="${Math.max(0, restanteMs)}" aria-label="Tiempo restante para esta carta"></progress><span class="reloj-left" aria-live="off">${s} s</span></div>`;
   }
   // Un reloj que avisa al acabarse. `empezadoEn` es un instante (Date.now()): así sigue
   // corriendo aunque se repinte la pantalla o el móvil se vaya al fondo.
@@ -126,7 +126,7 @@
   }
   function maximoField() {
     const actual = maximo();
-    return `<div class="field"><label for="live-max-players">Máximo de participantes</label><select id="live-max-players" data-maximo-sala>${MAXIMOS.map(n => `<option value="${n}"${n === actual ? " selected" : ""}>${n} jugadores</option>`).join("")}</select></div>`;
+    return `<div class="field"><label for="live-max-players">Máximo de jugadores</label><select id="live-max-players" data-maximo-sala>${MAXIMOS.map(n => `<option value="${n}"${n === actual ? " selected" : ""}>${n} jugadores</option>`).join("")}</select></div>`;
   }
   document.addEventListener("change", event => {
     const select = event.target.closest?.("select[data-maximo-sala]");

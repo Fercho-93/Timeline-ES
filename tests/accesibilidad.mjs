@@ -109,7 +109,7 @@ console.log("\nLas reglas se adaptan al mazo");
   ok("la Guía cita «Siguiente carta» y «Zoom de las cartas», los botones que existen", /«Siguiente carta»/.test(guia) && /«Zoom de las cartas»/.test(guia) && !/«Continuar»|«Vista»/.test(guia));
   const tutorialFuente = read("js/interfaz/tutorial.js");
   ok("el vídeo enseña a confirmar con «Colocar carta», no con «Sí, aquí»", /«Colocar carta»/.test(tutorialFuente) && !/Sí, aquí/.test(tutorialFuente));
-  ok("el reto diario tiene su propio capítulo en el manual", /data-guide-chapter="03"[^]*?<b>Reto diario<\/b>/.test(w.CONTINUUM.guideMarkup("history", "solo")));
+  ok("el reto diario tiene su propio capítulo en la Guía", /data-guide-chapter="03"[^]*?<b>Reto diario<\/b>/.test(w.CONTINUUM.guideMarkup("history", "solo")));
   ok("la competición explica sus rondas", /cinco cartas/i.test(w.CONTINUUM.guideMarkup("history", "competition")));
   ok("la guía online explica quién prepara la sala", /quien crea la partida/i.test(w.CONTINUUM.guideMarkup("history", "online")));
   ok("fuera del iPhone la guía no ofrece entrar con Apple", !/Apple/.test(w.CONTINUUM.guideMarkup("history", "solo")));

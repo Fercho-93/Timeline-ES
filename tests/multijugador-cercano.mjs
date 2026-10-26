@@ -87,11 +87,11 @@ const escribePin = async pin => {
   await pausa(400);
 };
 await escribePin(pinAnfitrion === "0000" ? "1111" : "0000");
-ok("TRAMPA: con un código equivocado no se entra ni se recibe la partida", !/Preparando la mesa/.test(html(invitado)) && !/Ana/.test(html(anfitrion)));
+ok("TRAMPA: con un código equivocado no se entra ni se recibe la partida", !/Preparando la sala/.test(html(invitado)) && !/Ana/.test(html(anfitrion)));
 ok("y se vuelve a pedir el código", !!invitado.document.querySelector("[data-nearby-pin]"));
 click(invitado, '[data-local-action="nearby-cancel"]'); await pausa();
 await escribePin(pinAnfitrion);
-ok("el invitado entra en la sala de espera sin escanear nada", /Preparando la mesa|Sala de espera/.test(html(invitado)) && /Ana/.test(html(invitado)));
+ok("el invitado entra en la sala de espera sin escanear nada", /Preparando la sala|Sala de espera/.test(html(invitado)) && /Ana/.test(html(invitado)));
 ok("el anfitrión ve llegar a la invitada", /Ana/.test(html(anfitrion)));
 ok("con dos personas el anfitrión ya puede sortear quién empieza", !!anfitrion.document.querySelector('[data-local-action="starter-draw"]'));
 

@@ -32,7 +32,7 @@
     return `<header class="topbar atlas-topbar${inGame ? ' atlas-game-topbar' : ''}">
       ${back ? `<button class="icon-btn atlas-back" ${back} aria-label="Volver a la pantalla anterior">${icon('back')}</button>` : '<span></span>'}
       ${inGame ? (title ? `<div class="topbar-title">${title}</div>` : '<span></span>') : '<div class="brand">Continuum</div>'}
-      <div class="atlas-topbar-actions">${help ? `<button class="icon-btn atlas-help" ${help} aria-label="Cómo se juega">${icon('guide')}</button>` : ''}${menu ? `<button class="icon-btn atlas-menu" ${menu} aria-label="Opciones de la partida" aria-haspopup="dialog">${icon('more')}</button>` : ''}</div>
+      <div class="atlas-topbar-actions">${help ? `<button class="icon-btn atlas-help" ${help} aria-label="Guía">${icon('guide')}</button>` : ''}${menu ? `<button class="icon-btn atlas-menu" ${menu} aria-label="Opciones de la partida" aria-haspopup="dialog">${icon('more')}</button>` : ''}</div>
     </header>`;
   }
   function nav(screen) {
@@ -740,7 +740,7 @@
         : ['menu-private.webp', 'voyage-duels-v1.webp', 'menu-collections.webp'];
       const art = choices.find(file => !usedArt.has(file)) || 'hero-geography-400.webp';
       usedArt.add(art);
-      const kicker = competition ? 'Cada ronda cuenta' : alone ? 'A tu ritmo' : joining ? 'Tu sitio en la mesa' : 'La mesa os espera';
+      const kicker = competition ? 'Cada tema cuenta' : alone ? 'A tu ritmo' : joining ? 'Tu sitio en la mesa' : 'La mesa os espera';
       panel.style.setProperty('--setup-illustration', `url("assets/${art}")`);
       if (panel.matches('.solo-fold')) return; // el desplegable ya conserva su cabecera
       let head = panel.querySelector(':scope > .solo-panel-head');
@@ -753,7 +753,7 @@
       const copy = document.createElement('div'); copy.className = 'setup-art-copy';
       const label = document.createElement('span'); label.className = 'setup-art-kicker'; label.textContent = kicker;
       const title = heading || document.createElement('h3');
-      if (!heading) title.textContent = joining ? 'Únete a la partida' : screen === 'hub-online-create' ? 'Prepara tu mesa' : screen === 'setup' ? 'Prepara la partida' : 'Elegid vuestra partida';
+      if (!heading) title.textContent = joining ? 'Unirme a una partida' : screen === 'hub-online-create' ? 'Prepara tu mesa' : screen === 'setup' ? 'Prepara la partida' : 'Elegid vuestra partida';
       copy.append(label, title); head.append(image, copy);
     });
   }

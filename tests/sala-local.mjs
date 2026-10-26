@@ -147,7 +147,7 @@ const expulsada = act(sala, "remove-player", { requesterId: "host", targetId: "a
 ok("expulsar quita a esa persona y devuelve sus cartas al descarte", !expulsada.playerOrder.includes("ana") && expulsada.discard.length >= 4);
 ok("el anfitrión no puede ser expulsado ni puede salir por su cuenta", intenta(() => act(expulsada, "remove-player", { requesterId: "host", targetId: "host", now: 6001 })) === "HOST");
 
-console.log("\nRevancha con la misma mesa");
+console.log("\nRevancha con los mismos jugadores");
 ok("no se puede pedir revancha a mitad de partida", intenta(() => act(sala, "rematch", { requesterId: "host", now: 7000 })) === "NOT_ALLOWED");
 const acabada = { ...sala, status: "ended", phase: "finished", winner: "leo", winners: ["leo"] };
 ok("solo el anfitrión la pide", intenta(() => act(acabada, "rematch", { requesterId: "ana", now: 7000 })) === "NOT_ALLOWED");

@@ -51,7 +51,7 @@ assert.equal(screen(), 'pass');
 console.log('  ok   la partida empieza con la mesa preparada');
 
 // «Cambiar jugadores o ajustes» (el botón de la pantalla final) vuelve a la preparación
-// con la misma mesa. Se pulsa aquí sin terminar la partida: la acción es la misma.
+// con los mismos jugadores. Se pulsa aquí sin terminar la partida: la acción es la misma.
 app().insertAdjacentHTML('beforeend', '<button data-action="setup">Otra partida</button>');
 await click('[data-action="setup"]');
 assert.equal(screen(), 'setup');

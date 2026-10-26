@@ -75,7 +75,7 @@
   function hostNameField() {
     const name = ownName();
     return name
-      ? `<input type="hidden" id="local-name-host" name="name" value="${name}"><p class="hint">Entras como <b>${name}</b>. Puedes cambiarlo desde tu perfil.</p>`
+      ? `<input type="hidden" id="local-name-host" name="name" value="${name}"><p class="hint">Entras como <b>${name}</b>. Puedes cambiarlo en Atlas.</p>`
       : `<div class="field"><label for="local-name-host">Tu nombre</label><input id="local-name-host" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name" value=""></div>`;
   }
 
@@ -169,7 +169,7 @@
       BAD_PIN: "Código incorrecto. Pídele a quien ha creado la sala el código de 4 cifras que ve en su pantalla",
       INVALID_START: "Hacen falta al menos dos personas para empezar",
       INVALID_ROOM: "No se pudo crear la sala",
-      ROOM_FULL: "La sala ya tiene el máximo de participantes",
+      ROOM_FULL: "La sala ya tiene el máximo de jugadores",
       ALREADY_STARTED: "La partida ya ha comenzado",
       DECK_MISMATCH: "Alguien lleva una versión distinta del juego. Actualizad todos los móviles y cread una sala nueva.",
       NOT_TURN: "Todavía no es tu turno",
@@ -340,22 +340,22 @@
     // Una competición se crea desde «Crear partida»: unirse está en su propia entrada.
     if (competition) {
       paint(`<div class="shell online-shell">${header("back")}
-        <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Competición sin internet</div><h2 data-focus tabindex="-1">${competition.rounds} temas al azar,<br>cada uno en su móvil</h2><p class="lead">${competition.cards} cartas por persona en cada tema. Ganar la ronda suma un punto; las cartas que te queden restan su número menos uno.</p></section>
+        <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Competición sin internet</div><h2 data-focus tabindex="-1">${competition.rounds} temas al azar,<br>cada uno en su móvil</h2><p class="lead">${competition.cards} cartas por persona en cada tema. Ganar un tema suma un punto; las cartas que te queden restan su número menos uno.</p></section>
         ${wifiNote()}
         ${cameraNote()}
         <div class="online-entry-grid online-entry-single">
-          <form class="panel online-form" data-local-form="create"><h3>Crear la sala</h3><p>Tú preparas la competición y los demás escanean tu código.</p>${hostNameField()}<button class="btn btn-primary btn-block" type="submit">Crear sala <span>→</span></button></form>
+          <form class="panel online-form" data-local-form="create"><h3>Crear una sala</h3><p>Tú preparas la competición y los demás escanean tu código.</p>${hostNameField()}<button class="btn btn-primary btn-block" type="submit">Crear sala <span>→</span></button></form>
         </div>
         <p class="online-note">No necesita conexión a internet en ningún momento.</p>
       </div>`, "local-entrada");
       return;
     }
     paint(`<div class="shell online-shell">${header("back")}
-      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${escapeHtml(CT.mode(modeKey).name)}</div><h2 data-focus tabindex="-1">Una mesa,<br>varias pantallas — sin internet</h2><p class="lead">Cada persona juega desde su móvil, conectadas por Wi-Fi local, sin ninguna conexión a internet.</p></section>
+      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${escapeHtml(CT.mode(modeKey).name)}</div><h2 data-focus tabindex="-1">Cada uno en su móvil,<br>sin internet</h2><p class="lead">Todos los móviles en la misma red Wi-Fi, sin ninguna conexión a internet.</p></section>
       ${wifiNote()}
       ${cameraNote()}
       <div class="online-entry-grid${createOnly ? " online-entry-single" : ""}">
-        ${createOnly ? "" : '<div class="panel online-form"><span class="form-number">01</span><h3>Unirse a una sala</h3><p>Alguien ya ha creado una y te ha pasado su código.</p><button type="button" class="btn btn-primary btn-block" data-local-action="go-unirse">Unirme a la partida <span>→</span></button></div>'}
+        ${createOnly ? "" : '<div class="panel online-form"><span class="form-number">01</span><h3>Unirme a una partida</h3><p>Alguien ya ha creado una y te ha pasado su código.</p><button type="button" class="btn btn-primary btn-block" data-local-action="go-unirse">Unirme <span>→</span></button></div>'}
         <form class="panel online-form" data-local-form="create">${createOnly ? "" : '<span class="form-number">02</span>'}<h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código.</p>${hostNameField()}<button class="btn btn-secondary btn-block" type="submit">Crear sala</button></form>
       </div>
       <p class="online-note">No necesita conexión a internet en ningún momento.</p>
@@ -376,7 +376,7 @@
         onChange: onRoomChange,
         onPeerLost: (lostName, playing) => showToast(playing
           ? `${lostName || "Alguien"} se ha desconectado: conserva su plaza y sus turnos se saltan. Invítale otra vez desde el menú ⋯.`
-          : `${lostName || "Alguien"} se ha desconectado y sale de la mesa`),
+          : `${lostName || "Alguien"} se ha desconectado y sale de la partida`),
         onPeerBack: backName => showToast(`${backName || "Alguien"} ha vuelto a su plaza`)
       });
     } catch (error) { console.error(error); showToast("No se pudo crear la sala"); return; }
@@ -389,7 +389,7 @@
   function renderUnirseForm() {
     screen = "local-unirse";
     paint(`<div class="shell online-shell">${header(directJoin ? "back" : "go-entrada")}
-      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Unirse a una sala</h2>${directJoin ? "<p class=\"lead\">No hace falta elegir mazo: la sala trae el suyo.</p>" : ""}</section>
+      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Unirme a una partida</h2>${directJoin ? "<p class=\"lead\">No hace falta elegir mazo: la sala trae el suyo.</p>" : ""}</section>
       ${directJoin ? wifiNote() + cameraNote() : ""}
       <form class="panel online-form" data-local-form="join-offer">
         <div class="field"><label for="local-guest-name">Tu nombre</label><input id="local-guest-name" name="name" maxlength="18" required placeholder="Ej. Ana" autocomplete="name" value="${ownName() || escapeHtml(savedSeat()?.name || "")}"></div>
@@ -398,7 +398,7 @@
         <button type="button" class="btn ${nearbyAvailable() ? "btn-secondary" : "btn-primary"} btn-block" data-local-action="scan-offer">${CAMERA_ICON} Escanear el código del anfitrión</button>
         <details class="qr-fallback"><summary>¿No puedes usar la cámara?</summary>
           <div class="field"><label for="local-guest-offer">Pega el código que te ha compartido el anfitrión</label><textarea id="local-guest-offer" name="offer" rows="3" placeholder="${enIPhone() ? "Recíbelo por AirDrop o Mensajes y pégalo aquí." : "Recíbelo por Bluetooth, AirDrop o Cerca y pégalo aquí."}"></textarea></div>
-          <button class="btn btn-secondary btn-block" type="submit">Unirse con ese código</button>
+          <button class="btn btn-secondary btn-block" type="submit">Unirme con ese código</button>
         </details>
       </form>
     </div>`, "local-unirse");
@@ -741,10 +741,10 @@ function starterPanelMarkupContent(isHost) {
         ${CT.LocalRoom.laterRound(roomState) ? nextThemeMarkup(true) : roomState.playerOrder.length < 2 ? '<p class="hint">Esperando a alguien más…</p>' : starterPanelMarkup(true)}`
       : CT.LocalRoom.laterRound(roomState) ? nextThemeMarkup(false) : roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles a la vez.</p>` : starterPanelMarkup(false);
     paint(`<div class="shell online-shell">${header("leave")}
-      <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${escapeHtml(roomState.roomCode)}</strong>${isHost ? `<div class="room-invite-actions"><button type="button" data-local-action="invite">${hostSession?.nearby ? "Invitar por QR (Android)" : "Invitar a alguien"}</button></div>` : ""}</div></section>
+      <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la sala</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${escapeHtml(roomState.roomCode)}</strong>${isHost ? `<div class="room-invite-actions"><button type="button" data-local-action="invite">${hostSession?.nearby ? "Invitar por QR (Android)" : "Invitar a alguien"}</button></div>` : ""}</div></section>
       ${isHost && hostSession?.nearby ? `<p class="online-note" data-nearby-note>Sala visible para los iPhones cercanos: que pulsen «Unirme a una partida → Buscar salas cercanas» y escriban este código: <b class="nearby-pin">${escapeHtml(hostSession.nearbyPin)}</b>. Para un Android, usa el QR.</p>` : ""}
       <div class="online-lobby-grid">
-        <section class="panel lobby-table-panel"><div class="section-label">Mesa de exploradores <small>${roomState.playerOrder.length}/${Number(roomState.capacity) || CT.LocalRoom.MAX_PLAYERS}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${roomState.playerOrder.length}</strong><small>${roomState.playerOrder.length === 1 ? "explorador" : "exploradores"}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
+        <section class="panel lobby-table-panel"><div class="section-label">Jugadores en la sala <small>${roomState.playerOrder.length}/${Number(roomState.capacity) || CT.LocalRoom.MAX_PLAYERS}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${roomState.playerOrder.length}</strong><small>${roomState.playerOrder.length === 1 ? "explorador" : "exploradores"}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
         <section class="panel lobby-settings">${settings}</section>
       </div>
     </div>`, "local-lobby");
@@ -985,15 +985,15 @@ function starterPanelMarkupContent(isHost) {
     const secondsLeft = turnRemaining();
     const powersEnabled = myTurn && !pulsing;
     const handSection = pulsing
-      ? `<section><div class="hand-title"><h3>Carta del duelo</h3><small>${defensa ? `reta ${escapeHtml(currentPlayer.name)}` : `contra ${escapeHtml(pulseTargetName)}`}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}">${categoryBadge(pulseCard)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${myPulse
+      ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>${defensa ? `te reta ${escapeHtml(currentPlayer.name)}` : `contra ${escapeHtml(pulseTargetName)}`}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}">${categoryBadge(pulseCard)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${myPulse
         ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro"
           : defensa ? `Colócala tú también. Si aciertas, no te llevas ninguna carta de ${escapeHtml(currentPlayer.name)}`
           : `Colócala. Si aciertas y ${escapeHtml(pulseTargetName)} falla, le pasas una carta tuya`)
-        : defensa ? `${escapeHtml(pulseTargetName)} está colocando la misma carta…` : `${escapeHtml(currentPlayer.name)} está colocando la carta del duelo…`}</p></section>`
+        : defensa ? `${escapeHtml(pulseTargetName)} está colocando la misma carta…` : `${escapeHtml(currentPlayer.name)} está colocando la carta del Pulso…`}</p></section>`
       : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${pendingIndex === null && selectedCardId === id ? "selected" : ""}" data-local-action="select" data-id="${id}" aria-pressed="${pendingIndex === null && selectedCardId === id}" ${myTurn ? "" : "disabled"}>${categoryBadge(card)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p></section>`;
     paint(`<div class="shell">${header("room-menu", { menu: true })}
-      <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, ronda ${roomState.round}</h1>
-      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length} · ` : ""}Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo para jugar"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
+      <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, vuelta ${roomState.round}</h1>
+      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length} · ` : ""}Vuelta ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo restante para esta carta"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
       <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores</div><div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i class="score-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'room:' + uid, id: esMio(uid) ? CT.Avatares.ownId() : player.avatarId })}</i><span class="score-copy"><b>${escapeHtml(player.name)}${uid === myPlayerId ? " · tú" : ""}${player.away ? " · desconectado" : ""}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(player.hand.length)}%"></i></span></span><em><strong>${player.hand.length}</strong><small>cartas</small></em></span>`; }).join("")}</div></section>
       ${pulsing ? `<div class="pulse-banner">⚡ Duelo · <b>${escapeHtml(currentPlayer.name)}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
       ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
@@ -1110,7 +1110,7 @@ function starterPanelMarkupContent(isHost) {
     }
     const puedeRevancha = isHost && roomState.playerOrder.filter(uid => !roomState.players[uid].away).length >= CT.LocalRoom.MIN_PLAYERS;
     const acciones = isHost
-      ? `${puedeRevancha ? '<button class="btn btn-primary btn-block" data-local-action="rematch">Revancha con la misma mesa <span>→</span></button>' : ""}<button class="btn ${puedeRevancha ? "btn-secondary" : "btn-primary"} btn-block" data-local-action="close-room">Cerrar la sala</button>`
+      ? `${puedeRevancha ? '<button class="btn btn-primary btn-block" data-local-action="rematch">Revancha con los mismos jugadores <span>→</span></button>' : ""}<button class="btn ${puedeRevancha ? "btn-secondary" : "btn-primary"} btn-block" data-local-action="close-room">Cerrar la sala</button>`
       : `<p class="hint">Si quien organiza pide revancha, volveréis todos a la sala de espera.</p><button class="btn btn-secondary btn-block" data-local-action="leave">Salir de la sala</button>`;
     paint(`<div class="shell">${header("leave")}<section class="pass-screen"><div class="panel pass-card"><div class="eyebrow">Partida terminada · ${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"} en la mesa</div><h2 data-focus tabindex="-1">${title}</h2><p>${lead}</p>${reviewActions()}${acciones}</div></section></div>`, "local-final");
   }

@@ -207,7 +207,7 @@
         ] },
 
       // 3 · En grupo
-      blockIntro(2, "En grupo", "Jugar con amigos", "Con otras personas", "Las reglas de una mesa compartida",
+      blockIntro(2, "En grupo", "Jugar con amigos", "Con otras personas", "Las reglas de una partida en grupo",
         ["Inicio", "Jugar"], "Veamos cómo se juega con otras personas."),
       // Un turno es una carta: Ana se queda sin cartas en su turno, pero gana al cerrar la vuelta,
       // después de que jueguen Luis y Sara (sin cartas también ellos, habría final).
@@ -263,9 +263,9 @@
         ["Jugar", "Jugar online"], "En «Jugar online» puedes unirte a una mesa pública o crear la tuya."),
       { chapter: 2, title: "Online", duration: 8800,
         html: `<div class="tv-board">${path(["Jugar", "Jugar online"])}<div class="tv-table-seats"><span>●</span><span>●</span><span class="is-free">○</span><span class="is-free">○</span></div><div class="tv-tiles tv-three">
-          ${tile("◎", "Mesas abiertas", "Siéntate en una")}${tile("+", "Crear mesa", "Juego, plazas y tiempo")}${tile("⚡", "Partida rápida", "Te sentamos")}</div></div>`,
+          ${tile("◎", "Mesas abiertas", "Siéntate en una")}${tile("+", "Crear mesa", "Juego, jugadores y tiempo")}${tile("⚡", "Partida rápida", "Te sentamos")}</div></div>`,
         steps: [
-          [0, c => { c.say("En las mesas públicas podéis jugar de 2 a 4 personas."); c.add(".tv-table-seats", "is-in"); }],
+          [0, c => { c.say("En las mesas públicas podéis jugar de 2 a 4 jugadores."); c.add(".tv-table-seats", "is-in"); }],
           [1400, c => c.fill(".tv-table-seats .is-free", 800)],
           [3600, c => { c.say("Elige una mesa, crea la tuya o busca una partida rápida."); c.stagger(".tv-tile", 450); }]
         ] },
@@ -284,9 +284,9 @@
           [5600, c => c.stagger(".tv-facts span", 350)]
         ] },
       { chapter: 3, title: "A jugar", duration: 4500, last: true,
-        html: `<div class="tv-center tv-end"><div class="tv-logo">A jugar</div><p>Para empezar, elige un mazo de Grandes colecciones en «Jugar solo» y juega en Fácil.</p><div class="tv-end-actions"><button type="button" class="btn btn-secondary" data-tv="replay">Ver otra vez</button>${portada ? "" : '<button type="button" class="btn btn-ghost" data-tv="manual">Ver el manual</button>'}</div></div>`,
+        html: `<div class="tv-center tv-end"><div class="tv-logo">A jugar</div><p>Para empezar, elige un mazo de Grandes colecciones en «Jugar solo» y juega en Fácil.</p><div class="tv-end-actions"><button type="button" class="btn btn-secondary" data-tv="replay">Ver otra vez</button>${portada ? "" : '<button type="button" class="btn btn-ghost" data-tv="manual">Ver la Guía completa</button>'}</div></div>`,
         steps: [
-          [0, c => { c.say(portada ? "Pulsa «Jugar» para empezar." : "Debajo tienes el manual, con todos los detalles."); c.add(".tv-end", "is-in"); }]
+          [0, c => { c.say(portada ? "Pulsa «Jugar» para empezar." : "Debajo tienes la Guía completa, con todos los detalles."); c.add(".tv-end", "is-in"); }]
         ] }
     ];
   }
@@ -306,7 +306,7 @@
     const list = scenes(modeKey, portada);
     // La línea de escenas de arriba: un tramo por escena, agrupados por capítulo.
     const timeline = CHAPTERS.map((name, chapter) => `<span class="tv-seg-group" data-chapter="${chapter}">${list.map((scene, index) => scene.chapter === chapter ? `<button type="button" class="tv-seg" data-tv-scene="${index}" tabindex="-1" aria-label="${esc(scene.title)}"><i></i></button>` : "").join("")}</span>`).join("");
-    return `<section class="tv-player" data-tutorial="${esc(modeKey)}"${portada ? " data-portada" : ""} aria-label="Guía en vídeo">
+    return `<section class="tv-player" data-tutorial="${esc(modeKey)}"${portada ? " data-portada" : ""} aria-label="Vídeo: cómo se juega">
       <div class="tv-screen">
         <i class="tv-light" aria-hidden="true"></i>
         <div class="tv-timeline" aria-hidden="true">${timeline}</div>

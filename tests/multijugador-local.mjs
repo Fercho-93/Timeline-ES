@@ -32,7 +32,7 @@ const submit = (w, sel) => { const el = w.document.querySelector(sel); if (!el) 
 console.log("\nEntrar en el modo desde el menú de verdad");
 let w = boot();
 await entrarWifi(w);
-ok("lleva a la entrada del modo sin conexión", w.document.body.innerHTML.includes("Una mesa"));
+ok("lleva a la entrada del modo sin conexión", w.document.body.innerHTML.includes("Cada uno en su móvil,<br>sin internet"));
 ok("avisa del punto de acceso Wi-Fi antes de nada", /punto de acceso Wi-Fi/.test(w.document.body.innerHTML));
 ok("pide activar la cámara aquí, no cuando ya haga falta escanear", !!w.document.querySelector('[data-local-action="warm-camera"]'));
 ok("el nombre llega ya escrito con el de este móvil", !!w.document.getElementById("local-name-host").value);
@@ -48,7 +48,7 @@ ok("invitar a alguien está disponible", !!w.document.querySelector('[data-local
 console.log("\nInvitar sin WebRTC disponible (como en esta prueba)");
 click(w, '[data-local-action="invite"]');
 await new Promise(resolve => setTimeout(resolve, 0));
-ok("no revienta: vuelve al vestíbulo con un aviso, no con una pantalla en blanco", w.document.body.innerHTML.includes("Preparando la mesa") || w.document.body.innerHTML.includes("Sala de espera") || w.document.body.innerHTML.includes("Mesa de exploradores"));
+ok("no revienta: vuelve al vestíbulo con un aviso, no con una pantalla en blanco", w.document.body.innerHTML.includes("Preparando la sala") || w.document.body.innerHTML.includes("Sala de espera") || w.document.body.innerHTML.includes("Jugadores en la sala"));
 
 console.log("\nUnirse por Wi-Fi desde «Unirme», sin elegir mazo");
 w = boot();
@@ -81,7 +81,7 @@ ok("un código inválido no rompe la pantalla, se queda en la misma", !!w.docume
 
 console.log("\nVolver atrás no se queda a medias");
 click(w, '[data-local-action="go-entrada"]');
-ok("vuelve a la entrada del modo, no al menú principal", w.document.body.innerHTML.includes("Una mesa"));
+ok("vuelve a la entrada del modo, no al menú principal", w.document.body.innerHTML.includes("Cada uno en su móvil,<br>sin internet"));
 
 
 // ---------------------------------------------------------------------------
@@ -287,7 +287,7 @@ ok("gana quien más se acerca en la final", /Fer.*gana/.test(anfitrion.document.
 ok("el anfitrión puede pedir la revancha", !!anfitrion.document.querySelector('[data-local-action="rematch"]'));
 ok("la invitada puede salir de la pantalla final (antes el botón no hacía nada)", !!invitada.document.querySelector('[data-local-action="leave"]'));
 
-console.log("\nRevancha con la misma mesa");
+console.log("\nRevancha con los mismos jugadores");
 click(anfitrion, '[data-local-action="rematch"]');
 await until(() => pantalla(invitada) === "local-lobby");
 ok("los dos vuelven al vestíbulo, con las mismas personas", pantalla(anfitrion) === "local-lobby" && pantalla(invitada) === "local-lobby" && /Ana/.test(html(anfitrion)));

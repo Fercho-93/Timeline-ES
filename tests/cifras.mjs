@@ -237,7 +237,7 @@ console.log("\nCrear un duelo de cifras y jugarlo");
   abreMazo(w, "geografia", "population");
   (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
   // El duelo es una sola opción del menú con las dos modalidades dentro.
-  ok("hay una sola pantalla: en directo y cuatro combinaciones de duelo", w.document.querySelectorAll('[data-duel-block]').length === 5 && /Partida con amigos/.test(texto(w)));
+  ok("hay una sola pantalla: en directo y cuatro combinaciones de duelo", w.document.querySelectorAll('[data-duel-block]').length === 5 && /Cada uno en su móvil/.test(texto(w)));
   ok("por defecto, en directo, sin elegir prueba", w.document.querySelector('[data-duel-block="directo"]').hidden === false && w.document.querySelector('[data-duel-kind-field]').hidden === true);
   {
     // Mismo orden que en el resto de modalidades: ritmo, conexión, máximo, cartas, poderes, tiempo, nombre y botón.

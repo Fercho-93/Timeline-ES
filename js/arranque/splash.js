@@ -141,7 +141,7 @@
       guide.id = 'splash-guide';
       guide.type = 'button';
       guide.className = 'splash-guide';
-      guide.textContent = 'Ver el manual';
+      guide.textContent = 'Ver cómo se juega';
       actions.append(button, guide);
       const elapsed = performance.now() - introStart;
       actions.style.animationDelay = `${Math.max(0, 5000 - elapsed)}ms`;
@@ -173,8 +173,8 @@
     capa.className = 'splash-video';
     capa.setAttribute('role', 'dialog');
     capa.setAttribute('aria-modal', 'true');
-    capa.setAttribute('aria-label', 'Cómo se juega');
-    capa.innerHTML = `<div class="splash-video-head"><button type="button" class="splash-video-close" aria-label="Volver a la portada">←</button><span>Cómo se juega</span></div>${video}`;
+    capa.setAttribute('aria-label', 'Vídeo: cómo se juega');
+    capa.innerHTML = `<div class="splash-video-head"><button type="button" class="splash-video-close" aria-label="Volver a la portada">←</button><span>Vídeo: cómo se juega</span></div>${video}`;
     const volver = () => {
       capa.querySelector('[data-tutorial]')?.tutorial?.stop();
       document.removeEventListener('keydown', escape);

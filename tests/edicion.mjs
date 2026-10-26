@@ -174,7 +174,7 @@ for (const reduce of [false, true]) {
   } finally { w.close(); }
 }
 {
-  // «Ver el manual», bajo «Jugar»: reproduce la guía en vídeo sobre la portada, sin entrar en
+  // «Ver cómo se juega», bajo «Jugar»: reproduce la guía en vídeo sobre la portada, sin entrar en
   // el juego, y al terminar (o al cerrarla) se vuelve a la portada con «Jugar» esperando.
   const {w, advance} = splashClock();
   try {
@@ -185,7 +185,7 @@ for (const reduce of [false, true]) {
     w.CONTINUUM_SPLASH.gate().then(() => { abierto = true; });
     await new Promise(resolve => setImmediate(resolve));
     const guia = w.document.getElementById('splash-guide');
-    assert.ok(guia && guia.tagName === 'BUTTON' && guia.textContent === 'Ver el manual', 'la portada ofrece ver el manual');
+    assert.ok(guia && guia.tagName === 'BUTTON' && guia.textContent === 'Ver cómo se juega', 'la portada ofrece ver el vídeo de cómo se juega');
     assert.equal(guia.previousElementSibling?.id, 'splash-play', 'justo debajo de «Jugar»');
     guia.click();
     await new Promise(resolve => setImmediate(resolve));
