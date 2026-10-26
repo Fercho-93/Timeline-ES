@@ -148,6 +148,18 @@ for (const mazo of cronologicos) {
   ok(`ninguna explicación cuenta correcciones del mazo${conNotas.length ? `: ${conNotas.map(c => `${c.id} «${c.title}»`).join(", ")}` : ""}`, !conNotas.length);
 }
 
+// Un reparto no lleva dos cartas de la misma serie numerada: el nombre ya daría el orden.
+{
+  const ids = VIDEOGAME_CARDS.map(c => c.id);
+  const serieDe = new Map(VIDEOGAME_CARDS.map(c => [c.id, c.serie]));
+  let mezcla = true;
+  for (let i = 0; i < 50; i++) {
+    const series = CT.uniqueValueIds("videogames", ids).map(id => serieDe.get(id)).filter(Boolean);
+    if (new Set(series).size !== series.length) mezcla = false;
+  }
+  ok("los repartos dejan una sola consola de cada serie (PlayStation, Xbox)", mezcla && VIDEOGAME_CARDS.filter(c => c.serie).length >= 9);
+}
+
 const todos = [...cronologicos.flat(), ...COUNTRY_CARDS, ...POPULATION_CARDS, ...LANGUAGE_CARDS, ...ANIMAL_WEIGHT_CARDS, ...ANIMAL_LIFESPAN_CARDS, ...ANIMAL_SPEED_CARDS, ...CITY_DISTANCE_CARDS];
 console.log("\nEntre mazos");
 ok("los identificadores no chocan entre modalidades", new Set(todos.map(c => c.id)).size === todos.length);
@@ -164,8 +176,8 @@ ok("los identificadores no chocan entre modalidades", new Set(todos.map(c => c.i
 // un número aparte que se desincronizaría en silencio.
 console.log("\nGran mezcla");
 const mixed = CT.cards("mixed");
-const esperadasEnMezcla = cronologicos.flat().length - CT.MIXED_DUPLICATE_INVENTION_IDS.size;
-ok(`${mixed.length} cartas, las de los mazos de tiempo juntas menos los duplicados de Inventos`, mixed.length === esperadasEnMezcla);
+const esperadasEnMezcla = cronologicos.flat().length - CT.MIXED_DUPLICATE_INVENTION_IDS.size - CT.MIXED_DUPLICATE_WORLD_IDS.size;
+ok(`${mixed.length} cartas, las de los mazos de tiempo juntas menos los hitos repetidos entre mazos`, mixed.length === esperadasEnMezcla);
 ok("identificadores únicos también mezclados", new Set(mixed.map(c => c.id)).size === mixed.length);
 
 console.log(`\n${fail} fallos`);

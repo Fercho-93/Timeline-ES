@@ -72,7 +72,9 @@ y 1.271 cartas (recuento de octubre de 2026; la cifra exacta la da `CT.cards(maz
   la distancia geodésica en línea recta entre centros urbanos, no una ruta por carretera, tren o avión.
 
 **Gran mezcla temporal** no es de ningún bloque temático, a propósito: concatena los ocho mazos
-cronológicos —769 cartas en total— y los ordena sobre un único eje. Se presenta aparte en la
+cronológicos —766 cartas: quedan fuera tres hitos de Historia mundial que ya están en Historia de
+España (Colón, la primera vuelta al mundo y la guerra de los Treinta Años)— y los ordena sobre un
+único eje. Se presenta aparte en la
 portada como modalidad transversal, reutiliza las épocas generales de Historia mundial y no
 entra en la rotación de la Competición, que sí cambia de tema.
 

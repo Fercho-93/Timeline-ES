@@ -2,7 +2,7 @@
 // cambio de formato concreto. El recorrido mezcla música clásica, popular y tecnología
 // musical: la pregunta es cuándo ocurrió el hito, no qué género es "más importante".
 window.MUSIC_CARDS = [
-  { id: 6001, year: 1607, title: "Estreno de L'Orfeo", detail: "La ópera de Claudio Monteverdi se estrena en Mantua y se convierte en una de las primeras obras maestras del género." },
+  { id: 6001, year: 1607, title: "Estreno de L’Orfeo", detail: "La ópera de Claudio Monteverdi se estrena en Mantua y se convierte en una de las primeras obras maestras del género." },
   { id: 6002, year: 1721, title: "Conciertos de Brandeburgo", detail: "Johann Sebastian Bach dedica a Christian Ludwig de Brandeburgo los seis conciertos que resumen el esplendor instrumental barroco." },
   { id: 6003, year: 1741, title: "Publicación de las Variaciones Goldberg", detail: "Bach publica un aria con treinta variaciones que se convertirá en una cima de la música para teclado." },
   { id: 6004, year: 1787, title: "Estreno de Don Giovanni", detail: "Mozart estrena en Praga su ópera sobre el mito de don Juan, a medio camino entre la comedia y el drama." },
@@ -25,13 +25,13 @@ window.MUSIC_CARDS = [
   { id: 6021, year: 1959, title: "Kind of Blue", detail: "Miles Davis publica el álbum de jazz modal más célebre y uno de los discos más vendidos de la historia del género." },
   { id: 6022, year: 1962, title: "Love Me Do", detail: "The Beatles lanzan su primer sencillo y comienza una carrera que transformará la cultura popular mundial." },
   { id: 6023, year: 1965, title: "Like a Rolling Stone", detail: "Bob Dylan rompe la duración habitual del sencillo y lleva una escritura más literaria al centro del pop." },
-  { id: 6024, year: 1967, title: "Sgt. Pepper's Lonely Hearts Club Band", detail: "The Beatles convierten el estudio de grabación en instrumento y el álbum en una obra pensada como conjunto." },
+  { id: 6024, year: 1967, title: "Sgt. Pepper’s Lonely Hearts Club Band", detail: "The Beatles convierten el estudio de grabación en instrumento y el álbum en una obra pensada como conjunto." },
   { id: 6025, year: 1969, title: "Festival de Woodstock", detail: "Más de treinta actuaciones y una multitud gigantesca fijan el gran símbolo musical de la contracultura." },
-  { id: 6026, year: 1971, title: "What's Going On", detail: "Marvin Gaye publica un álbum conceptual que une soul, conciencia social y una producción de enorme influencia." },
+  { id: 6026, year: 1971, title: "What’s Going On", detail: "Marvin Gaye publica un álbum conceptual que une soul, conciencia social y una producción de enorme influencia." },
   { id: 6027, year: 1973, title: "The Dark Side of the Moon", detail: "Pink Floyd combina rock, síntesis electrónica y sonido de estudio en uno de los álbumes más duraderos de las listas." },
   { id: 6028, year: 1975, title: "Bohemian Rhapsody", detail: "Queen publica un sencillo de seis minutos, sin estribillo convencional y con una sección operística grabada por capas." },
   { id: 6029, year: 1977, title: "Rumours", detail: "Fleetwood Mac transforma las tensiones internas del grupo en uno de los discos más vendidos de todos los tiempos." },
-  { id: 6030, year: 1979, title: "Rapper's Delight", detail: "The Sugarhill Gang lleva el hip-hop a las listas internacionales con uno de los primeros grandes éxitos comerciales del rap." },
+  { id: 6030, year: 1979, title: "Rapper’s Delight", detail: "The Sugarhill Gang lleva el hip-hop a las listas internacionales con uno de los primeros grandes éxitos comerciales del rap." },
   { id: 6031, year: 1981, title: "MTV empieza a emitir", detail: "El canal inaugura una era en la que el videoclip y la imagen del artista pasan a ser inseparables de la canción." },
   { id: 6032, year: 1982, title: "Thriller", detail: "Michael Jackson publica el álbum más vendido de la historia y convierte sus videoclips en acontecimientos globales." },
   { id: 6033, year: 1984, title: "Purple Rain", detail: "Prince une álbum, película y gira en una obra que mezcla rock, pop, funk y una puesta en escena inolvidable." },

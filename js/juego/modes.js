@@ -13,16 +13,22 @@
   // millón se expresa en millones con tres cifras significativas. Redondear no puede
   // estropear el orden de las superficies y poblaciones seleccionadas. Los ejes de
   // animales tienen su propio formato; pueden existir empates reales.
+  // En «es-ES», toLocaleString no agrupa los números de cuatro cifras: «1051 km» salía junto a
+  // «10.702 km» en el mismo mazo. Aquí se agrupan todos desde el millar.
+  function cifra(value, opciones = {}) {
+    return value.toLocaleString("es-ES", { useGrouping: "always", ...opciones });
+  }
+
   function compact(value) {
     if (value < 1e6) {
-      if (value < 10) return value.toLocaleString("es-ES", { maximumFractionDigits: 2 });
-      return Math.round(value).toLocaleString("es-ES");
+      if (value < 10) return cifra(value, { maximumFractionDigits: 2 });
+      return cifra(Math.round(value));
     }
-    const millions = value / 1e6;
+    const millions = value >= 1e9 ? Number((value / 1e6).toPrecision(3)) : value / 1e6;
     const decimals = millions >= 100 ? 0 : millions >= 10 ? 1 : 2;
-    const cifra = millions.toLocaleString("es-ES", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    const texto = cifra(millions, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
     // «1,00 millones» no lo dice nadie; justo por encima del millón se dice «1 millón».
-    return Math.round(millions * 100) === 100 ? "1 millón" : `${cifra} millones`;
+    return Math.round(millions * 100) === 100 ? "1 millón" : `${texto} millones`;
   }
 
   // Además del dato completo, cada eje sabe decirlo en corto. Es lo que cabe en el mapa
@@ -30,25 +36,25 @@
   function shortMillions(value) {
     if (value >= 1e6) {
       const millones = value / 1e6;
-      const cifra = millones >= 100 ? Math.round(millones) : Number(millones.toPrecision(3));
-      return `${cifra.toLocaleString("es-ES")} M`;
+      const numero = millones >= 100 ? Math.round(millones) : Number(millones.toPrecision(3));
+      return `${cifra(numero)} M`;
     }
     // «402 mil» se lee de un vistazo; «402.329», en un hueco de cuarenta píxeles, no.
-    if (value >= 10000) return `${Math.round(value / 1000).toLocaleString("es-ES")} mil`;
+    if (value >= 10000) return `${cifra(Math.round(value / 1000))} mil`;
     return compact(value);
   }
 
   function compactMass(value) {
-    if (value < 0.001) return `${Math.round(value * 1e6).toLocaleString("es-ES")} mg`;
-    if (value < 1) return `${Math.round(value * 1000).toLocaleString("es-ES")} g`;
-    if (value < 1000) return `${value.toLocaleString("es-ES", { maximumFractionDigits: 1 })} kg`;
+    if (value < 0.001) return `${cifra(Math.round(value * 1e6))} mg`;
+    if (value < 1) return `${cifra(Math.round(value * 1000))} g`;
+    if (value < 1000) return `${cifra(value, { maximumFractionDigits: 1 })} kg`;
     const tonnes = value / 1000;
     const decimals = tonnes >= 100 ? 0 : tonnes >= 10 ? 0 : 1;
-    return `${tonnes.toLocaleString("es-ES", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })} t`;
+    return `${cifra(tonnes, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })} t`;
   }
 
   function compactDistance(value) {
-    return `${Math.round(value).toLocaleString("es-ES")} km`;
+    return `${cifra(Math.round(value))} km`;
   }
 
   // Los hablantes se publican en millones con un decimal y ese decimal hace falta: entre
@@ -57,7 +63,7 @@
   // que ahí ya da la cifra exacta.
   function compactSpeakers(value) {
     if (value < 1e6) return `${compact(value)} hablantes`;
-    const millones = (value / 1e6).toLocaleString("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const millones = cifra(value / 1e6, { maximumFractionDigits: 1 });
     return `${millones} millones`;
   }
 
@@ -68,7 +74,7 @@
     if (dias < 1) {
       const horas = dias * 24;
       if (horas < 1) return `${Math.round(horas * 60)} min`;
-      return `${horas.toLocaleString("es-ES", { maximumFractionDigits: 1 })} h`;
+      return `${cifra(horas, { maximumFractionDigits: 1 })} h`;
     }
     // Hasta unos tres meses se cuenta en días, o en semanas si el dato es un número exacto de
     // ellas: redondeadas a meses, las «seis semanas» de la abeja salían como «1 mes» y los
@@ -83,7 +89,7 @@
       return `${meses} ${meses === 1 ? "mes" : "meses"}`;
     }
     // Como los meses y los días: «1 año», no «1 años».
-    return `${value.toLocaleString("es-ES", { maximumFractionDigits: 1 })} ${value === 1 ? "año" : "años"}`;
+    return `${cifra(value, { maximumFractionDigits: 1 })} ${value === 1 ? "año" : "años"}`;
   }
 
   function compactSpeed(value) {
@@ -91,10 +97,10 @@
     // enseñaba como «0», así que por debajo de 0,01 la escala baja a metros por hora.
     if (value < 0.01) {
       const metros = value * 1000;
-      return `${metros.toLocaleString("es-ES", { maximumFractionDigits: metros < 1 ? 2 : 1 })} m/h`;
+      return `${cifra(metros, { maximumFractionDigits: metros < 1 ? 2 : 1 })} m/h`;
     }
     const decimals = value < 1 ? 3 : 2;
-    return `${value.toLocaleString("es-ES", { maximumFractionDigits: decimals })} km/h`;
+    return `${cifra(value, { maximumFractionDigits: decimals })} km/h`;
   }
 
   // Un eje dice cómo se ordenan las cartas, cómo se muestra el dato una vez revelado y
@@ -123,8 +129,8 @@
         { limit: 1492, key: "medieval", name: "Edad Media", symbol: "♜" },
         { limit: 1700, key: "imperio", name: "Monarquía Hispánica", symbol: "✦" },
         { limit: 1808, key: "ilustracion", name: "Ilustración", symbol: "☼" },
-        { limit: 1931, key: "moderna", name: "España contemporánea", symbol: "⌁" },
-        { limit: 1975, key: "sigloxx", name: "Siglo XX", symbol: "◈" },
+        { limit: 1931, key: "moderna", name: "Liberalismo y Restauración", symbol: "⌁" },
+        { limit: 1975, key: "sigloxx", name: "República y franquismo", symbol: "◈" },
         { limit: Infinity, key: "democracia", name: "Democracia", symbol: "◎" }
       ]
     },
@@ -276,9 +282,9 @@
       bands: [
         { limit: 100, key: "cercana", name: "Cercana", symbol: "·" },
         { limit: 500, key: "regional", name: "Regional", symbol: "▪" },
-        { limit: 2000, key: "nacional", name: "Entre países cercanos", symbol: "◈" },
-        { limit: 6000, key: "continental", name: "Intercontinental", symbol: "◆" },
-        { limit: 12000, key: "oceanica", name: "Transoceánica", symbol: "★" },
+        { limit: 2000, key: "nacional", name: "Media distancia", symbol: "◈" },
+        { limit: 6000, key: "continental", name: "Larga distancia", symbol: "◆" },
+        { limit: 12000, key: "oceanica", name: "Muy larga distancia", symbol: "★" },
         { limit: Infinity, key: "antipoda", name: "Casi antípoda", symbol: "⬢" }
       ]
     }
@@ -300,6 +306,10 @@
   // El mazo de Inventos ya no duplica hitos de los mazos de Astronomía o Medicina.
   // Se conserva la constante para mantener estable la interfaz de CONTINUUM.
   const MIXED_DUPLICATE_INVENTION_IDS = new Set();
+  // Historia de España e Historia mundial comparten tres hitos con el mismo año (Colón, la
+  // primera vuelta al mundo y la guerra de los Treinta Años). Cada mazo conserva el suyo; en
+  // la Gran mezcla solo queda el de España, para no dar dos cartas casi iguales.
+  const MIXED_DUPLICATE_WORLD_IDS = new Set([5047, 5050, 5053]);
 
   // Una modalidad hereda las bandas de su eje salvo que declare las suyas, como el cine:
   // comparte el eje del tiempo con la historia, pero no las mismas épocas.
@@ -327,6 +337,7 @@
         // médicos y astronómicos duplicados viven en sus mazos específicos.
         .flatMap(([sourceMode, deck]) => deck
           .filter(card => sourceMode !== "inventions" || !MIXED_DUPLICATE_INVENTION_IDS.has(card.id))
+          .filter(card => sourceMode !== "world" || !MIXED_DUPLICATE_WORLD_IDS.has(card.id))
           .map(card => ({ ...card, sourceMode }))),
       axis: "time",
       bands: WORLD_BANDS
@@ -371,7 +382,7 @@
         { limit: 1972, key: "laboratorio", name: "Pioneros", symbol: "⌨" },
         { limit: 1983, key: "arcade", name: "Era arcade", symbol: "●" },
         { limit: 1990, key: "ochobits", name: "Consolas de 8 y 16 bits", symbol: "◆" },
-        { limit: 2000, key: "tresd", name: "Salto a las 3D", symbol: "△" },
+        { limit: 2000, key: "tresd", name: "Años noventa", symbol: "△" },
         { limit: 2010, key: "online", name: "Juego conectado", symbol: "◎" },
         { limit: Infinity, key: "actual", name: "Juego actual", symbol: "✦" }
       ]
@@ -1185,6 +1196,18 @@
     }
     const kept = new Set();
     for (const group of groups.values()) kept.add(group.length === 1 ? group[0] : group[Math.floor(random() * group.length)]);
+    // Las secuelas numeradas (PlayStation 2, 3, 4…) se ordenan solas por el nombre: como los
+    // empates, de cada serie queda una carta al azar en cada reparto.
+    const series = new Map();
+    for (const id of ids) {
+      const serie = kept.has(id) && byId.get(id)?.serie;
+      if (serie) (series.get(serie) || series.set(serie, []).get(serie)).push(id);
+    }
+    for (const group of series.values()) {
+      if (group.length < 2) continue;
+      const queda = group[Math.floor(random() * group.length)];
+      for (const id of group) if (id !== queda) kept.delete(id);
+    }
     return ids.filter(id => kept.has(id));
   }
 
@@ -1226,7 +1249,7 @@
   }
 
   window.CONTINUUM = {
-    MODES, BLOCKS, DEFAULT_MODE, DEFAULT_BLOCK, MIXED_DUPLICATE_INVENTION_IDS,
+    MODES, BLOCKS, DEFAULT_MODE, DEFAULT_BLOCK, MIXED_DUPLICATE_INVENTION_IDS, MIXED_DUPLICATE_WORLD_IDS,
     has, mode, axis, cards,
     pulseRules: PULSE_RULES,
     usesAnimalArt, cardArt, animalArt, cardBack, deckFingerprint, categoryFor, categoryBadge,

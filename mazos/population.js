@@ -10,7 +10,7 @@ window.POPULATION_CARDS = [
   { id: 3003, value: 287886782, title: "Indonesia", detail: "Un extenso archipiélago del sudeste asiático y uno de los países más poblados del mundo." },
   { id: 3004, value: 242431832, title: "Nigeria", detail: "El país más poblado de África, con una población muy joven." },
   { id: 3005, value: 213562666, title: "Brasil", detail: "Casi la mitad de la población de Sudamérica." },
-  { id: 3006, value: 177818044, title: "Bangladesh", detail: "Concentra una enorme población en aproximadamente 148.000 km², menos superficie que Grecia y Bulgaria juntas." },
+  { id: 3006, value: 177818044, title: "Bangladés", detail: "Concentra una enorme población en aproximadamente 148.000 km², menos superficie que Grecia y Bulgaria juntas." },
   { id: 3007, value: 132997658, title: "México", detail: "El país hispanohablante más poblado del mundo, con diferencia." },
   { id: 3008, value: 122427731, title: "Japón", detail: "Encadena más de una década de descensos: en 2024 perdió unos 550.000 habitantes, muy por encima de las caídas de comienzos de los años 2010." },
   { id: 3009, value: 102177431, title: "Vietnam", detail: "Superó los cien millones en 2023." },

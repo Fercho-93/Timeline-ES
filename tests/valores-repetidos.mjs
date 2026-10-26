@@ -17,7 +17,13 @@ for (const key of Object.keys(CT.MODES)) {
   const limpio = CT.uniqueValueIds(key, ids);
   const valores = limpio.map(id => valor.get(id));
   assert.equal(new Set(valores).size, valores.length, `${key}: quedan valores repetidos`);
-  assert.equal(new Set(valores).size, new Set(ids.map(id => valor.get(id))).size, `${key}: no se pierde ningún valor`);
+  // Solo se pierden valores de las series numeradas (PlayStation 2, 3…), que se reducen a una
+  // carta por reparto; el resto de valores siguen todos.
+  const serie = new Map(cartas.map(c => [c.id, c.serie]));
+  const perdidos = [...new Set(ids.map(id => valor.get(id)))].filter(v => !valores.includes(v));
+  assert.ok(perdidos.every(v => ids.some(id => valor.get(id) === v && serie.get(id))), `${key}: no se pierde ningún valor fuera de las series`);
+  const deSerie = limpio.map(id => serie.get(id)).filter(Boolean);
+  assert.equal(new Set(deSerie).size, deSerie.length, `${key}: una carta por serie`);
   assert.deepEqual(limpio, ids.filter(id => limpio.includes(id)), `${key}: se conserva el orden`);
   if (limpio.length < ids.length) conRepetidos++;
 }

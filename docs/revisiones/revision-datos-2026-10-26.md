@@ -59,3 +59,38 @@ carta y quedan aquí:
 | `speed` 13035 · Araña flic-flac de Marruecos (huida) | Sustituye al cangrejo araña, sin velocidad publicada. |
 | `speed` 13023 · Berrendo americano (carrera, referencia NPS) | Antes valía 138 km/h. |
 | `speed` 13028 · Halcón gerifalte (picado medido) | Antes valía 275 km/h. |
+
+## Segunda tanda: criterios, formatos y grafías
+
+- **Misma carta, otra especie (D6).** Los títulos de Naturaleza dicen la especie que mide cada
+  fuente: camaleón mediterráneo (peso) y velado (longevidad, velocidad); escorpión peludo de Arizona
+  y emperador; gorila oriental y occidental; papión oliva; pato Pekín y doméstico.
+- **Reyes de España (D8).** El reto ordena por la subida al trono, aunque sea en minoría de edad
+  (Isabel II 1833, Alfonso XIII 1886). Fernando VII pasa de 1814 a 1808: fue proclamado el 19 de
+  marzo de 1808, tras el motín de Aranjuez. La carta de 1902 de Historia de España cuenta otro
+  hecho («Comienza el reinado efectivo de Alfonso XIII») y se queda.
+- **Redondeos (D12).** Se usa la cifra de la fuente: puntos medios exactos en Longevidad (el panda
+  y el cerdo, con el mismo rango 10–15, valían 12,5 y 13; ahora los dos 12,5), y en Velocidad la
+  cifra medida (camaleón 0,61 km/h y escorpión 1,18, antes ambos 1; perezoso 0,276; manatí 24,1…).
+- **Qué mide cada carta (D13).** Todos los títulos de peso y longevidad llevan entre paréntesis
+  qué miden: «media», «media en libertad», «media en cautividad», «máximo habitual», «límite
+  inferior en libertad».
+- **Retos rápidos (D14–D15).** Un formato de etiqueta por reto (husos en «N horas más/menos»,
+  estadios sin «espectadores», separador de miles, una sola cifra decimal). En la Segunda Guerra
+  Mundial las batallas van por su comienzo; Stalingrado y El Alamein, fechadas por su final, se
+  titulan por el hecho que fechan («Rendición alemana en Stalingrado», «Victoria aliada en El
+  Alamein»). El Camp Nou dice que su aforo es el de antes de la reforma. En el cuerpo humano, ojos y
+  nariz, pulmones y corazón tienen etiquetas distintas; hígado y estómago empatan.
+- **Fechas aproximadas (D16).** Todas llevan «(fecha aproximada)» en el título y «c.» en la
+  etiqueta (Hammurabi, Emporion, La Celestina y el astrolabio no lo llevaban); las tradicionales,
+  «(fecha tradicional)» al final del título.
+- **Números (D17).** Separador de miles también en cifras de cuatro dígitos («1.051 km»), tres
+  cifras significativas por encima de mil millones («1.480 millones») y sin «,0» sobrante.
+- **Épocas (D19).** Las bandas de Distancias se llaman por la distancia («Media distancia»,
+  «Larga distancia»…); en Historia de España, «Liberalismo y Restauración» (1808–1930) y «República y
+  franquismo» (1931–1974); en Videojuegos, «Años noventa».
+- **Grafías (D20).** Bangladés, capibara, «Día de la Constitución», «Red Dead Redemption 2»,
+  esprint, apóstrofo tipográfico y «1 de septiembre de 1939». Halo deja de repetir el lanzamiento
+  de la Xbox. Las consolas numeradas (PlayStation, Xbox) llevan `serie` y el reparto deja una de
+  cada serie, como hace con los empates. En la Gran mezcla salen los tres hitos de Mundial que
+  repetían uno de España.

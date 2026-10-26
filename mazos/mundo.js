@@ -6,10 +6,10 @@
 // El mazo evita a propósito los hitos técnicos y científicos, que son el juego de al
 // lado, y mira más allá de España, que tiene el suyo.
 window.WORLD_CARDS = [
-  { id: 5001, year: -3100, title: "La unificación de Egipto (fecha aproximada)", detail: "El Alto y el Bajo Egipto quedan bajo un solo rey y arranca el linaje de los faraones." },
-  { id: 5002, year: -2560, title: "La Gran Pirámide de Guiza (fecha aproximada)", detail: "La tumba de Keops: durante casi cuatro mil años, el edificio más alto del mundo." },
+  { id: 5001, year: -3100, title: "La unificación de Egipto (fecha aproximada)", detail: "El Alto y el Bajo Egipto quedan bajo un solo rey y arranca el linaje de los faraones.", label: "c. 3100 a. C." },
+  { id: 5002, year: -2560, title: "La Gran Pirámide de Guiza (fecha aproximada)", detail: "La tumba de Keops: durante casi cuatro mil años, el edificio más alto del mundo.", label: "c. 2560 a. C." },
   { id: 5003, year: -1274, title: "La batalla de Qadesh", detail: "Egipcios e hititas chocan en Siria y firman después el primer tratado de paz conservado." },
-  { id: 5004, year: -1200, title: "El colapso de la Edad del Bronce (fecha aproximada)", detail: "En pocas décadas caen casi todas las grandes ciudades del Mediterráneo oriental." },
+  { id: 5004, year: -1200, title: "El colapso de la Edad del Bronce (fecha aproximada)", detail: "En pocas décadas caen casi todas las grandes ciudades del Mediterráneo oriental.", label: "c. 1200 a. C." },
   { id: 5005, year: -753, title: "La fundación de Roma (fecha tradicional)", detail: "La tradición fija en este año la fundación de la ciudad por Rómulo." },
   { id: 5006, year: -586, title: "La destrucción del Primer Templo de Jerusalén", detail: "Nabucodonosor destruye Jerusalén y su templo; nuevas deportaciones agravan el exilio babilónico, iniciado años antes." },
   { id: 5007, year: -539, title: "Ciro el Grande conquista Babilonia", detail: "El Imperio persa se convierte en el mayor que ha visto el mundo hasta entonces." },

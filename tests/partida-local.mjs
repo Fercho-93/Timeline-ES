@@ -175,16 +175,17 @@ console.log("\n«Guardar y salir» con tiempo por turno no hace perder el turno"
 }
 
 console.log("\nMesa llena en un mazo pequeño");
-// Velocidad tiene valores repetidos: el tope de la mano se calcula sobre el mazo que se
-// reparte de verdad, no sobre todas sus cartas, o la línea empezaba sin carta.
+// El tope de la mano se calcula sobre el mazo que se reparte de verdad (sin empates ni la
+// carta del minijuego), reservando la carta de la línea y una para robar. Idiomas, con 50
+// cartas, no da para 9 jugadores con 6 cartas: salen 5 por persona.
 w = boot();
-click(irAJugar(w), '[data-block="naturaleza"]');
-click(w, '[data-mode="speed"]');
+click(irAJugar(w), '[data-block="geografia"]');
+click(w, '[data-mode="languages"]');
 (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('local');
-while (w.document.querySelectorAll("#players input").length < 8) click(w, '[data-action="add-player"]');
+while (w.document.querySelectorAll("#players input").length < 9) click(w, '[data-action="add-player"]');
 w.document.getElementById("hand-size").value = "6";
 click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
-const mesaLlena = JSON.parse(w.localStorage.getItem("hilo-game-speed-v1"));
+const mesaLlena = JSON.parse(w.localStorage.getItem("hilo-game-languages-v1"));
 const manosLlenas = mesaLlena.players.map(p => p.hand.length);
 ok("la línea empieza con una carta de verdad", mesaLlena.timeline.length === 1 && Number.isInteger(mesaLlena.timeline[0]));
 ok("todas las manos tienen las mismas cartas", manosLlenas.every(n => n === manosLlenas[0] && n > 0 && n < 6));

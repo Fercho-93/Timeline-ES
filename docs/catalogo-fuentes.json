@@ -724,7 +724,7 @@
     {
       "file": "mazos/cards.js",
       "id": 73,
-      "title": "Fundación griega de Emporion",
+      "title": "Fundación griega de Emporion (fecha aproximada)",
       "value": -575,
       "source": null,
       "reviewStatus": null,
@@ -794,7 +794,7 @@
     {
       "file": "mazos/cards.js",
       "id": 80,
-      "title": "Fundación tradicional de Emerita Augusta",
+      "title": "Fundación de Emerita Augusta (fecha tradicional)",
       "value": -25,
       "source": null,
       "reviewStatus": null,
@@ -874,7 +874,7 @@
     {
       "file": "mazos/cards.js",
       "id": 88,
-      "title": "Origen tradicional del reino de Pamplona",
+      "title": "Origen del reino de Pamplona (fecha tradicional)",
       "value": 824,
       "source": null,
       "reviewStatus": null,
@@ -1054,7 +1054,7 @@
     {
       "file": "mazos/cards.js",
       "id": 108,
-      "title": "Primera edición conocida de La Celestina",
+      "title": "Primera edición conocida de La Celestina (fecha aproximada)",
       "value": 1499,
       "source": null,
       "reviewStatus": null,
@@ -2874,7 +2874,7 @@
     {
       "file": "mazos/music.js",
       "id": 6001,
-      "title": "Estreno de L'Orfeo",
+      "title": "Estreno de L’Orfeo",
       "value": 1607,
       "source": null,
       "reviewStatus": null,
@@ -3104,7 +3104,7 @@
     {
       "file": "mazos/music.js",
       "id": 6024,
-      "title": "Sgt. Pepper's Lonely Hearts Club Band",
+      "title": "Sgt. Pepper’s Lonely Hearts Club Band",
       "value": 1967,
       "source": null,
       "reviewStatus": null,
@@ -3124,7 +3124,7 @@
     {
       "file": "mazos/music.js",
       "id": 6026,
-      "title": "What's Going On",
+      "title": "What’s Going On",
       "value": 1971,
       "source": null,
       "reviewStatus": null,
@@ -3164,7 +3164,7 @@
     {
       "file": "mazos/music.js",
       "id": 6030,
-      "title": "Rapper's Delight",
+      "title": "Rapper’s Delight",
       "value": 1979,
       "source": null,
       "reviewStatus": null,
@@ -4144,7 +4144,7 @@
     {
       "file": "mazos/videogames.js",
       "id": 7029,
-      "title": "Halo acompaña a la primera Xbox",
+      "title": "Halo: Combat Evolved",
       "value": 2001,
       "source": null,
       "reviewStatus": null,
@@ -4394,7 +4394,7 @@
     {
       "file": "mazos/videogames.js",
       "id": 7054,
-      "title": "Red Dead Redemption II",
+      "title": "Red Dead Redemption 2",
       "value": 2018,
       "source": null,
       "reviewStatus": null,
@@ -4564,7 +4564,7 @@
     {
       "file": "mazos/videogames.js",
       "id": 7071,
-      "title": "Oddworld: Abe's Oddysee",
+      "title": "Oddworld: Abe’s Oddysee",
       "value": 1997,
       "source": null,
       "reviewStatus": null,
@@ -4764,7 +4764,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10001,
-      "title": "Abeja melífera",
+      "title": "Abeja melífera (obrera adulta)",
       "value": 0.00012,
       "source": "https://www.nature.com/articles/s41598-022-21347-5",
       "reviewStatus": "reviewed",
@@ -4774,7 +4774,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10002,
-      "title": "Mariposa monarca",
+      "title": "Mariposa monarca (media)",
       "value": 0.0005,
       "source": "https://www.monarchwatch.org/read/",
       "reviewStatus": "reviewed",
@@ -4819,8 +4819,8 @@
     {
       "file": "mazos/animals.js",
       "id": 10007,
-      "title": "Paloma bravía",
-      "value": 0.35,
+      "title": "Paloma bravía (media)",
+      "value": 0.3587,
       "source": "https://animaldiversity.org/accounts/Columba_livia/",
       "reviewStatus": "reviewed",
       "comparison": null,
@@ -4849,7 +4849,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10040,
-      "title": "Flamenco",
+      "title": "Flamenco común (media)",
       "value": 3.1,
       "source": "https://animals.sandiegozoo.org/animals/flamingo",
       "reviewStatus": null,
@@ -4859,7 +4859,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10009,
-      "title": "Liebre europea",
+      "title": "Liebre europea (máximo habitual)",
       "value": 5,
       "source": "https://animaldiversity.org/accounts/Lepus_europaeus/",
       "reviewStatus": null,
@@ -4889,7 +4889,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10012,
-      "title": "Castor europeo",
+      "title": "Castor europeo (máximo habitual)",
       "value": 35,
       "source": "https://animaldiversity.org/accounts/Castor_fiber/",
       "reviewStatus": null,
@@ -4899,7 +4899,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10013,
-      "title": "Lince ibérico",
+      "title": "Lince ibérico (media)",
       "value": 12.8,
       "source": "https://animaldiversity.org/accounts/Lynx_pardinus/",
       "reviewStatus": null,
@@ -4919,7 +4919,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10014,
-      "title": "Gran danés macho",
+      "title": "Gran danés (macho, máximo del estándar)",
       "value": 79.4,
       "source": "https://www.akc.org/dog-breeds/great-dane/",
       "reviewStatus": null,
@@ -4949,7 +4949,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10017,
-      "title": "Chimpancé macho silvestre",
+      "title": "Chimpancé (macho silvestre, máximo habitual)",
       "value": 70,
       "source": "https://animaldiversity.org/accounts/Pan_troglodytes/",
       "reviewStatus": null,
@@ -5009,7 +5009,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10022,
-      "title": "Cebra de Grevy",
+      "title": "Cebra de Grevy (media)",
       "value": 400,
       "source": "https://animals.sandiegozoo.org/animals/zebra",
       "reviewStatus": null,
@@ -5039,7 +5039,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10023,
-      "title": "Caballo doméstico",
+      "title": "Caballo doméstico (de silla, mediano)",
       "value": 500,
       "source": "https://agriculture.vic.gov.au/livestock-and-animals/horses/basic-horse-care",
       "reviewStatus": "reviewed",
@@ -5129,7 +5129,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10031,
-      "title": "Tiburón ballena",
+      "title": "Tiburón ballena (adulto medio)",
       "value": 9000,
       "source": "https://images.nationalgeographic.org/image/upload/v1698248081/EducationHub/explorer_mag/trailblazer/2020-03/0320_TR.pdf",
       "reviewStatus": "reviewed",
@@ -5149,7 +5149,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10034,
-      "title": "Ballena jorobada",
+      "title": "Ballena jorobada (máximo)",
       "value": 36300,
       "source": "https://www.fisheries.noaa.gov/species/humpback-whale",
       "reviewStatus": null,
@@ -5169,7 +5169,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10038,
-      "title": "Ballena azul",
+      "title": "Ballena azul (antártica)",
       "value": 150000,
       "source": "https://www.fisheries.noaa.gov/species/blue-whale",
       "reviewStatus": null,
@@ -5179,7 +5179,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10046,
-      "title": "Tucán toco",
+      "title": "Tucán toco (media)",
       "value": 0.676,
       "source": "https://animaldiversity.org/accounts/Ramphastos_toco/",
       "reviewStatus": "reviewed",
@@ -5189,7 +5189,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10047,
-      "title": "Lémur de cola anillada",
+      "title": "Lémur de cola anillada (media silvestre)",
       "value": 2.2,
       "source": "https://animaldiversity.org/accounts/Lemur_catta/",
       "reviewStatus": "reviewed",
@@ -5229,7 +5229,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10051,
-      "title": "Dragón de Komodo",
+      "title": "Dragón de Komodo (silvestre)",
       "value": 70,
       "source": "https://nationalzoo.si.edu/animals/komodo-dragon",
       "reviewStatus": "reviewed",
@@ -5239,7 +5239,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10052,
-      "title": "Wallaby de Bennet",
+      "title": "Wallaby de Bennet (media)",
       "value": 12,
       "source": "https://www.publish.csiro.au/WR/pdf/WR24016",
       "reviewStatus": "reviewed",
@@ -5249,7 +5249,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10053,
-      "title": "Emú",
+      "title": "Emú (media)",
       "value": 55,
       "source": "https://nationalzoo.si.edu/animals/emu",
       "reviewStatus": "reviewed",
@@ -5259,7 +5259,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10054,
-      "title": "Perrito de las praderas",
+      "title": "Perrito de las praderas (media)",
       "value": 1.5,
       "source": "https://www.depts.ttu.edu/nsrl/mammals-of-texas-online-edition/Accounts_Rodentia/Cynomys_ludovicianus.php",
       "reviewStatus": "reviewed",
@@ -5279,7 +5279,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10056,
-      "title": "Mofeta rayada",
+      "title": "Mofeta rayada (media)",
       "value": 3.25,
       "source": "https://cwf-fcf.org/en/explore/resources/encyclopedias/fauna/mammals/striped-skunk.html",
       "reviewStatus": "reviewed",
@@ -5299,7 +5299,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10058,
-      "title": "Suricato",
+      "title": "Suricato (media)",
       "value": 0.8,
       "source": "https://www.nationalzoo.com.au/meerkat",
       "reviewStatus": "reviewed",
@@ -5309,7 +5309,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10059,
-      "title": "Cerdo vietnamita",
+      "title": "Cerdo vietnamita (media)",
       "value": 38.5,
       "source": "https://vcahospitals.com/cordova/know-your-pet/general-facts-about-mini-pigs",
       "reviewStatus": "reviewed",
@@ -5319,7 +5319,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10060,
-      "title": "Camello bactriano doméstico",
+      "title": "Camello bactriano doméstico (media)",
       "value": 475,
       "source": "https://www.zoo-frankfurt.de/en/tiere-von-a-z-detailansicht/animal/tiere-von-a-z-detailansicht/trampeltier",
       "reviewStatus": "reviewed",
@@ -5329,7 +5329,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10061,
-      "title": "Mero gigante",
+      "title": "Mero gigante (adulto comercial)",
       "value": 20,
       "source": "https://www.aciar.gov.au/sites/default/files/2021-07/final-report-FIS-2012-101.pdf",
       "reviewStatus": "reviewed",
@@ -5349,7 +5349,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10063,
-      "title": "Búho real",
+      "title": "Búho real (media)",
       "value": 2.8,
       "source": "https://animaldiversity.org/accounts/Bubo_bubo/",
       "reviewStatus": "reviewed",
@@ -5359,7 +5359,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10064,
-      "title": "Buitre leonado",
+      "title": "Buitre leonado (media)",
       "value": 9,
       "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8345826/",
       "reviewStatus": "reviewed",
@@ -5379,7 +5379,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10066,
-      "title": "Gorila",
+      "title": "Gorila oriental (media)",
       "value": 135,
       "source": "https://animaldiversity.org/accounts/Gorilla_beringei/",
       "reviewStatus": "reviewed",
@@ -5389,7 +5389,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10067,
-      "title": "Jaguar",
+      "title": "Jaguar (media)",
       "value": 100,
       "source": "https://animaldiversity.org/accounts/Panthera_onca/",
       "reviewStatus": "reviewed",
@@ -5399,7 +5399,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10068,
-      "title": "Leopardo",
+      "title": "Leopardo (media)",
       "value": 41,
       "source": "https://animaldiversity.org/accounts/Panthera_pardus/",
       "reviewStatus": "reviewed",
@@ -5409,8 +5409,8 @@
     {
       "file": "mazos/animals.js",
       "id": 10069,
-      "title": "Gran tiburón blanco",
-      "value": 428,
+      "title": "Gran tiburón blanco (media de un estudio)",
+      "value": 427.5,
       "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3600591/",
       "reviewStatus": "reviewed",
       "comparison": null,
@@ -5419,7 +5419,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10070,
-      "title": "Vaca doméstica",
+      "title": "Vaca doméstica (media)",
       "value": 389,
       "source": "https://www.fao.org/fileadmin/templates/ess/documents/methodology/tcf.pdf",
       "reviewStatus": "reviewed",
@@ -5429,7 +5429,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10071,
-      "title": "Cabra",
+      "title": "Cabra (adulto típico)",
       "value": 45,
       "source": "https://animaldiversity.org/accounts/Capra_hircus/",
       "reviewStatus": "reviewed",
@@ -5439,8 +5439,8 @@
     {
       "file": "mazos/animals.js",
       "id": 10072,
-      "title": "Oveja",
-      "value": 89,
+      "title": "Oveja (media)",
+      "value": 88.45,
       "source": "https://content.ces.ncsu.edu/sheep-facts",
       "reviewStatus": "reviewed",
       "comparison": null,
@@ -5449,7 +5449,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10073,
-      "title": "Cerdo doméstico común",
+      "title": "Cerdo doméstico común (media)",
       "value": 136,
       "source": "https://www.fao.org/fileadmin/templates/ess/documents/methodology/tcf.pdf",
       "reviewStatus": "reviewed",
@@ -5459,8 +5459,8 @@
     {
       "file": "mazos/animals.js",
       "id": 10074,
-      "title": "Gallina",
-      "value": 3,
+      "title": "Gallina (media)",
+      "value": 3.1,
       "source": "https://rarc.wisc.edu/tools_and_guides/species_general_data.html",
       "reviewStatus": "reviewed",
       "comparison": null,
@@ -5469,8 +5469,8 @@
     {
       "file": "mazos/animals.js",
       "id": 10075,
-      "title": "Pato",
-      "value": 4,
+      "title": "Pato Pekín (adulto, estimado)",
+      "value": 3.6,
       "source": "https://www.vet.cornell.edu/animal-health-diagnostic-center/programs/duck-research-laboratory/domestic-ducks",
       "reviewStatus": "reviewed",
       "comparison": null,
@@ -5479,7 +5479,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10076,
-      "title": "Camaleón",
+      "title": "Camaleón mediterráneo (media)",
       "value": 0.035,
       "source": "https://animaldiversity.org/accounts/Chamaeleo_chamaeleon/",
       "reviewStatus": "reviewed",
@@ -5489,8 +5489,8 @@
     {
       "file": "mazos/animals.js",
       "id": 10077,
-      "title": "Iguana marina",
-      "value": 5,
+      "title": "Iguana marina (media silvestre)",
+      "value": 4.9,
       "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4778492/",
       "reviewStatus": "reviewed",
       "comparison": null,
@@ -5499,7 +5499,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10078,
-      "title": "Escorpión",
+      "title": "Escorpión peludo de Arizona (media)",
       "value": 0.005,
       "source": "https://animaldiversity.org/accounts/Hadrurus_arizonensis/",
       "reviewStatus": "reviewed",
@@ -5509,7 +5509,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10079,
-      "title": "Atún rojo",
+      "title": "Atún rojo (media)",
       "value": 250,
       "source": "https://animaldiversity.org/accounts/Thunnus_thynnus/",
       "reviewStatus": "reviewed",
@@ -5519,7 +5519,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10080,
-      "title": "Salmón",
+      "title": "Salmón atlántico (comercial)",
       "value": 5,
       "source": "https://animaldiversity.org/accounts/Salmo_salar/",
       "reviewStatus": "reviewed",
@@ -5529,7 +5529,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10081,
-      "title": "Foca común",
+      "title": "Foca común (media)",
       "value": 115,
       "source": "https://animaldiversity.org/accounts/Phoca_vitulina/",
       "reviewStatus": "reviewed",
@@ -5539,7 +5539,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10082,
-      "title": "Morsa",
+      "title": "Morsa (media)",
       "value": 1000,
       "source": "https://animaldiversity.org/accounts/Odobenus_rosmarus/",
       "reviewStatus": "reviewed",
@@ -5549,7 +5549,7 @@
     {
       "file": "mazos/animals.js",
       "id": 10083,
-      "title": "Búfalo africano",
+      "title": "Búfalo africano (media)",
       "value": 753,
       "source": "https://www.fao.org/4/w7540e/w7540e0g.htm",
       "reviewStatus": "reviewed",
@@ -5559,8 +5559,8 @@
     {
       "file": "mazos/animals.js",
       "id": 10084,
-      "title": "Babuino",
-      "value": 21,
+      "title": "Babuino (género Papio, media)",
+      "value": 20.5,
       "source": "https://animaldiversity.org/accounts/Papio/",
       "reviewStatus": "reviewed",
       "comparison": null,
@@ -5609,7 +5609,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12005,
-      "title": "Abeja obrera adulta",
+      "title": "Abeja obrera adulta (media)",
       "value": 0.11498973305954825,
       "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2398712/",
       "reviewStatus": null,
@@ -5959,7 +5959,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12040,
-      "title": "Armadillo gigante",
+      "title": "Armadillo gigante (media en libertad)",
       "value": 13.5,
       "source": "https://animaldiversity.org/accounts/Priodontes_maximus/",
       "reviewStatus": null,
@@ -5969,7 +5969,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12041,
-      "title": "Oso andino",
+      "title": "Oso andino (media en libertad)",
       "value": 20,
       "source": "https://animaldiversity.org/accounts/Tremarctos_ornatus/",
       "reviewStatus": null,
@@ -5979,7 +5979,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12042,
-      "title": "Pingüino africano",
+      "title": "Pingüino africano (media en libertad)",
       "value": 12.5,
       "source": "https://animaldiversity.org/accounts/Spheniscus_demersus/",
       "reviewStatus": null,
@@ -5999,7 +5999,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12044,
-      "title": "Águila calva",
+      "title": "Águila calva (media en libertad)",
       "value": 17.5,
       "source": "https://animaldiversity.org/accounts/Haliaeetus_leucocephalus/",
       "reviewStatus": null,
@@ -6009,7 +6009,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12045,
-      "title": "Bonobo",
+      "title": "Bonobo (media en libertad)",
       "value": 20,
       "source": "https://animaldiversity.org/accounts/Pan_paniscus/",
       "reviewStatus": null,
@@ -6019,7 +6019,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12046,
-      "title": "Dromedario",
+      "title": "Dromedario (media)",
       "value": 40,
       "source": "https://animaldiversity.org/accounts/Camelus_dromedarius/",
       "reviewStatus": null,
@@ -6029,7 +6029,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12047,
-      "title": "Caracal",
+      "title": "Caracal (media)",
       "value": 12,
       "source": "https://animaldiversity.org/accounts/Caracal_caracal/",
       "reviewStatus": null,
@@ -6039,7 +6039,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12048,
-      "title": "Carpincho",
+      "title": "Capibara (media en libertad)",
       "value": 6,
       "source": "https://animaldiversity.org/accounts/Hydrochoerus_hydrochaeris/",
       "reviewStatus": null,
@@ -6049,7 +6049,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12049,
-      "title": "Sifaca de Coquerel",
+      "title": "Sifaca de Coquerel (media en libertad)",
       "value": 27,
       "source": "https://animaldiversity.org/accounts/Propithecus_coquereli/",
       "reviewStatus": null,
@@ -6059,7 +6059,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12050,
-      "title": "Emú",
+      "title": "Emú (media en libertad)",
       "value": 7,
       "source": "https://animaldiversity.org/accounts/Dromaius_novaehollandiae/",
       "reviewStatus": null,
@@ -6069,7 +6069,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12051,
-      "title": "Flamenco común",
+      "title": "Flamenco común (media)",
       "value": 25,
       "source": "https://animaldiversity.org/accounts/Phoenicopterus_roseus/",
       "reviewStatus": null,
@@ -6079,7 +6079,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12052,
-      "title": "Panda gigante",
+      "title": "Panda gigante (media en libertad)",
       "value": 12.5,
       "source": "https://animaldiversity.org/accounts/Ailuropoda_melanoleuca/",
       "reviewStatus": null,
@@ -6089,7 +6089,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12053,
-      "title": "Koala",
+      "title": "Koala (media en libertad)",
       "value": 13,
       "source": "https://animaldiversity.org/accounts/Phascolarctos_cinereus/",
       "reviewStatus": null,
@@ -6099,7 +6099,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12054,
-      "title": "Tiburón leopardo",
+      "title": "Tiburón leopardo (media en libertad)",
       "value": 21,
       "source": "https://animaldiversity.org/accounts/Triakis_semifasciata/",
       "reviewStatus": null,
@@ -6109,7 +6109,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12055,
-      "title": "Lince euroasiático",
+      "title": "Lince euroasiático (media en libertad)",
       "value": 5,
       "source": "https://animaldiversity.org/accounts/Lynx_lynx/",
       "reviewStatus": null,
@@ -6119,7 +6119,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12056,
-      "title": "Nutria africana sin garras",
+      "title": "Nutria africana sin garras (media en libertad)",
       "value": 11,
       "source": "https://animaldiversity.org/accounts/Aonyx_capensis/",
       "reviewStatus": null,
@@ -6129,7 +6129,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12057,
-      "title": "Orangután de Borneo",
+      "title": "Orangután de Borneo (media en libertad)",
       "value": 35,
       "source": "https://animaldiversity.org/accounts/Pongo_pygmaeus/",
       "reviewStatus": null,
@@ -6139,7 +6139,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12058,
-      "title": "Búho real",
+      "title": "Búho real (en libertad)",
       "value": 20,
       "source": "https://animaldiversity.org/accounts/Bubo_bubo/",
       "reviewStatus": null,
@@ -6149,7 +6149,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12059,
-      "title": "Pelícano blanco común",
+      "title": "Pelícano blanco común (media en libertad)",
       "value": 15.5,
       "source": "https://animaldiversity.org/accounts/Pelecanus_onocrotalus/",
       "reviewStatus": null,
@@ -6159,7 +6159,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12060,
-      "title": "Oso polar",
+      "title": "Oso polar (límite inferior en libertad)",
       "value": 25,
       "source": "https://animaldiversity.org/accounts/Ursus_maritimus/",
       "reviewStatus": null,
@@ -6169,7 +6169,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12061,
-      "title": "Puercoespín norteamericano",
+      "title": "Puercoespín norteamericano (media en libertad)",
       "value": 6,
       "source": "https://animaldiversity.org/accounts/Erethizon_dorsatum/",
       "reviewStatus": null,
@@ -6179,7 +6179,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12062,
-      "title": "Mapache",
+      "title": "Mapache (media en libertad)",
       "value": 5,
       "source": "https://animaldiversity.org/accounts/Procyon_lotor/",
       "reviewStatus": null,
@@ -6189,7 +6189,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12063,
-      "title": "Panda rojo",
+      "title": "Panda rojo (media)",
       "value": 9,
       "source": "https://animaldiversity.org/accounts/Ailurus_fulgens/",
       "reviewStatus": null,
@@ -6199,7 +6199,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12064,
-      "title": "Reno o caribú",
+      "title": "Reno o caribú (media en libertad)",
       "value": 4.5,
       "source": "https://animaldiversity.org/accounts/Rangifer_tarandus/",
       "reviewStatus": null,
@@ -6209,7 +6209,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12065,
-      "title": "Hiena manchada",
+      "title": "Hiena manchada (en libertad)",
       "value": 20,
       "source": "https://animaldiversity.org/accounts/Crocuta_crocuta/",
       "reviewStatus": null,
@@ -6219,7 +6219,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12066,
-      "title": "Takin",
+      "title": "Takin (media)",
       "value": 13.5,
       "source": "https://animals.sandiegozoo.org/animals/takin",
       "reviewStatus": null,
@@ -6229,8 +6229,8 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12067,
-      "title": "Gorila",
-      "value": 38,
+      "title": "Gorila occidental (media en libertad)",
+      "value": 37.5,
       "source": "https://animaldiversity.org/accounts/Gorilla_gorilla/",
       "reviewStatus": null,
       "comparison": null,
@@ -6239,8 +6239,8 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12068,
-      "title": "Jaguar",
-      "value": 12,
+      "title": "Jaguar (media en libertad)",
+      "value": 11.5,
       "source": "https://animaldiversity.org/accounts/Panthera_onca/",
       "reviewStatus": null,
       "comparison": null,
@@ -6249,7 +6249,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12069,
-      "title": "Leopardo",
+      "title": "Leopardo (media en libertad)",
       "value": 11,
       "source": "https://animaldiversity.org/accounts/Panthera_pardus/",
       "reviewStatus": null,
@@ -6259,7 +6259,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12070,
-      "title": "Gran tiburón blanco",
+      "title": "Gran tiburón blanco (media estimada)",
       "value": 35,
       "source": "https://animaldiversity.org/accounts/Carcharodon_carcharias/",
       "reviewStatus": null,
@@ -6269,8 +6269,8 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12071,
-      "title": "Vaca doméstica",
-      "value": 18,
+      "title": "Vaca doméstica (media)",
+      "value": 17.5,
       "source": "https://animal.research.wvu.edu/files/d/68e6d750-3b90-4396-a9a6-e73f24dd3bf8/humane-care-of-aging-animals.pdf",
       "reviewStatus": null,
       "comparison": null,
@@ -6279,7 +6279,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12072,
-      "title": "Cabra",
+      "title": "Cabra doméstica (media en cautividad)",
       "value": 15,
       "source": "https://animaldiversity.org/accounts/Capra_hircus/",
       "reviewStatus": null,
@@ -6289,7 +6289,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12073,
-      "title": "Oveja",
+      "title": "Oveja (media)",
       "value": 11,
       "source": "https://animal.research.wvu.edu/files/d/68e6d750-3b90-4396-a9a6-e73f24dd3bf8/humane-care-of-aging-animals.pdf",
       "reviewStatus": null,
@@ -6299,8 +6299,8 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12074,
-      "title": "Cerdo doméstico común",
-      "value": 13,
+      "title": "Cerdo doméstico común (media)",
+      "value": 12.5,
       "source": "https://science.rspca.org.uk/documents/1494931/0/FS%2BPig%2BFactsheet.pdf/66c19082-4a0c-129b-10cb-548cc2f2bbfc",
       "reviewStatus": null,
       "comparison": null,
@@ -6309,8 +6309,8 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12075,
-      "title": "Gallina",
-      "value": 8,
+      "title": "Gallina (media)",
+      "value": 7.5,
       "source": "https://potawatomizoo.org/animal/chicken/",
       "reviewStatus": null,
       "comparison": null,
@@ -6319,7 +6319,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12076,
-      "title": "Pato",
+      "title": "Pato doméstico (media en cautividad)",
       "value": 10,
       "source": "https://www.rvc.ac.uk/Media/Default/Beaumont%20Sainsbury%20Animal%20Hospital/EXOTICS/Animal%20Care%20Factsheets/Duck%20caresheet%20Nov%202023%20vb.pdf",
       "reviewStatus": null,
@@ -6329,8 +6329,8 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12077,
-      "title": "Camaleón",
-      "value": 7,
+      "title": "Camaleón velado (media en cautividad)",
+      "value": 6.5,
       "source": "https://www.nationalgeographic.com/animals/reptiles/facts/veiled-chameleon",
       "reviewStatus": null,
       "comparison": null,
@@ -6339,8 +6339,8 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12078,
-      "title": "Iguana marina",
-      "value": 9,
+      "title": "Iguana marina (media)",
+      "value": 8.5,
       "source": "https://galapagosconservation.org.uk/species/marine-iguana/",
       "reviewStatus": null,
       "comparison": null,
@@ -6349,8 +6349,8 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12079,
-      "title": "Escorpión",
-      "value": 7,
+      "title": "Escorpión emperador (media en cautividad)",
+      "value": 6.5,
       "source": "https://www.oregonzoo.org/animals/common-emperor-scorpion",
       "reviewStatus": null,
       "comparison": null,
@@ -6359,7 +6359,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12080,
-      "title": "Atún rojo",
+      "title": "Atún rojo del Atlántico (media en libertad)",
       "value": 15,
       "source": "https://animaldiversity.org/accounts/Thunnus_thynnus/",
       "reviewStatus": null,
@@ -6369,7 +6369,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12081,
-      "title": "Salmón",
+      "title": "Salmón atlántico (media)",
       "value": 5,
       "source": "https://www.fisheries.noaa.gov/species/atlantic-salmon",
       "reviewStatus": null,
@@ -6379,8 +6379,8 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12082,
-      "title": "Foca común",
-      "value": 28,
+      "title": "Foca común (media)",
+      "value": 27.5,
       "source": "https://www.fisheries.noaa.gov/species/harbor-seal",
       "reviewStatus": null,
       "comparison": null,
@@ -6389,7 +6389,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12083,
-      "title": "Morsa",
+      "title": "Morsa (media en libertad)",
       "value": 35,
       "source": "https://animaldiversity.org/accounts/Odobenus_rosmarus/",
       "reviewStatus": null,
@@ -6399,7 +6399,7 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12084,
-      "title": "Búfalo africano",
+      "title": "Búfalo africano (media en libertad)",
       "value": 11,
       "source": "https://animaldiversity.org/accounts/Syncerus_caffer/",
       "reviewStatus": null,
@@ -6409,8 +6409,8 @@
     {
       "file": "mazos/lifespan.js",
       "id": 12085,
-      "title": "Babuino",
-      "value": 28,
+      "title": "Papión oliva (media en libertad)",
+      "value": 27.5,
       "source": "https://primate.wisc.edu/primate-info-net/pin-factsheets/pin-factsheet-olive-baboon/",
       "reviewStatus": null,
       "comparison": null,
@@ -6460,7 +6460,7 @@
       "file": "mazos/speed.js",
       "id": 13005,
       "title": "Perezoso de tres dedos (entre las ramas)",
-      "value": 0.27,
+      "value": 0.276,
       "source": "https://www.guinnessworldrecords.com/world-records/70459-slowest-mammal",
       "reviewStatus": null,
       "comparison": null,
@@ -6510,7 +6510,7 @@
       "file": "mazos/speed.js",
       "id": 13010,
       "title": "Manatí de Florida (aceleración nadando)",
-      "value": 24,
+      "value": 24.1,
       "source": "https://myfwc.com/education/wildlife/manatee/facts-and-information/",
       "reviewStatus": null,
       "comparison": null,
@@ -6560,7 +6560,7 @@
       "file": "mazos/speed.js",
       "id": 13015,
       "title": "Hipopótamo común (carga en tierra)",
-      "value": 23,
+      "value": 22.5,
       "source": "https://animals.sandiegozoo.org/animals/hippo",
       "reviewStatus": null,
       "comparison": null,
@@ -6570,7 +6570,7 @@
       "file": "mazos/speed.js",
       "id": 13016,
       "title": "Elefante (máximo fiable registrado)",
-      "value": 25,
+      "value": 24.5,
       "source": "https://journals.biologists.com/jeb/article/209/19/3812/16362/The-locomotor-kinematics-of-Asian-and-African",
       "reviewStatus": null,
       "comparison": null,
@@ -6580,7 +6580,7 @@
       "file": "mazos/speed.js",
       "id": 13017,
       "title": "Jirafa (galopando)",
-      "value": 56,
+      "value": 56.3,
       "source": "https://animals.sandiegozoo.org/animals/giraffe",
       "reviewStatus": null,
       "comparison": null,
@@ -6600,7 +6600,7 @@
       "file": "mazos/speed.js",
       "id": 13019,
       "title": "Iguana espinosa (esprint en tierra)",
-      "value": 35,
+      "value": 34.9,
       "source": "https://www.guinnessworldrecords.com/world-records/498679-fastest-reptile-on-land",
       "reviewStatus": null,
       "comparison": null,
@@ -6640,7 +6640,7 @@
       "file": "mazos/speed.js",
       "id": 13023,
       "title": "Berrendo americano (carrera, referencia NPS)",
-      "value": 97,
+      "value": 96.6,
       "source": "https://www.nps.gov/wica/learn/nature/pronghorn.htm",
       "reviewStatus": null,
       "comparison": null,
@@ -6660,7 +6660,7 @@
       "file": "mazos/speed.js",
       "id": 13025,
       "title": "Cangrejo nadador de Henslow (nadando)",
-      "value": 5,
+      "value": 4.68,
       "source": "https://www.guinnessworldrecords.com/world-records/112624-fastest-swimming-crustacean",
       "reviewStatus": null,
       "comparison": null,
@@ -6700,7 +6700,7 @@
       "file": "mazos/speed.js",
       "id": 13029,
       "title": "Vencejo común (vuelo horizontal medido)",
-      "value": 112,
+      "value": 111.6,
       "source": "https://www.guinnessworldrecords.com/world-records/fastest-bird-level-flight",
       "reviewStatus": null,
       "comparison": null,
@@ -6720,7 +6720,7 @@
       "file": "mazos/speed.js",
       "id": 13031,
       "title": "Hormiga plateada del Sáhara (carrera)",
-      "value": 3,
+      "value": 3.08,
       "source": "https://journals.biologists.com/jeb/article/222/20/jeb198705/224418/High-speed-locomotion-in-the-Saharan-silver-ant",
       "reviewStatus": null,
       "comparison": null,
@@ -6760,7 +6760,7 @@
       "file": "mazos/speed.js",
       "id": 13035,
       "title": "Araña flic-flac de Marruecos (huida)",
-      "value": 6,
+      "value": 6.12,
       "source": "https://www.guinnessworldrecords.com/world-records/82841-fastest-spider",
       "reviewStatus": null,
       "comparison": null,
@@ -6770,7 +6770,7 @@
       "file": "mazos/speed.js",
       "id": 13036,
       "title": "Topo europeo (desplazamiento en galerías)",
-      "value": 4,
+      "value": 3.6,
       "source": "https://viagallica.com/a/taupe_europe.htm",
       "reviewStatus": null,
       "comparison": null,
@@ -6780,7 +6780,7 @@
       "file": "mazos/speed.js",
       "id": 13037,
       "title": "Cucaracha americana (carrera medida)",
-      "value": 5,
+      "value": 5.4,
       "source": "https://journals.biologists.com/jeb/article/156/1/215/6299/Mechanics-of-A-Rapid-Running-Insect-Two-Four-and",
       "reviewStatus": null,
       "comparison": null,
@@ -6810,7 +6810,7 @@
       "file": "mazos/speed.js",
       "id": 13040,
       "title": "Pez vela del Pacífico (ráfaga de natación)",
-      "value": 25,
+      "value": 25.3,
       "source": "https://researchportal.plymouth.ac.uk/files/38901447/icv017.pdf",
       "reviewStatus": null,
       "comparison": null,
@@ -6820,7 +6820,7 @@
       "file": "mazos/speed.js",
       "id": 13041,
       "title": "Pelícano pardo (vuelo rasante)",
-      "value": 42,
+      "value": 42.1,
       "source": "https://animaldiversity.org/accounts/Pelecanus_occidentalis/",
       "reviewStatus": null,
       "comparison": null,
@@ -6900,7 +6900,7 @@
       "file": "mazos/speed.js",
       "id": 13049,
       "title": "Humano adulto (carrera recreativa)",
-      "value": 10,
+      "value": 9.9,
       "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10588426/",
       "reviewStatus": null,
       "comparison": null,
@@ -6910,7 +6910,7 @@
       "file": "mazos/speed.js",
       "id": 13050,
       "title": "Delfín mular (natación media diurna)",
-      "value": 5,
+      "value": 5.15,
       "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3794307/",
       "reviewStatus": null,
       "comparison": null,
@@ -6929,7 +6929,7 @@
     {
       "file": "mazos/speed.js",
       "id": 13052,
-      "title": "Jaguar (sprint corto)",
+      "title": "Jaguar (esprint corto)",
       "value": 80,
       "source": "https://www.artis.nl/en/artis-zoo/what-to-explore-in-artis-zoo/jaguar",
       "reviewStatus": null,
@@ -6939,7 +6939,7 @@
     {
       "file": "mazos/speed.js",
       "id": 13053,
-      "title": "Leopardo (sprint corto)",
+      "title": "Leopardo (esprint corto)",
       "value": 58,
       "source": "https://animals.sandiegozoo.org/animals/leopard",
       "reviewStatus": null,
@@ -7009,7 +7009,7 @@
     {
       "file": "mazos/speed.js",
       "id": 13060,
-      "title": "Pato corredor indio (sprint terrestre)",
+      "title": "Pato corredor indio (esprint terrestre)",
       "value": 13,
       "source": "https://www.oregonzoo.org/animals/indian-runner-duck",
       "reviewStatus": null,
@@ -7020,7 +7020,7 @@
       "file": "mazos/speed.js",
       "id": 13061,
       "title": "Camaleón velado (locomoción)",
-      "value": 1,
+      "value": 0.61,
       "source": "https://webcentral.uc.edu/eProf/media/attachment/eprofmediafile_69.pdf",
       "reviewStatus": null,
       "comparison": null,
@@ -7039,8 +7039,8 @@
     {
       "file": "mazos/speed.js",
       "id": 13063,
-      "title": "Escorpión (sprint)",
-      "value": 1,
+      "title": "Escorpión (esprint)",
+      "value": 1.18,
       "source": "https://file.iflora.cn/fastdfs/group4/M00/00/F7/wKhnsV3GuFmAQLI_AYa4cWdOCz4363.pdf",
       "reviewStatus": null,
       "comparison": null,
@@ -7060,7 +7060,7 @@
       "file": "mazos/speed.js",
       "id": 13065,
       "title": "Salmón atlántico (ráfaga acuática)",
-      "value": 15,
+      "value": 14.9,
       "source": "https://onlinelibrary.wiley.com/doi/pdf/10.1002/%28SICI%291099-1646%28199801/02%2914%3A1%3C41%3A%3AAID-RRR475%3E3.0.CO%3B2-8",
       "reviewStatus": null,
       "comparison": null,
@@ -7139,7 +7139,7 @@
     {
       "file": "mazos/inventos.js",
       "id": 4004,
-      "title": "El código de Hammurabi",
+      "title": "El código de Hammurabi (fecha aproximada)",
       "value": -1750,
       "source": null,
       "reviewStatus": null,
@@ -8969,7 +8969,7 @@
     {
       "file": "mazos/astronomy.js",
       "id": 4011,
-      "title": "El astrolabio en el mundo islámico",
+      "title": "El astrolabio en el mundo islámico (fecha aproximada)",
       "value": 850,
       "source": "https://www.britishmuseum.org/collection/object/W_1855-0709-1",
       "reviewStatus": null,
@@ -9489,7 +9489,7 @@
     {
       "file": "mazos/astronomy.js",
       "id": 8049,
-      "title": "Chang'e 6 trae muestras de la cara oculta",
+      "title": "Chang’e 6 trae muestras de la cara oculta",
       "value": 2024,
       "source": "https://www.cnsa.gov.cn/english/n6465652/n6465653/c10573060/content.html",
       "reviewStatus": null,
@@ -10799,7 +10799,7 @@
     {
       "file": "mazos/population.js",
       "id": 3006,
-      "title": "Bangladesh",
+      "title": "Bangladés",
       "value": 177818044,
       "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,

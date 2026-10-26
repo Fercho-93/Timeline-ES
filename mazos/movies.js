@@ -8,7 +8,7 @@ window.MOVIE_CARDS = [
   { id: 1006, year: 1933, title: "King Kong", detail: "El gorila gigante trepa al Empire State en la película que popularizó la animación fotograma a fotograma." },
   { id: 1007, year: 1936, title: "Tiempos modernos", detail: "Chaplin se enreda entre los engranajes de la cadena de montaje." },
   { id: 1008, year: 1937, title: "Blancanieves y los siete enanitos", detail: "Disney arriesga su estudio en el primer largometraje de animación en color." },
-  { id: 1009, year: 1939, title: "Lo que el viento se llevó", detail: "Scarlett O'Hara y el incendio de Atlanta en el mayor éxito de taquilla de su tiempo." },
+  { id: 1009, year: 1939, title: "Lo que el viento se llevó", detail: "Scarlett O’Hara y el incendio de Atlanta en el mayor éxito de taquilla de su tiempo." },
   { id: 1010, year: 1940, title: "El gran dictador", detail: "Chaplin baila con el globo terráqueo y ridiculiza a Hitler en plena guerra." },
   { id: 1011, year: 1941, title: "Ciudadano Kane", detail: "Orson Welles debuta a los 25 años con «Rosebud» y cambia el lenguaje del cine." },
   { id: 1012, year: 1942, title: "Casablanca", detail: "Bogart e Ingrid Bergman se despiden en la niebla del aeropuerto." },

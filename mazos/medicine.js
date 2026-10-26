@@ -2,10 +2,10 @@
 // demostración, aprobación o intervención— y se evita presentar una sola persona como
 // autora de procesos que fueron colectivos.
 window.MEDICINE_CARDS = [
-  { id: 9001, year: -400, title: "El corpus hipocrático (fecha aproximada)", detail: "Una colección de tratados griegos empieza a explicar la enfermedad mediante observación y causas naturales, no solo religiosas." },
+  { id: 9001, year: -400, title: "El corpus hipocrático (fecha aproximada)", detail: "Una colección de tratados griegos empieza a explicar la enfermedad mediante observación y causas naturales, no solo religiosas.", label: "c. 400 a. C." },
   { id: 9002, year: 1025, title: "El Canon de medicina de Avicena", detail: "La gran síntesis médica de Ibn Sina ordena conocimientos grecorromanos e islámicos y se enseñará durante siglos." },
   { id: 9003, year: 1242, title: "Ibn al-Nafis describe la circulación pulmonar", detail: "Explica que la sangre pasa del corazón a los pulmones y regresa, en vez de atravesar poros invisibles entre los ventrículos." },
-  { id: 4015, year: 1286, title: "Las primeras gafas (fecha aproximada)", detail: "En la Toscana se montan dos lentes convexas sobre la nariz para leer de cerca." },
+  { id: 4015, year: 1286, title: "Las primeras gafas (fecha aproximada)", detail: "En la Toscana se montan dos lentes convexas sobre la nariz para leer de cerca.", label: "c. 1286" },
   { id: 9004, year: 1543, title: "Vesalio publica De humani corporis fabrica", detail: "Las disecciones humanas y sus ilustraciones corrigen numerosos errores anatómicos heredados de Galeno." },
   { id: 9005, year: 1628, title: "Harvey explica la circulación de la sangre", detail: "William Harvey demuestra que el corazón impulsa la sangre en un circuito continuo por todo el cuerpo." },
   { id: 9006, year: 1665, title: "Micrographia", detail: "Robert Hooke publica dibujos realizados al microscopio y emplea la palabra célula al describir el corcho." },

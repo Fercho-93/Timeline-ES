@@ -21,7 +21,7 @@ assert.doesNotMatch(card('mazos/movies.js', 1064).detail, /^Peter Jackson estren
 const w = { CONTINUUM: {} }; vm.runInNewContext(read('mazos/quick-challenges-data.js'), { window: w });
 const decks = w.CONTINUUM.QuickCatalog.challenges;
 const teruel = decks.find(d => d.id === 'civil-war').cards.find(c => c.title === 'Batalla de Teruel');
-assert.equal(teruel.value, 19371215); assert.equal(teruel.label, '15 diciembre 1937');
+assert.equal(teruel.value, 19371215); assert.equal(teruel.label, '15 de diciembre de 1937');
 const fernando = decks.find(d => d.id === 'kings').cards.find(c => c.title === 'Fernando VII');
 assert.match(fernando.detail, /1808/, 'Fernando VII: se aclara que reinó unas semanas en 1808');
 

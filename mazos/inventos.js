@@ -8,11 +8,11 @@
 // los datos para forzar separación. Los empates son válidos en cualquier orden. Donde la
 // fecha es aproximada o discutida, lo dicen el título y la explicación.
 window.INVENTION_CARDS = [
-  { id: 4001, year: -3300, title: "La escritura cuneiforme (fecha aproximada)", detail: "En Sumeria se empiezan a marcar cuentas sobre arcilla blanda; es el primer sistema de escritura conocido." },
-  { id: 4002, year: -3500, title: "La rueda de alfarero (fecha aproximada)", detail: "Hacia el 3500 a. C. Mesopotamia ya usa el torno de alfarero, el uso más antiguo documentado de la rueda, anterior o contemporáneo a las ruedas de transporte; los tornos lentos son aún más antiguos." },
-  { id: 4003, year: -2600, title: "El papiro egipcio (fecha aproximada)", detail: "Egipto convierte una planta del Nilo en una superficie ligera para escribir. Los papiros con texto más antiguos que se conservan, el Diario de Merer, son de hacia 2600 a. C.; el uso del papiro es anterior." },
-  { id: 4004, year: -1750, title: "El código de Hammurabi", detail: "Babilonia graba en piedra uno de los primeros conjuntos de leyes escritas que se conservan." },
-  { id: 4005, year: -630, title: "Las primeras monedas acuñadas (fecha aproximada)", detail: "El reino de Lidia sella trozos de electro con un peso garantizado por el Estado." },
+  { id: 4001, year: -3300, title: "La escritura cuneiforme (fecha aproximada)", detail: "En Sumeria se empiezan a marcar cuentas sobre arcilla blanda; es el primer sistema de escritura conocido.", label: "c. 3300 a. C." },
+  { id: 4002, year: -3500, title: "La rueda de alfarero (fecha aproximada)", detail: "Hacia el 3500 a. C. Mesopotamia ya usa el torno de alfarero, el uso más antiguo documentado de la rueda, anterior o contemporáneo a las ruedas de transporte; los tornos lentos son aún más antiguos.", label: "c. 3500 a. C." },
+  { id: 4003, year: -2600, title: "El papiro egipcio (fecha aproximada)", detail: "Egipto convierte una planta del Nilo en una superficie ligera para escribir. Los papiros con texto más antiguos que se conservan, el Diario de Merer, son de hacia 2600 a. C.; el uso del papiro es anterior.", label: "c. 2600 a. C." },
+  { id: 4004, year: -1750, title: "El código de Hammurabi (fecha aproximada)", detail: "Babilonia graba en piedra uno de los primeros conjuntos de leyes escritas que se conservan.", label: "c. 1750 a. C." },
+  { id: 4005, year: -630, title: "Las primeras monedas acuñadas (fecha aproximada)", detail: "El reino de Lidia sella trozos de electro con un peso garantizado por el Estado.", label: "c. 630 a. C." },
   { id: 4008, year: -46, title: "Julio César decreta la reforma del calendario", detail: "La reforma se decreta en 46 a. C.; el calendario juliano entra en vigor el 1 de enero de 45 a. C. La carta usa el año del decreto, no el de su aplicación." },
   { id: 4009, year: 105, title: "La mejora del papel en China (fecha tradicional)", detail: "La tradición atribuye a Cai Lun la presentación de un proceso barato con corteza, cáñamo y trapos; ya existían antecedentes de papel en China siglos antes." },
   { id: 4012, year: 830, title: "El tratado de álgebra de Al-Juarismi (fecha aproximada)", detail: "Al-Juarismi escribe su tratado de álgebra durante el reinado de al-Mamún (813–833). Se sitúa aproximadamente hacia 830, no en 850, fecha asociada a su muerte.", label: "c. 830" },
@@ -27,7 +27,7 @@ window.INVENTION_CARDS = [
   { id: 4031, year: 1735, title: "Linneo publica la primera edición de «Systema Naturae»", detail: "Linneo presenta su clasificación de la naturaleza. Los puntos de partida de su nomenclatura binomial llegarán en 1753 para plantas y 1758 para animales." },
   { id: 4032, year: 1752, title: "El pararrayos de Franklin", detail: "Tras el experimento de la cometa, propone una punta metálica conectada a tierra." },
   { id: 4033, year: 1769, title: "Watt patenta el condensador separado", detail: "Enfriar el vapor fuera del cilindro triplica el rendimiento y arranca la revolución industrial." },
-  { id: 4035, year: 1783, title: "El primer vuelo tripulado en globo de aire caliente", detail: "Los hermanos Montgolfier construyen el globo que eleva a Pilâtre de Rozier y al marqués d'Arlandes sobre París: el primer vuelo tripulado libre." },
+  { id: 4035, year: 1783, title: "El primer vuelo tripulado en globo de aire caliente", detail: "Los hermanos Montgolfier construyen el globo que eleva a Pilâtre de Rozier y al marqués d’Arlandes sobre París: el primer vuelo tripulado libre." },
   { id: 4037, year: 1800, title: "La pila de Volta", detail: "Discos de cobre y cinc separados por paño húmedo: la primera corriente eléctrica continua." },
   { id: 4038, year: 1804, title: "La primera locomotora de vapor", detail: "Trevithick arrastra diez toneladas sobre raíles en Gales y gana una apuesta." },
   { id: 4040, year: 1821, title: "El primer motor eléctrico", detail: "Faraday hace girar un alambre alrededor de un imán: la electricidad se convierte en movimiento." },
