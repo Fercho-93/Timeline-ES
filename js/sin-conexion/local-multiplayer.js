@@ -38,6 +38,9 @@
   let selectedCardId = null, pendingIndex = null;
   let busy = false;
   let cardsByIdCache = new Map();
+  // Las cartas falladas en la partida, de cualquier participante, para «Ver lo que se falló»
+  // al terminar, como en un solo móvil y en la sala online.
+  let sessionFailed = new Map();
   // Reloj del turno. El anfitrión manda con su propio reloj (`turnStartedAt`); cada
   // invitado cuenta desde que recibe el turno, para no depender de que los relojes de los
   // móviles coincidan — en la misma Wi-Fi el mensaje tarda milésimas.
@@ -241,8 +244,12 @@
     roomState = room;
     // En una competición el mazo cambia de una ronda a otra: se juega siempre el de la sala.
     if (room?.mode && room.mode !== modeKey && CT.has(room.mode)) modeKey = room.mode;
+    // Cada partida (también cada tema de una competición o una revancha) repasa solo lo suyo.
+    if (room.status === "playing" && previous?.status !== "playing") sessionFailed = new Map();
     if (room.phase === "reveal" && room.reveal) {
       const reveal = room.reveal;
+      // Un fallo, o un Pulso en el que fallan los dos: lo mismo que apunta el modo de un solo móvil.
+      if (reveal.duel ? !reveal.correct && !reveal.targetOk : !reveal.correct) sessionFailed.set(reveal.cardId, reveal.cardId);
       // Tu jugada (o tu defensa de un Pulso) suena y vibra al resolverse, como en las demás mesas.
       if (previous && previous.version !== room.version) {
         if (esMio(reveal.playerId)) CT.Effects?.feedback?.(!!reveal.correct);
@@ -264,6 +271,8 @@
     if (previous?.phase !== room.phase || previous?.status !== room.status) renderGame.revelando = false;
     if (role === "guest") rememberSeat();
     if (["local-lobby", "local-game", "local-invitar", "local-unirse-compartir", "local-cercanas", "local-final", "local-final-secreta"].includes(screen)) renderCurrent();
+    // Repasando la partida no se interrumpe nada, salvo que quien organiza pida revancha.
+    else if (screen === "local-review" && room.status !== "ended") renderCurrent();
   }
 
   // El canal con el anfitrión se ha caído: cerró la sala, se quedó sin batería o salió de
@@ -303,6 +312,7 @@
     role = null; hostSession = null; guestSession = null; roomState = null; myPlayerId = "";
     pendingInvite = null; pendingAnswerText = ""; selectedCardId = null; pendingIndex = null;
     cardsByIdCache = new Map();
+    sessionFailed = new Map();
     // Desde «Unirme»: no hay mazo elegido, el de la invitación manda. Se salta la entrada;
     // si la invitación ya viene escaneada y hay nombre de perfil, se entra sin más, y si
     // se pidió buscar salas cercanas, se empieza a buscar.
@@ -1088,14 +1098,37 @@ function starterPanelMarkupContent(isHost) {
       const siguiente = quedan
         ? (isHost ? '<button class="btn btn-primary btn-block" data-local-action="competition-next">Siguiente tema <span>→</span></button><button class="btn btn-secondary btn-block" data-local-action="close-room">Cerrar la sala</button>' : '<p class="hint">Quien organiza pondrá en marcha el siguiente tema.</p><button class="btn btn-secondary btn-block" data-local-action="leave">Salir de la sala</button>')
         : (isHost ? '<button class="btn btn-primary btn-block" data-local-action="close-room">Cerrar la sala</button>' : '<button class="btn btn-secondary btn-block" data-local-action="leave">Salir de la sala</button>');
-      paint(`<div class="shell">${header("leave")}<section class="pass-screen"><div class="panel pass-card"><div class="eyebrow">Competición · tema ${t.index + 1} de ${t.queue.length}</div><h2 data-focus tabindex="-1">${title}</h2><p>${lead}</p></div>${board}<div class="panel">${siguiente}</div></section></div>`, "local-final");
+      paint(`<div class="shell">${header("leave")}<section class="pass-screen"><div class="panel pass-card"><div class="eyebrow">Competición · tema ${t.index + 1} de ${t.queue.length}</div><h2 data-focus tabindex="-1">${title}</h2><p>${lead}</p>${reviewActions()}</div>${board}<div class="panel">${siguiente}</div></section></div>`, "local-final");
       return;
     }
     const puedeRevancha = isHost && roomState.playerOrder.filter(uid => !roomState.players[uid].away).length >= CT.LocalRoom.MIN_PLAYERS;
     const acciones = isHost
       ? `${puedeRevancha ? '<button class="btn btn-primary btn-block" data-local-action="rematch">Revancha con la misma mesa <span>→</span></button>' : ""}<button class="btn ${puedeRevancha ? "btn-secondary" : "btn-primary"} btn-block" data-local-action="close-room">Cerrar la sala</button>`
       : `<p class="hint">Si quien organiza pide revancha, volveréis todos a la sala de espera.</p><button class="btn btn-secondary btn-block" data-local-action="leave">Salir de la sala</button>`;
-    paint(`<div class="shell">${header("leave")}<section class="pass-screen"><div class="panel pass-card"><div class="eyebrow">Partida terminada · ${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"} en la mesa</div><h2 data-focus tabindex="-1">${title}</h2><p>${lead}</p>${acciones}</div></section></div>`, "local-final");
+    paint(`<div class="shell">${header("leave")}<section class="pass-screen"><div class="panel pass-card"><div class="eyebrow">Partida terminada · ${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"} en la mesa</div><h2 data-focus tabindex="-1">${title}</h2><p>${lead}</p>${reviewActions()}${acciones}</div></section></div>`, "local-final");
+  }
+
+  // Los mismos repasos que al acabar en un solo móvil o en la sala online: la línea entera
+  // tal y como quedó y, si hubo fallos, las cartas que se fallaron.
+  function reviewActions() {
+    const jugadas = roomState.timeline.length, fallos = sessionFailed.size;
+    return `<div class="actions final-actions"><button class="btn btn-ghost" data-local-action="review-timeline">Ver las ${jugadas} ${jugadas === 1 ? "carta" : "cartas"} jugadas</button>${fallos ? `<button class="btn btn-ghost" data-local-action="review-failed">Ver lo que se falló (${fallos})</button>` : ""}</div>`;
+  }
+  function renderReview(failed) {
+    screen = "local-review";
+    const ids = failed ? [...sessionFailed.values()] : roomState.timeline;
+    const titulo = failed ? `${ids.length} ${ids.length === 1 ? "carta" : "cartas"} para recordar` : `${ids.length} ${ids.length === 1 ? "carta jugada" : "cartas jugadas"}`;
+    paint(`<div class="shell">${header("back-from-review")}<section>
+      <div class="eyebrow">${failed ? "Repaso" : "Línea de tiempo completa"}</div>
+      <h1 data-focus tabindex="-1">${titulo}</h1>
+      <div class="review-grid">${ids.map(id => {
+        const card = getCard(id);
+        if (!card) return "";
+        const era = eraForCard(card);
+        return `<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content">${categoryBadge(card)}<div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
+      }).join("")}</div>
+      <div class="actions" style="justify-content:center"><button class="btn btn-primary" data-local-action="back-from-review">Volver</button></div>
+    </section></div>`, "local-review");
   }
 
   function doSelect(id) {
@@ -1237,6 +1270,8 @@ function starterPanelMarkupContent(isHost) {
     else if (action === "qr-scan-back") { const onBack = qrScanOnBack; qrScanOnBack = null; (onBack || renderEntrada)(); }
     else if (action === "start") doStart();
     else if (action === "close-room") doCloseRoom();
+    else if (action === "review-timeline" || action === "review-failed") renderReview(action === "review-failed");
+    else if (action === "back-from-review") renderCurrent();
     else if (action === "kick") { const uid = target.dataset.uid, name = roomState?.players[uid]?.name || "esta persona"; CT.UI.confirmDialog("Saldrá de la sala y sus cartas volverán al mazo.", () => { CT.closeDialog?.(); doRemovePlayer(uid); }, { title: `¿Expulsar a ${name}?`, confirmLabel: "Expulsar", cancelLabel: "Cancelar" }); }
     else if (action === "select") doSelect(target.dataset.id);
     else if (action === "place" || action === "pulse-place") doPlace(Number(target.dataset.index));

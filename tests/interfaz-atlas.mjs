@@ -100,6 +100,36 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
     click(w,'.home-nav [data-action="home-top"]');assert.equal(screen(w),'home');
   } finally {w.close();}
 }
+// Al terminar una sala online se repasa lo fallado, como en un solo móvil: un fallo de
+// cualquiera de la mesa entra en «Ver lo que se falló»; un acierto, no.
+{
+  const w=boot();
+  try {
+    w.eval(`(() => {
+      const initializeApp=()=>({}),getAuth=()=>({}),getFirestore=()=>({}),firebaseApp={},auth={},db={};
+      const deleteDoc=async()=>{},disableNetwork=async()=>{},enableNetwork=async()=>{},doc=()=>({}),getDoc=async()=>({exists:()=>false,data:()=>null}),onSnapshot=()=>()=>{},runTransaction=async()=>{},serverTimestamp=()=>null,setDoc=async()=>{},writeBatch=()=>({set(){},update(){},delete(){},commit:async()=>{}});
+      ${read('js/online/online.js').replace(/^import .*;$/gm,'').replace('export async function','async function')}
+      const ids=CT.cards('animals').map(c=>c.id);
+      user={uid:'fer'};selectedModeKey='animals';roomCode='ABCD2345';roomRef={};
+      const base={mode:'animals',status:'playing',players:{fer:{name:'Fer',hand:[]},ana:{name:'Ana',hand:[ids[5]]}},playerOrder:['fer','ana'],current:0,hostUid:'ana',timeline:[ids[0],ids[1]],deck:ids.slice(9),discard:[ids[2]],round:2};
+      roomState={...base,phase:'reveal',version:7,reveal:{playerUid:'ana',cardId:ids[2],correct:false}};anotaProgreso();
+      roomState={...base,phase:'reveal',version:8,reveal:{playerUid:'fer',cardId:ids[1],correct:true}};anotaProgreso();
+      roomState={...base,status:'ended',phase:'finished',version:9,winner:'fer',winners:['fer']};
+      CT.onlineActive=true;renderWinner();
+      window.__fallada=CT.cards('animals').find(c=>c.id===ids[2]).title;
+    })()`);
+    const boton=w.document.querySelector('[data-online-action="review-failed"]');
+    assert.ok(boton,'la sala online ofrece «Ver lo que se falló»');
+    assert.match(boton.textContent,/\(1\)/);
+    click(w,'[data-online-action="review-failed"]');
+    assert.equal(w.document.querySelectorAll('.review-grid .timeline-card').length,1);
+    assert.ok(w.document.querySelector('.review-grid').textContent.includes(w.__fallada));
+    click(w,'[data-online-action="back-from-timeline"]');
+    assert.ok(w.document.querySelector('[data-online-action="review-failed"]'),'«Volver» regresa al resultado');
+    // Lo que el perfil deja pendiente (guardar el progreso) termina antes de cerrar la ventana.
+    await new Promise(resolve=>setTimeout(resolve,50));
+  } finally {w.close();}
+}
 {
   const w=boot();
   try {

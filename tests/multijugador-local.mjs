@@ -384,6 +384,15 @@ console.log("\nCompetición sin internet entre dos móviles");
   await juega([h3, g3], "history", [g3]);
   await until(() => [h3, g3].every(win => pantalla(win) === "local-final"));
   ok("al acabar el tema, los dos ven el marcador de la competición", [h3, g3].every(win => /tournament-board/.test(html(win)) && /Fer<\/strong><span>1 punto/.test(html(win))));
+  // Los mismos repasos que en un solo móvil y en la sala online: la línea entera y lo fallado.
+  ok("los dos móviles ofrecen ver las cartas jugadas y lo que se falló", [h3, g3].every(win => !!win.document.querySelector('[data-local-action="review-timeline"]') && /Ver lo que se falló \(1\)/.test(html(win))));
+  click(h3, '[data-local-action="review-failed"]');
+  ok("el repaso enseña la carta fallada", pantalla(h3) === "local-review" && h3.document.querySelectorAll(".review-grid .timeline-card").length === 1);
+  click(h3, '[data-local-action="back-from-review"]');
+  click(h3, '[data-local-action="review-timeline"]');
+  ok("y la línea entera tal y como quedó", h3.document.querySelectorAll(".review-grid .timeline-card").length === h3.document.querySelector("h1").textContent.match(/\d+/)?.[0] * 1);
+  click(h3, '[data-local-action="back-from-review"]');
+  ok("«Volver» regresa al resultado", pantalla(h3) === "local-final");
   ok("solo quien organiza puede pasar al siguiente tema", !!h3.document.querySelector('[data-local-action="competition-next"]') && !g3.document.querySelector('[data-local-action="competition-next"]'));
   click(h3, '[data-local-action="competition-next"]');
   await until(() => pantalla(g3) === "local-lobby");

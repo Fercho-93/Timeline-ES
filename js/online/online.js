@@ -59,6 +59,9 @@ let lastObservedTurnUid = null;
 let lastObservedRoomVersion = null;
 let sessionNewDiscoveries = 0;
 let sessionAchievements = [];
+// Las cartas falladas en la mesa, de cualquier participante, para «Ver lo que se falló» al
+// terminar, como en un solo móvil. Cada una con su mazo: una competición cambia de mazo.
+let sessionFailed = new Map();
 let fallbackTimerVersion = null;
 let fallbackTimerStartedAt = 0;
 let turnTimerHandle = null;
@@ -473,6 +476,7 @@ export async function openOnlineMode(options = {}) {
   createOnly = !!options.createOnly && !joinOnly;
   sessionNewDiscoveries = 0;
   sessionAchievements = [];
+  sessionFailed = new Map();
   // Desde «Crear partida» el nombre ya es el del perfil: no se vuelve a pedir, se crea la sala.
   const profileName = String(CT.Identidad?.propio?.() || "").trim().slice(0, 18);
   const autoCreate = createOnly && !cleanCode(options.roomCode) && !!profileName;
@@ -723,6 +727,8 @@ function anotaProgreso() {
   if (roomState.phase === "reveal" && roomState.reveal) {
     const { reveal } = roomState;
     const mine=reveal.playerUid===user.uid;
+    // Un fallo, o un Pulso en el que fallan los dos: lo mismo que apunta el modo de un solo móvil.
+    if (reveal.pulse ? !reveal.correct && !reveal.targetOk : !reveal.correct) sessionFailed.set(`${modeKey()}:${reveal.cardId}`, { id: reveal.cardId, mode: modeKey() });
     if (CT.Progreso.discover({ mode: modeKey(), cardId: reveal.cardId, mine: reveal.targetUid === user.uid, correct: !!reveal.targetOk })) CT.Effects.discovery?.();
     const card=mine?CT.cards(modeKey()).find(item=>item.id===reveal.cardId):null;
     const nuevaLamina=mine&&reveal.correct&&card&&!CT.Progreso.seenCards().has(card.id)&&!!CT.cardArt(modeKey(),card);
@@ -1628,7 +1634,7 @@ function renderWinner() {
     ? "Ha sido la única persona en terminar la ronda sin cartas."
     : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
   const logroMarkup=sessionAchievements.length?`<div class="logros-nuevos" role="status"><div class="eyebrow">${sessionAchievements.length===1?'Logro nuevo':`${sessionAchievements.length} logros nuevos`}</div>${sessionAchievements.map(item=>`<div class="logro-chip"><b>${escapeHtml(item.name)}</b><small>${escapeHtml(item.desc)}</small></div>`).join('')}</div>`:'';
-  paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel winner-online final-composition"><div class="eyebrow">Fin de la partida · Sala ${roomCode}</div><h1 class="final-title" data-focus tabindex="-1">${title}</h1><p class="final-lead">${lead}</p>${onlineFinalMetrics(roomState.timeline.length,sessionNewDiscoveries,sessionAchievements.length)}${logroMarkup}<div class="actions final-actions"><button class="btn btn-ghost" data-online-action="review-timeline">Ver las ${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"} jugadas</button>${roomState.matchmaking === "public" ? '<button class="btn btn-primary" data-online-action="public-again">Buscar otra partida</button><button class="btn btn-secondary" data-online-action="back">Ir al inicio</button>' : `<button class="btn btn-primary" data-online-action="back">Ir al inicio</button>${roomState.hostUid === user.uid ? '<button class="btn btn-secondary" data-online-action="close-room">Cerrar sala</button>' : ""}`}</div></div></section></div>`, "online-winner");
+  paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel winner-online final-composition"><div class="eyebrow">Fin de la partida · Sala ${roomCode}</div><h1 class="final-title" data-focus tabindex="-1">${title}</h1><p class="final-lead">${lead}</p>${onlineFinalMetrics(roomState.timeline.length,sessionNewDiscoveries,sessionAchievements.length)}${logroMarkup}<div class="actions final-actions"><button class="btn btn-ghost" data-online-action="review-timeline">Ver las ${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"} jugadas</button>${failedHere().length ? `<button class="btn btn-ghost" data-online-action="review-failed">Ver lo que se falló (${failedHere().length})</button>` : ""}${roomState.matchmaking === "public" ? '<button class="btn btn-primary" data-online-action="public-again">Buscar otra partida</button><button class="btn btn-secondary" data-online-action="back">Ir al inicio</button>' : `<button class="btn btn-primary" data-online-action="back">Ir al inicio</button>${roomState.hostUid === user.uid ? '<button class="btn btn-secondary" data-online-action="close-room">Cerrar sala</button>' : ""}`}</div></div></section></div>`, "online-winner");
   if(roomState.tournament) {
     const section=appEl.querySelector('.pass-screen');
     section.insertAdjacentHTML('afterbegin',tournamentBoard(uids));
@@ -1642,16 +1648,28 @@ function onlineFinalMetrics(cards,newPlates,achievements) {
 
 // Igual que en el juego local: quien gana su partida también quiere repasar la línea
 // entera tal y como quedó, no solo lo que falló por el camino.
+function reviewCard(id) {
+  const card = getCard(id);
+  if (!card) return "";
+  const era = eraForCard(card);
+  return `<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content">${categoryBadge(card)}<div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
+}
 function renderTimelineReview() {
   paint(`<div class="shell">${header()}<section>
     <div class="eyebrow">Línea de tiempo completa</div>
     <h1 data-focus tabindex="-1">${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta jugada" : "cartas jugadas"}</h1>
-    <div class="review-grid">${roomState.timeline.map(id => {
-      const card = getCard(id);
-      if (!card) return "";
-      const era = eraForCard(card);
-      return `<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content">${categoryBadge(card)}<div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
-    }).join("")}</div>
+    <div class="review-grid">${roomState.timeline.map(reviewCard).join("")}</div>
+    <div class="actions" style="justify-content:center"><button class="btn btn-primary" data-online-action="back-from-timeline">Volver</button></div>
+  </section></div>`, "online-timeline-review");
+}
+// Las falladas de esta partida: las de su mazo, que en una competición es el del tema que acaba.
+const failedHere = () => [...sessionFailed.values()].filter(item => item.mode === modeKey()).map(item => item.id);
+function renderFailedReview() {
+  const ids = failedHere();
+  paint(`<div class="shell">${header()}<section>
+    <div class="eyebrow">Repaso</div>
+    <h1 data-focus tabindex="-1">${ids.length} ${ids.length === 1 ? "carta" : "cartas"} para recordar</h1>
+    <div class="review-grid">${ids.map(reviewCard).join("")}</div>
     <div class="actions" style="justify-content:center"><button class="btn btn-primary" data-online-action="back-from-timeline">Volver</button></div>
   </section></div>`, "online-timeline-review");
 }
@@ -1983,6 +2001,7 @@ document.addEventListener("click", event => {
   if (action === "back") navigateOnline("back");
   else if (action === "claim-host") claimHost();
   else if (action === "review-timeline") renderTimelineReview();
+  else if (action === "review-failed") renderFailedReview();
   else if (action === "back-from-timeline") renderWinner();
   else if (action === "guide") showGuide();
   else if (action === "close-guide") CT.closeDialog();
