@@ -92,9 +92,10 @@
   // En una competición, desde la segunda ronda no hay minijuego: empieza el siguiente de la
   // mesa en cada tema, igual que en la sala online.
   function laterRound(state) { return (state.tournament?.index || 0) > 0; }
+  // `playerOrder` ya llega girado del tema anterior, así que basta con un paso: girarlo
+  // `index` posiciones acumulaba los giros (0, 1, 3, 6…) y había quien no empezaba nunca.
   function rotatedOrder(state) {
-    const shift = state.tournament.index % state.playerOrder.length;
-    return [...state.playerOrder.slice(shift), ...state.playerOrder.slice(0, shift)];
+    return [...state.playerOrder.slice(1), ...state.playerOrder.slice(0, 1)];
   }
   function startRoom(state, { requesterId, handSize, turnSeconds, order, deck: shuffledDeck, ghost = false, pulse = false, random = Math.random, now }) {
     if (state.hostId !== requesterId) throw new Error("NOT_HOST");
@@ -397,7 +398,7 @@
   }
 
   CT.LocalRoom = {
-    MIN_PLAYERS, MAX_PLAYERS, createRoom, joinRoom, startRoom, placeCard, finishTurn, skipTurn, rematch, removePlayer, competitionNext, laterRound,
+    MIN_PLAYERS, MAX_PLAYERS, createRoom, joinRoom, startRoom, placeCard, finishTurn, skipTurn, rematch, removePlayer, competitionNext, laterRound, rotatedOrder,
     starterComplete, finalComplete, pulseAvailable, pulseTargets, reduce
   };
 })();

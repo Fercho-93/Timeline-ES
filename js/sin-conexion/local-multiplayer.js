@@ -700,7 +700,7 @@ function starterPanelMarkupContent(isHost) {
   // el siguiente de la mesa. Quien organiza lo pone en marcha.
   function nextThemeMarkup(isHost) {
     const t = roomState.tournament;
-    const first = roomState.players[roomState.playerOrder[t.index % roomState.playerOrder.length]];
+    const first = roomState.players[CT.LocalRoom.rotatedOrder(roomState)[0]];
     return `${CT.Tournament.journey(t)}<h3>Tema ${t.index + 1} de ${t.queue.length}: ${escapeHtml(CT.mode(roomState.mode).name)}</h3><p>Empieza ${escapeHtml(first?.name || "el siguiente de la mesa")}.</p>${isHost ? '<button type="button" class="btn btn-primary btn-block" data-local-action="start">Empezar el tema <span>→</span></button>' : '<p class="hint">Esperando a que quien organiza empiece el tema.</p>'}`;
   }
 

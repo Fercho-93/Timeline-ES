@@ -60,5 +60,26 @@ const html = w.CONTINUUM.Tournament.board(sala.tournament, sala.playerOrder.map(
 ok("cuenta los dos temas: cada uno ganó uno y le quedaron dos cartas en el otro", /Fer<\/strong><span>0 puntos/.test(html) && /Ana<\/strong><span>0 puntos/.test(html));
 ok("y da el resultado final", /Resultado de la competición/.test(html));
 
+// `playerOrder` llega girado del tema anterior: girarlo otra vez `index` posiciones
+// acumulaba los giros y, con tres personas, una no empezaba nunca.
+console.log("\nCon tres personas, empieza cada una por turno");
+{
+  const seis = { queue: ["a", "b", "c", "d", "e", "f"], index: 0, history: [], handSize: 2 };
+  let mesa = Room.createRoom({ roomCode: "XYZ789", hostId: "host", hostName: "Fer", modeKey: "a", tournament: seis, now: 1 });
+  mesa = act(mesa, "join", { playerId: "ana", name: "Ana" });
+  mesa = act(mesa, "join", { playerId: "luis", name: "Luis" });
+  mesa = act(mesa, "starter-draw", { requesterId: "host", cardId: "a-99" });
+  for (const id of ["host", "ana", "luis"]) mesa = act(mesa, "starter-guess", { playerId: id, value: 1 });
+  const empiezan = [], anunciados = ["host"];
+  for (let tema = 0; tema < 6; tema++) {
+    mesa = act(mesa, "start", { requesterId: "host", handSize: 2, order: ["host", "ana", "luis"], deck: mazo(seis.queue[tema], 30) });
+    empiezan.push(mesa.playerOrder[mesa.current]);
+    mesa = { ...mesa, status: "ended", phase: "finished", winner: mesa.playerOrder[0], winners: [mesa.playerOrder[0]] };
+    if (tema < 5) { mesa = act(mesa, "competition-next", { requesterId: "host" }); anunciados.push(Room.rotatedOrder(mesa)[0]); }
+  }
+  ok(`el turno de empezar pasa por toda la mesa (${empiezan.join(" → ")})`, empiezan.join() === "host,ana,luis,host,ana,luis");
+  ok("la sala de espera anuncia a quien de verdad empieza", anunciados.join() === empiezan.join());
+}
+
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);
