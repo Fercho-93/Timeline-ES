@@ -42,7 +42,7 @@
   const MENU_ART = {
     "Jugar": "home-door-jugar.webp", "Jugar solo": "mode-walk-solo.webp", "Retos rápidos": "menu-quick.webp",
     "Jugar con amigos": "mode-walk-multi.webp", "Jugar online": "menu-online.webp",
-    "Unirme a una partida": "menu-private.webp", "Reto del día": "menu-daily.webp",
+    "Unirme a una partida": "menu-private.webp", "Reto diario": "menu-daily.webp",
     "Maratón": "mode-walk-solo.webp", "Competición": "competition-engraving.webp",
     "Mazos del día": "menu-daily.webp", "Partida sorpresa": "menu-quick.webp",
     "Mesas abiertas": "menu-online.webp", "Crear mesa": "menu-wifi.webp", "Partida rápida": "menu-quick.webp"
@@ -130,7 +130,7 @@
           [3400, c => c.say(`La línea va ${order}.`)]
         ] },
       { chapter: 0, title: "Tu turno", duration: 10000,
-        html: `<div class="tv-table">${lineMarkup(modeKey, [B, E])}<div class="tv-hand">${cardMarkup(modeKey, C, { hidden: true })}</div><span class="tv-confirm" aria-hidden="true">Sí, aquí</span></div>`,
+        html: `<div class="tv-table">${lineMarkup(modeKey, [B, E])}<div class="tv-hand">${cardMarkup(modeKey, C, { hidden: true })}</div><span class="tv-confirm" aria-hidden="true">Colocar carta →</span></div>`,
         steps: [
           [0, c => c.say("Arrastra la carta al hueco donde crees que va.")],
           [400, c => c.add(".tv-hand .tv-card", "is-in")],
@@ -138,7 +138,7 @@
           [2400, c => c.press(true)],
           [2900, c => c.dragTo(".tv-hand .tv-card", '.tv-gap[data-gap="1"]')],
           [4100, c => { c.press(false); c.drop('.tv-gap[data-gap="1"]'); }],
-          [4800, c => { c.add(".tv-confirm", "is-in"); c.say("Confirma con «Sí, aquí»."); }],
+          [4800, c => { c.add(".tv-confirm", "is-in"); c.say("Confirma con «Colocar carta»."); }],
           [5800, c => c.fingerTo(".tv-confirm")],
           [6400, c => c.tap()],
           [6900, c => { c.reveal(".tv-line .is-placed", true); c.remove(".tv-confirm", "is-in"); c.fingerHide(); c.say("Se descubre el dato. Si encaja, la carta se queda."); }]
@@ -156,14 +156,14 @@
       { chapter: 0, title: "Dónde se juega", duration: 8600,
         html: `<div class="tv-home">${door("Jugar", "tv-door-play")}
           <div class="tv-choices">${["Jugar solo", "Jugar con amigos", "Jugar online"].map(name => `<span>${menuArt(name)}<b>${name}</b></span>`).join("")}</div>
-          ${door("Unirme a una partida", "tv-door-join")}${door("Reto del día", "tv-door-daily")}</div>`,
+          ${door("Unirme a una partida", "tv-door-join")}${door("Reto diario", "tv-door-daily")}</div>`,
         steps: [
           [0, c => { c.say("En Inicio, toca «Jugar» para elegir si juegas solo, con amigos u online."); c.add(".tv-home", "is-in"); }],
           [1100, c => c.fingerTo(".tv-door-play")],
           [1700, c => { c.tap(); c.add(".tv-door-play", "is-open"); c.add(".tv-choices", "is-open"); }],
           [1900, c => c.stagger(".tv-choices > span", 300)],
           [3600, c => c.fingerHide()],
-          [4800, c => { c.say("En Inicio también están «Unirme a una partida» y «Reto del día»."); c.stagger(".tv-door-join, .tv-door-daily", 400); }]
+          [4800, c => { c.say("En Inicio también están «Unirme a una partida» y «Reto diario»."); c.stagger(".tv-door-join, .tv-door-daily", 400); }]
         ] },
 
       // 2 · Jugar solo
@@ -270,11 +270,11 @@
           [3600, c => { c.say("Elige una mesa, crea la tuya o busca una partida rápida."); c.stagger(".tv-tile", 450); }]
         ] },
 
-      // 4 · Reto del día
-      blockIntro(3, "Reto del día", "Reto del día", "Desde Inicio", "El mismo desafío para todos",
-        ["Inicio", "Reto del día"], "En Inicio tienes el «Reto del día», con las mismas cartas para todos."),
-      { chapter: 3, title: "Reto del día", duration: 9600,
-        html: `<div class="tv-board">${path(["Inicio", "Reto del día"])}${dots("✓✓✗✓✓✓✗✓✓✗")}<div class="tv-score">7 de 10</div>
+      // 4 · Reto diario
+      blockIntro(3, "Reto diario", "Reto diario", "Desde Inicio", "El mismo desafío para todos",
+        ["Inicio", "Reto diario"], "En Inicio tienes el «Reto diario», con las mismas cartas para todos."),
+      { chapter: 3, title: "Reto diario", duration: 9600,
+        html: `<div class="tv-board">${path(["Inicio", "Reto diario"])}${dots("✓✓✗✓✓✓✗✓✓✗")}<div class="tv-score">7 de 10</div>
           <div class="tv-facts"><span>Un intento al día</span><span>Días pares: Grandes colecciones</span><span>Impares: Retos rápidos</span></div></div>`,
         steps: [
           [0, c => c.say("Cada día tienes un reto nuevo de 10 cartas.")],
@@ -291,7 +291,7 @@
     ];
   }
 
-  const CHAPTERS = ["Lo básico", "Jugar solo", "En grupo", "Reto del día"];
+  const CHAPTERS = ["Lo básico", "Jugar solo", "En grupo", "Reto diario"];
 
   const ICON = {
     play: '<svg class="tv-ico-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.6v14.8c0 .9 1 1.4 1.7.9l11-7.4c.7-.4.7-1.4 0-1.8l-11-7.4C8 3.2 7 3.7 7 4.6Z"/></svg>',

@@ -16,7 +16,6 @@
   const CT = window.CONTINUUM;
   const { escapeHtml } = CT;
   const appEl = document.getElementById("app");
-  const BACK_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 5-7 7 7 7M7 12h14"/></svg>';
   const SHARE_ICON = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.6" x2="15.4" y2="6.4"/><line x1="8.6" y1="13.4" x2="15.4" y2="17.6"/></svg>';
   const WIFI_ICON = '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5a11 11 0 0 1 14 0"/><path d="M8.5 16a6 6 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1"/></svg>';
   const CAMERA_ICON = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="14" r="3.5"/></svg>';
@@ -91,8 +90,10 @@
     } else showToast("Selecciona el texto y cópialo a mano");
   }
 
-  function header(backAction, actionsHtml = "") {
-    return `<header class="topbar"><button class="icon-btn" data-local-action="${backAction}" aria-label="Volver">${BACK_ICON}</button><div class="brand">Continuum</div><div class="topbar-actions">${actionsHtml}</div></header>`;
+  // La misma cabecera que el resto del juego: la flecha a la izquierda y, en la mesa, el menú ⋯
+  // («Opciones de la partida»), que es lo que nombran la Guía y los avisos.
+  function header(backAction, { menu = false } = {}) {
+    return CT.UI.header(`data-local-action="${backAction}"`, menu ? 'data-local-action="room-menu"' : '', menu);
   }
 
   // En la app de iPhone no se habla de Android (guía 2.3.10 de App Review).
@@ -374,7 +375,7 @@
         deckFingerprint: CT.deckFingerprint(modeKey),
         onChange: onRoomChange,
         onPeerLost: (lostName, playing) => showToast(playing
-          ? `${lostName || "Alguien"} se ha desconectado: conserva su plaza y sus turnos se saltan. Invítale otra vez desde el menú.`
+          ? `${lostName || "Alguien"} se ha desconectado: conserva su plaza y sus turnos se saltan. Invítale otra vez desde el menú ⋯.`
           : `${lostName || "Alguien"} se ha desconectado y sale de la mesa`),
         onPeerBack: backName => showToast(`${backName || "Alguien"} ha vuelto a su plaza`)
       });
@@ -741,7 +742,7 @@ function starterPanelMarkupContent(isHost) {
       : CT.LocalRoom.laterRound(roomState) ? nextThemeMarkup(false) : roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles a la vez.</p>` : starterPanelMarkup(false);
     paint(`<div class="shell online-shell">${header("leave")}
       <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${escapeHtml(roomState.roomCode)}</strong>${isHost ? `<div class="room-invite-actions"><button type="button" data-local-action="invite">${hostSession?.nearby ? "Invitar por QR (Android)" : "Invitar a alguien"}</button></div>` : ""}</div></section>
-      ${isHost && hostSession?.nearby ? `<p class="online-note" data-nearby-note>Sala visible para los iPhones cercanos: que pulsen «Unirme a una sala → Buscar salas cercanas» y escriban este código: <b class="nearby-pin">${escapeHtml(hostSession.nearbyPin)}</b>. Para un Android, usa el QR.</p>` : ""}
+      ${isHost && hostSession?.nearby ? `<p class="online-note" data-nearby-note>Sala visible para los iPhones cercanos: que pulsen «Unirme a una partida → Buscar salas cercanas» y escriban este código: <b class="nearby-pin">${escapeHtml(hostSession.nearbyPin)}</b>. Para un Android, usa el QR.</p>` : ""}
       <div class="online-lobby-grid">
         <section class="panel lobby-table-panel"><div class="section-label">Mesa de exploradores <small>${roomState.playerOrder.length}/${Number(roomState.capacity) || CT.LocalRoom.MAX_PLAYERS}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${roomState.playerOrder.length}</strong><small>${roomState.playerOrder.length === 1 ? "explorador" : "exploradores"}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
         <section class="panel lobby-settings">${settings}</section>
@@ -850,7 +851,7 @@ function starterPanelMarkupContent(isHost) {
       <div class="eyebrow">Sala ${escapeHtml(lastSeat?.roomCode || "")}</div>
       <h2 data-focus tabindex="-1">Se ha perdido la conexión</h2>
       <p>Tu plaza y tus cartas siguen guardadas en el móvil de quien organiza la sala. Mientras no vuelvas, tus turnos se saltan.</p>
-      <p class="hint">Sin internet no hay forma de reengancharse sola: pídele que te invite otra vez (Menú → Invitar a alguien) y escanea su código. Volverás a tu sitio, con tus cartas.</p>
+      <p class="hint">Sin internet no hay forma de reengancharse sola: pídele que te invite otra vez (⋯ → Invitar a alguien) y escanea su código. Volverás a tu sitio, con tus cartas.</p>
       <button type="button" class="btn btn-primary btn-block" data-local-action="go-unirse">Volver a sentarme <span>→</span></button>
       <button type="button" class="btn btn-ghost btn-block" data-local-action="forget-seat">Salir de la partida</button>
     </div></section></div>`, "local-desconectado");
@@ -973,7 +974,7 @@ function starterPanelMarkupContent(isHost) {
     for (let index = 0; index <= timelineCards.length; index++) {
       const confirmable = myPulse ? pulseCard : (myTurn ? selectedCard : null);
       slots.push(confirmable && pendingIndex === index
-        ? `<div class="slot-confirm" data-index="${index}"><small>Colocar aquí</small><strong>${escapeHtml(confirmable.title)}</strong><button class="btn btn-primary btn-block" data-local-action="${myPulse ? (defensa ? "confirm-defense" : "confirm-pulse") : "confirm-place"}" data-autofocus>Sí, aquí</button><button class="btn btn-ghost btn-block" data-local-action="cancel-place">Cancelar</button></div>`
+        ? `<div class="slot-confirm" data-index="${index}"><small>Colocar aquí</small><strong>${escapeHtml(confirmable.title)}</strong><button class="btn btn-primary btn-block" data-local-action="${myPulse ? (defensa ? "confirm-defense" : "confirm-pulse") : "confirm-place"}" data-autofocus>Colocar carta →</button><button class="btn btn-ghost btn-block" data-local-action="cancel-place">Cambiar</button></div>`
         : myPulse
           ? `<button class="slot" data-local-action="pulse-place" data-index="${index}" aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>${index === 0 ? "−" : "+"}</span></button>`
         : index === failIndex
@@ -990,7 +991,7 @@ function starterPanelMarkupContent(isHost) {
           : `Colócala. Si aciertas y ${escapeHtml(pulseTargetName)} falla, le pasas una carta tuya`)
         : defensa ? `${escapeHtml(pulseTargetName)} está colocando la misma carta…` : `${escapeHtml(currentPlayer.name)} está colocando la carta del duelo…`}</p></section>`
       : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${pendingIndex === null && selectedCardId === id ? "selected" : ""}" data-local-action="select" data-id="${id}" aria-pressed="${pendingIndex === null && selectedCardId === id}" ${myTurn ? "" : "disabled"}>${categoryBadge(card)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p></section>`;
-    paint(`<div class="shell">${header("room-menu", '<button class="icon-btn" data-local-action="room-menu" aria-label="Abrir menú de la sala">Sala</button>')}
+    paint(`<div class="shell">${header("room-menu", { menu: true })}
       <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, ronda ${roomState.round}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length} · ` : ""}Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo para jugar"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
       <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores</div><div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i class="score-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'room:' + uid, id: esMio(uid) ? CT.Avatares.ownId() : player.avatarId })}</i><span class="score-copy"><b>${escapeHtml(player.name)}${uid === myPlayerId ? " · tú" : ""}${player.away ? " · desconectado" : ""}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(player.hand.length)}%"></i></span></span><em><strong>${player.hand.length}</strong><small>cartas</small></em></span>`; }).join("")}</div></section>
@@ -1083,7 +1084,7 @@ function starterPanelMarkupContent(isHost) {
       const faltan = final.players.filter(uid => !(uid in answers)).map(uid => escapeHtml(name(uid))).join(", ");
       body = `<p>Respuestas guardadas: ${Object.keys(answers).length} de ${final.players.length}.</p>${finalist && !answered ? CT.Final.form(modeKey, "data-local-final") : `<section class="panel"><h2>${answered ? "Tu respuesta está guardada" : "Estás siguiendo la final"}</h2><p>Esperando a ${faltan}. Las cifras se revelan cuando todos hayan respondido.</p></section>`}`;
     }
-    paint(`<div class="shell">${header("room-menu", '<button class="icon-btn" data-local-action="room-menu" aria-label="Abrir menú de la sala">Sala</button>')}<h1 data-focus tabindex="-1">Final de desempate</h1><p>Solo juegan ${final.players.map(uid => escapeHtml(name(uid))).join(", ")}: terminaron la misma ronda sin cartas.</p>${CT.Final.question(modeKey, final)}${body}</div>`, "local-final-secreta");
+    paint(`<div class="shell">${header("room-menu", { menu: true })}<h1 data-focus tabindex="-1">Final de desempate</h1><p>Solo juegan ${final.players.map(uid => escapeHtml(name(uid))).join(", ")}: terminaron la misma ronda sin cartas.</p>${CT.Final.question(modeKey, final)}${body}</div>`, "local-final-secreta");
     const form = appEl.querySelector("[data-local-final]");
     if (form && draft?.guess) { form.elements.guess.value = draft.guess; if (form.elements.era && draft.era) form.elements.era.value = draft.era; }
   }

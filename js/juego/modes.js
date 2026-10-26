@@ -1070,7 +1070,7 @@
     const difficulty = '<div class="guide-levels">'+Object.values(window.CONTINUUM.Ghost?.LEVELS || {}).map(level => '<div><b>'+escapeHtml(level.name)+'</b><span>'+escapeHtml(level.description)+'</span></div>').join('')+'</div>';
     const result = '<div class="guide-cards">'+
       guideCard('✓','Si aciertas','','La carta muestra su valor y se queda en la línea. Así tienes otra referencia para la siguiente jugada. Jugando solo, sumas un acierto. En una partida en grupo de Grandes colecciones, tienes una carta menos en la mano.')+
-      guideCard('↺','Si fallas jugando solo','','La línea marca con «Aquí» dónde iba y te lo dice con una frase. Al pulsar «Continuar», la carta pasa a ese sitio y sirve de referencia. En las rondas, la maratón y la competición en solitario pierdes una de tus tres vidas; el reto diario no tiene vidas y siempre se juega entero.')+
+      guideCard('↺','Si fallas jugando solo','','La línea marca con «Aquí» dónde iba y te lo dice con una frase. Al pulsar «Siguiente carta», la carta pasa a ese sitio y sirve de referencia. En las rondas, la maratón y la competición en solitario pierdes una de tus tres vidas; el reto diario no tiene vidas y siempre se juega entero.')+
       guideCard('↺','Si fallas en grupo','Grandes colecciones','La carta no entra en la línea: va al descarte y robas otra del mazo, así que tu mano no se reduce. Si el mazo se acaba, se baraja el descarte; si tampoco queda descarte, te quedas con la carta que tenías. En los duelos la carta fallada tampoco entra en la línea, y no hay vidas.')+
       guideCard('◷','Si se acaba el tiempo','','Solo pasa si la partida tiene tiempo por carta. Jugando solo, en los duelos y en Retos rápidos cuenta como un fallo. En las partidas en grupo de Grandes colecciones (en un solo móvil, en una sala o en una mesa) se pierde el turno: no colocas nada y tu mano no cambia. Jugando solo o en el duelo «Mismas cartas», salir de la aplicación con una carta abierta también la da por fallada.')+'</div>'+
       '<h4>Cómo se gana</h4><p>Jugando solo cuentan tus aciertos. En las rondas también consigues estrellas (capítulo 02). En los duelos gana quien más acierte; si acertáis lo mismo, es empate, salvo en el duelo de cifras «Mismas cartas», donde gana quien respondió más rápido.</p>'+
@@ -1081,8 +1081,8 @@
     // Las reglas del reto de hoy, calculadas al abrir la guía (si la aplicación aún no las ofrece, se omiten).
     const hoy = window.CONTINUUM.dailyInfo?.();
     const dailyToday = hoy ? guideCard('◆','Hoy: '+escapeHtml(hoy.family),escapeHtml(hoy.title),escapeHtml(hoy.rules)+(hoy.done?' Hoy ya lo has jugado.':'')) : '';
-    const daily = '<p>Encontrarás «Reto del día» en Inicio. Es independiente de las partidas que elijas en «Jugar solo».</p><div class="guide-cards">'+
-      guideCard('☼','Reto del día','Un único intento al día','Cada día juegas las mismas 10 cartas que el resto de jugadores. Un día toca un mazo de Grandes colecciones, en Fácil, y al siguiente uno de Retos rápidos, siempre alternando. No hay vidas ni límite de tiempo: aunque falles, sigues hasta el final. Tu resultado (por ejemplo, 7 de 10) cuenta para el ranking diario y semanal. Las demás partidas no suman puntos en ese ranking.')+
+    const daily = '<p>Encontrarás «Reto diario» en Inicio. Es independiente de las partidas que elijas en «Jugar solo».</p><div class="guide-cards">'+
+      guideCard('☼','Reto diario','Un único intento al día','Cada día juegas las mismas 10 cartas que el resto de jugadores. Un día toca un mazo de Grandes colecciones, en Fácil, y al siguiente uno de Retos rápidos, siempre alternando. No hay vidas ni límite de tiempo: aunque falles, sigues hasta el final. Tu resultado (por ejemplo, 7 de 10) cuenta para el ranking diario y semanal. Las demás partidas no suman puntos en ese ranking.')+
       dailyToday+'</div>';
     const formats = '<p>En Inicio, abre «Jugar» y elige si quieres jugar solo, con amigos u online. En <b>Grandes colecciones</b> encontrarás mazos sobre historia, animales, países y otros temas. Los <b>Retos rápidos</b> son mazos más cortos, cada uno con su propia regla de orden. La verás antes de empezar.</p>'+
       '<h4>Jugar solo</h4><div class="guide-cards">'+
@@ -1116,7 +1116,7 @@
       guideCard('3','Por turnos','Entre dos','Cada uno desde su móvil y cuando pueda. Os turnáis carta a carta sobre la misma línea y cada uno juega, en cada tema, las cartas por persona que se eligieron (con 5 temas, como mucho 3). Gana quien más acierte en total; si acertáis lo mismo, es empate.')+'</div><p>La competición no cuenta para el ranking del reto diario, pero sí para tu Atlas: láminas, recorrido y logros.</p>';
     const controls = '<div class="guide-cards">'+
       guideCard('↔','Explora la línea','','Desliza a los lados para recorrerla; los huecos de los extremos también valen. Para arrastrar una carta, mantenla pulsada un momento: si deslizas sin esperar, lo que se mueve es la línea. Si llevas la carta hacia un borde, la línea avanza sola.')+
-      guideCard('＋','Tamaño de las cartas','80 % · 100 % · 120 %','El zoom está en el menú ⋯ de la partida, en «Vista» (donde no hay menú, en la lupa junto a la línea). Vuelve al 100 % al cambiar de pantalla.')+
+      guideCard('＋','Tamaño de las cartas','80 % · 100 % · 120 %','El zoom está en el menú ⋯ de la partida, en «Zoom de las cartas» (donde no hay menú, en la lupa junto a la línea). Vuelve al 100 % al cambiar de pantalla.')+
       guideCard('⋯','Menú y salida','','El menú ⋯ reúne la guía, los ajustes y el zoom. Al salir de una partida eliges «Guardar y salir», para retomarla desde Inicio, o «Salir sin guardar», que la descarta: no cuenta nada de ella, ni aciertos, ni láminas, ni logros. En la competición, los temas ya terminados sí quedan en tu Atlas.')+
       guideCard('⌂','Salir de una sala','','Salir no pausa la partida para los demás, y lo que ya acertaste cuenta. Quien creó la sala puede saltar el turno de alguien, expulsar a un participante o cerrar la sala para todos.')+
       guideCard('←','Volver','Desliza hacia la derecha','En el móvil, desliza el dedo de izquierda a derecha (fuera de la línea): la pantalla o el diálogo se apartan con el dedo y, al soltar, vuelves a lo anterior. Si sueltas pronto, se quedan donde estaban. En el ordenador se usa la flecha de arriba'+(window.Capacitor?.isNativePlatform?.() && window.Capacitor.getPlatform?.() === 'ios' ? '' : ', y en Android también vale el botón Atrás')+'. En plena partida el gesto no hace nada: la flecha y el menú ⋯ preguntan antes si quieres guardar.')+'</div>';
@@ -1148,7 +1148,7 @@
       '<div class="atlas-section-heading guide-manual"><h2>Manual de consulta</h2><p class="guide-index-hint">'+here+' · Abre el tema que quieras consultar.</p></div>'+
       guideChapter('01','Aciertos, fallos y cómo se gana','Qué pasa al confirmar y quién gana','result',result)+
       guideChapter('02','Elige cómo jugar','Solo, con amigos u online','modes',formats)+
-      guideChapter('03','Reto del día','Un intento al día · Desde Inicio','chapters',daily)+
+      guideChapter('03','Reto diario','Un intento al día · Desde Inicio','chapters',daily)+
       guideChapter('04','Poderes: Fantasma y Pulso','Solo en partidas en grupo','powers',powers)+
       guideChapter('05','Competición','Varios temas seguidos','chapters',chapters)+
       guideChapter('06','Muévete por el tablero','Gestos, zoom, menú y salida','line',controls)+

@@ -21,7 +21,7 @@ assert.doesNotMatch(source, /ROOM_FULL: "[^"]*\d/, "el aviso de sala llena no da
 for (const archivo of ["js/online/online.js", "js/sin-conexion/local-multiplayer.js"]) assert.doesNotMatch(fs.readFileSync(new URL(`../${archivo}`, import.meta.url), "utf8"), /cartas (volverán|vuelven) al mazo/, `${archivo} no dice que las cartas vuelven al mazo`);
 assert.equal((source.match(/clientVersion: CLIENT_VERSION/g) || []).length, 2, "crear y unirse deben registrar la misma versión");
 assert.doesNotMatch(source, /Para usar esta sala, actualizad todos los móviles a v39/, "el aviso no debe seguir mostrando la versión antigua");
-assert.match(source, /paint\(`<div class="shell">\$\{header\(\x27<button class="icon-btn" data-online-action="room"/, "la partida debe mostrar un menú de controles de sala");
+assert.match(source, /CT\.UI\.header\('data-online-action="back"', playing \|\| roomRef \? 'data-online-action="room"'/, "la partida debe mostrar el menú ⋯ de la sala");
 assert.match(source, /Terminar partida y cerrar sala/, "el anfitrión debe poder terminar y cerrar la sala durante la partida");
 assert.match(source, /Salir de la partida/, "un jugador debe poder salir de la partida");
 assert.match(source, /roomState\.status === "playing"[\s\S]*?room-connection/, "la presencia debe ocultarse durante la partida");

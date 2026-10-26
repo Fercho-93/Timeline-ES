@@ -47,9 +47,9 @@
 
     const dailyWrap = document.createElement('section');
     dailyWrap.className = 'mode-daily-zone';
-    dailyWrap.setAttribute('aria-label', 'Reto del día');
+    dailyWrap.setAttribute('aria-label', 'Reto diario');
     dailyWrap.append(daily);
-    const family=document.createElement('p');family.className='mode-daily-family';family.innerHTML=`Hoy · <strong>${dailyFamily()}</strong> · un único reto del día`;dailyWrap.append(family);
+    const family=document.createElement('p');family.className='mode-daily-family';family.innerHTML=`Hoy · <strong>${dailyFamily()}</strong> · un intento al día`;dailyWrap.append(family);
 
     const play = doors.querySelector('.home-door[data-action="jugar"]');
     if (!play) return;

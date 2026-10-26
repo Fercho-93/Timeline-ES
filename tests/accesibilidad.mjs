@@ -103,8 +103,13 @@ console.log("\nLas reglas se adaptan al mazo");
   const conPulso = w.CONTINUUM.guideMarkup("history", "local", { pulse: true });
   ok("el Pulso se explica fuera de solitario", /Pulso/.test(conPulso) && /Los dos colocáis/.test(conPulso));
   ok("y la guía dice si está en juego o no", /en juego/.test(conPulso) && /opcional/.test(w.CONTINUUM.guideMarkup("history", "local", { pulse: false })));
-  ok("la guía empieza por el vídeo, con cuatro capítulos y Reto del día aparte", /data-tutorial=/.test(conPulso) && (conPulso.match(/class="tv-chapter"/g) || []).length === 4 && ["Lo básico", "Jugar solo", "En grupo", "Reto del día"].every(nombre => conPulso.includes(nombre)));
-  ok("el reto diario tiene su propio capítulo en el manual", /data-guide-chapter="03"[^]*?<b>Reto del día<\/b>/.test(w.CONTINUUM.guideMarkup("history", "solo")));
+  ok("la guía empieza por el vídeo, con cuatro capítulos y Reto diario aparte", /data-tutorial=/.test(conPulso) && (conPulso.match(/class="tv-chapter"/g) || []).length === 4 && ["Lo básico", "Jugar solo", "En grupo", "Reto diario"].every(nombre => conPulso.includes(nombre)));
+  // La Guía y el vídeo nombran los botones con su texto de verdad.
+  const guia = w.CONTINUUM.guideMarkup("history", "solo");
+  ok("la Guía cita «Siguiente carta» y «Zoom de las cartas», los botones que existen", /«Siguiente carta»/.test(guia) && /«Zoom de las cartas»/.test(guia) && !/«Continuar»|«Vista»/.test(guia));
+  const tutorialFuente = read("js/interfaz/tutorial.js");
+  ok("el vídeo enseña a confirmar con «Colocar carta», no con «Sí, aquí»", /«Colocar carta»/.test(tutorialFuente) && !/Sí, aquí/.test(tutorialFuente));
+  ok("el reto diario tiene su propio capítulo en el manual", /data-guide-chapter="03"[^]*?<b>Reto diario<\/b>/.test(w.CONTINUUM.guideMarkup("history", "solo")));
   ok("la competición explica sus rondas", /cinco cartas/i.test(w.CONTINUUM.guideMarkup("history", "competition")));
   ok("la guía online explica quién prepara la sala", /quien crea la partida/i.test(w.CONTINUUM.guideMarkup("history", "online")));
   ok("fuera del iPhone la guía no ofrece entrar con Apple", !/Apple/.test(w.CONTINUUM.guideMarkup("history", "solo")));
@@ -132,7 +137,7 @@ console.log("\nLas reglas se adaptan al mazo");
     ['Dificultad', 'Retos rápidos', 'Retos rápidos', 1],
     ['Retos rápidos', 'En grupo', 'Tu mano', 2],
     ['Poderes', 'Jugar online', 'Online', 2],
-    ['Online', 'Reto del día', 'Reto del día', 3]
+    ['Online', 'Reto diario', 'Reto diario', 3]
   ]) {
     click(w, `.tv-seg[aria-label="${anterior}"]`);
     click(w, '[data-tv="next"]');
@@ -145,7 +150,7 @@ console.log("\nLas reglas se adaptan al mazo");
   click(w, '[data-tv-chapter="2"]');
   ok("el capítulo En grupo abre desde su entradilla", el(w, '.tv-stage h3').textContent === 'En grupo');
   click(w, '[data-tv-chapter="3"]');
-  ok("Reto del día abre como capítulo independiente", el(w, '.tv-stage h3').textContent === 'Reto del día' && el(w, '[data-tv-chapter="3"]').classList.contains('is-current'));
+  ok("Reto diario abre como capítulo independiente", el(w, '.tv-stage h3').textContent === 'Reto diario' && el(w, '[data-tv-chapter="3"]').classList.contains('is-current'));
   click(w, '[data-tv="prev"]');
   ok("el capítulo diario viene después de Online", el(w, '.tv-scene-title').textContent === 'Online');
   click(w, '[data-tv-chapter="3"]');
@@ -169,7 +174,7 @@ console.log("\nLas reglas se adaptan al mazo");
   const chapters = [...w.document.querySelectorAll('[data-guide-chapter]')];
   ok("ocho capítulos cubren todas las reglas sin desplegarlas de golpe", chapters.length === 8 && chapters.every(chapter => !chapter.open));
   const formatos = el(w, '[data-guide-chapter="02"]'), diario = el(w, '[data-guide-chapter="03"]');
-  ok("el reto diario queda fuera de las opciones de Jugar solo", !/Reto del día|reto diario/i.test(formatos.textContent) && diario.querySelector('summary b').textContent === 'Reto del día');
+  ok("el reto diario queda fuera de las opciones de Jugar solo", !/Reto del día|reto diario/i.test(formatos.textContent) && diario.querySelector('summary b').textContent === 'Reto diario');
   ok("su bloque explica dónde abrirlo y sus reglas", /Inicio/.test(diario.textContent) && /10 cartas/.test(diario.textContent) && /sin límite de tiempo|ni límite de tiempo/.test(diario.textContent));
   chapters[0].open = true;
   await respira();

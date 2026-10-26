@@ -303,6 +303,7 @@ await minijuego(anfitrion, invitada, anfitrion);
 click(anfitrion, '[data-local-action="start"]');
 await until(() => pantalla(invitada) === "local-game");
 ok("con límite de tiempo se enseña la cuenta atrás", !!anfitrion.document.getElementById("turn-timer") && !!invitada.document.getElementById("turn-timer"));
+ok("la mesa lleva la cabecera común, con el menú ⋯ «Opciones de la partida»", !!anfitrion.document.querySelector('.atlas-topbar .atlas-menu[aria-label="Opciones de la partida"][data-local-action="room-menu"]') && !/>Sala</.test(anfitrion.document.querySelector("header").innerHTML));
 click(anfitrion, '[data-local-action="room-menu"]');
 ok("volver abre el menú de la sala en vez del vestíbulo", !!anfitrion.document.querySelector("[data-local-room-overlay]") && pantalla(anfitrion) === "local-game");
 ok("desde el menú se puede volver a invitar a alguien", !!anfitrion.document.querySelector('[data-local-room-overlay] [data-local-action="invite"]'));

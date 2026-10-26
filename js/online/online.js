@@ -393,7 +393,7 @@ function getCard(id) {
   return cardsById().get(id);
 }
 
-function header(extra = "") {
+function header() {
   const playing = roomState?.status === 'playing';
   return CT.UI.header('data-online-action="back"', playing || roomRef ? 'data-online-action="room"' : '', !!playing);
 }
@@ -510,7 +510,7 @@ function renderEntry(invited = "") {
   // El nombre del perfil manda: el que se usó antes en esta misma sala solo se propone si
   // este móvil todavía no tiene perfil.
   const ownName = escapeHtml(CT.Identidad?.propio?.() || known?.name || "");
-  paint(`<div class="shell online-shell">${header('<button class="icon-btn" data-online-action="guide">Guía</button><button class="icon-btn" data-online-action="back">Salir</button>')}
+  paint(`<div class="shell online-shell">${header()}
     <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${joinOnly ? "Sala privada" : CT.mode(selectedModeKey).name}</div><h2 data-focus tabindex="-1">Una mesa,<br>varias pantallas</h2><p class="lead">Cada persona juega desde su móvil y todos ven la línea temporal avanzar en directo.</p></section>
     <div class="online-entry-grid${invited ? " online-entry-invited" : ""}${!invited && createOnly ? " online-entry-single" : ""}">
       ${!invited && createOnly ? "" : `<form class="panel online-form" data-online-form="join"><span class="form-number">01</span><h3>${invited ? "Te han invitado a una sala" : "Entrar en una sala"}</h3><p>${invited ? "Introduce tu nombre para unirte a la partida compartida." : "Usa el código que aparece en el móvil anfitrión."}</p><div class="field"><label for="online-code">Código de sala</label><input id="online-code" name="code" class="room-code-input" maxlength="8" required placeholder="ABCD2345" value="${escapeHtml(invited)}" autocapitalize="characters" autocomplete="off"></div><div class="field"><label for="online-player-name">Tu nombre</label><input id="online-player-name" name="name" maxlength="18" required placeholder="Ej. Lucía" autocomplete="name" value="${ownName}"></div>${invited ? "" : '<button class="btn btn-secondary btn-block" type="button" data-online-action="scan-qr">Escanear código QR</button>'}<button class="btn btn-primary btn-block" type="submit">Unirme a la partida <span>→</span></button></form>`}
@@ -937,7 +937,7 @@ function renderPublicLobby() {
   const mode = CT.mode(modeKey());
   const count = roomState.playerOrder.length;
   const starter = publicStarterMarkup();
-  paint(`<div class="shell online-shell public-lobby">${header('<button class="icon-btn" data-online-action="guide">Guía</button>')}
+  paint(`<div class="shell online-shell public-lobby">${header()}
     <section class="public-lobby-head"><div class="eyebrow"><span class="eyebrow-line"></span> Mesa pública · hasta ${roomState.capacity} jugadores</div><h2 data-focus tabindex="-1">${escapeHtml(mode.name)}</h2><p class="hint">Partida con conexión: cada uno juega desde su móvil, con ${publicHand()} ${publicHand() === 1 ? "carta inicial" : "cartas iniciales"} y ${publicSeconds() ? `con ${publicSeconds()} s por turno` : "sin límite de tiempo por turno"}.</p></section>
     <section class="panel public-status" role="status" aria-live="polite">${publicStatusMarkup()}</section>
     <section class="panel public-roster"><div class="section-label">Jugadores <small>${count}/${roomState.capacity}</small></div><ul class="public-seats">${publicRosterMarkup()}</ul></section>
@@ -994,7 +994,7 @@ function tournamentBoard(winners = []) {
 function renderCompetitionIntro() {
   const mode = CT.mode(roomState.mode);
   const art = { history: ["hero-history", 467], entertainment: ["hero-entertainment", 1050], science: ["hero-science", 1050], nature: ["hero-nature", 1050], globe: ["hero-geography", 859], mixed: ["hero-mixed", 992] }[CT.blockOf(roomState.mode).art] || ["hero-history", 467];
-  paint(`<div class="shell online-shell">${header('<button class="icon-btn" data-online-action="room">Partida</button>')}<section class="pass-screen"><div class="panel pass-card comp-splash">
+  paint(`<div class="shell online-shell">${header()}<section class="pass-screen"><div class="panel pass-card comp-splash">
     <div class="chapter-art" aria-hidden="true"><img src="assets/${art[0]}-700.webp" alt="" width="700" height="${art[1]}" decoding="async" fetchpriority="high"></div>
     ${CT.Tournament.journey(roomState.tournament)}
     <div class="chapter-number">Tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length}</div>
@@ -1138,7 +1138,7 @@ function renderGame() {
   for (let index = 0; index <= timelineCards.length; index++) {
     const confirmable = myPulse ? pulseCard : (myTurn ? selectedCard : null);
     slots.push(confirmable && pendingIndex === index
-      ? `<div class="slot-confirm" data-index="${index}"><small>Colocar aquí</small><strong>${escapeHtml(confirmable.title)}</strong><button class="btn btn-primary btn-block" data-online-action="${myPulse ? (defensa ? "confirm-defense" : "confirm-pulse") : "confirm-place"}" data-autofocus>Sí, aquí</button><button class="btn btn-ghost btn-block" data-online-action="cancel-place">Cancelar</button></div>`
+      ? `<div class="slot-confirm" data-index="${index}"><small>Colocar aquí</small><strong>${escapeHtml(confirmable.title)}</strong><button class="btn btn-primary btn-block" data-online-action="${myPulse ? (defensa ? "confirm-defense" : "confirm-pulse") : "confirm-place"}" data-autofocus>Colocar carta →</button><button class="btn btn-ghost btn-block" data-online-action="cancel-place">Cambiar</button></div>`
       : myPulse
         ? `<button class="slot" data-online-action="pulse-place" data-index="${index}" aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>${index === 0 ? "−" : "+"}</span></button>`
       : index === failIndex
@@ -1158,7 +1158,7 @@ function renderGame() {
   // quien abre la sala a mitad de turno ve lo que de verdad queda, no un contador que
   // vuelve a empezar de cero en su pantalla.
   const secondsLeft = roomState.phase === "turn" && turnSeconds() ? (turnRemaining() ?? turnSeconds()) : null;
-  paint(`<div class="shell">${header('<button class="icon-btn" data-online-action="room" aria-label="Abrir menú de la sala">Menú</button>')}
+  paint(`<div class="shell">${header()}
     <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, ronda ${roomState.round}</h1>
     <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · ronda ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length}` : `Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}`}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo para jugar"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
     <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores</div><div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i class="score-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'uid:' + uid, id: uid === user.uid ? CT.Avatares.ownId() : player.avatarId })}</i><span class="score-copy"><b>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(player.hand.length)}%"></i></span></span><em><strong>${player.hand.length}</strong><small>cartas</small></em></span>`; }).join("")}</div></section>
