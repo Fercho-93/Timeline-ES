@@ -2118,8 +2118,8 @@
       <h2>¿Borrar todo el progreso?</h2>
       <p class="lead" style="margin-inline:auto">Se pierden las estadísticas y los logros de este móvil, y no hay manera de recuperarlos. El reto diario y sus rachas no se tocan.</p>
       <div class="actions" style="display:grid">
-        <button class="btn btn-ghost" data-action="perfil-reset-confirm">Sí, borrar el perfil</button>
         <button class="btn btn-primary" data-action="close-menu">Mejor no</button>
+        <button class="btn btn-ghost exit-discard" data-action="perfil-reset-confirm">Sí, borrar el perfil</button>
       </div>
     </div></div>`, true);
   }
@@ -3946,7 +3946,7 @@
       <button class="btn btn-primary" data-action="close-menu">Seguir jugando</button>
       <button class="btn btn-secondary" data-action="rules">Guía</button>${CT.settingsButton()}
       <button class="btn btn-secondary" data-action="solo-menu">Guardar y salir</button>
-      ${puedeSalirSinGuardar ? '<button class="btn btn-ghost" data-action="abandon-solo">Salir sin guardar</button>' : ''}
+      ${puedeSalirSinGuardar ? '<button class="btn btn-ghost exit-discard" data-action="abandon-solo">Salir sin guardar</button>' : ''}
     </div></div></div>`, true);
   }
 
@@ -3963,7 +3963,7 @@
     if (soloSlot === "daily") { soloSlot = "mode"; home(); } else if (eraDuelo) duelHome(); else soloHome();
   }
   function gameMenu() {
-    overlay(`<div class="overlay"><div class="modal"><h2>Opciones de la partida</h2><div class="actions" style="display:grid"><button class="btn btn-primary" data-action="close-menu">Seguir jugando</button><button class="btn btn-secondary" data-action="rules">Guía</button>${CT.settingsButton()}<button class="btn btn-secondary" data-action="ui-back">Guardar y salir</button><button class="btn btn-ghost" data-action="abandon">Salir sin guardar</button></div></div></div>`, true);
+    overlay(`<div class="overlay"><div class="modal"><h2>Opciones de la partida</h2><div class="actions" style="display:grid"><button class="btn btn-primary" data-action="close-menu">Seguir jugando</button><button class="btn btn-secondary" data-action="rules">Guía</button>${CT.settingsButton()}<button class="btn btn-secondary" data-action="ui-back">Guardar y salir</button><button class="btn btn-ghost exit-discard" data-action="abandon">Salir sin guardar</button></div></div></div>`, true);
   }
 
   const showToast = message => CT.toast(message);

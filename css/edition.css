@@ -956,8 +956,12 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .board-result-layer .modal.board-result { width: 100%; max-width: 660px; max-height: none; margin: 0 auto; padding: 16px; border: 1px solid #b79d6955; border-radius: 16px; text-align: left; box-shadow: 0 6px 22px #4a341a15; background: #fff9ec; }
 #app .board-result > .result-mark, #app .board-result > .eyebrow { display: none; }
 #app .board-result h2 { font-size: 1.02rem; line-height: 1.3; margin: 8px 0 10px; }
-.result-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; }.result-summary b { color: #4d7054; font: 600 .86rem system-ui; }.failure .result-summary b { color: #93492c; }
-#app .result-summary .year { font-size: 1.5rem; margin: 0; }
+.result-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.result-summary b { flex: none; white-space: nowrap; color: var(--edition-success); font: 600 .86rem var(--ui-font); }
+.failure .result-summary b { color: var(--edition-danger); }
+#app .result-summary .year { min-width: 0; margin: 0; font-size: 1.5rem; text-align: right; overflow-wrap: anywhere; }
+/* Las cifras largas de Retos rápidos («+6 h respecto a Madrid») bajan de tamaño en vez de partir el rótulo. */
+#app .result-summary .year.year-long { font-size: 1.1rem; line-height: 1.2; }
 .result-history { margin: 8px 0 14px; }.result-history > summary { cursor: pointer; font: .8rem system-ui; color: #79613b; padding: 6px 0; }.result-history .reveal { margin-top: 12px; }.result-history p { font-size: .9rem; line-height: 1.45; }
 #app .board-result .btn-block { min-height: 44px; padding: 10px 16px; }
 @media (prefers-reduced-motion: reduce) { #app.atlas-board .timeline-card { transition: none; } }
@@ -4147,7 +4151,6 @@ html #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell { 
 #app [data-exit-dialog] .exit-actions { display: grid; gap: 10px; }
 #app [data-exit-dialog] .exit-actions .btn { margin: 0; }
 #app [data-exit-dialog] .exit-actions .btn-primary { background: #8a3f2f; border-color: #7a3a2c; color: #fff6e8; }
-#app [data-exit-dialog] .exit-actions .btn-secondary { background: linear-gradient(155deg, rgba(250,246,235,.97), rgba(232,221,201,.96)); border: 1px solid #b9a98e; color: #5b4936; box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 2px 4px rgba(54,41,26,.12); }
 #app [data-exit-dialog] .exit-actions .exit-discard { background: transparent; border-color: transparent; box-shadow: none; color: #8a3f2f; text-decoration: underline; text-underline-offset: 3px; }
 
 /* ══ 23 · Pergamino en selección y configuración, «pasa el móvil», Atlas, Guía y ranking ══ */
@@ -4172,12 +4175,6 @@ html #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell { 
   box-shadow: inset 0 1px 2px #7a3f1d14;
 }
 :root:not([data-theme="dark"]) #app :is(.panel, .settings-modal .settings-section) :is(input, select, textarea):focus-visible { outline: 2px solid #b8653d; outline-offset: 2px; }
-:root:not([data-theme="dark"]) #app :is(.panel, .settings-modal .settings-section) .btn-secondary {
-  border: 1px solid #b9a98e;
-  background: linear-gradient(155deg, rgba(250,246,235,.97), rgba(232,221,201,.96));
-  color: #5b4936;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 2px 4px rgba(54,41,26,.12);
-}
 :root:not([data-theme="dark"]) #app :is(.panel, .settings-modal .settings-section) .btn-ghost { background: transparent; border-color: #cdb48d; color: #5b4936; }
 :root:not([data-theme="dark"]) #app .overlay .modal:not(.board-result, .quick-result, .enc-modal, .settings-modal, .rules) {
   border: 1px solid #d8bf9c;
@@ -4187,12 +4184,6 @@ html #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell { 
   color: #2a1a10;
 }
 :root:not([data-theme="dark"]) #app .overlay .modal:not(.board-result, .quick-result, .enc-modal, .settings-modal, .rules) :is(h2, h3) { color: #2a1a10; }
-:root:not([data-theme="dark"]) #app .overlay .modal:not(.board-result, .quick-result, .enc-modal, .settings-modal, .rules) .btn-secondary {
-  border: 1px solid #b9a98e;
-  background: linear-gradient(155deg, rgba(250,246,235,.97), rgba(232,221,201,.96));
-  color: #5b4936;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 2px 4px rgba(54,41,26,.12);
-}
 
 /* Atlas y Ajustes con el mismo pergamino: los bloques grandes como panel de papel y las piezas
    que llevan dentro (colecciones, logros) como láminas más claras. */
@@ -5647,8 +5638,6 @@ html[data-theme="dark"] #app[data-screen][data-screen] .tiempo-field .segmented-
 :root[data-theme="dark"] #app [data-exit-dialog] .modal h2 { color: var(--edition-ink); }
 :root[data-theme="dark"] #app [data-exit-dialog] .modal h2::after { color: var(--edition-rust); }
 :root[data-theme="dark"] #app [data-exit-dialog] .modal p { color: var(--edition-muted); }
-:root[data-theme="dark"] #app [data-exit-dialog] .exit-actions .btn-secondary { border-color: var(--edition-line); background: var(--edition-surface); color: var(--edition-ink); box-shadow: none; }
-:root[data-theme="dark"] #app [data-exit-dialog] .exit-actions .exit-discard { color: var(--edition-rust); }
 :root[data-theme="dark"] .quick-splash { background: radial-gradient(ellipse at 50% 32%, #3a2818 0, #24170d 55%, #18110b 100%); color: var(--edition-ink); }
 :root[data-theme="dark"] .quick-splash .eyebrow { color: var(--edition-brass); }
 :root[data-theme="dark"] .quick-splash-hint { color: var(--edition-muted); }
@@ -5890,3 +5879,39 @@ html #app[data-screen] .local-setup #players .player-row::before { grid-column: 
 }
 /* La muestra de Ajustes usa el tema elegido, incluso antes de aplicarlo al resto del juego. */
 html:root #app .settings-modal .settings-section .settings-look-preview .look-preview-page h3 { color: var(--preview-ink); }
+
+/* ══ 31 · Botones: un principal, un secundario, un fantasma y una salida destructiva ══ */
+/* Había siete versiones del botón principal (de 43 a 56 px de alto, radios de 6 a 14 px,
+   fondos lisos, degradados y un verde azulado en el Atlas), el secundario copiado en cinco
+   sitios y tres formas de «Salir sin guardar». Aquí queda una sola regla para cada uno y las
+   pantallas solo eligen cuál usan. El selector es largo a propósito: tiene que ganar a las
+   reglas de cada pantalla de las secciones anteriores sin recurrir a !important.
+   Medidas: todo botón llega a 44 px (el mínimo táctil); el principal, los de ancho completo
+   y los de los menús, a 48 px, salvo en la mesa, donde se quedan en 44 para no quitar sitio
+   a la línea. */
+html body #app[data-screen][data-screen][data-screen][data-screen][data-screen] :is(.btn, .comp-splash-start) { min-height: 44px; border-radius: 10px; }
+html body #app[data-screen][data-screen][data-screen][data-screen][data-screen] :is(.btn-primary, .btn-block, .comp-splash-start) { font: 650 .9375rem/1.2 var(--ui-font); letter-spacing: 0; text-transform: none; }
+html body #app[data-screen][data-screen][data-screen][data-screen][data-screen] :is(.btn-primary, .btn-block, .overlay .actions .btn, .comp-splash-start) { min-height: 48px; padding: 12px 18px; }
+html body #app.atlas-board[data-screen][data-screen][data-screen][data-screen][data-screen] :is(.placement-dock, .board-result, .slot-confirm) :is(.btn, .btn-block) { min-height: 44px; padding: 10px 14px; }
+html body #app[data-screen][data-screen][data-screen][data-screen][data-screen] :is(.btn-primary, .comp-splash-start) {
+  border: 1px solid color-mix(in srgb, var(--scene-color) 78%, #000);
+  background: var(--scene-color); color: #fff9ed;
+  box-shadow: inset 0 1px 0 #ffffff24, 0 4px 12px color-mix(in srgb, var(--scene-color) 22%, transparent);
+}
+html body #app[data-screen][data-screen][data-screen][data-screen][data-screen] .btn-secondary { border: 1px solid var(--edition-line); background: var(--edition-surface); color: var(--edition-ink); box-shadow: none; }
+:root:not([data-theme="dark"]) body #app[data-screen][data-screen][data-screen][data-screen][data-screen] .btn-secondary {
+  border-color: #b9a98e;
+  background: linear-gradient(155deg, rgba(250,246,235,.97), rgba(232,221,201,.96));
+  color: #5b4936;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 2px 4px rgba(54,41,26,.12);
+}
+html body #app[data-screen][data-screen][data-screen][data-screen][data-screen] .btn-ghost { border-color: transparent; background: transparent; color: var(--edition-ink); box-shadow: none; }
+/* La salida que descarta algo (salir sin guardar, borrar el perfil, eliminar la cuenta): un
+   enlace en el color de error, siempre debajo de la opción de quedarse. */
+html body #app[data-screen][data-screen][data-screen][data-screen][data-screen] .exit-discard { border-color: transparent; background: transparent; box-shadow: none; color: var(--edition-danger); text-decoration: underline; text-underline-offset: 3px; }
+/* Desactivado: un solo aspecto en vez de seis opacidades sueltas. */
+html body #app[data-screen][data-screen][data-screen][data-screen][data-screen] :is(.btn, .comp-splash-start):disabled { opacity: .5; filter: saturate(.35); cursor: not-allowed; box-shadow: none; }
+/* Las «×» de cerrar, con el área táctil mínima (la de expulsar de la sala crece hacia fuera
+   para no tapar el retrato). */
+html body #app :is(.avatar-picker-close, .settings-close) { width: 44px; height: 44px; min-height: 44px; }
+html body #app .table-seat .kick-btn::before { content: ""; position: absolute; inset: -7px; }

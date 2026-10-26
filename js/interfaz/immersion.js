@@ -963,6 +963,7 @@
     const label = document.createElement('b');
     label.textContent = modal.classList.contains('success') ? '✓ Bien colocado' : '× No encaja ahí';
     const date = document.createElement('span'); date.className = 'year'; date.textContent = reveal?.querySelector('.year')?.textContent || '';
+    if (date.textContent.length > 9) date.classList.add('year-long');
     summary.append(label, date); modal.prepend(summary);
     const details = document.createElement('details'); details.className = 'result-history';
     const toggle = document.createElement('summary'); toggle.textContent = 'Ver historia'; details.append(toggle);

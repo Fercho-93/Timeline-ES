@@ -284,5 +284,5 @@
     input.closest(".segmented")?.querySelectorAll(".segmented-option").forEach(op => op.classList.toggle("is-on", op.querySelector("input").checked));
   });
 
-  CT.settingsButton = () => '<button class="icon-btn" data-settings-action="open">Ajustes</button>';
+  CT.settingsButton = () => '<button class="btn btn-secondary" data-settings-action="open">Ajustes</button>';
 })();

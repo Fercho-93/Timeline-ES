@@ -1844,7 +1844,7 @@ async function shareRoom() {
 }
 
 function showQr() {
-  document.body.insertAdjacentHTML("beforeend", `<div class="overlay qr-overlay" data-qr-overlay><div class="modal qr-modal"><div class="eyebrow">Invitación a la sala</div><h2>Escanea para entrar</h2><div class="qr-frame"><canvas id="room-qr" aria-label="Código QR de invitación a la sala"></canvas></div><div class="qr-room-code">${roomCode}</div><p>Abre la cámara del otro móvil y apunta al código. El enlace rellenará automáticamente la sala.</p><div class="actions" style="display:grid"><button class="btn btn-primary" data-online-action="share">Compartir enlace</button><button class="btn btn-secondary" data-online-action="close-qr">Cerrar</button></div></div></div>`);
+  document.body.insertAdjacentHTML("beforeend", `<div class="overlay qr-overlay" data-qr-overlay><div class="modal qr-modal"><div class="eyebrow">Invitación a la sala</div><h2>Escanea para entrar</h2><div class="qr-frame"><canvas id="room-qr" aria-label="Código QR de invitación a la sala"></canvas></div><div class="qr-room-code">${roomCode}</div><p>Abre la cámara del otro móvil y apunta al código. El enlace rellenará automáticamente la sala.</p><div class="actions" style="display:grid"><button class="btn btn-primary" data-online-action="share">Compartir enlace</button><button class="btn btn-primary btn-block" data-online-action="close-qr">Cerrar</button></div></div></div>`);
   try { CT.QrEncode.draw(document.getElementById("room-qr"), invitationUrl()); }
   catch (error) { console.error(error); showToast("La dirección es demasiado larga para generar el QR"); }
   abreCapa(document.querySelector("[data-qr-overlay]"), true);
