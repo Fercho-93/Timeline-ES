@@ -3967,6 +3967,8 @@ html #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell { 
 }
 :root #app .overlay .modal:not(.board-result, .quick-result, .enc-modal, .settings-modal, .rules) { border-radius: 16px; }
 :root:not([data-theme="dark"]) #app .overlay .modal:not(.board-result, .quick-result, .enc-modal, .settings-modal, .rules) :is(h2, h3) { color: #2a1a10; }
+/* La cabecera del ranking es de cuero oscuro: su título («Todas», «Hoy») sigue en claro. */
+:root:not([data-theme="dark"]) #app .overlay .modal .ranking-hero h2 { color: #fff5df; }
 
 /* Atlas y Ajustes con el mismo pergamino: los bloques grandes como panel de papel y las piezas
    que llevan dentro (colecciones, logros) como láminas más claras. */

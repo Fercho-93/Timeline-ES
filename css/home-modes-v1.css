@@ -7,10 +7,15 @@
 #app .mode-entry-grid::before { content: "ELIGE TU CAMINO"; grid-column: 1 / -1; }
 #app .mode-daily-family { margin: -2px 4px 2px; color: #665442; font: .8rem/1.4 var(--ui-font); }
 /* «El reto de hoy», su pie y el recuento de temas de la mesa pública se leen sobre el mapa del
-   fondo (en el ordenador, sobre el globo azul): van sobre una píldora de papel. */
+   fondo (en el ordenador, sobre el globo azul): tinta más oscura y un halo de papel en las propias
+   letras, como el lema de la portada. */
 #app .mode-daily-zone::before, #app .mode-daily-family, #app .mode-topic-count {
-  width: fit-content; padding: 3px 10px; border-radius: 12px; background: color-mix(in srgb, var(--edition-paper, #f6f1e8) 86%, transparent);
+  color: #3f2a17; font-weight: 600; text-shadow: 0 0 1px #fbf4e4, 0 0 3px #fbf4e4, 0 0 5px #fbf4e4, 0 0 9px #fbf4e4, 0 0 16px #f6ecd6;
 }
+:root[data-theme="dark"] #app .mode-daily-zone::before, :root[data-theme="dark"] #app .mode-daily-family, :root[data-theme="dark"] #app .mode-topic-count {
+  text-shadow: 0 0 1px #140d08, 0 0 3px #140d08, 0 0 5px #140d08, 0 0 9px #140d08, 0 0 16px #140d08;
+}
+:root[data-theme="dark"] #app .mode-topic-count { color: #e9dcc3; }
 #app .mode-play-zone { min-width: 0; }
 #app .mode-play-card { width: 100%; backface-visibility: visible; }
 #app .mode-choices-reveal { contain: layout paint; }
@@ -94,7 +99,7 @@
 #app .mode-topic-grid label:has(input:checked) { color: var(--ink-solid-contrast, #fff); background: var(--ink-solid, var(--terracota)); border-color: transparent; }
 #app .mode-topic-grid label:has(input:checked)::before { border-color: currentColor; color: currentColor; }
 #app .mode-topic-grid label:has(input:focus-visible) { outline: 3px solid var(--edition-rust); outline-offset: 2px; }
-#app .mode-topic-count { margin: -4px 2px 0; justify-self: center; }
+#app .mode-topic-count { margin: -4px 2px 0; }
 /* Jugar online: el tablón de mesas abiertas (como el vestíbulo de Risk) y la pantalla para crear una. */
 #app .public-board { display: grid; gap: 8px; }
 /* Títulos de sección de «Jugar online»: versalitas doradas con una línea fina, como «EL RETO DE HOY»

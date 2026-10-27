@@ -6,7 +6,7 @@
 .account-card { padding:0; gap:0; overflow:hidden; border:1px solid var(--edition-line); border-radius:24px; background:var(--edition-surface); box-shadow:0 16px 40px #3a241614; font-family:var(--ui-font); color:var(--edition-ink); }
 .account-hero,.ranking-hero { position:relative; overflow:hidden; background:radial-gradient(ellipse at 100% 0%,#c2926955,transparent 65%),repeating-radial-gradient(circle at 105% 15%,transparent 0 48px,#e3c78e12 49px 50px,transparent 51px 92px),#3a2416; color:#faf4e6; }
 .account-hero { padding:24px; }
-.account-kicker { display:block; font:600 .63rem/1.5 var(--ui-font); letter-spacing:.18em; color:#e4c891; }
+.account-kicker { display:block; font:600 .63rem/1.5 var(--ui-font); letter-spacing:.18em; color:#f0d8a8; }
 .account-save-state { font-size:.7rem; color:#ead9bd; }
 .account-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border-top:1px solid #e4c89140; padding-top:18px; gap:16px; }
 .account-metrics > div+div { border-left:1px solid #e4c89140; padding-left:12px; }
@@ -85,7 +85,12 @@
 #app .ranking-nav .btn, .ranking-nav .btn { color: #f0d08a; border: 1px solid #e0bd6f; background: #f0d08a1f; font-weight: 700; }
 #app .ranking-nav .btn:not(:disabled):active { background: #f0d08a40; }
 #app .ranking-nav .btn:disabled, .ranking-nav .btn:disabled { opacity: .4; color: #f0d08a; border-color: #e0bd6f99; }
-.ranking-time { display: block; opacity: .7; font-size: .7rem; }
+.ranking-time { display: block; opacity: .85; font-size: .7rem; }
+/* Las flechas ‹ › van sobre la cabecera oscura: la regla general de los botones fantasma las teñía
+   de tinta oscura y no se veían. */
+html body #app[data-screen][data-screen][data-screen][data-screen][data-screen] .ranking-nav .btn-ghost { color: #f0d08a; }
+/* «Tú» en el podio: las placas son de papel claro también en oscuro, así que el latón claro no se leía. */
+.ranking-medallion .ranking-you { color: #7a4f1c; }
 .ranking-more { display: block; margin: 12px auto 0; }
 
 .account-signin { padding:0 20px 16px; font:.8rem/1.5 var(--ui-font); }
