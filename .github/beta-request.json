@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 812,
+  "cache": 846,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Apertura rediseñada como lámina ilustrada y minijuego de quién empieza ilustrado y más fácil de contestar en todas las modalidades, con acabado común en duelos, finales y salas. Las mesas públicas dejan responder con tiempo y enseñan 8 segundos quién empieza; el abanico de cartas se puede hojear fuera de turno, también en Retos rápidos. Menos calor y batería en iPhone"
+  "reason": "Textos legibles en claro y en oscuro: cabecera de la partida, dibujos de dificultad, ranking (título, flechas y «Tú») y rótulos de la portada y de las mesas públicas, sin recuadros sobre las letras. Se quita «Profundidad al mover el móvil» de Ajustes"
 }
