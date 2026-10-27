@@ -851,7 +851,6 @@
       // barra del navegador. Antes de elegir hueco no se añade un panel redundante.
       if (slot && timelineSection) timelineSection.insertAdjacentElement('afterend', dock);
     }
-    refreshDepth();
     fitBoard(container);
     scheduleCardText(container);
     if (screen === 'game' && CT.Mesa.ancho() <= 699) window.requestAnimationFrame?.(() => {
@@ -938,7 +937,6 @@
         active: navigation.querySelector('[aria-current]')
       });
     }
-    refreshDepth();
   }
   function closeSurface(modal) {
     const saved = surfaceNav.get(modal); if (!saved) return;
@@ -951,7 +949,6 @@
       saved.active?.setAttribute('aria-current','page');
     }
     surfaceNav.delete(modal);
-    setTimeout(refreshDepth, 0);
   }
   function compactResult(overlay) {
     if (!overlay.hasAttribute('data-result-card')) return false;
@@ -987,83 +984,5 @@
     }
   }
 
-  // Las capas que leen la profundidad, en el mismo orden en que edition.css las dibuja:
-  // el paisaje y las láminas del atlas, y el fondo y el dibujo de cada portada. La lista
-  // está aquí y no marcada con una clase porque la fórmula de cada capa vive en la hoja:
-  // esto es el índice de esas reglas. Si allí aparece una capa nueva, aquí se añade su
-  // selector. Las variables se escriben en la capa y no en la portada a propósito —
-  // están declaradas sin herencia, así que ponerlas arriba ya no llegaría abajo, y esa
-  // es justo la razón de que una escritura no recalcule toda la portada.
-  const DEPTH_LAYERS = '.atlas-landscape img, .atlas-specimens, .panel-backdrop img, .panel-art img';
-
-  // Volver a escribir una variable con el valor que ya tenía cuesta lo mismo que
-  // cambiarla. Con el móvil quieto sobre la mesa el giroscopio sigue avisando, y sin esta
-  // comparación cada aviso repintaría lo mismo otra vez.
-  function setVar(node, name, value) {
-    if (node.style.getPropertyValue(name) !== value) node.style.setProperty(name, value);
-  }
-
-  // Un único listener de orientación, conectado solo con permiso y en las portadas.
-  let depthListening = false, depthFrame = 0, origin = null, tilt = {x: 0, y: 0};
-  function depthTarget() {
-    const app = document.getElementById('app');
-    if (!app || playing.has(app.dataset.screen) || app.querySelector('.overlay')) return null;
-    return app.querySelector('[data-depth-scene]') || app.querySelector('.gallery-panel.active') || app.querySelector('.gallery-panel');
-  }
-  function onTilt(event) {
-    if (!Number.isFinite(event.beta) || !Number.isFinite(event.gamma)) return;
-    origin ||= {beta: event.beta, gamma: event.gamma};
-    tilt = {x: Math.max(-1, Math.min(1, (event.gamma - origin.gamma) / 18)), y: Math.max(-1, Math.min(1, (event.beta - origin.beta) / 18))};
-    if (depthFrame) return;
-    depthFrame = requestAnimationFrame(() => {
-      depthFrame = 0;
-      const scene = depthTarget();
-      if (!scene) return;
-      const scenes = scene.matches('.gallery-panel')
-        ? document.querySelectorAll('#app .gallery-panel') : [scene];
-      // Dos decimales: por debajo de eso el desplazamiento no se ve, y redondear es lo
-      // que hace que un móvil casi quieto deje de escribir en cada aviso.
-      const x = `${(tilt.x * 7).toFixed(2)}px`, y = `${(tilt.y * 5).toFixed(2)}px`;
-      const rx = `${(-tilt.y * 2).toFixed(2)}deg`, ry = `${(tilt.x * 2.5).toFixed(2)}deg`;
-      scenes.forEach(target => {
-        const rect = target.getBoundingClientRect();
-        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
-        target.querySelectorAll(DEPTH_LAYERS).forEach(layer => {
-          setVar(layer, '--depth-x', x);
-          setVar(layer, '--depth-y', y);
-        });
-        // El giro sí lo usa la portada en su propia regla, así que ahí se queda.
-        setVar(target, '--cover-rx', rx);
-        setVar(target, '--cover-ry', ry);
-      });
-    });
-  }
-  function refreshDepth() {
-    const enabled = CT.effectPrefs?.().depth && !reduced() && !document.hidden && !!depthTarget();
-    if (enabled && !depthListening) { origin = null; window.addEventListener('deviceorientation', onTilt, {passive: true}); depthListening = true; }
-    else if (!enabled && depthListening) {
-      window.removeEventListener('deviceorientation', onTilt); depthListening = false; origin = null;
-      cancelAnimationFrame(depthFrame); depthFrame = 0;
-      document.querySelectorAll('[data-depth-scene], .gallery-panel').forEach(scene => {
-        scene.style.removeProperty('--cover-rx');
-        scene.style.removeProperty('--cover-ry');
-        scene.querySelectorAll(DEPTH_LAYERS).forEach(layer => {
-          layer.style.removeProperty('--depth-x');
-          layer.style.removeProperty('--depth-y');
-          layer.style.removeProperty('--scene-scroll');
-        });
-      });
-    }
-  }
-  async function requestDepth() {
-    try {
-      if (!window.DeviceOrientationEvent) return false;
-      if (typeof window.DeviceOrientationEvent.requestPermission === 'function') return await window.DeviceOrientationEvent.requestPermission() === 'granted';
-      return true;
-    } catch { return false; }
-  }
-  document.addEventListener('visibilitychange', refreshDepth);
-  window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', refreshDepth);
-  CT.UI = {isPlaying: screen => playing.has(screen), header, nav, mount, captureBoard, compactResult, confirmExit, askDialog, confirmDialog, pulseGiftDialog, reveal, openSurface, closeSurface, requestDepth,
-    updateEffects() { refreshDepth(); }};
+  CT.UI = {isPlaying: screen => playing.has(screen), header, nav, mount, captureBoard, compactResult, confirmExit, askDialog, confirmDialog, pulseGiftDialog, reveal, openSurface, closeSurface};
 })();

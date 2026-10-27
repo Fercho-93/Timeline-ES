@@ -155,90 +155,15 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
 {
   const w=boot();
   try {
-    assert.deepEqual(JSON.parse(JSON.stringify(w.CONTINUUM.effectPrefs())),{sound:false,haptics:false,depth:false,sfx:true,sfxVolume:0.7});
+    assert.deepEqual(JSON.parse(JSON.stringify(w.CONTINUUM.effectPrefs())),{sound:false,haptics:false,sfx:true,sfxVolume:0.7});
     assert.equal(w.CONTINUUM.setAmbience, undefined, 'ya no hay música que activar');
     click(w,'[data-settings-action="open"]');
     assert.equal(w.document.querySelectorAll('.home-nav').length,1);
     assert.ok(w.document.querySelector('.settings-modal .home-nav'));
     assert.equal(w.document.querySelector('[data-settings-action="ambience"]'), null, 'Ajustes no ofrece música');
-    w.DeviceOrientationEvent={requestPermission:async()=> 'denied'};
-    const depth=w.document.querySelector('[data-settings-action="depth"]');depth.checked=true;depth.dispatchEvent(new w.Event('change',{bubbles:true}));
-    await new Promise(resolve=>setTimeout(resolve,0));
-    assert.equal(w.CONTINUUM.effectPrefs().depth,false);assert.equal(depth.checked,false);
+    assert.equal(w.document.querySelector('[data-settings-action="depth"]'), null, 'Ajustes ya no ofrece profundidad al mover el móvil');
     click(w,'[data-settings-action="close"]');
     assert.ok(w.document.querySelector('.shell > .home-nav'));
   } finally {w.close();}
 }
-// La profundidad se escribe en cada aviso del giroscopio, que en un móvil en la mano
-// llega a ser sesenta veces por segundo. Poner esas variables en la portada obligaba al
-// navegador a recalcular el estilo de todo lo que cuelga de ella —fondo, dibujo, rótulo,
-// índice, lámina— y no solo el de la capa que se mueve. Ahora van declaradas sin herencia
-// (@property en css/edition.css) y se escriben capa por capa, que es lo que lo evita. Las dos
-// mitades tienen que ir juntas: con la declaración sin la escritura en las capas, el
-// efecto se apagaría en silencio.
-{
-  const css = read('css/edition.css');
-  for (const [nombre, tipo] of [['--depth-x','<length>'],['--depth-y','<length>'],['--scene-scroll','<length>'],['--cover-rx','<angle>'],['--cover-ry','<angle>']]) {
-    const regla = new RegExp(`@property ${nombre} \\{[^}]*syntax: '${tipo}'[^}]*inherits: false`);
-    assert.ok(regla.test(css), `${nombre} se declara como ${tipo} y sin heredarse`);
-  }
-}
-{
-  // Sin preferencia de movimiento reducido: con ella la profundidad no se enciende, y el
-  // valor tiene que estar puesto antes de que se carguen los guiones porque alguno lo
-  // consulta al arrancar.
-  const w = boot(false);
-  try {
-    w.DeviceOrientationEvent = {requestPermission: async () => 'granted'};
-    click(w,'[data-settings-action="open"]');
-    const depth = w.document.querySelector('[data-settings-action="depth"]');
-    depth.checked = true; depth.dispatchEvent(new w.Event('change',{bubbles:true}));
-    await new Promise(resolve => setTimeout(resolve, 0));
-    assert.equal(w.CONTINUUM.effectPrefs().depth, true, 'con permiso concedido, la profundidad queda encendida');
-    click(w,'[data-settings-action="close"]');
-    // Cerrar los ajustes repinta la portada y vuelve a conectar el sensor en el turno
-    // siguiente: hasta que eso pasa no hay a quién escribirle.
-    await new Promise(resolve => setTimeout(resolve, 20));
-
-    const inclina = (beta, gamma) => {
-      const event = new w.Event('deviceorientation');
-      Object.defineProperties(event, {beta:{value:beta}, gamma:{value:gamma}});
-      w.dispatchEvent(event);
-    };
-    // Las portadas de las colecciones se despliegan en «Jugar solo».
-    w.CONTINUUM.ModeHubs.open('hub-solo'); w.document.querySelector('[data-inline-route]').click();
-    inclina(0, 0);            // la primera lectura fija el origen
-    inclina(9, 9);            // media inclinación en los dos ejes
-    await new Promise(resolve => setTimeout(resolve, 40));   // el frame que escribe
-
-    const panel = w.document.querySelector('#app .gallery-panel');
-    assert.ok(panel, 'hay portadas en la galería');
-    const capas = [...panel.querySelectorAll('.panel-backdrop img, .panel-art img')];
-    assert.ok(capas.length >= 2, 'la portada trae su fondo y su dibujo');
-    for (const capa of capas) assert.ok(capa.style.getPropertyValue('--depth-x'), 'cada capa recibe su propia profundidad');
-    // Lo que de verdad protege este bloque: si alguien devuelve la escritura a la portada,
-    // las variables ya no bajan solas hasta las capas y el efecto se apaga sin avisar.
-    assert.equal(panel.style.getPropertyValue('--depth-x'), '', 'la profundidad no se escribe en la portada, que arrastraría a todo su contenido');
-    assert.ok(panel.style.getPropertyValue('--cover-rx'), 'el giro sí lo usa la portada en su propia regla y ahí se queda');
-
-    // Un aviso que no mueve el móvil no vuelve a escribir: con el teléfono sobre la mesa
-    // el sensor sigue avisando igual.
-    const antes = capas[0].style.getPropertyValue('--depth-x');
-    capas[0].style.setProperty('--depth-x', antes);   // el mismo valor no cuenta como cambio
-    inclina(9, 9);
-    await new Promise(resolve => setTimeout(resolve, 40));
-    assert.equal(capas[0].style.getPropertyValue('--depth-x'), antes, 'una lectura repetida deja el valor donde estaba');
-
-    // Y al apagar el efecto no queda rastro ni arriba ni abajo.
-    click(w,'[data-settings-action="open"]');
-    const otra = w.document.querySelector('[data-settings-action="depth"]');
-    otra.checked = false; otra.dispatchEvent(new w.Event('change',{bubbles:true}));
-    await new Promise(resolve => setTimeout(resolve, 0));
-    const panelTras = w.document.querySelector('#app .gallery-panel') || panel;
-    assert.equal(panelTras.style.getPropertyValue('--cover-rx'), '', 'apagar el efecto limpia el giro de la portada');
-    for (const capa of panelTras.querySelectorAll('.panel-backdrop img, .panel-art img'))
-      assert.equal(capa.style.getPropertyValue('--depth-x'), '', 'y la profundidad de cada capa');
-  } finally {w.close();}
-}
-console.log('Profundidad: variables sin herencia, escritas capa por capa, sin repetir lecturas y limpias al apagarse: OK');
 console.log('Atlas: muestras, navegación, confirmación única, zoom, guardado, salida online y permisos opcionales: OK');

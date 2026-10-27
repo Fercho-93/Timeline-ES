@@ -413,8 +413,6 @@
       window.CONTINUUM.Effects?.transition?.(open ? 'unroll' : 'fold');
       inlineOpen[app.dataset.screen] = open;
       inlineCollections.setAttribute('aria-expanded', String(open));
-      // El efecto de profundidad al inclinar el móvil también vale para las portadas desplegadas.
-      window.CONTINUUM.UI?.updateEffects?.();
       return;
     }
     const topicInput=event.target.closest('[data-public-topic]');

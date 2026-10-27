@@ -1,5 +1,5 @@
 // La pantalla de Ajustes y las preferencias que no dependen de la partida: apariencia
-// (tema y tamaño del texto), sonido, vibración y profundidad, más la ayuda (comentarios
+// (tema y tamaño del texto), sonido y vibración, más la ayuda (comentarios
 // con diagnóstico, edad declarada, privacidad). Vive aparte porque se abre igual desde
 // cualquier pantalla (la barra de abajo y el menú de cada partida, local u online) y
 // porque se guarda por móvil, no por cuenta ni por modalidad (`hilo-ajustes-v1`, ver
@@ -10,7 +10,7 @@
   const CT = window.CONTINUUM;
   const KEY = "hilo-ajustes-v1";
   const TEXT_SIZES = [['100','Normal'],['125','Grande'],['150','Muy grande'],['200','Doble']];
-  const DEFAULTS = { theme: "light", textSize: "100", haptics: false, depth: false, sfx: true, sfxVolume: 70 };
+  const DEFAULTS = { theme: "light", textSize: "100", haptics: false, sfx: true, sfxVolume: 70 };
   // Las dos apariencias, en un solo sitio: de aquí salen el desplegable, la validación
   // de lo guardado y el color de la barra del navegador.
   const THEMES = {
@@ -38,6 +38,8 @@
       const settings = { ...DEFAULTS, ...stored };
       // La música ambiente se quitó del juego: se descartan sus ajustes guardados.
       delete settings.ambience; delete settings.ambienceVolume;
+      // Igual con la profundidad al mover el móvil, que también se quitó.
+      delete settings.depth;
       // La versión anterior ofrecía seis aspectos. Se reducen a los dos equivalentes
       // sin tocar el resto de preferencias y se persiste la migración para hacerla una
       // sola vez. Un valor desconocido vuelve al aspecto principal.
@@ -109,7 +111,7 @@
       </section>
 
       <section class="settings-section settings-effects">
-        <div class="settings-section-heading"><span aria-hidden="true">02</span><div><h2>Sonido y movimiento</h2><p>Pequeños detalles para acompañar la partida.</p></div></div>
+        <div class="settings-section-heading"><span aria-hidden="true">02</span><div><h2>Sonido y vibración</h2><p>Pequeños detalles para acompañar la partida.</p></div></div>
         <label class="opt-row"><span>Vibración suave</span><input type="checkbox" data-settings-action="haptics" aria-describedby="haptics-help" ${s.haptics === true && hapticsSupported ? "checked" : ""} ${hapticsSupported ? "" : "disabled"}></label>
         <p class="hint" id="haptics-help" role="status">${hapticsSupported ? 'Un toque breve al elegir posición, confirmar y recibir el resultado.' : (window.Capacitor?.isNativePlatform?.() ? 'La vibración no está disponible en esta versión de la app. Comprueba si hay una actualización.' : 'Este navegador no ofrece vibración. En iPhone necesitas la app de TestFlight o App Store.')}</p>
         ${hapticsSupported ? `<button class="btn btn-secondary" data-settings-action="test-haptics" ${s.haptics ? '' : 'disabled'}>Probar vibración</button>` : ''}
@@ -119,8 +121,6 @@
           <input id="ajuste-volumen-efectos" type="range" min="0" max="100" step="5" value="${Math.max(0, Math.min(100, Number(s.sfxVolume) || 0))}" data-settings-action="sfx-volume" aria-describedby="sfx-help">
           <p class="hint" id="sfx-help">Notas suaves al coger y colocar cartas, acertar o fallar. En iPhone respetan el modo silencio.</p>
         </div>
-        <label class="opt-row"><span>Profundidad al mover el móvil</span><input type="checkbox" data-settings-action="depth" ${s.depth === true ? "checked" : ""}></label>
-        <p class="hint" data-depth-help>La profundidad solo actúa en las portadas y respeta «reducir movimiento».</p>
         <p class="hint">Los efectos acompañan al resultado; toda la información también se muestra en texto.</p>
       </section>
 
@@ -178,7 +178,6 @@
     draftLook = { theme: settings.theme, textSize: settings.textSize };
     save();
     applyTheme();
-    CT.UI?.updateEffects();
     CT.closeDialog();
     showToast('Preferencias restablecidas');
   }
@@ -192,7 +191,7 @@
     CT.openDialog(document.querySelector('[data-overlay="settings"]'), true);
   }
 
-  CT.effectPrefs = () => ({ sound: false, haptics: settings.haptics === true, depth: settings.depth === true, sfx: settings.sfx === true, sfxVolume: settings.sfxVolume / 100 });
+  CT.effectPrefs = () => ({ sound: false, haptics: settings.haptics === true, sfx: settings.sfx === true, sfxVolume: settings.sfxVolume / 100 });
   function previewLook() {
     const preview=document.querySelector('[data-look-preview]'), apply=document.querySelector('[data-settings-action="apply-look"]');
     if(!preview||!apply)return;
@@ -215,18 +214,10 @@
       if (!['100','125','150','200'].includes(event.target.value)) return;
       draftLook.textSize = event.target.value; previewLook(); CT.Effects?.transition?.('select'); return;
     }
-    if (["haptics", "depth", "sfx"].includes(event.target.dataset.settingsAction)) {
+    if (["haptics", "sfx"].includes(event.target.dataset.settingsAction)) {
       const key = event.target.dataset.settingsAction;
-      let enabled = event.target.checked;
-      if (key === 'depth' && enabled) {
-        event.target.disabled = true;
-        enabled = await CT.UI.requestDepth();
-        event.target.disabled = false;
-        event.target.checked = enabled;
-        const help = document.querySelector('[data-depth-help]');
-        if (!enabled && help) help.textContent = 'Este dispositivo no ha permitido usar el movimiento. Las portadas siguen funcionando.';
-      }
-      settings[key] = enabled; save(); CT.UI?.updateEffects();
+      const enabled = event.target.checked;
+      settings[key] = enabled; save();
       CT.Effects?.transition?.('select');
       if (key === 'haptics') {
         const test = document.querySelector('[data-settings-action="test-haptics"]');

@@ -5,7 +5,7 @@
     1 · Variables de la edición, escenas por mazo y fondo
     2 · Piel común sobre styles.css: barra superior, inicio, botones, diálogos y barra inferior sencilla
     3 · Menús y colecciones: galería, archivo de libros, carta única, enciclopedia y Android estrecho
-    4 · Mesa del atlas (#app.atlas-board): cabecera, profundidad, medida de la mesa y mazos cerrados
+    4 · Mesa del atlas (#app.atlas-board): cabecera, medida de la mesa y mazos cerrados
     5 · Jugar en solitario: reto diario, duelo por enlace, carta en la mano y resultado
     6 · Competición, colecciones con dioramas y mesa de explorador
     7 · Enciclopedia, Ajustes, resultado, competición y sala de espera
@@ -358,7 +358,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 @keyframes edition-line { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @media (min-width: 960px) { .splash-hitos { grid-column: 2; margin: 10px 0 0; } }
 
-/* ══ 4 · Mesa del atlas (#app.atlas-board): cabecera, profundidad, medida de la mesa y mazos cerrados ══ */
+/* ══ 4 · Mesa del atlas (#app.atlas-board): cabecera, medida de la mesa y mazos cerrados ══ */
 /* Atlas: navegación común, arte integrado y mesa compacta. */
 :root { --atlas-selection: #9b452b; }
 :root[data-theme="dark"] { --atlas-selection: #f2aa83; }
@@ -373,28 +373,15 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .enc-modal { padding-bottom: calc(100px + var(--safe-bottom)); }
 #app .enc-modal .atlas-nav { position: fixed; }
 #app .atlas-landscape { position: absolute; inset: 0; z-index: -1; max-width: none; overflow: hidden; }
-/* La profundidad de las portadas la escribe immersion.js en cada aviso del giroscopio, y
-   eso llega a ser sesenta veces por segundo. Declarar aquí que estas variables no se
-   heredan es lo que impide que cada escritura obligue a recalcular el estilo de la
-   portada entera —fondo, dibujo, rótulo, índice, lámina— en lugar del de la capa que de
-   verdad cambia. A cambio, quien las escribe tiene que ponerlas en cada capa y no en la
-   portada que las contiene: esa lista vive en immersion.js, junto a esta explicación.
-   En un navegador sin @property el efecto se ve exactamente igual; solo se pierde el
-   ahorro, que es lo que había antes de todo esto. */
-@property --depth-x { syntax: '<length>'; inherits: false; initial-value: 0px; }
-@property --depth-y { syntax: '<length>'; inherits: false; initial-value: 0px; }
-@property --scene-scroll { syntax: '<length>'; inherits: false; initial-value: 0px; }
-@property --cover-rx { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
-@property --cover-ry { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
-#app .atlas-landscape img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 35%; filter: sepia(1) saturate(.55); transform: translate(var(--depth-x,0px), var(--depth-y,0px)) scale(1.06); transition: transform 350ms ease-out; }
+#app .atlas-landscape img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 35%; filter: sepia(1) saturate(.55); transform: scale(1.06); }
 #app .atlas-landscape::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, var(--edition-paper) 0%, color-mix(in srgb,var(--edition-paper) 88%,transparent) 18%, transparent 47%, color-mix(in srgb,var(--edition-paper) 35%,transparent) 70%,var(--edition-paper) 100%); }
-#app .atlas-specimens { display: flex; justify-content: center; gap: 10px; align-items: end; max-width: 510px; width: 100%; justify-self: center; transform: translate(calc(var(--depth-x,0px) * -0.6), calc(var(--depth-y,0px) * -0.6)); transition: transform 350ms ease-out; }
+#app .atlas-specimens { display: flex; justify-content: center; gap: 10px; align-items: end; max-width: 510px; width: 100%; justify-self: center; }
 .atlas-specimens figure { width: 30%; margin: 0; padding: 4px; border: 1px solid var(--edition-line); background: var(--edition-surface); box-shadow: 0 8px 14px #382a2233; border-radius: 6px; overflow: hidden; }
 .atlas-specimens figure:first-child { transform: rotate(-8deg) translateY(4px); }
 .atlas-specimens figure:last-child { transform: rotate(8deg) translateY(4px); }
 #app .atlas-specimens img { position: static; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; filter: sepia(1) saturate(.55); }
 .atlas-specimens figcaption { padding: 5px 2px; color: var(--edition-ink); text-align: center; font-size: .8rem; line-height: 1.2; overflow-wrap: anywhere; }
-#app .gallery-panel img { transform: translate(var(--depth-x,0px),var(--depth-y,0px)) scale(1.035); transition: transform 500ms ease-out; }
+#app .gallery-panel img { transform: scale(1.035); }
 #app.atlas-board .shell { max-width: 940px; padding: max(4px,var(--safe-top)) 12px max(12px,var(--safe-bottom)); }
 #app.atlas-board .atlas-topbar { margin-bottom: 4px; }
 #app.atlas-board .game-head { margin: 0 0 6px; gap: 8px; }
