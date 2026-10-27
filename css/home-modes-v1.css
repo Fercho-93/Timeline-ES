@@ -6,6 +6,11 @@
 #app .mode-daily-zone::before { content: "EL RETO DE HOY"; }
 #app .mode-entry-grid::before { content: "ELIGE TU CAMINO"; grid-column: 1 / -1; }
 #app .mode-daily-family { margin: -2px 4px 2px; color: #665442; font: .8rem/1.4 var(--ui-font); }
+/* «El reto de hoy», su pie y el recuento de temas de la mesa pública se leen sobre el mapa del
+   fondo (en el ordenador, sobre el globo azul): van sobre una píldora de papel. */
+#app .mode-daily-zone::before, #app .mode-daily-family, #app .mode-topic-count {
+  width: fit-content; padding: 3px 10px; border-radius: 12px; background: color-mix(in srgb, var(--edition-paper, #f6f1e8) 86%, transparent);
+}
 #app .mode-play-zone { min-width: 0; }
 #app .mode-play-card { width: 100%; backface-visibility: visible; }
 #app .mode-choices-reveal { contain: layout paint; }
@@ -89,7 +94,7 @@
 #app .mode-topic-grid label:has(input:checked) { color: var(--ink-solid-contrast, #fff); background: var(--ink-solid, var(--terracota)); border-color: transparent; }
 #app .mode-topic-grid label:has(input:checked)::before { border-color: currentColor; color: currentColor; }
 #app .mode-topic-grid label:has(input:focus-visible) { outline: 3px solid var(--edition-rust); outline-offset: 2px; }
-#app .mode-topic-count { margin: -4px 2px 0; }
+#app .mode-topic-count { margin: -4px 2px 0; justify-self: center; }
 /* Jugar online: el tablón de mesas abiertas (como el vestíbulo de Risk) y la pantalla para crear una. */
 #app .public-board { display: grid; gap: 8px; }
 /* Títulos de sección de «Jugar online»: versalitas doradas con una línea fina, como «EL RETO DE HOY»

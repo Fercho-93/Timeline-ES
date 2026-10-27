@@ -25,6 +25,15 @@ html #app.mesa-escena > .overlay:not(.board-result-layer) {
     repeating-linear-gradient(94deg, transparent 0 29px, #fff8e414 29px 30px),
     color-mix(in srgb, var(--edition-paper) 48%, transparent);
 }
+/* En oscuro, el foco de luz crema volvía gris la cabecera de la mesa y apagaba su texto
+   (el título de la ronda, las vidas, «por colocar»): ahí basta un brillo cálido tenue. */
+:root[data-theme="dark"] .mesa-fondo {
+  background:
+    radial-gradient(ellipse at 48% 28%, #c2926914 0 16%, transparent 58%),
+    repeating-linear-gradient(4deg, transparent 0 7px, #0000000d 7px 8px),
+    repeating-linear-gradient(94deg, transparent 0 29px, #fff8e40a 29px 30px),
+    color-mix(in srgb, var(--edition-paper) 48%, transparent);
+}
 /* Con una capa abierta se oscurece también lo que queda a los lados de la mesa, con el mismo
    velo que la capa (#111a17a6): un marco del tamaño de la mesa cuya sombra cubre solo el resto. */
 .mesa-fondo::after {

@@ -56,7 +56,3 @@ html[data-tablet="horizontal"] #app .home-doors > .mode-play-zone { grid-column:
 html[data-tablet="horizontal"] #app .home-doors > .mode-daily-zone { grid-column: 2; }
 html[data-tablet="horizontal"] #app .home-doors > .mode-ranking-summary { grid-column: 1 / -1; }
 html[data-tablet="horizontal"] #app .home-doors > :not(.mode-play-zone, .mode-daily-zone, .mode-ranking-summary) { grid-column: 1 / -1; }
-/* El pie del reto diario se lee sobre el mapa: va sobre un fondo de papel. */
-html[data-tablet] #app .mode-daily-family {
-  display: inline-block; padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, var(--edition-paper, #f6f1e8) 86%, transparent);
-}
