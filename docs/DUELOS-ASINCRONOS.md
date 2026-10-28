@@ -7,10 +7,10 @@ colección `turnDuels`) y en `js/retos/quick-challenges.js` / `js/retos/quick-on
 rápidos (salas de dos en `quickRooms`). Los dos ejes del juego siguen igual: ordenar o cifras.
 
 Las cartas se alternan una a una, así que el total es siempre par y los dos juegan las mismas:
-16 al ordenar (8 cada uno) y 10 en cifras (5 cada uno). En la competición por turnos se eligen
+10 al ordenar (5 cada uno) y 10 en cifras (5 cada uno). En la competición por turnos se eligen
 las cartas de cada persona en cada tema, y cada tema reparte el doble; con el tope de 30 cartas
 que admiten las reglas, con 5 temas son como mucho 3 por persona. Hasta la v816 un duelo de
-ordenar tenía 15 y quien lo creaba jugaba una más; los que ya estaban empezados terminan con
+ordenar tenía 15 y quien lo creaba jugaba una más (y hasta la v846 tenía 16); los que ya estaban empezados terminan con
 el total que guardaron.
 
 ## Organización

@@ -22,9 +22,9 @@ let archivedIds = new Set(), blockedPlayers = new Map();
 const sending = new Set();
 let retryTimer = null, delivery = '';
 // Se alternan carta a carta, así que el total tiene que ser par para que los dos jueguen las
-// mismas: con las 15 del duelo por enlace, quien creaba el duelo jugaba una más. Los duelos ya
-// empezados guardan su `total` y terminan con el que tenían.
-const TOTAL = 16;
+// mismas: con un número impar, quien creaba el duelo jugaba una más. Diez, como en el resto del
+// juego. Los duelos ya empezados guardan su `total` y terminan con el que tenían.
+const TOTAL = 10;
 let stop = null, current = null, onBack = null, enteredAt = 0, shareLink = '', pendingIndex = null;
 
 const safe = value => CT.escapeHtml(String(value ?? ''));

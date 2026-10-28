@@ -24,7 +24,7 @@ try {
         hiddenLabel: () => 'Fecha oculta', timelineTitle: () => 'Línea temporal', Accounts: { user: { uid: 'me' } },
         Storage: { getItem: k => localStorage.getItem(k), setItem: (k, v) => (localStorage.setItem(k, v), true), removeItem: k => localStorage.removeItem(k) },
         Links: { invitation: () => 'https://continuum.test/#turn-duel=layout' }, Avatares: { markup: () => '', forUser: () => '' }, timelineEnds: () => '', has: () => true,
-        Duelo: { CARTAS: 15, reparto: () => cards.map(c => c.id), Cifras: { factorDe: () => 1, reparto: () => cards.map(c => c.id), regla: () => ({ pregunta: '¿En qué año fue?' }), campo: (_, id, { attrs = '', hintId = '' } = {}) => `<div class="field cifra-field"><label for="${id}">Tu respuesta</label><input id="${id}" type="text" inputmode="numeric" autocomplete="off" ${attrs}><p class="hint"${hintId ? ` id="${hintId}"` : ''}></p></div>` } }
+        Duelo: { CARTAS: 10, reparto: () => cards.map(c => c.id), Cifras: { factorDe: () => 1, reparto: () => cards.map(c => c.id), regla: () => ({ pregunta: '¿En qué año fue?' }), campo: (_, id, { attrs = '', hintId = '' } = {}) => `<div class="field cifra-field"><label for="${id}">Tu respuesta</label><input id="${id}" type="text" inputmode="numeric" autocomplete="off" ${attrs}><p class="hint"${hintId ? ` id="${hintId}"` : ''}></p></div>` } }
       };
     });
     await page.addScriptTag({ url: '/js/interfaz/mapa.js' });

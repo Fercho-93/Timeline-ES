@@ -2153,7 +2153,7 @@
 
   // Cuándo se acaba una partida en solitario. El duelo es el único formato sin vidas: las
   // dos partes juegan las mismas cartas de principio a fin, porque si a una se le acabaran
-  // a la séptima el marcador estaría comparando siete cartas contra quince.
+  // a la séptima el marcador estaría comparando siete cartas contra diez.
   function soloAcabada() {
     if (!solo) return true;
     if (solo.total && solo.played >= solo.total) return true;

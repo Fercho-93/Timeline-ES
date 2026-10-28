@@ -13,9 +13,10 @@
   "use strict";
 
   const CT = window.CONTINUUM;
-  // Las cartas de un duelo: quince, bastantes para que el resultado signifique algo y pocas
-  // para jugarlo de una sentada. (El reto diario es de diez.)
-  const CARTAS = 15;
+  // Las cartas de un duelo: diez, como el reto diario, el duelo de cifras y los Retos rápidos
+  // con varias personas, para que todas las marcas del juego sean del mismo tamaño. Cada
+  // enlace lleva su `total`, así que los duelos de quince que ya circulan se siguen jugando.
+  const CARTAS = 10;
   // Un tope por encima de lo que genera la aplicación, para que un enlace manipulado no
   // pueda pedir un reparto desmesurado.
   const MAX_CARTAS = 40;

@@ -431,7 +431,7 @@ Tiene **dos modalidades**, que se eligen dentro del mismo formato porque compart
 todo —las mismas cartas en los dos móviles, el enlace, el nombre, el reloj y lo que pasa al
 salirse de la aplicación— y solo se diferencian en qué se hace con cada carta:
 
-- **Ordenar las cartas.** 15 cartas que se colocan en la línea. Gana quien más acierte.
+- **Ordenar las cartas.** 10 cartas que se colocan en la línea (hasta la v846 eran 15; los enlaces antiguos se juegan con las suyas). Gana quien más acierte.
 - **Escribir la cifra.** 10 cartas de las que se responde el número —los habitantes, los
   años, los kilómetros—. Una respuesta es un acierto si se queda lo bastante cerca (por
   porcentaje, o por años de diferencia en los mazos de fechas). Gana quien tenga más aciertos;
@@ -492,7 +492,7 @@ añadir una fila a `REGLAS` y estrenar versión, no editar un número: los enlac
 circulando siguen siendo válidos y siguen significando lo que significaban.
 
 El duelo no gasta vidas: las dos partes juegan todas las cartas de principio a fin. Si a una
-se le acabaran a la séptima, el marcador estaría comparando siete cartas contra quince.
+se le acabaran a la séptima, el marcador estaría comparando siete cartas contra diez.
 
 El enlace lleva una **huella del mazo** —su número de cartas y un hash de sus
 identificadores en orden—. No es opcional: si los dos móviles llevan versiones distintas de

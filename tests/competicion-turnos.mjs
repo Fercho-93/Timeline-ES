@@ -33,7 +33,7 @@ w.CONTINUUM = {
   Tournament: { create: rounds => ({ queue: ['alfa', 'beta'].slice(0, rounds) }) },
   Progreso: { cerradas: [], finishCompetition({ clave }) { this.cerradas.push(clave); return []; } },
   // Reparto fijo: el orden del mazo tal cual, tantas cartas como pida el tema más la de salida.
-  Duelo: { CARTAS: 15, reparto: (mode, _seed, total) => decks[mode].slice(0, total + 1).map(c => c.id), crearSemilla: () => 'semilla', Cifras: { CARTAS: 10 } }
+  Duelo: { CARTAS: 10, reparto: (mode, _seed, total) => decks[mode].slice(0, total + 1).map(c => c.id), crearSemilla: () => 'semilla', Cifras: { CARTAS: 10 } }
 };
 w.eval(fs.readFileSync('js/online/links.js', 'utf8'));
 const created = [];
