@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 846,
+  "cache": 847,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Textos legibles en claro y en oscuro: cabecera de la partida, dibujos de dificultad, ranking (título, flechas y «Tú») y rótulos de la portada y de las mesas públicas, sin recuadros sobre las letras. Se quita «Profundidad al mover el móvil» de Ajustes"
+  "reason": "Los duelos de ordenar (por enlace y por turnos) pasan a 10 cartas, como el reto diario, el duelo de cifras y los Retos rápidos; los duelos ya empezados y los enlaces antiguos conservan su tamaño"
 }
