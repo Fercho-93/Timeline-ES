@@ -1,4 +1,4 @@
-import { servirJuego, chromium, opcionesLanzamiento } from './lib/navegador.mjs';
+import { servirJuego, chromium, opcionesLanzamiento, DECODIFICAR } from './lib/navegador.mjs';
 import fs from 'node:fs/promises';
 import assert from 'node:assert/strict';
 const server = await servirJuego();
@@ -49,7 +49,7 @@ try {
     await page.locator('[data-quick="start"]').click();
     const plate = page.locator('[data-quick-starter][data-starter-dialog] .starter-card-art img');
     await plate.waitFor();
-    await plate.evaluate(img => img.decode());
+    await plate.evaluate(DECODIFICAR);
     assert.ok(await plate.evaluate(img => img.naturalWidth > 0 && img.getBoundingClientRect().height >= 150), 'Retos rápidos muestra la lámina ilustrada');
     assert.equal(await page.locator('[data-quick-starter] #quick-starter-input').getAttribute('aria-describedby'), 'quick-starter-input-hint');
     for (const v of ['1900', '1500']) { await page.locator('#quick-starter-input').fill(v); await page.locator('[data-quick="starter-guess"]').click(); }

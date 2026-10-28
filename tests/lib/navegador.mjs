@@ -41,3 +41,16 @@ export async function servirJuego({ inicio = gameHtml(read("index.html")) } = {}
   await new Promise(resolve => servidor.listen(0, "127.0.0.1", resolve));
   return servidor;
 }
+
+// Espera a que una imagen esté decodificada. `img.decode()` rechaza con «Aborted by source change» si
+// la pantalla se repinta y cambia el `src` mientras decodifica: se reintenta con el nuevo, y si la
+// imagen ya está cargada se da por buena. Es una función en texto para pasarla a `evaluate`.
+export const DECODIFICAR = `async img => {
+  for (let intento = 0; intento < 5; intento++) {
+    try { await img.decode(); return; } catch (error) {
+      if (img.complete && img.naturalWidth > 0 && error?.name !== "EncodingError") return;
+      await new Promise(resolver => setTimeout(resolver, 100));
+    }
+  }
+  await img.decode();
+}`;

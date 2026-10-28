@@ -1,7 +1,7 @@
 // Prueba de maquetación real: JSDOM no puede detectar que una imagen se encoge.
 // Ejecutar con Playwright instalado; el workflow instala Chromium y WebKit.
 // ENGINES=chromium limita la prueba a Chromium donde no hay WebKit instalado (por defecto, los dos).
-import { servirJuego, chromium, motores, opcionesLanzamiento } from './lib/navegador.mjs';
+import { servirJuego, chromium, motores, opcionesLanzamiento, DECODIFICAR } from './lib/navegador.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 const server = await servirJuego();
@@ -52,7 +52,7 @@ try {
         }
        },{theme,mode,context});
        const art=openingPage.locator('.starter-card-art img');
-       await art.evaluate(img=>img.decode());
+       await art.evaluate(DECODIFICAR);
        const fit=await art.evaluate(img=>{
         const box=img.getBoundingClientRect(),frame=img.parentElement,outer=frame.getBoundingClientRect(),style=getComputedStyle(img),edge=getComputedStyle(frame);
         const left=outer.left+parseFloat(edge.borderLeftWidth),top=outer.top+parseFloat(edge.borderTopWidth);
@@ -76,7 +76,7 @@ try {
    await illustratedPage.locator('[data-mode="history"]').click();
    await illustratedPage.locator('[data-action="start-free"]').click();
    const illustratedCard=illustratedPage.locator('.timeline .timeline-card:has(.animal-card-art)').first();
-   await illustratedCard.locator('img').evaluate(img=>img.decode());
+   await illustratedCard.locator('img').evaluate(DECODIFICAR);
    const illustrated=await illustratedCard.evaluate(card=>{
      const image=card.querySelector('.card-visual'),caption=card.querySelector('.card-content');
      const bounds=element=>element.getBoundingClientRect();
@@ -263,7 +263,7 @@ try {
     await page.locator('[data-block="historia"]').click();
     await page.locator('[data-mode="history"]').click();
     if(width===414) {
-      await page.locator('.atlas-landscape img, .atlas-specimens img, .walking-art').evaluateAll(imgs=>Promise.all(imgs.map(img=>{img.loading='eager';return img.decode();})));
+      await page.locator('.atlas-landscape img, .atlas-specimens img, .walking-art').evaluateAll(`imgs=>Promise.all(imgs.map(img=>{img.loading='eager';return (${DECODIFICAR})(img);}))`);
       await page.screenshot({path:`test-results/zoom/${engine}-menu-color.png`,fullPage:true});
       await page.locator('[data-action="rules"]').click();
       const guideBack=page.locator('.rules .guide-tools > .atlas-dialog-back');
@@ -350,7 +350,7 @@ try {
       assert.ok(await page.locator('.enc-deck-cover img').count()>5,'los mazos tienen portada');
       const toolbar=await page.locator('.enc-toolbar-compact').boundingBox();
       assert.ok(toolbar.height<260,'los filtros dejan protagonismo al álbum');
-      await page.locator('.enc-recent-card img, .enc-deck-cover img').evaluateAll(imgs=>Promise.all(imgs.map(img=>{img.loading='eager';return img.decode();})));
+      await page.locator('.enc-recent-card img, .enc-deck-cover img').evaluateAll(`imgs=>Promise.all(imgs.map(img=>{img.loading='eager';return (${DECODIFICAR})(img);}))`);
       await page.screenshot({path:`test-results/zoom/${engine}-enciclopedia-album.png`,fullPage:true});
       await page.locator('[data-action="enc-back"]').first().click();
       // La enciclopedia vuelve al Atlas: de ahí, otra vez a Jugar solo y al mazo.
@@ -360,7 +360,7 @@ try {
       await historyMode.click();
     }
     await page.locator('[data-action="resume-solo"]').click();
-    await page.locator('.timeline-card img').evaluate(img=>img.decode());
+    await page.locator('.timeline-card img').evaluate(DECODIFICAR);
     const measure=()=>page.evaluate(()=>{
       const card=document.querySelector('.timeline-card'),img=card.querySelector('img'),panel=card.querySelector('.card-visual');
       const box=e=>{const r=e.getBoundingClientRect();return {width:r.width,height:r.height,left:r.left,top:r.top}};
