@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 847,
+  "cache": 848,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Los duelos de ordenar (por enlace y por turnos) pasan a 10 cartas, como el reto diario, el duelo de cifras y los Retos rápidos; los duelos ya empezados y los enlaces antiguos conservan su tamaño"
+  "reason": "Ajustes con apariencia en botones, sin prueba de vibración ni notas, y privacidad actualizada para registro con Google, Apple o correo; Guía y Atlas con cabeceras más limpias"
 }
