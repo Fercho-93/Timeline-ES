@@ -360,11 +360,10 @@ console.log('Vista Android compacta: detección independiente y ampliación del 
       assert.deepEqual(colores(w), [COLORES[theme], COLORES[theme]], `${theme} fija las dos etiquetas`);
       // El desplegable ofrece solo Claro y Oscuro y llega marcando el que está puesto.
       w.document.querySelector('[data-settings-action="open"]').click();
-      const opciones = [...w.document.querySelectorAll('#ajuste-tema option')];
-      assert.deepEqual(opciones.map(o => o.value), ASPECTOS);
-      assert.equal(w.document.querySelector('#ajuste-tema option[selected]').value, theme);
+      const opciones = [...w.document.querySelectorAll('[data-chip-group="theme"] .settings-chip')];
+      assert.deepEqual(opciones.map(o => o.dataset.value), ASPECTOS);
+      assert.equal(w.document.querySelector('[data-chip-group="theme"] .is-on').dataset.value, theme);
       assert.ok(opciones.every(o => o.textContent.trim()), 'cada aspecto tiene su nombre');
-      assert.equal(w.document.querySelectorAll('#ajuste-tema optgroup').length, 0, 'dos opciones directas, sin grupos vacíos');
     } finally { w.close(); }
   }
   const estilos = read('css/edition.css') + read('css/styles.css');
@@ -376,9 +375,7 @@ console.log('Vista Android compacta: detección independiente y ampliación del 
     const w = boot({ seen: true });
     try {
       w.document.querySelector('[data-settings-action="open"]').click();
-      const select = w.document.querySelector('#ajuste-tema');
-      select.value = 'dark';
-      select.dispatchEvent(new w.Event('change', { bubbles: true }));
+      w.document.querySelector('[data-settings-action="theme"][data-value="dark"]').click();
       assert.equal(w.document.documentElement.dataset.theme, 'light');
       assert.equal(w.document.querySelector('[data-look-preview]').dataset.previewTheme, 'dark');
       w.document.querySelector('[data-settings-action="apply-look"]').click();
@@ -386,8 +383,9 @@ console.log('Vista Android compacta: detección independiente y ampliación del 
       assert.equal(colores(w).join('|'), '#18110b|#18110b');
       assert.equal(JSON.parse(w.localStorage.getItem('hilo-ajustes-v1')).theme, 'dark');
       // Y un valor que no existe no llega a aplicarse: el aspecto anterior se queda.
-      select.value = 'inventado';
-      select.dispatchEvent(new w.Event('change', { bubbles: true }));
+      const falso = w.document.createElement('button');
+      falso.dataset.settingsAction = 'theme'; falso.dataset.value = 'inventado';
+      w.document.body.appendChild(falso); falso.click();
       assert.equal(w.document.documentElement.dataset.theme, 'dark');
     } finally { w.close(); }
   }

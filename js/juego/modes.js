@@ -1165,7 +1165,7 @@
       ['Lámina','La ilustración de una carta, una vez desbloqueada en tu Atlas.']
     ].map(([term, text]) => '<dt>'+term+'</dt><dd>'+text+'</dd>').join('')+'</dl>';
     // La guía empieza por el vídeo (tutorial.js); debajo queda el manual de consulta.
-    return '<div class="guide-handbook"><header class="guide-masthead atlas-page-heading illustrated-heading"><img class="illustrated-heading-art" src="assets/guide-notebook-v1.webp" alt="" aria-hidden="true" decoding="async"><div class="eyebrow">Para explorar el juego</div><h1>Guía</h1><p>Primero, el vídeo con lo esencial. Debajo, la Guía completa por temas.</p></header>'+
+    return '<div class="guide-handbook"><header class="guide-masthead atlas-page-heading illustrated-heading"><img class="illustrated-heading-art" src="assets/guide-notebook-v1.webp" alt="" aria-hidden="true" decoding="async"><div class="eyebrow">Para explorar el juego</div><h1>Guía</h1></header>'+
       (window.CONTINUUM.Tutorial?.markup(modeKey) || '')+
       '<div class="atlas-section-heading guide-manual"><h2>La Guía, por temas</h2><p class="guide-index-hint">'+(here ? here+' · ' : '')+'Abre el tema que quieras consultar.</p></div>'+
       guideChapter('01','Aciertos, fallos y cómo se gana','Qué pasa al confirmar y quién gana','result',result)+

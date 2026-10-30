@@ -5674,3 +5674,9 @@ html body #app[data-screen][data-screen][data-screen][data-screen][data-screen] 
    para no tapar el retrato). */
 html body #app :is(.avatar-picker-close, .settings-close) { width: 44px; height: 44px; min-height: 44px; }
 html body #app .table-seat .kick-btn::before { content: ""; position: absolute; inset: -7px; }
+
+/* Apariencia y texto: botones discretos en vez de desplegables. */
+.settings-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+.settings-chip { min-height: 36px; padding: 6px 12px; border: 1px solid var(--edition-line); border-radius: 999px; background: transparent; color: var(--edition-muted); font: 600 .8rem/1 var(--ui-font); cursor: pointer; }
+.settings-chip.is-on { border-color: var(--edition-brass); color: var(--edition-ink); background: color-mix(in srgb, var(--edition-brass) 14%, transparent); }
+.settings-chip:focus-visible { outline: 2px solid var(--edition-brass); outline-offset: 2px; }

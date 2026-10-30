@@ -2024,7 +2024,7 @@
     const estrenado = resumen.cards > 0 || resumen.games > 0;
     paint(`<div class="shell">${header("back-menu")}
       <section class="setup-section perfil-section">
-        <header class="atlas-page-heading"><div class="eyebrow">Cuaderno de navegación · Continuum</div><h1 data-focus tabindex="-1">Tu Atlas</h1><p>Tus descubrimientos, tus travesías y los horizontes que aún te esperan.</p></header>
+        <header class="atlas-page-heading"><h1 data-focus tabindex="-1">Tu Atlas</h1></header>
         ${atlasIdentidad()}
         <nav class="atlas-chart" id="atlas-chart" tabindex="-1" aria-label="Mapa de tu Atlas">
           <div class="atlas-chart-heading"><span>MAPA DE TU VIAJE</span><small>Pon rumbo a nuevos descubrimientos</small></div>

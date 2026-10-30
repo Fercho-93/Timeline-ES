@@ -241,8 +241,8 @@ for (const platform of ['unsupported','web','native','native-missing','native-er
     assert.equal(w.CONTINUUM.effectPrefs().sound,false,'vibración independiente del sonido');
     if(platform==='native-error'){assert.match(w.document.querySelector('#haptics-help').textContent,/No se pudo/);continue;}
     assert.equal(pulses.length,1,'activar produce una prueba inmediata');
-    const test=w.document.querySelector('[data-settings-action="test-haptics"]');test.click();
-    await new Promise(resolve=>setTimeout(resolve,0));assert.equal(pulses.length,2);
+    assert.equal(w.document.querySelector('[data-settings-action="test-haptics"]'),null,'sin botón de prueba');
+    await w.CONTINUUM.Effects.testHaptics();assert.equal(pulses.length,2);
     if(platform==='web'){
       // Los momentos que se notan en la mano: te toca, fin, levantar carta, plantarse, poder, tiempo
       // agotado y el resultado de quién empieza (una sola vez por sorteo). Los menús solo suenan.
@@ -252,7 +252,7 @@ for (const platform of ['unsupported','web','native','native-missing','native-er
       assert.equal(JSON.stringify(pulses.slice(n)),JSON.stringify([28,28,18,28,28,[30,40,30],18,28]));
     }
     toggle.checked=false;toggle.dispatchEvent(new w.Event('change',{bubbles:true}));
-    assert.equal(test.disabled,true);const encendida=pulses.length;await w.CONTINUUM.Effects.testHaptics();w.CONTINUUM.Effects.transition('turn');w.CONTINUUM.Effects.power();assert.equal(pulses.length,encendida,'apagar detiene también las pruebas y los avisos');
+    const encendida=pulses.length;await w.CONTINUUM.Effects.testHaptics();w.CONTINUUM.Effects.transition('turn');w.CONTINUUM.Effects.power();assert.equal(pulses.length,encendida,'apagar detiene también las pruebas y los avisos');
   } finally {w.close();}
 }
 console.log('Vibración: prueba inmediata, independencia del sonido, navegador no compatible y errores nativos: OK');

@@ -311,8 +311,8 @@ try {
       assert.notEqual(settingsBackStyle.background,'rgba(0, 0, 0, 0)','la flecha de ajustes conserva su fondo de papel');
       assert.equal(await page.locator('.atlas-scroll-veil').count(),0,'hacer scroll en ajustes no añade niebla');
       await page.locator('.settings-modal').evaluate(modal=>{modal.scrollTop=0;});
-      await page.locator('#ajuste-tema').selectOption('dark');
-      await page.locator('#ajuste-texto').selectOption('150');
+      await page.locator('[data-settings-action="theme"][data-value="dark"]').click();
+      await page.locator('[data-settings-action="text-size"][data-value="150"]').click();
       assert.equal(await page.locator('[data-look-preview]').getAttribute('data-preview-theme'),'dark');
       assert.equal(await page.locator('html').getAttribute('data-theme'),'light','la muestra no aplica el tema antes de confirmar');
       const previewContrast=await page.locator('.look-preview-page').evaluate(el=>{

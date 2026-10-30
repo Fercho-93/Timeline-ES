@@ -74,9 +74,12 @@
 
   applyTheme();
 
-  function themeOptions(elegido) {
-    const opcion = key => `<option value="${key}"${key === elegido ? " selected" : ""}>${THEMES[key].label}</option>`;
-    return Object.keys(THEMES).map(opcion).join("");
+  const chip = (action, value, label, on) => `<button type="button" class="settings-chip${on ? " is-on" : ""}" data-settings-action="${action}" data-value="${value}" aria-pressed="${on}">${label}</button>`;
+  function themeChips(elegido) {
+    return Object.keys(THEMES).map(key => chip("theme", key, THEMES[key].label, key === elegido)).join("");
+  }
+  function sizeChips(elegido) {
+    return TEXT_SIZES.map(([value, label]) => chip("text-size", value, label, value === elegido)).join("");
   }
 
   function panelHtml() {
@@ -90,23 +93,15 @@
       <div class="settings-head">
         <button class="settings-close" data-settings-action="close" aria-label="Cerrar ajustes">×</button>
       </div>
-      <header class="atlas-page-heading illustrated-heading"><img class="illustrated-heading-art" src="assets/menu-collections.webp" alt="" aria-hidden="true" decoding="async"><div class="eyebrow">A tu manera</div><h1 tabindex="-1" data-dialog-focus>Ajustes</h1><p>Encuentra tu forma de leer, escuchar y jugar.</p></header><div class="settings-layout">
+      <header class="atlas-page-heading illustrated-heading"><img class="illustrated-heading-art" src="assets/menu-collections.webp" alt="" aria-hidden="true" decoding="async"><div class="eyebrow">A tu manera</div><h1 tabindex="-1" data-dialog-focus>Ajustes</h1></header><div class="settings-layout">
 
       <section class="settings-section settings-appearance">
-        <div class="settings-section-heading"><span aria-hidden="true">01</span><div><h2>Apariencia y lectura</h2><p>Prueba los cambios antes de aplicarlos.</p></div></div>
+        <div class="settings-section-heading"><span aria-hidden="true">01</span><div><h2>Apariencia y lectura</h2></div></div>
         <div class="settings-look-preview" data-look-preview data-preview-theme="${s.theme}" style="--preview-text:${Number(s.textSize)/100}">
           <div class="look-preview-page"><span>CONTINUUM</span><h3>Una página del atlas</h3><p>Así se verán el papel, la tinta y el tamaño de lectura.</p><div><i></i><b>1640</b></div></div>
         </div>
-        <div class="field">
-          <label for="ajuste-tema">Cómo se ve la aplicación</label>
-          <select id="ajuste-tema" data-settings-action="theme">${themeOptions(s.theme)}</select>
-        </div>
-        <div class="field">
-          <label for="ajuste-texto">Tamaño del texto</label>
-          <select id="ajuste-texto" data-settings-action="text-size">
-            ${TEXT_SIZES.map(([value,label])=>`<option value="${value}"${s.textSize===value?' selected':''}>${label}</option>`).join('')}
-          </select>
-        </div>
+        <div class="settings-chips" role="group" aria-label="Cómo se ve la aplicación" data-chip-group="theme">${themeChips(s.theme)}</div>
+        <div class="settings-chips" role="group" aria-label="Tamaño del texto" data-chip-group="text-size">${sizeChips(s.textSize)}</div>
         <button class="btn btn-secondary btn-block settings-apply-look" data-settings-action="apply-look" disabled>Aplicar apariencia</button>
       </section>
 
@@ -114,14 +109,11 @@
         <div class="settings-section-heading"><span aria-hidden="true">02</span><div><h2>Sonido y vibración</h2><p>Pequeños detalles para acompañar la partida.</p></div></div>
         <label class="opt-row"><span>Vibración suave</span><input type="checkbox" data-settings-action="haptics" aria-describedby="haptics-help" ${s.haptics === true && hapticsSupported ? "checked" : ""} ${hapticsSupported ? "" : "disabled"}></label>
         <p class="hint" id="haptics-help" role="status">${hapticsSupported ? 'Un toque breve al elegir posición, confirmar y recibir el resultado.' : (window.Capacitor?.isNativePlatform?.() ? 'La vibración no está disponible en esta versión de la app. Comprueba si hay una actualización.' : 'Este navegador no ofrece vibración. En iPhone necesitas la app de TestFlight o App Store.')}</p>
-        ${hapticsSupported ? `<button class="btn btn-secondary" data-settings-action="test-haptics" ${s.haptics ? '' : 'disabled'}>Probar vibración</button>` : ''}
-        <label class="opt-row"><span>Efectos de sonido</span><input type="checkbox" data-settings-action="sfx" aria-describedby="sfx-help" ${s.sfx === true ? "checked" : ""}></label>
+        <label class="opt-row"><span>Efectos de sonido</span><input type="checkbox" data-settings-action="sfx" ${s.sfx === true ? "checked" : ""}></label>
         <div class="field settings-volume">
           <label for="ajuste-volumen-efectos">Volumen de los efectos <output id="ajuste-volumen-efectos-valor">${Number(s.sfxVolume) || 0} %</output></label>
-          <input id="ajuste-volumen-efectos" type="range" min="0" max="100" step="5" value="${Math.max(0, Math.min(100, Number(s.sfxVolume) || 0))}" data-settings-action="sfx-volume" aria-describedby="sfx-help">
-          <p class="hint" id="sfx-help">Notas suaves al coger y colocar cartas, acertar o fallar. En iPhone respetan el modo silencio.</p>
+          <input id="ajuste-volumen-efectos" type="range" min="0" max="100" step="5" value="${Math.max(0, Math.min(100, Number(s.sfxVolume) || 0))}" data-settings-action="sfx-volume">
         </div>
-        <p class="hint">Los efectos acompañan al resultado; toda la información también se muestra en texto.</p>
       </section>
 
       </div><details class="settings-section settings-support"><summary><span><b>Versión y conexión</b><small>Uso sin conexión e información de la aplicación</small></span><i aria-hidden="true">+</i></summary><div class="settings-support-body">
@@ -129,8 +121,9 @@
         <p class="hint">Las partidas locales y las cartas ya descargadas funcionan sin conexión. Las salas, duelos por turnos, ranking y comentarios necesitan conexión. Si una ilustración no aparece, recarga cuando tengas internet.</p>
       </div></details>
 
-      ${window.CONTINUUM?.Accounts?.ready ? `<details class="settings-section settings-support settings-privacy"><summary><span><b>Privacidad y ranking</b><small>Qué se guarda y quién lo ve</small></span><i aria-hidden="true">+</i></summary><div class="settings-support-body">
-        <p class="hint" style="text-align:left">Tu progreso (partidas, aciertos, logros y retos diarios) se guarda en un servidor (Firebase) para que no se pierda, sin correo ni datos personales. El ranking del reto diario es público y opcional: solo apareces si lo decides.</p>
+      ${window.CONTINUUM?.Accounts?.ready ? `<details class="settings-section settings-support settings-privacy"><summary><span><b>Privacidad y ranking</b><small>Tu cuenta, tus datos y quién los ve</small></span><i aria-hidden="true">+</i></summary><div class="settings-support-body">
+        <p class="hint" style="text-align:left">Puedes registrarte con Google, con Apple o con tu correo electrónico. Así tu progreso (partidas, aciertos, logros y retos diarios) se guarda en tu cuenta y lo recuperas si cambias de móvil. Solo guardamos lo necesario para identificar tu cuenta; nunca publicamos tu correo.</p>
+        <p class="hint" style="text-align:left">El ranking del reto diario es público y opcional: solo apareces si lo decides, con tu nombre de perfil, avatar, aciertos y tiempo. Puedes salir de él cuando quieras.</p>
         <label class="opt-row"><span>Aparecer en el ranking público <small>Nombre de perfil, avatar, aciertos y tiempo</small></span><input type="checkbox" data-ranking-toggle ${window.CONTINUUM.Accounts.rankingPublico === true ? "checked" : ""}></label>
         <p class="hint" style="text-align:left"><a href="privacidad.html" target="_blank" rel="noopener noreferrer">Política de privacidad</a> · <a href="borrar-cuenta.html" target="_blank" rel="noopener noreferrer">Cómo borrar tus datos</a> (en el juego: Atlas → Tu cuenta y tus datos).</p>
       </div></details>` : ""}
@@ -210,40 +203,36 @@
       CT.Sonidos?.test();
       return;
     }
-    if (event.target.dataset.settingsAction === 'text-size') {
-      if (!['100','125','150','200'].includes(event.target.value)) return;
-      draftLook.textSize = event.target.value; previewLook(); CT.Effects?.transition?.('select'); return;
-    }
     if (["haptics", "sfx"].includes(event.target.dataset.settingsAction)) {
       const key = event.target.dataset.settingsAction;
       const enabled = event.target.checked;
       settings[key] = enabled; save();
       CT.Effects?.transition?.('select');
-      if (key === 'haptics') {
-        const test = document.querySelector('[data-settings-action="test-haptics"]');
-        if (test) test.disabled = !enabled;
-        if (enabled) await testHaptics();
-      }
+      if (key === 'haptics' && enabled) await testHaptics();
       return;
     }
-    if (event.target.dataset.settingsAction !== "theme") return;
-    if (!THEMES[event.target.value]) return;
-    draftLook.theme = event.target.value;
-    CT.Effects?.transition?.('select');
-    previewLook();
   });
 
   document.addEventListener("click", event => {
     const target = event.target.closest("[data-settings-action]");
     if (!target) return;
-    if (target.dataset.settingsAction === "open") open();
+    if (target.dataset.settingsAction === "theme" || target.dataset.settingsAction === "text-size") {
+      const value = target.dataset.value, tema = target.dataset.settingsAction === "theme";
+      if (tema ? !THEMES[value] : !TEXT_SIZES.some(([v]) => v === value)) return;
+      if (tema) draftLook.theme = value; else draftLook.textSize = value;
+      target.closest("[data-chip-group]")?.querySelectorAll(".settings-chip").forEach(c => {
+        const on = c === target; c.classList.toggle("is-on", on); c.setAttribute("aria-pressed", String(on));
+      });
+      CT.Effects?.transition?.('select');
+      previewLook();
+    }
+    else if (target.dataset.settingsAction === "open") open();
     else if (target.dataset.settingsAction === "close") CT.closeDialog();
     else if (target.dataset.settingsAction === "apply-look") {
       settings.theme=draftLook.theme;settings.textSize=draftLook.textSize;save();applyTheme();CT.Effects?.transition?.('select');previewLook();
     }
     else if (target.dataset.settingsAction === "feedback") sendFeedback();
     else if (target.dataset.settingsAction === "reset-preferences") resetPreferences();
-    else if (target.dataset.settingsAction === "test-haptics") void testHaptics();
     else if (target.dataset.settingsAction === "download-feedback") {
       void (async () => {
         const note = document.getElementById('feedback-note')?.value || '';
