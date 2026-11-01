@@ -83,8 +83,11 @@
   let previewCode=null, serverRoom=null, duelRoom=false, duelStarting=false, duelFirst=0, backTo=null, pendingInvite=null;
   function stopNetwork() {quickClock?.stop();quickClock=null;clearInterval(publicClock);publicClock=null;networkEpoch++;connection?.close();connection=null;room=null;serverRoom=null;myId=null;busy=false;invite=null;duelRoom=false;duelStarting=false;}
   function errorNotice(e) {busy=false;const message=e?.code==='permission-denied'||/missing or insufficient permissions/i.test(e?.message||'')?'No se pudo guardar el cambio en el duelo. Vuelve a abrirlo e inténtalo de nuevo.':e.message || String(e);let el=app().querySelector('#quick-error');if(!el){el=document.createElement('p');el.id='quick-error';el.setAttribute('role','alert');(app().querySelector('.modal') || app().querySelector('.quick-shell'))?.append(el);}if(el)el.textContent=message;CT.announce(message);}
-  function rounds(count=3, selectedId=null, seed=null, limit=0) {
-    const random=seed===null?Math.random:CT.seededRandom(CT.seedFrom(seed)), deal=c=>{const ids=CT.shuffleWith(c.cards.map(x=>x.id),random);return limit?ids.slice(0,limit):ids;};
+  // `fresh`: en solitario, las cartas que aún no están en la colección salen antes que las ya descubiertas,
+  // como en una ronda de Grandes colecciones; así cada partida de 10 cartas avanza la colección.
+  function rounds(count=3, selectedId=null, seed=null, limit=0, fresh=false) {
+    const seen=fresh?quickSeen():null;
+    const random=seed===null?Math.random:CT.seededRandom(CT.seedFrom(seed)), deal=c=>{const all=CT.shuffleWith(c.cards.map(x=>x.id),random),ids=seen?[...all.filter(id=>!seen.has(id)),...all.filter(id=>seen.has(id))]:all;return limit?ids.slice(0,limit):ids;};
     if (selectedId) return [E.challenge(selectedId)].map(c=>({id:c.id,order:deal(c)}));
     const catalog=CT.shuffleWith(CT.QuickCatalog.challenges,random);
     const list=Array.from({length:count},(_,i)=>catalog[i % catalog.length]);
@@ -175,7 +178,7 @@
     const sunArt='<svg class="quick-mode-art" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="10" y="14" width="44" height="40" rx="6" fill="var(--quick-card-paper, #fffaf0)" stroke="currentColor" stroke-width="2"/><path d="M10 25h44M21 9v10M43 9v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="32" cy="39" r="6" fill="currentColor" fill-opacity=".75"/><path d="M32 29v3M32 46v3M22 39h3M39 39h3M25 32l2 2M37 44l2 2M25 46l2-2M37 34l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
     const diceArt='<svg class="quick-mode-art" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><g transform="rotate(-12 26 34)"><rect x="12" y="20" width="28" height="36" rx="4" fill="var(--quick-card-paper, #fffaf0)" stroke="currentColor" stroke-width="2"/><text x="26" y="45" text-anchor="middle" font-size="20" font-family="Georgia, serif" fill="currentColor">?</text></g><g transform="rotate(12 40 30)"><rect x="26" y="12" width="28" height="36" rx="4" fill="var(--quick-card-paper, #fffaf0)" stroke="currentColor" stroke-width="2"/><text x="40" y="37" text-anchor="middle" font-size="20" font-family="Georgia, serif" fill="currentColor">?</text></g></svg>';
     shell(`<section class="setup-section solo-home quick-free-setup"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 class="solo-title" data-focus tabindex="-1">Jugar solo</h2>
-        <p class="lead">Ordena cada mazo entero: un fallo no te echa.</p>
+        <p class="lead">${E.SOLO_CARDS} cartas en cada reto: un fallo no te echa.</p>
         <p class="hint solo-dominadas">Tu colección: ${found} de ${cards} cartas descubiertas.</p>${button('collection','Ver tu colección','btn btn-ghost quick-collection-link')}</div>
         ${pendiente ? button('resume','Continuar partida guardada <span>→</span>','btn btn-primary btn-block') : ''}
         <div class="panel solo-panel quick-day-panel">
@@ -1147,15 +1150,15 @@
     }
     if (action === 'solo-mode') {setSoloMode(target.dataset.mode==='surprise'?'surprise':'day'); CT.Effects?.tap?.(); CT.Effects?.transition?.('page'); return;}
     if (action === 'collection') {collectionPage(target.dataset.deck || null); return;}
-    // Un mazo del día: el reto entero, sus cartas barajadas.
+    // Un mazo del día: 10 cartas de ese reto (E.SOLO_CARDS), más la que abre la línea.
     if (action === 'play-deck') {
       const id=target.dataset.deck;
       if(!todayDecks().some(c=>c.id===id)){freeSetup();return;}
-      prepare({names:['Tú'],rounds:rounds(1,id),kind:'free',length:1,seconds:CT.Tiempo.chosen('quick-solo')}); return;
+      prepare({names:['Tú'],rounds:rounds(1,id,null,E.SOLO_CARDS+1,true),kind:'free',length:1,seconds:CT.Tiempo.chosen('quick-solo')}); return;
     }
     if (action === 'start-free') {
       const count=Number(app().querySelector('#quick-free-length')?.value) || 3;
-      prepare({names:['Tú'],rounds:rounds(count),kind:'free',length:count,seconds:CT.Tiempo.chosen('quick-solo')}); return;
+      prepare({names:['Tú'],rounds:rounds(count,null,null,E.SOLO_CARDS+1,true),kind:'free',length:count,seconds:CT.Tiempo.chosen('quick-solo')}); return;
     }
     if (action === 'exit') {CT.UI.confirmExit(connection?.kind==='local' ? 'Al salir se cierra la conexión con la sala local.' : 'La partida se conserva para que puedas continuar después.', toEntry, undefined, undefined, (state || room) && connection?.kind!=='internet' ? {label:'Salir sin guardar', proceed:abandonQuick} : null); return;}
     if (action === 'abandon') {CT.UI.confirmExit('Se borrará esta partida y no podrás continuarla después.', abandonQuick, '¿Salir sin guardar?', 'Salir sin guardar'); return;}
@@ -1176,7 +1179,7 @@
       if (format === 'local' && starter && starter.key === names.join('|')) ordered = starter.order.map(i => names[i]);
       const count = Number(app().querySelector('#quick-length').value);
       const list = rounds(count).map(round => E.challenge(round.id)), multi = format === 'local' && names.length > 1;
-      const config = {names: ordered, rounds: list.map(c => ({id: c.id, order: multi ? CT.shuffle(c.cards.map(item => item.id)).slice(0, E.MULTI_CARDS) : CT.shuffle(c.cards.map(item => item.id))})),kind:format,historyId:historyId(),seconds:CT.Tiempo.chosen(format === 'local' ? 'quick-local' : 'quick-solo'),...(format === 'local' && names.length > 1 ? {keep: duelKeep()} : {})};
+      const config = {names: ordered, rounds: list.map(c => ({id: c.id, order: CT.shuffle(c.cards.map(item => item.id)).slice(0, multi ? E.MULTI_CARDS : E.SOLO_CARDS + 1)})),kind:format,historyId:historyId(),seconds:CT.Tiempo.chosen(format === 'local' ? 'quick-local' : 'quick-solo'),...(format === 'local' && names.length > 1 ? {keep: duelKeep()} : {})};
       record = {version: CT.QuickCatalog.version, config, commands: []}; state = E.create(config);
       save(); selected = null; slot = null; render(); return;
     }
@@ -1195,7 +1198,7 @@
   // El reto diario tiene siempre 10 cartas que ordenar, igual que el de Grandes colecciones: así los
   // aciertos de un día valen lo mismo que los de otro, sin cuentas. Una carta más abre la línea, y solo
   // entran los mazos que llegan a ese tamaño.
-  const DAILY_QUICK_CARDS = 10;
+  const DAILY_QUICK_CARDS = E.SOLO_CARDS;
   function dailyQuick(dayValue) {
     const seed=CT.seedFrom('quick-daily-'+dayValue), random=CT.seededRandom(seed);
     const all=CT.QuickCatalog.challenges, pool=all.filter(c=>c.cards.length>DAILY_QUICK_CARDS);

@@ -17,7 +17,8 @@
     if (config.seconds !== undefined && ![0, 15, 20, 30].includes(config.seconds)) throw Error('INVALID_CONFIG');
     for (const round of config.rounds) {
       const c = challenge(round.id);
-      // El reto diario juega un recorte fijo del mazo (ver DAILY_QUICK_CARDS en quick-challenges.js); el resto, el mazo entero.
+      // Cada partida juega un recorte del mazo (SOLO_CARDS en solitario, MULTI_CARDS con más gente); las guardadas antes
+      // del recorte, el mazo entero.
       if (!c || !Array.isArray(round.order) || round.order.length < 2 || round.order.length > c.cards.length ||
           new Set(round.order).size !== round.order.length || round.order.some(id => !c.cards.some(card => card.id === id))) throw Error('INVALID_DECK');
     }
@@ -90,5 +91,8 @@
   }
   // Partidas con más de una persona (sala, mesa pública, un solo móvil, duelo): siempre 10 cartas al azar del mazo.
   const MULTI_CARDS = 10;
-  CT.QuickEngine = {create, step, restore, challenge, keepPlaying, timeoutPlacement, MULTI_CARDS};
+  // Jugando solo (mazos del día, partida sorpresa y reto diario): 10 cartas que colocar en cada reto, como una ronda de
+  // Grandes colecciones, más la que abre la línea. Un mazo más pequeño se juega entero.
+  const SOLO_CARDS = 10;
+  CT.QuickEngine = {create, step, restore, challenge, keepPlaying, timeoutPlacement, MULTI_CARDS, SOLO_CARDS};
 })();

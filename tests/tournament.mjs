@@ -79,11 +79,12 @@ w.close();
   assert.match(css,/\.pass-screen\s*\{\s*grid-template-columns:\s*minmax\(0,\s*1fr\);?\s*\}/,'.pass-screen tiene una única columna acotada');
   assert.match(css,/\.chapter-journey ol > li\.chapter-stop\s*\{[^}]*display:\s*grid/,'los capítulos del recorrido no heredan el flex de las listas del marcador');
 }
-// Solitario conserva el mismo ciclo y respeta el número de cartas elegido.
-w=boot();w.CONTINUUM.localNavigate('home');w.CONTINUUM.ModeHubs.refreshHome();w.CONTINUUM.ModeHubs.open('hub-solo');click('[data-action="competition-menu"]');w.document.getElementById('competition-length').value='3';w.document.getElementById('competition-cards').value='2';
+// Solitario conserva el mismo ciclo y juega siempre 10 cartas por tema, como una ronda: no se eligen.
+w=boot();w.CONTINUUM.localNavigate('home');w.CONTINUUM.ModeHubs.refreshHome();w.CONTINUUM.ModeHubs.open('hub-solo');click('[data-action="competition-menu"]');w.document.getElementById('competition-length').value='3';
+assert.equal(w.document.getElementById('competition-cards'),null,'la competición en solitario no ofrece elegir las cartas por tema');
 click('[data-action="start-competition"]');click('[data-action="comp-next-round"]');
 let solo=JSON.parse(w.localStorage.getItem('continuum-competition-v1'));
-assert.equal(solo.cardsPerRound,2);assert.equal(solo.solo.total,2);
+assert.equal(solo.cardsPerRound,10);assert.equal(solo.solo.total,10);
 { // El recorrido no revela los mazos que aún no han llegado.
   const CTw = w.CONTINUUM, modos = CTw.Tournament.modes().slice(0, 3);
   const html = CTw.Tournament.journey({ queue: modos, index: 0, history: [], handSize: 4 });

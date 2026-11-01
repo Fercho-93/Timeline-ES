@@ -364,12 +364,11 @@
     screen = 'competition-menu';
     paint(`<div class="shell">${header("back-menu")}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Competición</div><h2 class="solo-title" data-focus tabindex="-1">Competición en solitario</h2>
-        <p class="lead">Temas al azar de las Grandes colecciones, uno detrás de otro, sin repetir.</p>${vidasAviso("por tema")}<p class="solo-intro-rule">Al final cuentan todos tus aciertos.</p></div>
+        <p class="lead">Temas al azar de las Grandes colecciones, uno detrás de otro, sin repetir. ${COMP_SOLO_CARDS} cartas en cada tema.</p>${vidasAviso("por tema")}<p class="solo-intro-rule">Al final cuentan todos tus aciertos.</p></div>
         ${loadCompetition() ? '<button class="btn btn-secondary btn-block" data-action="resume-competition">Continuar competición en solitario <span>→</span></button>' : ''}
         <div class="panel solo-panel">
           <div class="solo-panel-head"><h3>Qué juegas</h3></div>
           ${lengthField(competitionConfig.rounds)}
-          <div class="field"><label for="competition-cards">Cartas por tema</label><select id="competition-cards">${[1,2,3,4,5,6].map(n=>`<option${n===competitionConfig.cards?' selected':''}>${n}</option>`).join('')}</select></div>
           ${CT.Ghost.difficultyCards("competition-difficulty", competitionDifficulty).replace('class="field difficulty-field', 'class="field difficulty-field competition-difficulty')}
           <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-competition">Empezar competición <span aria-hidden="true">→</span></button>
         </div>
@@ -3728,12 +3727,15 @@
 
   // ── Competición en solitario ───────────────────────────────────────────────────────
   //
-  // Una ronda de ROUND_CARDS cartas por cada modalidad ya establecida, en un orden al azar
+  // Una ronda de COMP_SOLO_CARDS cartas por cada modalidad ya establecida, en un orden al azar
   // y sin repetir ninguna, todas con el mismo motor de colocar-una-a-una que el solitario
   // (`solo`, con kind: "comp"). Lo único propio de la competición vive en `comp`: qué
   // temas quedan por jugar y el marcador acumulado de las rondas ya resueltas.
   //
   // La competición se guarda con una clave independiente de las partidas por mazo.
+  // Cada tema se juega con las mismas cartas que una ronda en solitario (10). Antes se elegían de 1 a
+  // 6; ROUND_CARDS es el valor de entonces, para las competiciones guardadas sin `cardsPerRound`.
+  const COMP_SOLO_CARDS = SOLO_ROUND_CARDS;
   const ROUND_CARDS = 5;
   // «Gran mezcla temporal» no es un género propio: combina los demás mazos con eje temporal.
   // Un tema de competición que sea «un poco de todo lo anterior» no aporta nada nuevo a la
@@ -3772,7 +3774,7 @@
       const saved = JSON.parse(raw);
       if (saved.saveVersion !== CT.Saves.VERSION || !Array.isArray(saved.queue) || !Array.isArray(saved.roundsSummary) || !CT.has(saved.previousModeKey) || !CT.Ghost.LEVELS[saved.difficulty] || !saved.decks || !saved.queue.every(key => CT.has(key) && Array.isArray(saved.decks[key]))) throw Error("Formato de competición desconocido");
       saved.cardsPerRound ??= ROUND_CARDS;
-      if (!Number.isInteger(saved.cardsPerRound) || saved.cardsPerRound<1 || saved.cardsPerRound>6 || !Array.isArray(saved.totalFailed) || !Number.isInteger(saved.totalHits) || saved.totalHits < 0 || saved.roundsSummary.some(round => !CT.has(round.mode) || !Number.isInteger(round.hits) || round.hits < 0 || round.hits > saved.cardsPerRound || round.total !== saved.cardsPerRound)) throw Error("Marcador inválido");
+      if (!Number.isInteger(saved.cardsPerRound) || saved.cardsPerRound<1 || saved.cardsPerRound>COMP_SOLO_CARDS || !Array.isArray(saved.totalFailed) || !Number.isInteger(saved.totalHits) || saved.totalHits < 0 || saved.roundsSummary.some(round => !CT.has(round.mode) || !Number.isInteger(round.hits) || round.hits < 0 || round.hits > saved.cardsPerRound || round.total !== saved.cardsPerRound)) throw Error("Marcador inválido");
       if (saved.solo) CT.Saves.validate(saved.solo, saved.solo.mode);
       const themes = [...saved.queue, ...saved.roundsSummary.map(round => round.mode), ...(saved.solo ? [saved.solo.mode] : [])];
       if (!themes.length || new Set(themes).size !== themes.length || (!saved.finished && !saved.solo && !saved.queue.length)) throw Error("Rondas inválidas");
@@ -3802,7 +3804,7 @@
     const opciones = competitionOptions();
     comp = { decks: CT.Saves.clone(Object.fromEntries(temas.map(key => [key, CT.cards(key)]))), difficulty: competitionDifficulty, queue: shuffle(temas).slice(0, opciones.rounds || temas.length), roundsSummary: [], totalHits: 0, totalFailed: [] };
     comp.totalThemes = comp.queue.length;
-    comp.cardsPerRound = opciones.cards;
+    comp.cardsPerRound = COMP_SOLO_CARDS;
     comp.ms = CT.Ghost.level(comp.difficulty).seconds * 1000;
     compRoundIntro();
   }

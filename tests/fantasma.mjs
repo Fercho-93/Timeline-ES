@@ -229,9 +229,10 @@ for (const difficulty of ['easy','normal','hard','expert']) {
   // número de rondas se deduce del catálogo y de la cartera: ni añadir un mazo ni cerrar
   // uno debe obligar a tocar esta cuenta.
   const temas=Object.keys(w.CONTINUUM.MODES).filter(key=>key!=='mixed'&&w.CONTINUUM.Cartera.tiene(key)).length;
-  // Las cinco cartas del usuario nunca se consumen como incorporaciones automáticas.
+  // Las diez cartas de cada tema nunca se consumen como incorporaciones automáticas.
+  const porTema=10;
   while(rounds++<temas){
-    for(let i=0;i<5;i++){
+    for(let i=0;i<porTema;i++){
       const id=Number(w.document.querySelector('.hand-card').dataset.id),ct=w.CONTINUUM;
       const cards=Object.values(ct.MODES).flatMap(m=>m.cards),byId=new Map(cards.map(c=>[c.id,c]));
       const board=[...w.document.querySelectorAll('.timeline-card')].map(el=>byId.get(Number(el.dataset.id)));
@@ -243,6 +244,6 @@ for (const difficulty of ['easy','normal','hard','expert']) {
     }
     if(rounds<temas){click(w,'comp-next-round');}
   }
-  assert.match(w.document.body.textContent,new RegExp(String(temas*5)));w.close();
+  assert.match(w.document.body.textContent,new RegExp(String(temas*porTema)));w.close();
 }
 console.log('  Fantasma, conservación de cartas, guardado y cuatro dificultades: OK');

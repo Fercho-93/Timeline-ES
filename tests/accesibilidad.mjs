@@ -113,7 +113,7 @@ console.log("\nLas reglas se adaptan al mazo");
   const tutorialFuente = read("js/interfaz/tutorial.js");
   ok("el vídeo enseña a confirmar con «Colocar carta», no con «Sí, aquí»", /«Colocar carta»/.test(tutorialFuente) && !/Sí, aquí/.test(tutorialFuente));
   ok("el reto diario tiene su propio capítulo en la Guía", /data-guide-chapter="03"[^]*?<b>Reto diario<\/b>/.test(w.CONTINUUM.guideMarkup("history", "solo")));
-  ok("la competición explica sus rondas", /cinco cartas/i.test(w.CONTINUUM.guideMarkup("history", "competition")));
+  ok("la competición explica sus rondas", /diez cartas por tema/i.test(w.CONTINUUM.guideMarkup("history", "competition")));
   ok("la guía online explica quién prepara la sala", /quien crea la partida/i.test(w.CONTINUUM.guideMarkup("history", "online")));
   ok("fuera del iPhone la guía no ofrece entrar con Apple", !/Apple/.test(w.CONTINUUM.guideMarkup("history", "solo")));
   w.Capacitor = { isNativePlatform: () => true, getPlatform: () => "ios" };

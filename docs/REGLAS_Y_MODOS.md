@@ -213,13 +213,14 @@ El duelo por enlace es la excepción: su reloj no se para nunca, y el propio avi
 ## Competición
 
 La Competición es el último panel de la lista de Grandes colecciones, en Jugar solo, Un solo móvil
-y Cada uno en su móvil. Se configuran 3, 5 o todas las temáticas y entre 1 y 6 cartas por tema.
+y Cada uno en su móvil. Se configuran 3, 5 o todas las temáticas; en grupo, también entre 1 y 6
+cartas por persona en cada tema.
 Cada tema usa un mazo al azar distinto, sin repetir ninguno; Gran mezcla se excluye porque combina
 otros mazos.
 
 - **En solitario** se suman los aciertos, con tres vidas nuevas en cada tema. La competición
-  individual elige un nivel de dificultad (que fija el tiempo por carta), juega en cada tema las
-  cartas elegidas (cinco si no se cambia) y reserva cartas adicionales para el tablero. Al terminar
+  individual elige un nivel de dificultad (que fija el tiempo por carta), juega en cada tema 10
+  cartas, como una ronda (hasta la v848 se elegían de 1 a 6), y reserva cartas adicionales para el tablero. Al terminar
   el último tema se ve el marcador de todos juntos.
 - **En grupo** se reparten las cartas elegidas a cada jugador (ajustadas si el mazo es
   pequeño), gana el tema quien termine una vuelta completa sin cartas y se usa la final numérica
@@ -344,7 +345,10 @@ las mismas cartas por enlace). No usa el marcador de Competición: mantiene su p
 guardada. Usa las mismas cartas, tamaños, arrastre, confirmación, giro, zoom y ajustes del
 tablero compartido.
 
-En solitario, cada día se ofrecen cuatro retos distintos, iguales para todo el mundo: el
+En solitario, cada reto se juega con 10 cartas que colocar (`QuickEngine.SOLO_CARDS`) más la que abre
+la línea, igual que una ronda de Grandes colecciones y el reto diario; salen primero las que aún no
+están en la colección, y un mazo más pequeño se juega entero. Cada día se ofrecen cuatro retos
+distintos, iguales para todo el mundo: el
 catálogo se baraja una vez con semilla fija y cada día toma el tramo siguiente, así que en ocho
 días salen todos sin repetir de un día a otro. Cada carta que quien juega coloca bien entra en su
 **colección** de Retos rápidos (`quickMastered` en `hilo-perfil-v1`, que viaja con el progreso de

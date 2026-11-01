@@ -76,7 +76,7 @@ try {
   click(w, "resume-competition");
   click(w, "comp-confirm-resume");
   let steps = 0;
-  while (!saved(w).finished && steps++ < temas * 8) {
+  while (!saved(w).finished && steps++ < temas * 13) {
     state = saved(w);
     if (!state.solo) { w = open(entries(w)); click(irACompeticion(w), "competition-menu"); click(w, "resume-competition"); click(w, "comp-next-round"); continue; }
     const s = state.solo, c = new Map(s.savedDeck.map(c => [c.id, c]));
@@ -85,7 +85,7 @@ try {
     click(w, "confirm-place"); click(w, "solo-next");
   }
   assert.ok(saved(w).finished); assert.equal(saved(w).roundsSummary.length, temas);
-  assert.equal(saved(w).totalHits, temas * 5);
+  assert.equal(saved(w).totalHits, temas * 10);
   assert.equal(saved(w).queue.length, 0);
   console.log(`  ok competición: reparto, resultado pendiente, pausa, ${temas} rondas y marcador sin duplicación`);
 
