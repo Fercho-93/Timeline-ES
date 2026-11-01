@@ -2,7 +2,7 @@
 
 Un duelo por turnos se juega entre dos cuentas, cada una cuando puede. Se crea desde
 **Jugar con amigos → Cada uno en su móvil → Crear partida**, eligiendo el ritmo **Por turnos**, y
-se sigue en **Tus partidas**. El código está en `js/online/duelo-turnos.js` (Grandes colecciones,
+se sigue en **Tus duelos**. El código está en `js/online/duelo-turnos.js` (Grandes colecciones,
 colección `turnDuels`) y en `js/retos/quick-challenges.js` / `js/retos/quick-online.js` para los duelos de Retos
 rápidos (salas de dos en `quickRooms`). Los dos ejes del juego siguen igual: ordenar o cifras.
 
@@ -46,6 +46,10 @@ respuesta congelado. La pantalla distingue envío pendiente y confirmado. Una tr
 ya se aplicó la misma jugada, aunque se perdiera su confirmación. Se reintenta al recuperar
 conexión, al abrir la lista o el duelo, a mano o cada 15 segundos mientras la página sigue viva.
 Una partida ya cerrada o un turno resuelto desde otro dispositivo no se reescriben.
+
+Crear un duelo (o una competición por turnos) sí necesita conexión: sin internet, el formulario lo
+avisa encima del botón, propone jugar en directo por la Wi-Fi o con «Mismas cartas», y al pulsar no
+lo intenta.
 
 La cola pertenece a la cuenta y al dispositivo: no borrar el almacenamiento con envíos
 pendientes. Sin espacio se avisa y no se envía una respuesta sin protección local. No hay envío en

@@ -317,11 +317,15 @@
     internet:'<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.6 3.5 5.4 3.5 8.5s-1 5.9-3.5 8.5c-2.5-2.6-3.5-5.4-3.5-8.5s1-5.9 3.5-8.5Z"/>',
     wifi:'<path d="M4 10a12 12 0 0 1 16 0"/><path d="M7.5 13.5a7 7 0 0 1 9 0"/><circle cx="12" cy="17.5" r="1"/>'
   };
+  // El duelo por turnos se guarda en el servidor entre jugadas: sin internet no se puede crear.
+  const OFFLINE_TURNS='Sin internet no se puede crear un duelo por turnos. Podéis jugar en directo, por la Wi-Fi, o con «Mismas cartas».';
   function duelSetup() {
     stopNetwork(); duelFirst=0; page='duel-setup'; format='duel'; netKind='internet'; roomCapacity=2; state=null; record=null; selected=null; slot=null;
     const pace=duelPace();
     // Sin internet, en directo solo cabe la Wi-Fi: se marca sola, sin cambiar lo guardado.
     const offline=navigator.onLine===false, net=offline?'wifi':liveNet();
+    // El máximo de la sala se recuerda con el de las colecciones (`CT.ManoInicial`), con el tope de 8 de Retos rápidos.
+    const maxRoom=Math.min(Math.max(Number(CT.ManoInicial?.maximo?.())||4,2),8);
     const option=([key,title,foot])=>`<label class="segmented-option${key===pace?' is-on':''}"><input type="radio" name="quick-duel-pace" value="${key}"${key===pace?' checked':''}><i class="duel-option-mark" aria-hidden="true">${soloGlyph(PACE_GLYPH[key])}</i><span><b>${title}</b><small>${foot}</small></span></label>`;
     const block=(key,body)=>`<div data-quick-duel-block="${key}"${key===pace?'':' hidden'}>${body}</div>`;
     // Conexión y máximo solo cuentan en directo: van antes de la duración, el tiempo y el nombre.
@@ -336,7 +340,7 @@
           <div class="field duel-kind-field"><span class="field-label" id="quick-net-label">Conexión</span>
             <div class="segmented" role="radiogroup" aria-labelledby="quick-net-label">${[['internet','Por internet','Cada uno donde esté'],['wifi','Sin internet','Cerca, en la misma Wi-Fi']].map(([key,title,foot])=>`<label class="segmented-option${key===net?' is-on':''}"><input type="radio" name="quick-live-net" value="${key}"${key===net?' checked':''}><i class="duel-option-mark" aria-hidden="true">${soloGlyph(PACE_GLYPH[key])}</i><span><b>${title}</b><small>${foot}</small></span></label>`).join('')}</div></div>
           ${offline?'<p class="hint" data-offline-note>No hay internet: jugaréis por la Wi-Fi.</p>':''}
-          <div class="field"><label for="quick-net-players">Máximo de jugadores</label><select id="quick-net-players">${[2,3,4,5,6,7,8].map(n=>`<option value="${n}"${n===4?' selected':''}>${n} jugadores</option>`).join('')}</select></div>
+          <div class="field"><label for="quick-net-players">Máximo de jugadores</label><select id="quick-net-players" data-maximo-sala>${[2,3,4,5,6,7,8].map(n=>`<option value="${n}"${n===maxRoom?' selected':''}>${n} jugadores</option>`).join('')}</select></div>
         `)}
         ${lengthChips('quick-free-length',SHORT_LENGTHS,'Retos')}
         ${keepField(` data-quick-keep-field${pace==='seguidos'?' hidden':''}`)}
@@ -346,6 +350,7 @@
         ${block('seguidos',`<div class="duel-brief"><p>Juegas tú ahora y le mandas un enlace a tu amigo: juega los mismos retos cuando quiera, sin coincidir contigo. Un fallo no suma, pero se juega todo el reto.</p></div>
           ${button('start-duel','Jugar y retar <span>→</span>','btn btn-primary btn-block')}`)}
         ${block('turnos',`<div class="duel-brief"><p>Cada uno juega desde su móvil, por turnos. Creas el duelo, haces tú la primera jugada y después le mandas el enlace: tu amigo entra directo en la partida, ve tu última jugada y sigue él. En la revancha empieza el otro. La partida se guarda entre turnos.</p></div>
+          ${offline?`<p class="hint" data-offline-turnos>${OFFLINE_TURNS}</p>`:''}
           ${button('create-room','Crear duelo por turnos <span>→</span>','btn btn-primary btn-block')}
           ${readJSON(NET)?button('duels-list','Volver a Tus duelos','btn btn-ghost btn-block'):''}`)}
         <p id="quick-error" role="alert"></p>
@@ -612,6 +617,9 @@
   async function connectRoom(create) {
     // Desde «Partida con amigos», solo el ritmo «Por turnos» crea un duelo; en directo es una sala.
     if(create)duelRoom=page==='duel-setup'&&duelPace()==='turnos';
+    // El duelo por turnos va siempre por internet, aunque antes se probara una sala por Wi-Fi desde esta pantalla.
+    // Las alternativas ya las dice el aviso de encima del botón; el error solo dice qué ha pasado.
+    if(create&&duelRoom){netKind='internet';if(navigator.onLine===false)throw Error('Sin internet no se puede crear un duelo por turnos.');}
     const nameInput=app().querySelector(create?'#quick-net-name':'#quick-net-name-join') || app().querySelector('#quick-net-name'), name=nameInput.value.trim();if(!name)throw Error('Escribe tu nombre.');{const rechazado=CT.Moderacion?.problema(name);if(rechazado)throw Error(rechazado);}
     if (create) roomCapacity = duelRoom ? 2 : Number(app().querySelector('#quick-net-players')?.value) || roomCapacity;
     // La duración que se eligió al crear la sala; en la sala ya no hay desplegable, y sin esto siempre eran 3 retos.

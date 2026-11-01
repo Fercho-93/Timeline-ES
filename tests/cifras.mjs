@@ -256,7 +256,29 @@ console.log("\nCrear un duelo de cifras y jugarlo");
   abreMazo(w, "geografia", "population");
   (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
   ok("sin internet se propone la Wi-Fi y se avisa", w.document.querySelector('input[name="live-net"][value="wifi"]').checked && !!w.document.querySelector('[data-offline-note]') && w.localStorage.getItem("hilo-sala-red-v1") === "internet");
+  // Por turnos el duelo se guarda en el servidor: sin internet se avisa en los dos bloques y el botón no sigue.
+  ok("sin internet, por turnos se avisa de que no se puede crear", w.document.querySelectorAll('[data-duel-block^="turnos-"] [data-offline-turnos]').length === 2);
+  {
+    const porTurnos = w.document.querySelector('input[name="duel-pace"][value="turnos"]');
+    porTurnos.checked = true;
+    porTurnos.dispatchEvent(new w.Event("change", { bubbles: true }));
+    click(w, '[data-duel-block="turnos-orden"] [data-action="start-turn-duel"]');
+    ok("y no se pasa a preparar el duelo", !existe(w, '[data-action="duel-play"]') && /Sin internet no se puede crear un duelo por turnos/.test(w.document.getElementById("toast").textContent));
+    w.localStorage.setItem("hilo-duelo-ritmo-v1", "directo");
+  }
   Object.defineProperty(w.navigator, "onLine", { configurable: true, get: () => true });
+  abreMazo(w, "geografia", "population");
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
+  ok("con internet no hay aviso de turnos", !existe(w, '[data-offline-turnos]'));
+  {
+    // Mientras los avisos al móvil estén apagados, no se promete ninguno: la jugada del rival se ve en «Tus duelos».
+    const porTurnos = w.document.querySelector('input[name="duel-pace"][value="turnos"]');
+    porTurnos.checked = true;
+    porTurnos.dispatchEvent(new w.Event("change", { bubbles: true }));
+    click(w, '[data-duel-block="turnos-orden"] [data-action="start-turn-duel"]');
+    ok("por turnos no se promete un aviso que no llega", existe(w, '[data-action="duel-play"]') && /lo verás en «Tus duelos»/.test(texto(w)) && !/recibirás un aviso/.test(texto(w)));
+    w.localStorage.setItem("hilo-duelo-ritmo-v1", "directo");
+  }
   abreMazo(w, "geografia", "population");
   (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
   const aSeguidos = w.document.querySelector('input[name="duel-pace"][value="seguidos"]');

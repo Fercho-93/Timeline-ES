@@ -186,6 +186,8 @@ console.log("\nLas reglas se adaptan al mazo");
   ok("abrir otro capítulo recoge el anterior", !chapters[0].open && chapters[1].open);
   ok("las salas explican el reloj configurable, con las opciones reales", /sin tiempo, 15, 20 o 30 segundos/.test(chapters[1].textContent) && !/45/.test(chapters[1].textContent));
   ok("el duelo «Mismas cartas» se juega sin vidas", /Mismas cartas/.test(chapters[1].textContent) && /Sin vidas · 10 cartas/.test(chapters[1].textContent));
+  // Como `CT.Duelo.Cifras.compara`: en el duelo de cifras por enlace, con los mismos aciertos gana quien respondió antes.
+  ok("la Guía cuenta el desempate por rapidez de las cifras", /salvo al escribir la cifra: ahí gana quien haya respondido más rápido/.test(chapters[1].textContent));
   ok("Pulso explica sus cuatro resultados", el(w, '[data-guide-chapter="04"]').querySelectorAll('tbody tr').length === 4);
   for (const [key, info] of Object.entries(w.CONTINUUM.MODES)) {
     const markup = w.CONTINUUM.guideMarkup(key, 'solo');

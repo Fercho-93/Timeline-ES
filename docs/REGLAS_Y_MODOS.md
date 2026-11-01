@@ -214,7 +214,8 @@ El duelo por enlace es la excepción: su reloj no se para nunca, y el propio avi
 
 La Competición es el último panel de la lista de Grandes colecciones, en Jugar solo, Un solo móvil
 y Cada uno en su móvil. Se configuran 3, 5 o todas las temáticas; en grupo, también entre 1 y 6
-cartas por persona en cada tema.
+cartas por persona en cada tema. Por turnos caben como mucho 5 temas y 30 cartas en total, así que
+el formulario solo ofrece las cartas que se jugarán: con 5 temas, hasta 3 por persona; con 3, hasta 5.
 Cada tema usa un mazo al azar distinto, sin repetir ninguno; Gran mezcla se excluye porque combina
 otros mazos.
 

@@ -15,7 +15,7 @@ La portada tiene tres puertas y un atajo:
     **Competición** como último panel de la lista) o Retos rápidos.
   - **Jugar con amigos:** *Un solo móvil* (pasando el teléfono) o *Cada uno en su móvil*, donde
     se puede unirse a una partida, crearla (en directo, por turnos o con las mismas cartas) o
-    ver «Tus partidas».
+    ver «Tus duelos».
   - **Jugar online:** mesas públicas. Se crea una mesa, se elige entre las abiertas o se busca
     una partida rápida, de Grandes colecciones o de Retos rápidos.
 - **Unirme a una partida.** Atajo para quien recibe un QR, un enlace o un código.

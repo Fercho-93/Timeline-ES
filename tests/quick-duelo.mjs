@@ -126,7 +126,30 @@ CT.Quick.openDuel(html => { app.innerHTML = html; });
 assert.equal(app.querySelector('input[name="quick-live-net"]:checked').value, 'wifi');
 assert.ok(app.querySelector('[data-offline-note]'));
 assert.equal(w.CONTINUUM.Storage.getItem('continuum-quick-live-net-v1'), 'internet');
+// Por turnos el duelo se guarda en el servidor: sin internet se avisa antes de pulsar y, si se pulsa, no se crea nada.
+w.CONTINUUM.Storage.setItem('continuum-quick-duel-pace-v1', 'turnos');
+CT.Quick.openDuel(html => { app.innerHTML = html; });
+assert.ok(app.querySelector('[data-quick-duel-block="turnos"] [data-offline-turnos]'), 'sin internet se avisa de que el duelo por turnos no se puede crear');
+app.querySelector('[data-quick="create-room"]').click();
+await new Promise(resolve => setTimeout(resolve, 0));
+assert.match(app.querySelector('#quick-error').textContent, /Sin internet no se puede crear un duelo por turnos/);
+w.CONTINUUM.Storage.setItem('continuum-quick-duel-pace-v1', 'directo');
 Object.defineProperty(w.navigator, 'onLine', {configurable: true, get: () => true});
+CT.Quick.openDuel(html => { app.innerHTML = html; });
+assert.equal(app.querySelector('[data-offline-turnos]'), null, 'con internet no hay aviso');
+// El máximo de la sala se recuerda, el mismo que en las colecciones, y en Retos rápidos no pasa de 8.
+w.CONTINUUM.Storage.setItem('continuum-live-max-v1', '6');
+CT.Quick.openDuel(html => { app.innerHTML = html; });
+assert.equal(app.querySelector('#quick-net-players').value, '6');
+w.CONTINUUM.Storage.setItem('continuum-live-max-v1', '9');
+CT.Quick.openDuel(html => { app.innerHTML = html; });
+assert.equal(app.querySelector('#quick-net-players').value, '8', 'nueve en las colecciones son ocho en Retos rápidos');
+{
+  const maximo = app.querySelector('#quick-net-players'); maximo.value = '3';
+  maximo.dispatchEvent(new w.Event('change', {bubbles: true}));
+  assert.equal(w.CONTINUUM.Storage.getItem('continuum-live-max-v1'), '3', 'lo elegido aquí se recuerda');
+}
+w.CONTINUUM.Storage.removeItem('continuum-live-max-v1');
 // El texto tras fallar una carta concuerda con quien juega: «Pierdes…» en solitario, «Ana pierde…» en mesa,
 // y con 0 aciertos provisionales no dice «pierde 0 aciertos».
 {

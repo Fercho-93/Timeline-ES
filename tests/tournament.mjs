@@ -31,6 +31,46 @@ assert.equal(w.document.querySelector('[data-action="competition-local"]'), null
 assert.equal(w.document.querySelector('input[name="comp-content"]'), null);
 // Cartas por persona siempre a la vista, con 5 temas por defecto.
 assert.ok(w.document.getElementById('competition-cards').checkVisibility?.() ?? !w.document.getElementById('competition-cards').closest('[hidden]'));
+// Por turnos caben 30 cartas: el desplegable solo ofrece las cartas por persona que se jugarán con
+// esos temas, y la entradilla dice cómo se gana con cada ritmo.
+{
+  const doc = w.document, cartas = () => doc.getElementById('competition-cards');
+  const elegibles = () => [...cartas().options].filter(o => !o.disabled && !o.hidden).map(o => Number(o.value));
+  const cambia = (el, valor) => { if (el.type === 'radio') el.checked = true; else el.value = String(valor); el.dispatchEvent(new w.Event('change', {bubbles: true})); };
+  const ritmo = valor => cambia(doc.querySelector(`input[name="comp-pace"][value="${valor}"]`));
+  const temas = n => cambia(doc.getElementById('competition-length'), n);
+  const ayuda = () => doc.querySelector('[data-comp-cards-help]'), ayudaOculta = () => !!ayuda().closest('[hidden]'), lead = () => doc.querySelector('[data-comp-lead]').textContent;
+  assert.deepEqual(elegibles(), [1, 2, 3, 4, 5, 6], 'en directo, de 1 a 6');
+  assert.equal(ayudaOculta(), true);
+  assert.match(lead(), /todos a la vez/);
+  cartas().value = '6';
+  ritmo('turnos'); temas(5);
+  assert.deepEqual(elegibles(), [1, 2, 3], 'por turnos, con 5 temas caben 3 por persona');
+  assert.equal(cartas().value, '3', 'lo elegido baja al tope');
+  assert.equal(ayudaOculta(), false);
+  assert.match(ayuda().textContent, /con 5 temas caben como mucho 3 cartas/);
+  assert.match(lead(), /por turnos, y gana quien más acierte en total/);
+  assert.doesNotMatch(lead(), /todos a la vez/);
+  temas(3);
+  assert.deepEqual(elegibles(), [1, 2, 3, 4, 5], 'con 3 temas, 5');
+  assert.match(ayuda().textContent, /con 3 temas caben como mucho 5 cartas/);
+  // Al volver a entrar por turnos, la pantalla ya sale con el tope.
+  temas(5); w.CONTINUUM.ModeHubs.open('hub-friends-online'); click('[data-action="competition-menu"]');
+  assert.ok(Math.max(...elegibles()) <= 3 && Number(cartas().value) <= 3, 'repintada por turnos, sin cartas que no caben');
+  // Sin internet, la competición por turnos no se puede crear: se avisa y el botón no la empieza.
+  Object.defineProperty(w.navigator, 'onLine', {configurable: true, get: () => false});
+  w.CONTINUUM.ModeHubs.open('hub-friends-online'); click('[data-action="competition-menu"]');
+  assert.equal(doc.querySelector('[data-offline-turnos]').hidden, false);
+  assert.equal(doc.querySelector('[data-offline-note]').hidden, true, 'por turnos no se dice que se jugará por la Wi-Fi');
+  click('[data-action="comp-friends-start"]');
+  assert.ok(doc.querySelector('[data-action="comp-friends-start"]'), 'sigue en la misma pantalla');
+  assert.match(doc.getElementById('toast').textContent, /Sin internet no se puede crear una competición por turnos/);
+  ritmo('directo');
+  assert.equal(doc.querySelector('[data-offline-turnos]').hidden, true);
+  assert.equal(doc.querySelector('[data-offline-note]').hidden, false, 'en directo, por la Wi-Fi');
+  assert.deepEqual(elegibles(), [1, 2, 3, 4, 5, 6]);
+  Object.defineProperty(w.navigator, 'onLine', {configurable: true, get: () => true});
+}
 w.CONTINUUM.ModeHubs.open('hub-friends-local');click('[data-action="competition-menu"]');
 // Un solo móvil: una única ventana de ajustes (rondas y cartas), sin pantalla previa.
 assert.equal(w.document.getElementById('competition-cards'),null);

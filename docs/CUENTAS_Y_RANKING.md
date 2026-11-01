@@ -110,7 +110,7 @@ Atlas → «Tu cuenta y tus datos» → eliminar. Pide confirmación y no se pue
 Tipos de puntuación que enseña el juego: partida única (gana quien se queda sin cartas; empate →
 final numérica), partida con rondas (competición: +1 al ganar la ronda, −(cartas − 1) al resto),
 reto diario (X de 10; la rapidez desempata) y duelos (más aciertos; la rapidez desempata). En el
-Atlas y en «Tus partidas», el cara a cara con cada amigo de los duelos por turnos.
+Atlas y en «Tus duelos», el cara a cara con cada amigo de los duelos por turnos.
 
 ## Seguridad y datos
 

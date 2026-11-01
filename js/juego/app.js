@@ -378,9 +378,32 @@
   // Competición con amigos, cada uno en su móvil: temas al azar de las colecciones, cuántos temas,
   // el ritmo (en directo o por turnos) y, en directo, la conexión (internet o la misma Wi-Fi).
   const COMP_PACE_KEY = "hilo-competicion-ritmo-v1";
-  // Por turnos, una partida admite hasta 30 cartas: como mucho cinco temas.
-  const COMP_TURN_THEMES = 5;
+  // Por turnos, una partida admite hasta 30 cartas (`MAX_CARDS` de js/online/duelo-turnos.js, el
+  // tope de las reglas): como mucho cinco temas, y en cada uno las cartas por persona que quepan.
+  const COMP_TURN_THEMES = 5, COMP_TURN_CARDS = 30;
   function compPace() { return CT.Storage.getItem(COMP_PACE_KEY) === "turnos" ? "turnos" : "directo"; }
+  // Cuántas cartas por persona y tema se pueden elegir: de 1 a 6 en directo; por turnos, las que
+  // quepan en el tope (con 5 temas, 3; con 3, 5). El desplegable no ofrece más de las que se jugarán.
+  function compCardsCap(ritmo, temas) {
+    if (ritmo !== "turnos") return 6;
+    const n = Math.min(Number(temas) || COMP_TURN_THEMES, COMP_TURN_THEMES);
+    return Math.max(1, Math.min(6, Math.floor(COMP_TURN_CARDS / (2 * n))));
+  }
+  const compCardsHelp = temas => {
+    const n = Math.min(Number(temas) || COMP_TURN_THEMES, COMP_TURN_THEMES);
+    return `Por turnos, con ${n} temas caben como mucho ${compCardsCap("turnos", n)} cartas por persona en cada tema.`;
+  };
+  // Al cambiar el ritmo o los temas, el desplegable de cartas se ajusta sin repintar la pantalla.
+  function compSyncCards() {
+    const select = document.getElementById("competition-cards");
+    if (!select) return;
+    const ritmo = compPace(), temas = Number(document.getElementById("competition-length")?.value) || competitionConfig.rounds;
+    const tope = compCardsCap(ritmo, temas);
+    [...select.options].forEach(opcion => { opcion.hidden = opcion.disabled = Number(opcion.value) > tope; });
+    if (Number(select.value) > tope) select.value = String(tope);
+    const ayuda = app.querySelector("[data-comp-cards-help]");
+    if (ayuda) ayuda.textContent = compCardsHelp(temas);
+  }
   function competitionFriends() {
     screen = "competition-friends";
     const ritmo = compPace();
@@ -388,6 +411,10 @@
     const red = sinRed ? "wifi" : liveNet();
     const todosVisible = ritmo === "directo";
     const temas = !todosVisible && competitionConfig.rounds > COMP_TURN_THEMES ? COMP_TURN_THEMES : competitionConfig.rounds;
+    const topeCartas = compCardsCap(ritmo, temas), cartas = Math.min(competitionConfig.cards, topeCartas);
+    // Lo que solo vale para un ritmo se marca para enseñarlo o esconderlo al cambiarlo. La nota de
+    // las cartas va en su propio contenedor: el `display: block` de `.field-help` anularía `hidden`.
+    const soloDirecto = ritmo === "turnos" ? " hidden" : "", soloTurnos = ritmo === "turnos" ? "" : " hidden";
     const opcion = (name, clave, titulo, pie, icono, actual) => `<label class="segmented-option${clave === actual ? " is-on" : ""}">
       <input type="radio" name="${name}" value="${clave}"${clave === actual ? " checked" : ""}>
       <i class="duel-option-mark" aria-hidden="true">${glyph(GLYPHS[icono])}</i>
@@ -399,16 +426,18 @@
     </div>`;
     paint(`<div class="shell">${header("back-menu")}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Competición</div><h2 class="solo-title" data-focus tabindex="-1">Competición con amigos</h2>
-        <p class="lead">Cada uno en su móvil. Se juegan varios temas al azar de las Grandes colecciones, todos a la vez y con puntos, y gana quien más sume al final.</p></div>
+        <p class="lead" data-comp-lead>${compLead(ritmo)}</p></div>
         <div class="panel solo-panel">
           <div class="solo-panel-head"><h3>Qué jugáis</h3></div>
           ${lengthField(temas, { all: todosVisible })}
-          <div class="field"><label for="competition-cards">Cartas por persona en cada tema</label><select id="competition-cards">${[1, 2, 3, 4, 5, 6].map(n => `<option${n === competitionConfig.cards ? " selected" : ""}>${n}</option>`).join("")}</select></div>
+          <div class="field"><label for="competition-cards">Cartas por persona en cada tema</label><select id="competition-cards">${[1, 2, 3, 4, 5, 6].map(n => `<option${n === cartas ? " selected" : ""}${n > topeCartas ? " hidden disabled" : ""}>${n}</option>`).join("")}</select>
+            <div style="margin-bottom:14px" data-comp-turn-field${soloTurnos}><small class="field-help" data-comp-cards-help>${compCardsHelp(temas)}</small></div></div>
           <div class="solo-panel-head"><h3>Cómo jugáis</h3></div>
           ${grupo("comp-pace", "comp-pace-label", "Ritmo", [["directo", "En directo", "Todos a la vez, en una sala", "directo"], ["turnos", "Por turnos", "Cada uno cuando pueda", "turnos"]], ritmo)}
-          ${grupo("live-net", "comp-net-label", "Conexión", [["internet", "Por internet", "Cada uno donde esté", "internet"], ["wifi", "Sin internet", "Cerca, en la misma Wi-Fi", "wifi"]], red, ` data-comp-net-field${ritmo === "turnos" ? " hidden" : ""}`)}
-          ${sinRed ? '<p class="hint" data-offline-note>No hay internet: jugaréis por la Wi-Fi.</p>' : ""}
-          <div data-comp-net-field${ritmo === "turnos" ? " hidden" : ""}>${CT.ManoInicial.maximoField()}</div>
+          ${grupo("live-net", "comp-net-label", "Conexión", [["internet", "Por internet", "Cada uno donde esté", "internet"], ["wifi", "Sin internet", "Cerca, en la misma Wi-Fi", "wifi"]], red, ` data-comp-net-field${soloDirecto}`)}
+          ${sinRed ? `<p class="hint" data-offline-note data-comp-net-field${soloDirecto}>No hay internet: jugaréis por la Wi-Fi.</p>
+          <p class="hint" data-offline-turnos data-comp-turn-field${soloTurnos}>${SIN_RED_COMP_TURNOS}</p>` : ""}
+          <div data-comp-net-field${soloDirecto}>${CT.ManoInicial.maximoField()}</div>
           ${CT.Tiempo.field("amigos", { porDefecto: 15 })}
           <div class="field duel-identity-field">
             <label for="duel-name">Tu nombre de perfil</label>
@@ -421,6 +450,18 @@
       </section>
     </div>`);
   }
+  // La entradilla también depende del ritmo: por turnos no se juega a la vez ni se suman
+  // puntos por tema, sino que gana quien más acierte en total (como dice la Guía).
+  function compLead(ritmo) {
+    return ritmo === "turnos"
+      ? "Cada uno en su móvil. Se juegan varios temas al azar de las Grandes colecciones, por turnos, y gana quien más acierte en total."
+      : "Cada uno en su móvil. Se juegan varios temas al azar de las Grandes colecciones, todos a la vez y con puntos, y gana quien más sume al final.";
+  }
+  // Un duelo o una competición por turnos se guarda en el servidor entre jugada y jugada: sin
+  // internet no se puede crear. Se dice antes de pulsar y, si se pulsa igual, al pulsar.
+  const SIN_RED_TURNOS = "Sin internet no se puede crear un duelo por turnos. Podéis jugar en directo, por la Wi-Fi, o con «Mismas cartas».";
+  const SIN_RED_COMP_TURNOS = "Sin internet no se puede crear una competición por turnos. Podéis jugarla en directo, por la Wi-Fi.";
+  function avisoSinRed(texto) { CT.toast(texto, 3500); announce(texto); }
   // Qué pasa con cada ritmo, dicho en una frase.
   function compBrief(ritmo) {
     return ritmo === "turnos"
@@ -431,6 +472,7 @@
     const opciones = competitionOptions(), ritmo = compPace();
     const red = app.querySelector('input[name="live-net"]:checked')?.value || liveNet();
     if (ritmo === "turnos") {
+      if (navigator.onLine === false) { avisoSinRed(SIN_RED_COMP_TURNOS); return; }
       const competicion = { rounds: Math.min(opciones.rounds, COMP_TURN_THEMES), cards: opciones.cards };
       turnDuelReady.then(() => CT.TurnDuel?.open({ competition: competicion, back: backMenu }));
       return;
@@ -2639,6 +2681,8 @@
     const sinRed = navigator.onLine === false;
     const red = sinRed ? "wifi" : liveNet();
     const bloque = (clave, cuerpo) => `<div data-duel-block="${clave}"${clave === duelBlockKey(ritmo, prueba) ? "" : " hidden"}>${cuerpo}</div>`;
+    // Por turnos hace falta internet para crear el duelo: sin él se dice antes de pulsar.
+    const sinRedTurnos = sinRed ? `<p class="hint" data-offline-turnos>${SIN_RED_TURNOS}</p>` : "";
     // Lo que solo se elige en directo (conexión, máximo, cartas y poderes) va antes del tiempo y del nombre, como en el resto de formularios.
     const preDirecto = cuerpo => `<div data-duel-pre="directo"${ritmo === "directo" ? "" : " hidden"}>${cuerpo}</div>`;
     return `<div class="panel solo-panel">
@@ -2699,9 +2743,11 @@
         <button class="btn ${enCifras ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-cifras">${enCifras ? "Empezar otro duelo" : "Jugar y retar"} <span>→</span></button>`) : ""}
       ${bloque("turnos-orden", `<div class="duel-brief"><p>Una carta cada vez, cada uno desde su móvil. Juegas tú primero y después le mandas el enlace a tu rival; en la revancha empieza él.</p>
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Respondes cuando te toque. Con tiempo, el reloj empieza al abrir tu carta.</span></p></div>
+        ${sinRedTurnos}
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`)}
       ${regla ? bloque("turnos-cifras", `<div class="duel-brief"><p>Una cifra cada vez, cada uno desde su móvil. Juegas tú primero y después le mandas el enlace a tu rival; en la revancha empieza él.</p>
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Respondes cuando te toque. Con tiempo, el reloj empieza al abrir tu carta.</span></p></div>
+        ${sinRedTurnos}
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`) : ""}
     </div>`;
   }
@@ -3565,13 +3611,16 @@
     const regla = reglaCifra();
     const rival = duel?.rival || null;
     const plazo = Math.round((duel ? Number(duel.ms) || 0 : CT.Tiempo.chosen("amigos", 15) * 1000) / 1000);
+    // El aviso al móvil solo se promete con las notificaciones nativas encendidas
+    // (`nativePush` en js/nube/deployment.js); hasta entonces, la jugada del rival se ve en «Tus duelos».
+    const avisoRival = CT.Deployment?.nativePush === true ? "recibirás un aviso cuando el rival juegue" : "cuando el rival juegue, lo verás en «Tus duelos»";
     const reglas = cifrasEsta
       ? [`${Cifras.CARTAS} cartas de ${escapeHtml(currentMode().name)}, una detrás de otra.`,
          `En cada una escribes el número. ${escapeHtml(regla.pregunta || "")}`,
-         enTurnos ? `Cada uno responde desde su propio móvil: recibirás un aviso cuando el rival juegue.` : `Puntúa lo cerca que te quedes <b>y</b> lo rápido que respondas.`]
+         enTurnos ? `Cada uno responde desde su propio móvil: ${avisoRival}.` : `Puntúa lo cerca que te quedes <b>y</b> lo rápido que respondas.`]
       : [`${CT.Duelo.CARTAS} cartas de ${escapeHtml(currentMode().name)}, una detrás de otra.`,
          `Colocas cada una en el hueco que le toque de la línea.`,
-         enTurnos ? `Cada uno juega desde su propio móvil: recibirás un aviso cuando el rival juegue.` : `Gana quien más acierte. No se gastan vidas: se juegan todas.`];
+         enTurnos ? `Cada uno juega desde su propio móvil: ${avisoRival}.` : `Gana quien más acierte. No se gastan vidas: se juegan todas.`];
     paint(`<div class="shell">${header("back-menu")}
       <section class="pass-screen"><div class="panel duelo-listo">
         <div class="eyebrow">${enTurnos ? "Por turnos" : "Mismas cartas"}</div>
@@ -4112,15 +4161,22 @@
       CT.Storage.setItem(COMP_PACE_KEY, event.target.value);
       const ritmo = compPace();
       app.querySelectorAll("[data-comp-net-field]").forEach(campo => { campo.hidden = ritmo === "turnos"; });
+      app.querySelectorAll("[data-comp-turn-field]").forEach(campo => { campo.hidden = ritmo !== "turnos"; });
       // «Todos los temas» solo cabe en directo: por turnos hay un tope de temas.
       const todos = app.querySelector("[data-comp-all]"), select = document.getElementById("competition-length");
       const cabe = ritmo === "directo";
       if (todos) { todos.hidden = todos.disabled = !cabe; if (!cabe && select?.value === todos.value) select.value = String(COMP_TURN_THEMES); }
+      // Y las cartas por persona, al tope que deja el número de temas.
+      compSyncCards();
+      const lead = app.querySelector("[data-comp-lead]");
+      if (lead) lead.textContent = compLead(ritmo);
       const brief = app.querySelector("[data-comp-brief] p");
       if (brief) brief.textContent = compBrief(ritmo);
       app.querySelectorAll(".segmented-option").forEach(opcion => opcion.classList.toggle("is-on", opcion.querySelector("input").checked));
       return;
     }
+    // Competición con amigos: con más temas caben menos cartas por persona si se juega por turnos.
+    if (event.target.id === "competition-length" && screen === "competition-friends") { compSyncCards(); return; }
     if (event.target.name === "duel-kind" || event.target.name === "duel-pace" || event.target.name === "live-net") {
       const value = event.target.value;
       if (event.target.name === "duel-kind") CT.Storage.setItem(DUEL_KIND_KEY, value);
@@ -4363,7 +4419,7 @@
     else if (action === "comp-friends-start") startCompFriends();
     else if (action === "friends-join-nearby") { sessionStorage.setItem("continuum-entry-route", "wifi"); CT.LocalMultiplayer.open({ join: true, nearby: true, onBack: friendsJoin }); }
     else if (action === "start-live-room") { if ((app.querySelector('input[name="live-net"]:checked')?.value || liveNet()) === "wifi") launchLocalMultiplayer(); else launchOnline("", null, { createOnly: true }); }
-    else if (action === "start-turn-duel") { guardaNombreSiLoHay(); duelReady(duelKind(), null, "turnos"); }
+    else if (action === "start-turn-duel") { if (navigator.onLine === false) { avisoSinRed(SIN_RED_TURNOS); return; } guardaNombreSiLoHay(); duelReady(duelKind(), null, "turnos"); }
     else if (action === "open-quick-duel") { CT.Quick.openRoom((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); }, target.dataset.quickCode, duelsView).catch(() => showToast('No se pudo abrir el duelo. Comprueba tu conexión.')); }
     else if (action === "rematch-quick-duel" || action === "challenge-quick-rival") {
       target.disabled = true;

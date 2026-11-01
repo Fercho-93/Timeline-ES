@@ -134,5 +134,13 @@ assert.equal(r.after.timeline.length, 1 + 3, 'una carta guardada por cada aciert
 // una clave por partida para que el perfil no la cuente dos veces.
 t.subscribe(id);
 assert.ok(w.CONTINUUM.Progreso.cerradas.includes(`turnos:${id}`), 'la competición por turnos cuenta para «Vuelta completa»');
+// El formulario de «Competición con amigos» (js/juego/app.js) recorta temas y cartas por persona con
+// los mismos topes que este archivo: si se separan, ofrecería cartas que luego no se juegan.
+{
+  const app = fs.readFileSync('js/juego/app.js', 'utf8');
+  const tope = (texto, nombre) => Number(texto.match(new RegExp(`\\b${nombre} = (\\d+)`))?.[1]);
+  assert.ok(tope(source, 'MAX_CARDS') > 0 && tope(app, 'COMP_TURN_CARDS') === tope(source, 'MAX_CARDS'), 'el tope de cartas del formulario es el de las reglas');
+  assert.ok(tope(source, 'MAX_THEMES') > 0 && tope(app, 'COMP_TURN_THEMES') === tope(source, 'MAX_THEMES'), 'y el de temas también');
+}
 
 console.log('Competición por turnos: temas al azar, reparto por tema, líneas propias y documento válido para las reglas: OK');
