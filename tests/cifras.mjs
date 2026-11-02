@@ -642,7 +642,7 @@ console.log("\nAntes de jugar se explica, y se empieza al pulsar, sin cuenta atr
   (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
   click(w, '[data-action="start-cifras"]');
   ok("no se entra directamente a la partida", !existe(w, '[data-action="cifra-answer"]'));
-  ok("se explica cómo funciona la modalidad", existe(w, ".demo-cifras") && /Puntúa lo cerca/.test(texto(w)));
+  ok("se explica cómo funciona la modalidad", existe(w, ".demo-cifras") && /Es un acierto si te quedas cerca/.test(texto(w)));
   ok("se dicen el plazo y lo que pasa al salirse", /15 segundos por carta/.test(texto(w)) && /la carta se cierra/.test(texto(w)));
   ok("y hay un botón para empezar", existe(w, '[data-action="duel-play"]'));
 

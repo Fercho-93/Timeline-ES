@@ -112,7 +112,7 @@ try {
     partida('x1', 'nadie', 'Nadie', { status: 'cancelled' })
   ]);
   assert.equal(JSON.stringify(tabla.map(r => [r.alias, r.wins, r.losses, r.draws])), JSON.stringify([['Mario', 2, 1, 1], ['Lucía', 0, 1, 0]]));
-  assert.match(w.CONTINUUM.TurnDuel.standingsMarkup([partida('m1', 'mario', 'Mario', { status: 'finished', scores: { me: 3, mario: 1 } })]), /Mario[\s\S]*1 duelo[\s\S]*<b class="is-ahead">1<\/b><i>—<\/i><b class="">0<\/b>/);
+  assert.match(w.CONTINUUM.TurnDuel.standingsMarkup([partida('m1', 'mario', 'Mario', { status: 'finished', scores: { me: 3, mario: 1 } })]), /Mario[\s\S]*1 duelo[\s\S]*<b class="is-ahead">1<\/b><i>-<\/i><b class="">0<\/b>/);
   // Los duelos terminados de Retos rápidos cuentan en el mismo cara a cara (y quien solo juega ahí también sale).
   const conRapidos = w.CONTINUUM.TurnDuel.rivalStandings([partida('m1', 'mario', 'Mario', { status: 'finished', scores: { me: 3, mario: 1 } })], [
     { done: true, rivalUid: 'mario', rival: 'Mario', result: 'win' }, { done: true, rivalUid: 'zoe', rival: 'Zoe', result: 'loss' }, { done: false, rivalUid: 'zoe', rival: 'Zoe' }]);

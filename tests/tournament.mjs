@@ -49,7 +49,7 @@ assert.ok(w.document.getElementById('competition-cards').checkVisibility?.() ?? 
   assert.equal(cartas().value, '3', 'lo elegido baja al tope');
   assert.equal(ayudaOculta(), false);
   assert.match(ayuda().textContent, /con 5 temas caben como mucho 3 cartas/);
-  assert.match(lead(), /por turnos, y gana quien más acierte en total/);
+  assert.match(lead(), /por turnos entre dos; gana quien más acierte en total/);
   assert.doesNotMatch(lead(), /todos a la vez/);
   temas(3);
   assert.deepEqual(elegibles(), [1, 2, 3, 4, 5], 'con 3 temas, 5');
@@ -103,14 +103,21 @@ for(let round=0;round<3;round++) {
  assert.equal(state().tournament.index,round);
  // Terminar la competición en grupo también da «Vuelta completa», como en solitario; los temas de antes, no.
  assert.equal(w.CONTINUUM.Progreso.read().marks.comps,round===2?1:0,'la competición de un solo móvil cuenta para el logro al acabar');
- const saved=w.localStorage.getItem(key);w.close();w=boot(saved);w.CONTINUUM.localNavigate('home');w.CONTINUUM.ModeHubs.refreshHome();w.CONTINUUM.ModeHubs.open('hub-friends-local');click('[data-action="competition-menu"]');click('[data-action="competition-resume"]');
+ if(round===2){
+  // El marcador final, en la propia pantalla del último tema.
+  assert.equal(w.document.querySelector('[data-action="competition-next"]'),null);
+  assert.match(w.document.querySelector('.tournament-board').textContent,/3 puntos/);
+  assert.match(w.document.querySelector('.tournament-board').textContent,/0 puntos/,'quien pierde las tres finales no suma');
+  assert.equal(w.document.querySelectorAll('.chapter-stop.complete').length,2);
+  assert.match(w.document.querySelector('.final-title').textContent,/gana el tema|ganan el tema/,'el título habla del tema, no de la competición');
+ }
+ const saved=w.localStorage.getItem(key);w.close();w=boot(saved);w.CONTINUUM.localNavigate('home');w.CONTINUUM.ModeHubs.refreshHome();w.CONTINUUM.ModeHubs.open('hub-friends-local');click('[data-action="competition-menu"]');
+ // Una competición ya terminada no se ofrece seguir: solo quedaría el marcador final.
+ if(round===2){assert.equal(w.document.querySelector('[data-action="competition-resume"]'),null,'la competición terminada no se ofrece seguir');break;}
+ click('[data-action="competition-resume"]');
  assert.ok(w.document.querySelector('.tournament-board'));
- if(round<2){const prior=state().mode;click('[data-action="competition-next"]');assert.notEqual(state().mode,prior);assert.ok(state().players.every(p=>p.hand.length===1));click('[data-action="competition-round-start"]');}
+ const prior=state().mode;click('[data-action="competition-next"]');assert.notEqual(state().mode,prior);assert.ok(state().players.every(p=>p.hand.length===1));click('[data-action="competition-round-start"]');
 }
-assert.equal(w.document.querySelector('[data-action="competition-next"]'),null);
-assert.match(w.document.querySelector('.tournament-board').textContent,/3 puntos/);
-assert.match(w.document.querySelector('.tournament-board').textContent,/0 puntos/,'quien pierde las tres finales no suma');
-assert.equal(w.document.querySelectorAll('.chapter-stop.complete').length,2);
 w.close();
 // La pantalla de resultado no puede ensancharse más que el móvil: sin una pista de rejilla acotada, el recorrido de
 // una competición (capítulos en fila) empujaba todo el resultado fuera de la pantalla y solo se veía el fondo.

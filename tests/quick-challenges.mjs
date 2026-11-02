@@ -354,7 +354,7 @@ for (let r = 0; r < 3; r++) {
   // Plantarse es un botón propio a todo el ancho (no un adorno de la barra) que dice con cuántos puntos te
   // plantas, también con ninguno; con aciertos va destacado.
   const bankNow = () => w.document.querySelector('[data-quick="bank"]');
-  assert.equal(bankNow().textContent.trim(), 'Plantarme con 0 puntos');
+  assert.equal(bankNow().textContent.trim(), 'Plantarme con 0 aciertos');
   assert.ok(!bankNow().classList.contains('has-points'));
   assert.equal(bankNow().closest('.quick-bar'), null, 'el botón no va dentro de la barra del marcador');
   // Marcador: una ficha por jugador dentro de la barra, con una sola marcada como turno actual y las cifras
@@ -373,7 +373,7 @@ for (let r = 0; r < 3; r++) {
   activeFigures();
   click('[data-quick="bank"]');
   assert.ok(bankNow().classList.contains('has-points'));
-  assert.match(bankNow().textContent, /Plantarme con 1 punto$/);
+  assert.match(bankNow().textContent, /Plantarme con 1 acierto$/);
   activeFigures();
   click('[data-quick="bank"]');
   assert.equal(E.restore(JSON.parse(w.localStorage.getItem(key))).phase, 'round-end');

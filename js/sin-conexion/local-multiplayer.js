@@ -131,7 +131,7 @@
   };
 
   function wifiNote() {
-    return `<div class="wifi-note">${WIFI_ICON}<p><strong>Antes de empezar:</strong> uno de los móviles activa su punto de acceso Wi-Fi${enIPhone() ? "" : " (mejor si es Android)"} y el resto se une a esa red — no hace falta que tenga internet.</p></div>`;
+    return `<div class="wifi-note">${WIFI_ICON}<p><strong>Antes de empezar:</strong> conectad todos los móviles a la misma Wi-Fi. Si no hay ninguna, uno puede compartir su punto de acceso${enIPhone() ? "" : " (mejor si es Android)"} y el resto se une a él; no hace falta que tenga internet.</p></div>`;
   }
 
   // El permiso de la cámara hay que pedirlo aquí, al entrar, no cuando ya haga falta
@@ -140,7 +140,7 @@
   // con la pantalla explicando por qué, dispara el aviso del sistema mientras todavía se
   // puede arreglar sin prisas.
   function cameraNote() {
-    return `<div class="wifi-note">${CAMERA_ICON}<p><strong>Hace falta la cámara</strong> para leer los códigos QR entre los móviles cuando no compartáis ningún otro canal. Actívala ahora — si esperas a necesitarla, puede que ya no tengas cómo arreglarlo.</p><button type="button" class="btn btn-secondary" data-local-action="warm-camera">Activar la cámara</button></div>`;
+    return `<div class="wifi-note">${CAMERA_ICON}<p><strong>Hace falta la cámara</strong> para leer los QR de los otros móviles. Dale permiso ahora: a mitad de partida, sin internet, cuesta más arreglarlo.</p><button type="button" class="btn btn-secondary" data-local-action="warm-camera">Activar la cámara</button></div>`;
   }
 
   async function warmUpCamera() {
@@ -174,7 +174,7 @@
       DECK_MISMATCH: "Alguien lleva una versión distinta del juego. Actualizad todos los móviles y cread una sala nueva.",
       NOT_TURN: "Todavía no es tu turno",
       NOT_ALLOWED: "Esa acción no se puede hacer ahora",
-      HOST: "Quien organiza la sala no puede salir: cierra la sala",
+      HOST: "El anfitrión no puede salir: cierra la sala",
       STARTER_PENDING: "Antes de empezar, todos tienen que responder al minijuego de quién empieza",
       SEAT_TAKEN: "Esa plaza ya está ocupada por alguien conectado",
       WEBRTC_UNAVAILABLE: "Este navegador no admite conexiones directas entre móviles",
@@ -340,7 +340,7 @@
     // Una competición se crea desde «Crear partida»: unirse está en su propia entrada.
     if (competition) {
       paint(`<div class="shell online-shell">${header("back")}
-        <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Competición sin internet</div><h2 data-focus tabindex="-1">${competition.rounds} temas al azar,<br>cada uno en su móvil</h2><p class="lead">${competition.cards} cartas por persona en cada tema. Ganar un tema suma un punto; las cartas que te queden restan su número menos uno.</p></section>
+        <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Competición sin internet</div><h2 data-focus tabindex="-1">${competition.rounds} temas al azar,<br>cada uno en su móvil</h2><p class="lead">${competition.cards} cartas por persona en cada tema. ${CT.Tournament.PUNTOS}</p></section>
         ${wifiNote()}
         ${cameraNote()}
         <div class="online-entry-grid online-entry-single">
@@ -351,7 +351,7 @@
       return;
     }
     paint(`<div class="shell online-shell">${header("back")}
-      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${escapeHtml(CT.mode(modeKey).name)}</div><h2 data-focus tabindex="-1">Cada uno en su móvil,<br>sin internet</h2><p class="lead">Todos los móviles en la misma red Wi-Fi, sin ninguna conexión a internet.</p></section>
+      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${escapeHtml(CT.mode(modeKey).name)}</div><h2 data-focus tabindex="-1">Cada uno en su móvil,<br>sin internet</h2><p class="lead">Todos los móviles en la misma Wi-Fi. No hace falta internet.</p></section>
       ${wifiNote()}
       ${cameraNote()}
       <div class="online-entry-grid${createOnly ? " online-entry-single" : ""}">
@@ -449,7 +449,7 @@
     return `<div class="nearby-list">${nearbyRooms.map(room => {
       const known = CT.has(room.mode), sameDeck = !room.fp || !known || room.fp === CT.deckFingerprint(room.mode);
       const usable = known && sameDeck;
-      return `<button type="button" class="btn btn-secondary btn-block" data-local-action="nearby-join" data-id="${escapeHtml(room.id)}"${usable ? "" : " disabled"}><b>${escapeHtml(room.host || "Sala")}</b> · ${escapeHtml(known ? CT.mode(room.mode).name : "Mazo desconocido")}${usable ? "" : ` — ${known ? "versión distinta del juego" : "actualiza la app"}`}</button>`;
+      return `<button type="button" class="btn btn-secondary btn-block" data-local-action="nearby-join" data-id="${escapeHtml(room.id)}"${usable ? "" : " disabled"}><b>${escapeHtml(room.host || "Sala")}</b> · ${escapeHtml(known ? CT.mode(room.mode).name : "Mazo desconocido")}${usable ? "" : ` · ${known ? "otra versión del juego" : "actualiza la app"}`}</button>`;
     }).join("")}</div>`;
   }
 
@@ -533,7 +533,7 @@
       if (diagEl) diagEl.textContent = line();
       if (state === "connected" || state === "completed") { clearInterval(connectionWatch); connectionWatch = null; return; }
       if (state === "failed" || state === "disconnected" || seconds >= warnAfter) {
-        statusEl.textContent = "No consigue conectar. Comprobad que los dos móviles están en el mismo Wi-Fi, con los datos móviles apagados, y que el punto de acceso no aísla los dispositivos. Si sigue igual, empezad la invitación de nuevo.";
+        statusEl.textContent = "No se ha podido conectar. Comprobad que los dos móviles están en la misma Wi-Fi y con los datos móviles apagados. Algunos puntos de acceso no dejan que los móviles se vean entre sí: probad con otra red o empezad la invitación de nuevo.";
         // La línea técnica (ICE, QR, candidatos) es para quien depura; en la app de iPhone no se enseña.
         if (diagEl && !enIPhone()) diagEl.hidden = false;
       }
@@ -546,7 +546,7 @@
   function renderUnirseCompartir() {
     screen = "local-unirse-compartir";
     paint(`<div class="shell online-shell">${header("leave")}
-      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Enséñale esto al anfitrión</h2><p class="lead">Se incorporará sola en cuanto lo escanee con su cámara — no hace falta hacer nada más.</p></section>
+      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Enséñale esto al anfitrión</h2><p class="lead">Entrarás en la sala en cuanto lo escanee con su cámara. No tienes que hacer nada más.</p></section>
       <div class="panel qr-panel"><div class="qr-frame"><canvas id="local-answer-qr" aria-label="Tu respuesta, en código QR"></canvas></div></div>
       <details class="panel qr-fallback"><summary>¿No puede usar la cámara?</summary>
         <button type="button" class="btn btn-primary btn-block" data-local-action="share-answer">${SHARE_ICON} Compartir mi respuesta</button>
@@ -600,14 +600,14 @@
       </details>
       ${conectado
         ? `<div class="status status-ok"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span id="local-conn-status">Conectando…</span></div><small class="hint" id="local-conn-diag" hidden></small>`
-        : `<button type="button" class="btn btn-primary btn-block" data-local-action="scan-answer">${CAMERA_ICON} Ya me ha enseñado su código — escanearlo</button>
+        : `<button type="button" class="btn btn-primary btn-block" data-local-action="scan-answer">${CAMERA_ICON} Escanear su respuesta</button>
       <details class="panel qr-fallback"><summary>¿Te lo ha mandado a mano?</summary>
         <form data-local-form="accept-answer">
           <div class="field"><label for="local-answer">Pega aquí la respuesta que te manden</label><textarea id="local-answer" name="answer" rows="3" placeholder="Cuando te la manden, pégala en este campo…"></textarea></div>
           <button class="btn btn-secondary btn-block" type="submit">Conectar</button>
         </form>
       </details>`}
-      <button type="button" class="btn btn-ghost btn-block" data-local-action="local-lobby">Ir al vestíbulo</button>
+      <button type="button" class="btn btn-ghost btn-block" data-local-action="local-lobby">Volver a la sala</button>
     </div>`, "local-invitar");
     try { CT.QrEncode.draw(document.getElementById("local-invite-qr"), pendingInvite?.inviteText || ""); }
     catch (error) { console.error(error); showToast("No se pudo generar el código QR; usa la opción de compartir a mano"); }
@@ -797,9 +797,10 @@ function starterPanelMarkupContent(isHost) {
   // descarte y la partida no se quede esperando su turno.
   function requestLeave() {
     if (role === "host") {
-      if (roomState && roomState.playerOrder.length > 1 && roomState.status !== "ended") {
+      const quedanTemas = !!roomState?.tournament && roomState.tournament.index + 1 < roomState.tournament.queue.length;
+      if (roomState && roomState.playerOrder.length > 1 && (roomState.status !== "ended" || quedanTemas)) {
         const jugando = roomState.status === "playing";
-        CT.UI.confirmDialog(jugando ? "La partida no se guarda: si sales, la sala se cierra para todos los jugadores." : "Si sales, la sala se cierra para todos los jugadores.", () => leaveToEntrada(), { title: jugando ? "¿Salir de la partida?" : "¿Salir y cerrar la sala?", confirmLabel: jugando ? "Salir sin guardar" : "Cerrar sala", cancelLabel: jugando ? "Seguir jugando" : "Seguir en la sala" });
+        CT.UI.confirmDialog(jugando ? "La partida no se guarda: si sales, la sala se cierra para todos los jugadores." : quedanTemas ? "Si sales, la sala se cierra para todos y la competición se queda sin terminar." : "Si sales, la sala se cierra para todos los jugadores.", () => leaveToEntrada(), { title: jugando ? "¿Salir de la partida?" : "¿Salir y cerrar la sala?", confirmLabel: jugando ? "Salir sin guardar" : "Cerrar sala", cancelLabel: jugando ? "Seguir jugando" : "Seguir en la sala" });
         return;
       }
       leaveToEntrada();
@@ -851,7 +852,7 @@ function starterPanelMarkupContent(isHost) {
       <div class="eyebrow">Sala ${escapeHtml(lastSeat?.roomCode || "")}</div>
       <h2 data-focus tabindex="-1">Se ha perdido la conexión</h2>
       <p>Tu plaza y tus cartas siguen guardadas en el móvil del anfitrión. Mientras no vuelvas, tus turnos se saltan.</p>
-      <p class="hint">Sin internet no hay forma de reengancharse sola: pídele que te invite otra vez (⋯ → Invitar a alguien) y escanea su código. Volverás a tu sitio, con tus cartas.</p>
+      <p class="hint">Sin internet no puedes volver por tu cuenta: pídele que te invite otra vez (⋯ → Invitar a alguien) y escanea su código. Volverás a tu sitio, con tus cartas.</p>
       <button type="button" class="btn btn-primary btn-block" data-local-action="go-unirse">Volver a sentarme <span>→</span></button>
       <button type="button" class="btn btn-ghost btn-block" data-local-action="forget-seat">Salir de la partida</button>
     </div></section></div>`, "local-desconectado");
@@ -990,10 +991,10 @@ function starterPanelMarkupContent(isHost) {
           : defensa ? `Colócala tú también. Si aciertas, no te llevas ninguna carta de ${escapeHtml(currentPlayer.name)}`
           : `Colócala. Si aciertas y ${escapeHtml(pulseTargetName)} falla, le pasas una carta tuya`)
         : defensa ? `${escapeHtml(pulseTargetName)} está colocando la misma carta…` : `${escapeHtml(currentPlayer.name)} está colocando la carta del Pulso…`}</p></section>`
-      : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${pendingIndex === null && selectedCardId === id ? "selected" : ""}" data-local-action="select" data-id="${id}" aria-pressed="${pendingIndex === null && selectedCardId === id}" ${myTurn ? "" : "disabled"}>${categoryBadge(card)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p></section>`;
+      : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${pendingIndex === null && selectedCardId === id ? "selected" : ""}" data-local-action="select" data-id="${id}" aria-pressed="${pendingIndex === null && selectedCardId === id}" ${myTurn ? "" : "disabled"}>${categoryBadge(card)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p></section>`;
     paint(`<div class="shell">${header("room-menu", { menu: true })}
       <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, vuelta ${roomState.round}</h1>
-      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length} · ` : ""}Vuelta ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo restante para esta carta"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
+      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length} · ` : ""}Vuelta ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo restante para esta carta"><strong id="turn-timer-value">${secondsLeft}</strong><span>s</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
       <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores</div><div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i class="score-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'room:' + uid, id: esMio(uid) ? CT.Avatares.ownId() : player.avatarId })}</i><span class="score-copy"><b>${escapeHtml(player.name)}${uid === myPlayerId ? " · tú" : ""}${player.away ? " · desconectado" : ""}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(player.hand.length)}%"></i></span></span><em><strong>${player.hand.length}</strong><small>cartas</small></em></span>`; }).join("")}</div></section>
       ${pulsing ? `<div class="pulse-banner"><span aria-hidden="true">ϟ</span> Pulso · <b>${escapeHtml(currentPlayer.name)}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
       ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
@@ -1060,7 +1061,7 @@ function starterPanelMarkupContent(isHost) {
       </div></div>`;
     }
     const quien = reveal.playerId === myPlayerId ? "Tú" : escapeHtml(reveal.playerName || "");
-    const desenlace = `<p>${reveal.correct ? "La carta permanece en la línea temporal." : reveal.returned ? "No quedan cartas que robar, así que vuelve a su mano." : `${quien} ${reveal.playerId === myPlayerId ? "descartas" : "descarta"} la carta y ${reveal.playerId === myPlayerId ? "robas" : "roba"} una nueva.`}</p>`;
+    const desenlace = `<p>${reveal.correct ? "La carta se queda en la línea." : reveal.returned ? "No quedan cartas que robar, así que vuelve a su mano." : `${quien} ${reveal.playerId === myPlayerId ? "descartas" : "descarta"} la carta y ${reveal.playerId === myPlayerId ? "robas" : "roba"} una nueva.`}</p>`;
     return `<div class="overlay" data-result-card="${reveal.correct ? card.id : ""}"><div class="modal ${reveal.correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${reveal.correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${reveal.correct ? "¡Bien colocado!" : "No encaja ahí"} · ${quien}</div><h2><span class="solo-lectores">${reveal.correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2>${fichaCarta}${hint}${desenlace}${seguir}</div></div>`;
   }
 
@@ -1084,7 +1085,7 @@ function starterPanelMarkupContent(isHost) {
       const faltan = final.players.filter(uid => !(uid in answers)).map(uid => escapeHtml(name(uid))).join(", ");
       body = `<p>Respuestas guardadas: ${Object.keys(answers).length} de ${final.players.length}.</p>${finalist && !answered ? CT.Final.form(modeKey, "data-local-final") : `<section class="panel"><h2>${answered ? "Tu respuesta está guardada" : "Estás siguiendo la final"}</h2><p>Esperando a ${faltan}. Las cifras se revelan cuando todos hayan respondido.</p></section>`}`;
     }
-    paint(`<div class="shell">${header("room-menu", { menu: true })}<h1 data-focus tabindex="-1">Final de desempate</h1><p>Solo juegan ${final.players.map(uid => escapeHtml(name(uid))).join(", ")}: terminaron la misma ronda sin cartas.</p>${CT.Final.question(modeKey, final)}${body}</div>`, "local-final-secreta");
+    paint(`<div class="shell">${header("room-menu", { menu: true })}<h1 data-focus tabindex="-1">Final de desempate</h1><p>Solo juegan ${final.players.map(uid => escapeHtml(name(uid))).join(", ")}: terminaron la misma vuelta sin cartas.</p>${CT.Final.question(modeKey, final)}${body}</div>`, "local-final-secreta");
     const form = appEl.querySelector("[data-local-final]");
     if (form && draft?.guess) { form.elements.guess.value = draft.guess; if (form.elements.era && draft.era) form.elements.era.value = draft.era; }
   }
@@ -1094,7 +1095,9 @@ function starterPanelMarkupContent(isHost) {
     screen = "local-final";
     const uids = (roomState.winners || (roomState.winner ? [roomState.winner] : [])).filter(uid => roomState.players[uid]);
     const names = uids.map(uid => escapeHtml(roomState.players[uid].name) + (uid === myPlayerId ? " (tú)" : ""));
-    const title = !names.length ? "Partida terminada" : names.length === 1 ? `${names[0]} gana` : `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]} ganan`;
+    // En una competición esta pantalla cierra un tema; quién gana la competición lo dice el marcador.
+    const delTema = roomState.tournament ? " el tema" : "";
+    const title = !names.length ? "Partida terminada" : names.length === 1 ? `${names[0]} gana${delTema}` : `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]} ganan${delTema}`;
     const lead = names.length ? CT.Final.verdict({ ganadores: names.length, final: !!roomState.final, quedan: roomState.playerOrder.length }) : "";
     const isHost = role === "host";
     const t = roomState.tournament;
@@ -1103,7 +1106,7 @@ function starterPanelMarkupContent(isHost) {
       const quedan = t.index + 1 < t.queue.length;
       const board = CT.Tournament.board(t, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name, hand: roomState.players[id].hand })), uids, true);
       const siguiente = quedan
-        ? (isHost ? '<button class="btn btn-primary btn-block" data-local-action="competition-next">Siguiente tema <span>→</span></button><button class="btn btn-secondary btn-block" data-local-action="close-room">Cerrar la sala</button>' : '<p class="hint">Quien organiza pondrá en marcha el siguiente tema.</p><button class="btn btn-secondary btn-block" data-local-action="leave">Salir de la sala</button>')
+        ? (isHost ? '<button class="btn btn-primary btn-block" data-local-action="competition-next">Siguiente tema <span>→</span></button><button class="btn btn-secondary btn-block" data-local-action="close-room">Cerrar la sala</button>' : '<p class="hint">El anfitrión pondrá en marcha el siguiente tema.</p><button class="btn btn-secondary btn-block" data-local-action="leave">Salir de la sala</button>')
         : (isHost ? '<button class="btn btn-primary btn-block" data-local-action="close-room">Cerrar la sala</button>' : '<button class="btn btn-secondary btn-block" data-local-action="leave">Salir de la sala</button>');
       paint(`<div class="shell">${header("leave")}<section class="pass-screen"><div class="panel pass-card"><div class="eyebrow">Competición · tema ${t.index + 1} de ${t.queue.length}</div><h2 data-focus tabindex="-1">${title}</h2><p>${lead}</p>${reviewActions()}</div>${board}<div class="panel">${siguiente}</div></section></div>`, "local-final");
       return;
@@ -1112,7 +1115,7 @@ function starterPanelMarkupContent(isHost) {
     const acciones = isHost
       ? `${puedeRevancha ? '<button class="btn btn-primary btn-block" data-local-action="rematch">Revancha con los mismos jugadores <span>→</span></button>' : ""}<button class="btn ${puedeRevancha ? "btn-secondary" : "btn-primary"} btn-block" data-local-action="close-room">Cerrar la sala</button>`
       : `<p class="hint">Si el anfitrión pide revancha, volveréis todos a la sala de espera.</p><button class="btn btn-secondary btn-block" data-local-action="leave">Salir de la sala</button>`;
-    paint(`<div class="shell">${header("leave")}<section class="pass-screen"><div class="panel pass-card"><div class="eyebrow">Partida terminada · ${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"} en la mesa</div><h2 data-focus tabindex="-1">${title}</h2><p>${lead}</p>${reviewActions()}${acciones}</div></section></div>`, "local-final");
+    paint(`<div class="shell">${header("leave")}<section class="pass-screen"><div class="panel pass-card"><div class="eyebrow">Fin de la partida · ${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"} en la línea</div><h2 data-focus tabindex="-1">${title}</h2><p>${lead}</p>${reviewActions()}${acciones}</div></section></div>`, "local-final");
   }
 
   // Los mismos repasos que al acabar en un solo móvil o en la sala online: la línea entera
@@ -1126,7 +1129,7 @@ function starterPanelMarkupContent(isHost) {
     const ids = failed ? [...sessionFailed.values()] : roomState.timeline;
     const titulo = failed ? `${ids.length} ${ids.length === 1 ? "carta" : "cartas"} para recordar` : `${ids.length} ${ids.length === 1 ? "carta jugada" : "cartas jugadas"}`;
     paint(`<div class="shell">${header("back-from-review")}<section>
-      <div class="eyebrow">${failed ? "Repaso" : "Línea de tiempo completa"}</div>
+      <div class="eyebrow">${failed ? "Repaso" : "La línea completa"}</div>
       <h1 data-focus tabindex="-1">${titulo}</h1>
       <div class="review-grid">${ids.map(id => {
         const card = getCard(id);
@@ -1279,7 +1282,7 @@ function starterPanelMarkupContent(isHost) {
     else if (action === "close-room") doCloseRoom();
     else if (action === "review-timeline" || action === "review-failed") renderReview(action === "review-failed");
     else if (action === "back-from-review") renderCurrent();
-    else if (action === "kick") { const uid = target.dataset.uid, name = roomState?.players[uid]?.name || "esta persona"; CT.UI.confirmDialog("Saldrá de la sala y sus cartas pasarán al descarte.", () => { CT.closeDialog?.(); doRemovePlayer(uid); }, { title: `¿Expulsar a ${name}?`, confirmLabel: "Expulsar", cancelLabel: "Cancelar" }); }
+    else if (action === "kick") { const uid = target.dataset.uid, name = roomState?.players[uid]?.name || "esta persona"; CT.UI.confirmDialog(roomState?.status === "playing" ? "Saldrá de la sala y sus cartas pasarán al descarte." : "Saldrá de la sala.", () => { CT.closeDialog?.(); doRemovePlayer(uid); }, { title: `¿Expulsar a ${name}?`, confirmLabel: "Expulsar", cancelLabel: "Cancelar" }); }
     else if (action === "select") doSelect(target.dataset.id);
     else if (action === "place" || action === "pulse-place") doPlace(Number(target.dataset.index));
     else if (action === "confirm-place") doConfirmPlace();

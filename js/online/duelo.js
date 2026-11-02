@@ -343,7 +343,7 @@
   // `attrs` son atributos extra del campo (desactivado, enfoque automático…) y `hintId`, el id de la ayuda.
   function campoCifra(modeKey, id, { attrs = "", hintId = "" } = {}) {
     const regla = reglaCifra(modeKey), esc = CT.escapeHtml;
-    return `<div class="field cifra-field"><label for="${id}">Tu respuesta${regla.unidad ? ` <span class="cifra-unidad">(en ${esc(regla.unidad)})</span>` : ""}</label>`
+    return `<div class="field cifra-field"><label for="${id}">Tu respuesta${regla.unidad && !regla.anos ? ` <span class="cifra-unidad">(en ${esc(regla.unidad)})</span>` : ""}</label>`
       + `<input id="${id}" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send"${attrs ? ` ${attrs}` : ""}>`
       + `${botonesCifra(modeKey, id)}<p class="hint"${hintId ? ` id="${hintId}"` : ""}>${esc(regla.pista || "")}</p></div>`;
   }
@@ -568,7 +568,7 @@
   const ritmoTexto = ms => Number(ms) > 0 ? `a ${Math.round(ms / 1000)} segundos por carta` : "sin tiempo";
   function invitacion({ modeName, nombre, hits, total, payload, ms = MS }) {
     const quien = nombre ? `${nombre} te reta` : "Te retan";
-    return `${quien} en Continuum · ${modeName}\n📊 ${hits}/${total}, ${ritmoTexto(ms)} — a ver si lo superas\n${enlace(payload)}`;
+    return `${quien} en Continuum · ${modeName}\n📊 ${hits}/${total}, ${ritmoTexto(ms)}. ¿Lo superas?\n${enlace(payload)}`;
   }
 
   // El cara a cara, para compartir el resultado. Las dos cuadrículas, una debajo de otra,
@@ -576,7 +576,7 @@
   function marcador({ modeName, rival, mio }) {
     const rejilla = sec => sec.map(acierto => (acierto ? "🟩" : "⬜")).join("");
     const veredicto = mio.hits > rival.hits ? "Gano yo" : mio.hits < rival.hits ? `Gana ${rival.nombre || "quien retaba"}` : "Empate";
-    return `Duelo en Continuum · ${modeName}\n${veredicto} — ${mio.hits} a ${rival.hits}\n${rival.nombre || "Quien retaba"} ${rejilla(rival.sequence)}\nYo ${rejilla(mio.sequence)}`;
+    return `Duelo en Continuum · ${modeName}\n${veredicto}: ${mio.hits} a ${rival.hits}\n${rival.nombre || "Quien retaba"} ${rejilla(rival.sequence)}\nYo ${rejilla(mio.sequence)}`;
   }
 
   // La competición no nombra sus temas, ni al retar ni al compartir el resultado: cada tema se
@@ -584,14 +584,14 @@
   // todavía no la ha jugado.
   function invitacionCompeticion({ nombre, temas, hits, total, payload, ms = MS }) {
     const quien = nombre ? `${nombre} te reta` : "Te retan";
-    return `${quien} en Continuum · Competición de ${temas} temas\n📊 ${hits}/${total}, ${ritmoTexto(ms)} — a ver si lo superas\n${enlace(payload)}`;
+    return `${quien} en Continuum · Competición de ${temas} temas\n📊 ${hits}/${total}, ${ritmoTexto(ms)}. ¿Lo superas?\n${enlace(payload)}`;
   }
 
   // Las cuadrículas van partidas por temas, con un espacio entre uno y otro.
   function marcadorCompeticion({ temas, porTema, rival, mio }) {
     const rejilla = sec => Array.from({ length: temas }, (_, i) => sec.slice(i * porTema, (i + 1) * porTema).map(acierto => (acierto ? "🟩" : "⬜")).join("")).join(" ");
     const veredicto = mio.hits > rival.hits ? "Gano yo" : mio.hits < rival.hits ? `Gana ${rival.nombre || "quien retaba"}` : "Empate";
-    return `Competición en Continuum · ${temas} temas\n${veredicto} — ${mio.hits} a ${rival.hits}\n${rival.nombre || "Quien retaba"} ${rejilla(rival.sequence)}\nYo ${rejilla(mio.sequence)}`;
+    return `Competición en Continuum · ${temas} temas\n${veredicto}: ${mio.hits} a ${rival.hits}\n${rival.nombre || "Quien retaba"} ${rejilla(rival.sequence)}\nYo ${rejilla(mio.sequence)}`;
   }
 
   function invitacionCifras({ modeName, nombre, aciertos, total, payload, ms = CIFRAS_MS }) {
@@ -619,7 +619,7 @@
     const aviso = salidas[0] + salidas[1]
       ? `\n⬛ cartas cerradas por salir de la app: ${rival.nombre || "quien retaba"} ${salidas[0]}, yo ${salidas[1]}`
       : "";
-    return `Duelo de cifras en Continuum · ${modeName}\n${veredicto}${porTiempo} — ${mio.aciertos} a ${rival.aciertos} aciertos\n${rival.nombre || "Quien retaba"} ${rejillaCifras(mode, seed, total, rival.jugadas, ms)}\nYo ${rejillaCifras(mode, seed, total, mio.jugadas, ms)}${aviso}`;
+    return `Duelo de cifras en Continuum · ${modeName}\n${veredicto}${porTiempo}: ${mio.aciertos} a ${rival.aciertos} aciertos\n${rival.nombre || "Quien retaba"} ${rejillaCifras(mode, seed, total, rival.jugadas, ms)}\nYo ${rejillaCifras(mode, seed, total, mio.jugadas, ms)}${aviso}`;
   }
 
   // En qué punto está un duelo por turnos, contado desde quien mira (`yo`, su uid): a

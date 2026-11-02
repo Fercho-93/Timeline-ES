@@ -39,7 +39,9 @@
     const rows = players.map(p=>({...p,points:history.reduce((sum,r)=>sum+(r.hands[p.id]!=null ? roundDelta(r.hands[p.id], ganaRonda(r, p.id)) : 0),0)})).sort((a,b)=>b.points-a.points);
     const finished = terminada && t.index+1 === t.queue.length;
     const leaders = rows.filter(p=>p.points === rows[0].points).map(p=>CT.escapeHtml(p.name));
-    return `<section class="panel tournament-board">${journey(t)}<div class="tournament-score-head"><div><span>${finished?'Recorrido completado':`Tema ${t.index+1} de ${t.queue.length}`}</span><h2>${finished ? 'Resultado de la competición' : CT.escapeHtml(CT.mode(t.queue[t.index]).name)}</h2></div><small>${t.handSize} ${t.handSize===1?'carta':'cartas'} por persona</small></div><ol class="tournament-score">${rows.map((p,index)=>`<li><i>${index+1}</i><strong>${CT.escapeHtml(p.name)}</strong><span>${p.points} ${p.points===1?'punto':'puntos'}</span></li>`).join('')}</ol>${finished ? `<p class="tournament-verdict"><strong>${leaders.join(' y ')} ${leaders.length===1?'gana':'empatan en'} la competición.</strong></p>` : '<p class="hint">Ganar un tema suma un punto; las cartas restantes restan su número menos uno.</p>'}</section>`;
+    return `<section class="panel tournament-board">${journey(t)}<div class="tournament-score-head"><div><span>${finished?'Recorrido completado':`Tema ${t.index+1} de ${t.queue.length}`}</span><h2>${finished ? 'Resultado de la competición' : CT.escapeHtml(CT.mode(t.queue[t.index]).name)}</h2></div><small>${t.handSize} ${t.handSize===1?'carta':'cartas'} por persona</small></div><ol class="tournament-score">${rows.map((p,index)=>`<li><i>${index+1}</i><strong>${CT.escapeHtml(p.name)}</strong><span>${p.points} ${p.points===1?'punto':'puntos'}</span></li>`).join('')}</ol>${finished ? `<p class="tournament-verdict"><strong>${leaders.join(' y ')} ${leaders.length===1?'gana':'empatan en'} la competición.</strong></p>` : `<p class="hint">${PUNTOS}</p>`}</section>`;
   }
-  CT.Tournament = {modes,create,next,journey,board};
+  // Cómo se puntúa en grupo, con las mismas palabras en todas las pantallas que lo cuentan.
+  const PUNTOS = 'Ganar un tema suma un punto. Quien lo acaba con cartas en la mano resta un punto por cada una, salvo la primera.';
+  CT.Tournament = {modes,create,next,journey,board,PUNTOS};
 })();

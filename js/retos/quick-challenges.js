@@ -143,7 +143,7 @@
   const profileName=()=>String(CT.Identidad?.propio?.()||CT.Identidad?.nombre?.()||'Explorador').slice(0,24);
   function identityField() {
     const name=profileName();
-    return `<div class="field duel-identity-field"><label for="quick-profile-name">Tu nombre de perfil</label><div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares?.markup?.(name,{size:38,seed:CT.Avatares.ownSeed?.()})||''}</span><input id="quick-profile-name" type="text" readonly aria-readonly="true" value="${esc(name)}"></div><small class="field-help">Se usará automáticamente en la partida. Puedes cambiarlo desde tu perfil.</small></div><input type="hidden" id="quick-net-name" value="${esc(name)}"><textarea id="quick-net-code" hidden></textarea>`;
+    return `<div class="field duel-identity-field"><label for="quick-profile-name">Tu nombre de perfil</label><div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares?.markup?.(name,{size:38,seed:CT.Avatares.ownSeed?.()})||''}</span><input id="quick-profile-name" type="text" readonly aria-readonly="true" value="${esc(name)}"></div><small class="field-help">Se usará en la partida. Puedes cambiarlo en Atlas.</small></div><input type="hidden" id="quick-net-name" value="${esc(name)}"><textarea id="quick-net-code" hidden></textarea>`;
   }
   // Mazos del día: cada día salen QUICK_DAY_DECKS retos distintos, los mismos para todo el mundo, que
   // van rotando por el catálogo entero. El catálogo se baraja una vez con una semilla fija y cada día
@@ -346,10 +346,10 @@
         ${keepField(` data-quick-keep-field${pace==='seguidos'?' hidden':''}`)}
         ${CT.Tiempo.field('amigos',{porDefecto:15})}
         ${identityField()}
-        ${block('directo',`<div class="duel-brief"><p>Una sala de 2 a 8 jugadores: todos jugáis a la vez, cada uno en su móvil. Quién empieza se decide en la sala de espera con un minijuego: cada uno adivina la cifra de una carta. Al crearla compartes el código, el enlace o el QR.</p></div>${button('live-room','Crear sala <span>→</span>','btn btn-primary btn-block')}`)}
-        ${block('seguidos',`<div class="duel-brief"><p>Juegas tú ahora y le mandas un enlace a tu amigo: juega los mismos retos cuando quiera, sin coincidir contigo. Un fallo no suma, pero se juega todo el reto.</p></div>
+        ${block('directo',`<div class="duel-brief"><p>Jugáis todos a la vez, cada uno desde su móvil, de 2 a 8 jugadores. En la sala de espera, un minijuego decide quién empieza. Por internet invitas con el código, el enlace o el QR; sin internet, con un QR.</p></div>${button('live-room','Crear sala <span>→</span>','btn btn-primary btn-block')}`)}
+        ${block('seguidos',`<div class="duel-brief"><p>Juegas tú ahora y mandas un enlace: quien lo abra juega los mismos retos cuando quiera y compara su marca con la tuya. Un fallo no suma, pero se juega todo el reto. Gana quien más acierte.</p></div>
           ${button('start-duel','Jugar y retar <span>→</span>','btn btn-primary btn-block')}`)}
-        ${block('turnos',`<div class="duel-brief"><p>Cada uno juega desde su móvil, por turnos. Creas el duelo, haces tú la primera jugada y después le mandas el enlace: tu amigo entra directo en la partida, ve tu última jugada y sigue él. En la revancha empieza el otro. La partida se guarda entre turnos.</p></div>
+        ${block('turnos',`<div class="duel-brief"><p>Entre dos, cada uno desde su móvil y cuando pueda: os turnáis carta a carta. Juegas tú la primera y después le mandas el enlace a tu rival, que entra directo en la partida y ve tu última jugada. En la revancha empieza tu rival. La partida se guarda entre turnos.</p></div>
           ${offline?`<p class="hint" data-offline-turnos>${OFFLINE_TURNS}</p>`:''}
           ${button('create-room','Crear duelo por turnos <span>→</span>','btn btn-primary btn-block')}
           ${readJSON(NET)?button('duels-list','Volver a Tus duelos','btn btn-ghost btn-block'):''}`)}
@@ -374,7 +374,7 @@
           ${button('create-room',only?'Crear sala <span>→</span>':'Crear sala',only?'btn btn-primary btn-block':'btn btn-secondary btn-block')}</section>`}
       </div>
       ${net && readJSON(NET) ? button('reconnect','Volver a mi sala','btn btn-secondary btn-block') : ''}
-      <p class="hint">El primer turno rota en cada reto para que todos tengan las mismas oportunidades.</p><p id="quick-error" role="alert"></p></section>`);
+      <p class="hint">El primer turno rota en cada reto.</p><p id="quick-error" role="alert"></p></section>`);
   }
   // Aviso breve (el mismo cartel de toda la aplicación) para lo que pasa fuera de la pantalla en la que se está.
   function notice(message) {
@@ -591,7 +591,7 @@
     clearInterval(publicClock);publicClock=null;
     const draft=app().querySelector('#quick-room-starter-input')?.value||'';
     state=null;const host=myId===room.host, cap=room.capacity, count=room.members.length;
-    if(cap===2 && (duelRoom || !host)) {duelWaiting(code,host);return;}
+    if(cap===2 && (duelRoom || (!host && room.invitedUid))) {duelWaiting(code,host);return;}
     const slots=SEAT_SLOTS[cap]||SEAT_SLOTS[8], table=Array(9).fill('<div class="table-seat is-unused" aria-hidden="true"></div>');
     slots.forEach((slot,i)=>{
       const name=room.names[i], mine=room.members[i]===myId;
@@ -734,7 +734,7 @@
     if(action==='share-duel'){await CT.LocalShare.shareSignal(duelLink());return true;}
     if(action==='live-room'){const net=app().querySelector('input[name="quick-live-net"]:checked')?.value||liveNet();netKind=net==='wifi'?'local':'internet';await connectRoom(true);return true;}
     if(action==='create-room'||action==='join-room'){await connectRoom(action==='create-room');return true;}
-    if(action==='start-room'){const count=Number(app().querySelector('#quick-net-length')?.value)||roomLength||3;await networkAction({type:'start',rounds:rounds(count,null,null,E.MULTI_CARDS),kind:(room?.capacity||roomCapacity)===2?'duel':'network',historyId:historyId(),keep:duelKeep(),seconds:CT.Tiempo.get('amigos',15),...((room?.capacity||roomCapacity)===2?{first:duelFirst}:(()=>{const order=room?CT.QuickRoom.starterOrder(room):null;return Number.isInteger(order?.[0])?{first:order[0]}:{};})())});return true;}
+    if(action==='start-room'){const count=Number(app().querySelector('#quick-net-length')?.value)||roomLength||3;await networkAction({type:'start',rounds:rounds(count,null,null,E.MULTI_CARDS),kind:duelRoom?'duel':'network',historyId:historyId(),keep:duelKeep(),seconds:CT.Tiempo.get('amigos',15),...(duelRoom?{first:duelFirst}:(()=>{const order=room?CT.QuickRoom.starterOrder(room):null;return Number.isInteger(order?.[0])?{first:order[0]}:{};})())});return true;}
     if(action==='rematch-room'){
       const cfg=state.config, me=state.players[room.members.indexOf(myId)].name, other=room.members.find(m=>m!==myId);
       await createDuelRoom({renderPage:paint,name:me,length:cfg.rounds.length,keep:cfg.keep!==false,iStart:me!==cfg.names[cfg.first||0],invite:other?{uid:other,name:room.names[room.members.indexOf(other)]}:null,back:backTo});
@@ -781,7 +781,7 @@
   function starterFieldMarkup(names) {
     if (starter && starter.key === names.join('|')) {
       const order = starter.order.map(i => esc(names[i])).join(' → ');
-      return `<span class="field-label">Quién empieza</span><p class="starter-result"><strong>${esc(names[starter.order[0]])}</strong> ha acertado más cerca y empieza.</p><p class="hint">Orden de juego: ${order}</p>${CT.StarterPresentation.repeatButton('data-quick="draw-starter"')}`;
+      return `<span class="field-label">Quién empieza</span><p class="starter-result"><strong>${esc(names[starter.order[0]])}</strong> se ha acercado más y empieza.</p><p class="hint">Orden de juego: ${order}</p>${CT.StarterPresentation.repeatButton('data-quick="draw-starter"')}`;
     }
     return `<span class="field-label">Quién empieza</span>${CT.StarterPresentation.drawButton('data-quick="draw-starter"')}`;
   }
@@ -1007,8 +1007,8 @@
     const keep = E.keepPlaying(state);
     // Plantarse: botón a todo el ancho bajo la barra, para verlo a la primera. Siempre dice con cuántos puntos
     // te plantas (los aciertos provisionales de este reto); con ninguno va más discreto, con el mismo alto.
-    const pass = keep ? '' : `<button class="quick-bank${p.points ? ' has-points' : ''}" data-quick="bank">${p.points ? '<span class="quick-bank-mark" aria-hidden="true">✓</span>' : ''}Plantarme con ${p.points} ${p.points === 1 ? 'punto' : 'puntos'}</button>`;
-    const heading = `${room && outboxHere() ? '<p class="hint" role="status">Sin conexión: tu jugada está guardada en este móvil y se enviará sola al volver.</p>' : ''}${room ? `<p class="hint">${room.members.length < state.players.length ? 'Juega tu turno: después le mandas el duelo a tu amigo' : myTurn() ? "Tu turno" : `Turno de ${esc(p.name)}`} · ${connection?.kind==='local' ? 'Red Wi-Fi local' : 'Sala por internet'}</p>` : ''}<h1 class="solo-lectores" data-focus tabindex="-1">${esc(c.title)}${!room && state.players.length === 1 ? '' : ` · Turno de ${esc(p.name)}`}</h1><div class="quick-bar${state.players.length > 2 ? ' quick-bar-many' : ''}"><span class="quick-left"><b>${state.remaining.length}</b> por colocar</span>${scores()}</div>${state.phase === 'turn' && myTurn() ? pass : ''}`;
+    const pass = keep ? '' : `<button class="quick-bank${p.points ? ' has-points' : ''}" data-quick="bank">${p.points ? '<span class="quick-bank-mark" aria-hidden="true">✓</span>' : ''}Plantarme con ${p.points} ${p.points === 1 ? 'acierto' : 'aciertos'}</button>`;
+    const heading = `${room && outboxHere() ? '<p class="hint" role="status">Sin conexión: tu jugada está guardada en este móvil y se enviará sola al volver.</p>' : ''}${room ? `<p class="hint">${room.members.length < state.players.length ? 'Juega tu turno: después le mandas el duelo a tu amigo' : myTurn() ? "Tu turno" : `Turno de ${esc(p.name)}`}${record?.config?.kind === 'duel' ? '' : ` · ${connection?.kind==='local' ? 'Misma Wi-Fi' : 'Sala por internet'}`}</p>` : ''}<h1 class="solo-lectores" data-focus tabindex="-1">${esc(c.title)}${!room && state.players.length === 1 ? '' : ` · Turno de ${esc(p.name)}`}</h1><div class="quick-bar${state.players.length > 2 ? ' quick-bar-many' : ''}"><span class="quick-left"><b>${state.remaining.length}</b> por colocar</span>${scores()}</div>${state.phase === 'turn' && myTurn() ? pass : ''}`;
     if (room?.resigned) {
       const yo = room.resigned === myId, rival = esc(state.players.find((_, i) => room.members[i] !== myId)?.name || 'Tu rival');
       shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Duelo con un amigo · Retos rápidos</div><h2 data-focus tabindex="-1">${yo ? 'Te has rendido' : `${rival} se ha rendido`}</h2></div></section>

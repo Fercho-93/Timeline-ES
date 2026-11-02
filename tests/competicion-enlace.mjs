@@ -206,7 +206,7 @@ console.log("\nQuien lo abre juega lo mismo y ve el cara a cara");
   ok("cuenta como duelo ganado", p.marks.duelWins === 1 && p.totals.wins === 1 && p.marks.comps === 1);
   click(w, '[data-action="share-duel"]');
   await duerme(10);
-  ok("el resultado se comparte partido por temas", /Gano yo — 6 a 5/.test(w.compartido || "") && /Yo 🟩🟩 🟩🟩 🟩🟩/.test(w.compartido || ""));
+  ok("el resultado se comparte partido por temas", /Gano yo: 6 a 5/.test(w.compartido || "") && /Yo 🟩🟩 🟩🟩 🟩🟩/.test(w.compartido || ""));
   click(w, '[data-action="comp-duel-rematch"]');
   ok("devolver el reto prepara otra con la misma forma", /3 temas al azar/.test(texto(w)) && /2 cartas en cada uno/.test(texto(w)) && !/la marca de/.test(texto(w)));
   w.close();

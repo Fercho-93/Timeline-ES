@@ -400,6 +400,7 @@ function header() {
 }
 
 const showToast = message => CT.toast(message, 3000);
+const mayuscula = texto => String(texto).charAt(0).toUpperCase() + String(texto).slice(1);
 
 function showGuide() {
   const mode = modeKey();
@@ -512,16 +513,16 @@ function renderEntry(invited = "") {
   // este móvil todavía no tiene perfil.
   const ownName = escapeHtml(CT.Identidad?.propio?.() || known?.name || "");
   paint(`<div class="shell online-shell">${header()}
-    <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${joinOnly ? "Sala privada" : CT.mode(selectedModeKey).name}</div><h2 data-focus tabindex="-1">Cada uno<br>en su móvil</h2><p class="lead">Todos ven la línea avanzar en directo, estén donde estén.</p></section>
+    <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${joinOnly || invited ? "Sala privada" : CT.mode(selectedModeKey).name}</div><h2 data-focus tabindex="-1">Cada uno<br>en su móvil</h2><p class="lead">Todos ven la línea avanzar en directo, estén donde estén.</p></section>
     <div class="online-entry-grid${invited ? " online-entry-invited" : ""}${!invited && createOnly ? " online-entry-single" : ""}">
-      ${!invited && createOnly ? "" : `<form class="panel online-form" data-online-form="join"><span class="form-number">01</span><h3>${invited ? "Te han invitado a una sala" : "Entrar en una sala"}</h3><p>${invited ? "Introduce tu nombre para unirte a la partida compartida." : "Usa el código que aparece en el móvil anfitrión."}</p><div class="field"><label for="online-code">Código de sala</label><input id="online-code" name="code" class="room-code-input" maxlength="8" required placeholder="ABCD2345" value="${escapeHtml(invited)}" autocapitalize="characters" autocomplete="off"></div><div class="field"><label for="online-player-name">Tu nombre</label><input id="online-player-name" name="name" maxlength="18" required placeholder="Ej. Lucía" autocomplete="name" value="${ownName}"></div>${invited ? "" : '<button class="btn btn-secondary btn-block" type="button" data-online-action="scan-qr">Escanear código QR</button>'}<button class="btn btn-primary btn-block" type="submit">Unirme <span>→</span></button></form>`}
+      ${!invited && createOnly ? "" : `<form class="panel online-form" data-online-form="join"><span class="form-number">01</span><h3>${invited ? "Te han invitado a una sala" : "Entrar en una sala"}</h3><p>${invited ? "Introduce tu nombre para unirte a la partida compartida." : "Usa el código que aparece en el móvil del anfitrión."}</p><div class="field"><label for="online-code">Código de sala</label><input id="online-code" name="code" class="room-code-input" maxlength="8" required placeholder="ABCD2345" value="${escapeHtml(invited)}" autocapitalize="characters" autocomplete="off"></div><div class="field"><label for="online-player-name">Tu nombre</label><input id="online-player-name" name="name" maxlength="18" required placeholder="Ej. Lucía" autocomplete="name" value="${ownName}"></div>${invited ? "" : '<button class="btn btn-secondary btn-block" type="button" data-online-action="scan-qr">Escanear código QR</button>'}<button class="btn btn-primary btn-block" type="submit">Unirme <span>→</span></button></form>`}
       ${invited || joinOnly ? "" : `<form class="panel online-form" data-online-form="create">${createOnly ? "" : '<span class="form-number">02</span>'}<h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código, el enlace o el QR.</p><div class="field"><label for="online-host-name">Tu nombre</label><input id="online-host-name" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name" value="${ownName}"></div><button class="btn ${createOnly ? "btn-primary" : "btn-secondary"} btn-block" type="submit">Crear sala${createOnly ? " <span>→</span>" : ""}</button></form>`}
     </div>
     <p class="online-note">Necesita conexión a internet durante la partida compartida.</p>
   </div>`, "online-entry");
   if (competitionOptions && !invited) {
     appEl.querySelector('.online-intro .eyebrow').textContent='Competición con amigos';
-    appEl.querySelector('.online-intro .lead').textContent=`${competitionOptions.rounds} temas al azar de las Grandes colecciones, ${competitionOptions.cards} cartas por persona. Ganar un tema suma un punto; las cartas que te queden restan su número menos uno.`;
+    appEl.querySelector('.online-intro .lead').textContent=`${competitionOptions.rounds} temas al azar de las Grandes colecciones, ${competitionOptions.cards} cartas por persona. ${CT.Tournament.PUNTOS}`;
   }
 }
 
@@ -700,7 +701,7 @@ function showTurnChangeSplash(nextUid, previousState = null) {
       <div class="turn-change-mark" aria-hidden="true">${myResult?.correct && !isMine ? "✓" : isMine ? "✦" : "→"}</div>
       <div class="eyebrow">${isMine ? "Tu turno" : "Cambio de turno"}</div>
       <h2>${heading}</h2>
-      <p>${isMine ? "Elige una carta y colócala en la línea temporal." : `Le toca a <strong>${escapeHtml(nextName)}</strong>.`}</p>
+      <p>${isMine ? "Elige una carta y colócala en la línea." : `Le toca a <strong>${escapeHtml(nextName)}</strong>.`}</p>
     </div>
   </div>`);
   const splash = appEl.querySelector("[data-turn-change-splash]");
@@ -797,7 +798,7 @@ function starterPanelMarkupContent(isHost) {
   const winner = ranking[0];
   const valueOf = uid => starterRecords.get(uid)?.value;
   const lista = CT.StarterPresentation.order(ranking.map(uid => ({name: roomState.players[uid].name + (uid === user.uid ? " · tú" : ""), value: CT.Duelo.Cifras.formato(modeKey(), valueOf(uid))})));
-  const resultado = `${cardMarkup(true)}${lista}<p>${escapeHtml(roomState.players[winner].name)} ha acertado más cerca y empieza.</p>`;
+  const resultado = `${cardMarkup(true)}${lista}<p>${escapeHtml(roomState.players[winner].name)} se ha acercado más y empieza.</p>`;
   if (!isHost) return `${resultado}<p class="hint">Esperando al anfitrión para empezar.</p>`;
   return `${resultado}${repetir}<button class="btn btn-primary btn-block" data-online-action="start" ${roomState.playerOrder.length < 2 ? "disabled" : ""}>Empezar <span>→</span></button>`;
 }
@@ -841,7 +842,7 @@ function renderLobby() {
   paint(`<div class="shell online-shell">${header(`<button class="icon-btn" data-online-action="guide">Guía</button><button class="icon-btn" data-online-action="lobby-exit">Salir</button>`)}
     <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la sala</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${roomCode}</strong><div class="room-invite-actions"><button data-online-action="share">Compartir enlace</button><button data-online-action="qr">Mostrar QR</button></div></div></section>
     <div class="online-lobby-grid"><section class="panel lobby-table-panel"><div class="section-label">Jugadores en la sala <small>${people.length}/${capacity}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${people.length}</strong><small>${people.length===1?'explorador':'exploradores'}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
-      <section class="panel lobby-settings">${isHost ? `<div class="section-label">Ajustes</div><input type="hidden" id="online-turn-seconds" value="${lobbySettings.turnSeconds}"><div class="field"><span class="field-label">Tiempo por carta</span><p class="hint">${CT.Tiempo?.texto?.(lobbySettings.turnSeconds) ?? lobbySettings.turnSeconds + " s"} (lo elegiste al crear la partida).</p></div>${roomState.tournament ? "" : `<input type="hidden" id="online-hand-size" value="${lobbySettings.handSize}"><div class="field"><span class="field-label">Cartas iniciales</span><p class="hint">${lobbySettings.handSize} por persona (lo elegiste al crear la partida).</p></div>`}${roomState.tournament ? "" : `<input type="checkbox" hidden id="online-pulse"${lobbySettings.pulse ? " checked" : ""}><input type="checkbox" hidden id="online-ghost"${lobbySettings.ghost ? " checked" : ""}><div class="field"><span class="field-label">Poderes</span><p class="hint">${CT.ManoInicial?.poderesTexto?.({ pulse: lobbySettings.pulse, ghost: lobbySettings.ghost }) ?? "sin poderes"} (lo elegiste al crear la partida).</p></div>`}${people.length < 2 ? `<p class="hint">Esperando a alguien más…</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(true)}</div>`}` : `${roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(false)}</div>`}`}</section>
+      <section class="panel lobby-settings">${isHost ? `<div class="section-label">Ajustes</div><input type="hidden" id="online-turn-seconds" value="${lobbySettings.turnSeconds}"><div class="field"><span class="field-label">Tiempo por carta</span><p class="hint">${mayuscula(CT.Tiempo?.texto?.(lobbySettings.turnSeconds) ?? lobbySettings.turnSeconds + " s")}.</p></div>${roomState.tournament ? "" : `<input type="hidden" id="online-hand-size" value="${lobbySettings.handSize}"><div class="field"><span class="field-label">Cartas iniciales</span><p class="hint">${lobbySettings.handSize} por persona.</p></div>`}${roomState.tournament ? "" : `<input type="checkbox" hidden id="online-pulse"${lobbySettings.pulse ? " checked" : ""}><input type="checkbox" hidden id="online-ghost"${lobbySettings.ghost ? " checked" : ""}><div class="field"><span class="field-label">Poderes</span><p class="hint">${mayuscula(CT.ManoInicial?.poderesTexto?.({ pulse: lobbySettings.pulse, ghost: lobbySettings.ghost }) ?? "sin poderes")}.</p></div>`}${people.length < 2 ? `<p class="hint">Esperando a alguien más…</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(true)}</div>`}` : `${roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(false)}</div>`}`}</section>
     </div>
   </div>`, "online-lobby");
   if (draft) { const input = document.getElementById("starter-guess-input"); if (input && !input.value) { input.value = draft; CT.StarterPresentation.syncAnswer(input); } }
@@ -849,7 +850,7 @@ function renderLobby() {
     // En la sala de espera no se enseña qué mazos vienen: cada ronda se descubre en su cartel. Solo
     // el resumen de la competición, sin nombres.
     const t = roomState.tournament;
-    appEl.querySelector('.lobby-head').insertAdjacentHTML('afterend', `<section class="panel tournament-board tournament-summary"><div class="tournament-score-head"><div><span>Competición</span><h2>${t.queue.length} ${t.queue.length === 1 ? 'tema' : 'temas'} al azar</h2></div><p>${t.handSize} ${t.handSize === 1 ? 'carta' : 'cartas'} por persona. Ganar un tema suma un punto; las cartas restantes restan su número menos uno.</p></div></section>`);
+    appEl.querySelector('.lobby-head').insertAdjacentHTML('afterend', `<section class="panel tournament-board tournament-summary"><div class="tournament-score-head"><div><span>Competición</span><h2>${t.queue.length} ${t.queue.length === 1 ? 'tema' : 'temas'} al azar</h2></div><p>${t.handSize} ${t.handSize === 1 ? 'carta' : 'cartas'} por persona. ${CT.Tournament.PUNTOS}</p></div></section>`);
   }
 }
 
@@ -1161,7 +1162,7 @@ function renderGame() {
   const secondsLeft = roomState.phase === "turn" && turnSeconds() ? (turnRemaining() ?? turnSeconds()) : null;
   paint(`<div class="shell">${header()}
     <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, vuelta ${roomState.round}</h1>
-    <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length}` : `Vuelta ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}`}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo restante para esta carta"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
+    <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length}` : `Vuelta ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}`}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo restante para esta carta"><strong id="turn-timer-value">${secondsLeft}</strong><span>s</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
     <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores</div><div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i class="score-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'uid:' + uid, id: uid === user.uid ? CT.Avatares.ownId() : player.avatarId })}</i><span class="score-copy"><b>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(player.hand.length)}%"></i></span></span><em><strong>${player.hand.length}</strong><small>cartas</small></em></span>`; }).join("")}</div></section>
     ${pulsing ? `<div class="pulse-banner"><span aria-hidden="true">ϟ</span> Pulso · <b>${escapeHtml(currentPlayer.name)}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
     ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
@@ -1173,7 +1174,7 @@ function renderGame() {
           : `Colócala. Si aciertas y ${escapeHtml(pulseTargetName)} falla, le pasas una carta tuya`)
         : defensa ? `${escapeHtml(pulseTargetName)} está colocando la misma carta…`
         : `${escapeHtml(currentPlayer.name)} está colocando la carta del Pulso…`}</p></section>`
-      : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${pendingIndex === null && selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" aria-pressed="${pendingIndex === null && selectedCardId === id}" ${myTurn ? "" : "disabled"}>${categoryBadge(card)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p>${myTurn && pulseAvailable() ? `<button class="btn btn-secondary btn-block pulse-btn" data-online-action="pulse-open"><span aria-hidden="true">ϟ</span> Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`}
+      : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${pendingIndex === null && selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" aria-pressed="${pendingIndex === null && selectedCardId === id}" ${myTurn ? "" : "disabled"}>${categoryBadge(card)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p>${myTurn && !roomState.pulsePower && pulseAvailable() ? `<button class="btn btn-secondary btn-block pulse-btn" data-online-action="pulse-open"><span aria-hidden="true">ϟ</span> Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`}
     <section class="board-timeline-section"><div class="hand-title"><h3>${timelineTitle()}</h3></div>${CT.timelineEnds(modeKey())}${CT.timelineMap(modeKey(), timelineCards, { hidden: !!roomState.ghost?.pending.length })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
     ${!pulsing && roomState.phase !== "reveal" ? CT.Ghost.power(roomState.ghost, user.uid, roomState.timeline.length, me.hand.length, 'data-online-action="ghost-use"', myTurn) : ""}
     ${roomState.phase === "reveal" ? revealOverlay(currentUid) : ""}
@@ -1249,7 +1250,7 @@ function revealOverlay(currentUid) {
       ${seguir}
     </div></div>`;
   }
-  const desenlace = `<p>${reveal.correct ? "La carta permanece en la línea temporal." : reveal.returned ? "No quedan cartas que robar, así que vuelve a su mano." : `${escapeHtml(reveal.playerName)} descarta la carta y roba una nueva.`}</p>`;
+  const desenlace = `<p>${reveal.correct ? "La carta se queda en la línea." : reveal.returned ? "No quedan cartas que robar, así que vuelve a su mano." : `${escapeHtml(reveal.playerName)} descarta la carta y roba una nueva.`}</p>`;
   return `<div class="overlay" data-result-card="${reveal.correct ? card.id : ''}"><div class="modal ${reveal.correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${reveal.correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${reveal.correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${reveal.correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2>${fichaCarta}${hint}${desenlace}${seguir}</div></div>`;
 }
 
@@ -1637,11 +1638,13 @@ function renderWinner() {
   clearTurnTimer();
   const uids = (roomState.winners || [roomState.winner]).filter(uid => roomState.players[uid]);
   const names = uids.map(uid => escapeHtml(roomState.players[uid].name));
-  const title = names.length === 1 ? `${names[0]} gana` : `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]} ganan`;
+  // En una competición esta pantalla cierra un tema; quién gana la competición lo dice el marcador.
+  const delTema = roomState.tournament ? " el tema" : "";
+  const title = names.length === 1 ? `${names[0]} gana${delTema}` : `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]} ganan${delTema}`;
   const lead = roomState.final && !CT.Final.valid(modeKey(), roomState.final) ? "La final se manipuló: este resultado no es válido."
     : CT.Final.verdict({ ganadores: names.length, final: !!roomState.final, quedan: roomState.playerOrder.length });
   const logroMarkup=sessionAchievements.length?`<div class="logros-nuevos" role="status"><div class="eyebrow">${sessionAchievements.length===1?'Logro nuevo':`${sessionAchievements.length} logros nuevos`}</div>${sessionAchievements.map(item=>`<div class="logro-chip"><b>${escapeHtml(item.name)}</b><small>${escapeHtml(item.desc)}</small></div>`).join('')}</div>`:'';
-  paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel winner-online final-composition"><div class="eyebrow">Fin de la partida · Sala ${roomCode}</div><h1 class="final-title" data-focus tabindex="-1">${title}</h1><p class="final-lead">${lead}</p>${onlineFinalMetrics(roomState.timeline.length,sessionNewDiscoveries,sessionAchievements.length)}${logroMarkup}<div class="actions final-actions"><button class="btn btn-ghost" data-online-action="review-timeline">Ver las ${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"} jugadas</button>${failedHere().length ? `<button class="btn btn-ghost" data-online-action="review-failed">Ver lo que se falló (${failedHere().length})</button>` : ""}${roomState.matchmaking === "public" ? '<button class="btn btn-primary" data-online-action="public-again">Buscar otra partida</button><button class="btn btn-secondary" data-online-action="back">Ir al inicio</button>' : `<button class="btn btn-primary" data-online-action="back">Ir al inicio</button>${roomState.hostUid === user.uid ? '<button class="btn btn-secondary" data-online-action="close-room">Cerrar sala</button>' : ""}`}</div></div></section></div>`, "online-winner");
+  paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel winner-online final-composition"><div class="eyebrow">${roomState.tournament ? `Fin del tema ${roomState.tournament.index + 1}` : "Fin de la partida"} · Sala ${roomCode}</div><h1 class="final-title" data-focus tabindex="-1">${title}</h1><p class="final-lead">${lead}</p>${onlineFinalMetrics(roomState.timeline.length,sessionNewDiscoveries,sessionAchievements.length)}${logroMarkup}<div class="actions final-actions"><button class="btn btn-ghost" data-online-action="review-timeline">Ver las ${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"} jugadas</button>${failedHere().length ? `<button class="btn btn-ghost" data-online-action="review-failed">Ver lo que se falló (${failedHere().length})</button>` : ""}${roomState.matchmaking === "public" ? '<button class="btn btn-primary" data-online-action="public-again">Buscar otra partida</button><button class="btn btn-secondary" data-online-action="home">Ir al inicio</button>' : `<button class="btn btn-primary" data-online-action="home">Ir al inicio</button>${roomState.hostUid === user.uid ? '<button class="btn btn-secondary" data-online-action="close-room">Cerrar sala</button>' : ""}`}</div></div></section></div>`, "online-winner");
   if(roomState.tournament) {
     const section=appEl.querySelector('.pass-screen');
     section.insertAdjacentHTML('afterbegin',tournamentBoard(uids));
@@ -1663,7 +1666,7 @@ function reviewCard(id) {
 }
 function renderTimelineReview() {
   paint(`<div class="shell">${header()}<section>
-    <div class="eyebrow">Línea de tiempo completa</div>
+    <div class="eyebrow">La línea completa</div>
     <h1 data-focus tabindex="-1">${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta jugada" : "cartas jugadas"}</h1>
     <div class="review-grid">${roomState.timeline.map(reviewCard).join("")}</div>
     <div class="actions actions-centro"><button class="btn btn-primary" data-online-action="back-from-timeline">Volver</button></div>
@@ -1689,19 +1692,20 @@ function roomMenu() {
   const currentName = currentUid ? roomState.players[currentUid].name : "";
   const others = (roomState?.playerOrder || []).filter(uid => uid !== roomState.hostUid);
   appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-room-overlay><div class="modal">
-    <div class="eyebrow">Sala ${roomCode}</div><h2>Opciones de la partida</h2><p class="hint">La partida continúa mientras consultas este menú.</p>
+    <div class="eyebrow">Sala ${roomCode}</div><h2>${playing ? "Opciones de la partida" : "Opciones de la sala"}</h2>${playing ? '<p class="hint">La partida continúa mientras consultas este menú.</p>' : ""}
     <div class="actions actions-columna">
       <button class="btn btn-secondary" data-online-action="guide">Guía</button>${CT.settingsButton()}
       <button class="btn btn-secondary" data-online-action="back">Volver a la pantalla anterior</button>
       <button class="btn btn-secondary" data-online-action="share">Compartir enlace</button>
       <button class="btn btn-secondary" data-online-action="qr">Mostrar QR</button>
+      ${canClaimHost() ? '<button class="btn btn-secondary" data-online-action="claim-host">Tomar relevo del anfitrión</button>' : ""}
       ${isHost && playing && !inFinal ? `<button class="btn btn-ghost" data-online-action="skip">Saltar el turno de ${escapeHtml(currentName)}</button>` : ""}
     </div>
     ${isHost && others.length && !inFinal ? `<div class="manage-players"><div class="section-label">Jugadores</div>${others.map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, roomState.matchmaking === 'public' ? 'mesa' : 'sala') || ''}<button class="kick-btn" data-online-action="kick" data-uid="${uid}">Expulsar</button></div>`).join("")}</div>` : ""}
     ${!(isHost && others.length && !inFinal) && roomState?.playerOrder?.some(uid => uid !== user.uid) ? `<div class="manage-players"><div class="section-label">Jugadores</div>${roomState.playerOrder.filter(uid => uid !== user.uid).map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, roomState.matchmaking === 'public' ? 'mesa' : 'sala') || ''}</div>`).join("")}</div>` : ""}
     ${inFinal ? '<p>La final espera a todos los finalistas. Si alguien se desconecta, puede volver a entrar y responder.</p>' : ''}
     <div class="actions actions-columna">
-      ${isHost && playing ? '<button class="btn btn-ghost" data-online-action="close-room">Terminar partida y cerrar sala</button>' : isHost ? '<button class="btn btn-ghost" data-online-action="close-room">Cerrar la sala</button>' : inFinal ? '<button class="btn btn-ghost" data-online-action="back">Ir al inicio</button>' : '<button class="btn btn-ghost" data-online-action="leave-room">Salir de la partida</button>'}
+      ${isHost && playing ? '<button class="btn btn-ghost" data-online-action="close-room">Terminar partida y cerrar sala</button>' : isHost ? '<button class="btn btn-ghost" data-online-action="close-room">Cerrar la sala</button>' : inFinal ? '<button class="btn btn-ghost" data-online-action="home">Ir al inicio</button>' : `<button class="btn btn-ghost" data-online-action="leave-room">${playing ? "Salir de la partida" : "Salir de la sala"}</button>`}
       <button class="btn btn-primary" data-online-action="close-room-menu">Seguir jugando</button>
     </div>
   </div></div>`);
@@ -1846,7 +1850,7 @@ async function shareRoom() {
 }
 
 function showQr() {
-  document.body.insertAdjacentHTML("beforeend", `<div class="overlay qr-overlay" data-qr-overlay><div class="modal qr-modal"><div class="eyebrow">Invitación a la sala</div><h2>Escanea para entrar</h2><div class="qr-frame"><canvas id="room-qr" aria-label="Código QR de invitación a la sala"></canvas></div><div class="qr-room-code">${roomCode}</div><p>Abre la cámara del otro móvil y apunta al código. El enlace rellenará automáticamente la sala.</p><div class="actions actions-columna"><button class="btn btn-primary" data-online-action="share">Compartir enlace</button><button class="btn btn-primary btn-block" data-online-action="close-qr">Cerrar</button></div></div></div>`);
+  document.body.insertAdjacentHTML("beforeend", `<div class="overlay qr-overlay" data-qr-overlay><div class="modal qr-modal"><div class="eyebrow">Invitación a la sala</div><h2>Escanea para entrar</h2><div class="qr-frame"><canvas id="room-qr" aria-label="Código QR de invitación a la sala"></canvas></div><div class="qr-room-code">${roomCode}</div><p>Desde el otro móvil, escanéalo con la cámara o en «Unirme a una partida». Entrará directo en esta sala.</p><div class="actions actions-columna"><button class="btn btn-primary" data-online-action="share">Compartir enlace</button><button class="btn btn-primary btn-block" data-online-action="close-qr">Cerrar</button></div></div></div>`);
   try { CT.QrEncode.draw(document.getElementById("room-qr"), invitationUrl()); }
   catch (error) { console.error(error); showToast("La dirección es demasiado larga para generar el QR"); }
   abreCapa(document.querySelector("[data-qr-overlay]"), true);
@@ -2006,7 +2010,8 @@ document.addEventListener("click", event => {
   if (!target) return;
   const action = target.dataset.onlineAction;
   if (action === "back") navigateOnline("back");
-  else if (action === "claim-host") claimHost();
+  else if (action === "home") navigateOnline("home-top");
+  else if (action === "claim-host") { CT.closeDialog(); claimHost(); }
   else if (action === "review-timeline") renderTimelineReview();
   else if (action === "review-failed") renderFailedReview();
   else if (action === "back-from-timeline") renderWinner();
@@ -2050,7 +2055,7 @@ document.addEventListener("click", event => {
   else if (action === "skip") { CT.closeDialog(); skipTurn(); }
   else if (action === "kick") {
     const uid = target.dataset.uid, name = roomState?.players[uid]?.name || "esta persona";
-    CT.UI.confirmDialog("Saldrá de la sala y sus cartas pasarán al descarte.", () => { CT.closeDialog(); removePlayer(uid); }, { title: `¿Expulsar a ${name}?`, confirmLabel: "Expulsar", cancelLabel: "Cancelar" });
+    CT.UI.confirmDialog(roomState?.status === "playing" ? "Saldrá de la sala y sus cartas pasarán al descarte." : "Saldrá de la sala.", () => { CT.closeDialog(); removePlayer(uid); }, { title: `¿Expulsar a ${name}?`, confirmLabel: "Expulsar", cancelLabel: "Cancelar" });
   } else if (action === "leave-public") void leavePublicLobby();
   else if (action === "public-again") { detachOnline(); CT.launchPublicMatch?.(); }
   else if (action === "leave-room") requestLeaveRoom();

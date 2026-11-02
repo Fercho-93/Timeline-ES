@@ -100,6 +100,11 @@
     if (select && MANO.includes(Number(select.value))) { try { CT.Storage.setItem(CLAVE_MANO, String(Number(select.value))); } catch { /* almacenamiento lleno */ } }
   });
   // Poderes (Pulso y Fantasma) de esas mismas partidas: también se eligen en la pantalla previa.
+  // Qué hace cada uno, con las mismas palabras en un solo móvil y en las salas.
+  const PODERES = {
+    ghost: "Quien encuentra una puede esconder las cifras de la línea durante una vuelta. Hay de 1 a 3 según los jugadores, y puede que no salga ninguna.",
+    pulse: "Quien encuentra una puede retar a otro jugador: los dos colocan la misma carta y, si solo acierta quien reta, le pasa una carta suya. Hay de 1 a 3 según los jugadores."
+  };
   const CLAVE_PODERES = "continuum-live-powers-v1";
   function poderes() {
     try { const v = JSON.parse(CT.Storage.getItem(CLAVE_PODERES) || "{}"); return { pulse: !!v.pulse, ghost: !!v.ghost }; } catch { return { pulse: false, ghost: false }; }
@@ -108,8 +113,8 @@
     const p = poderes();
     return `<div class="poderes-field"><span class="field-label" id="live-powers-label">Poderes</span>
       <p class="hint">Para una primera partida, mejor sin poderes.</p>
-      <label class="opt-row"><span>Cartas Fantasma <small>De 1 a 3 poderes ocultos según los jugadores. Pueden quedarse sin descubrir.</small></span><input type="checkbox" id="live-ghost-toggle" data-poder="ghost"${p.ghost ? " checked" : ""}></label>
-      <label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="live-pulse-toggle" data-poder="pulse"${p.pulse ? " checked" : ""}></label>
+      <label class="opt-row"><span>Cartas Fantasma <small>${PODERES.ghost}</small></span><input type="checkbox" id="live-ghost-toggle" data-poder="ghost"${p.ghost ? " checked" : ""}></label>
+      <label class="opt-row"><span>Cartas Pulso <small>${PODERES.pulse}</small></span><input type="checkbox" id="live-pulse-toggle" data-poder="pulse"${p.pulse ? " checked" : ""}></label>
     </div>`;
   }
   document.addEventListener("change", event => {
@@ -134,5 +139,5 @@
     const select = event.target.closest?.("select[data-maximo-sala]");
     if (select && MAXIMOS.includes(Number(select.value))) { try { CT.Storage.setItem(CLAVE_MAX, String(Number(select.value))); } catch { /* almacenamiento lleno */ } }
   });
-  CT.ManoInicial = { get: mano, field: manoField, poderes, poderesField, poderesTexto, maximo, maximoField };
+  CT.ManoInicial = { get: mano, field: manoField, poderes, poderesField, poderesTexto, maximo, maximoField, PODERES };
 })();
