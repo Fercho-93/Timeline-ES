@@ -2514,8 +2514,10 @@
   // de la partida libre sin decirlo, y quien una vez eligió Difícil se encontraba siempre la competición así.
   let competitionDifficulty = CT.Storage.getItem("continuum-competition-difficulty-v1") || "easy";
   if (!CT.Ghost.LEVELS[competitionDifficulty]) competitionDifficulty = "easy";
-  // Las cartas que el tablero acaba de colocar y todavía no se han visto llegar.
+  // Las cartas que el tablero acaba de colocar y todavía no se han visto llegar, y cuánto se
+  // espera antes de que la primera empiece a viajar.
   let recienColocadas = [];
+  const ESPERA_LLEGADA = 1000;
   if (!CT.Ghost.LEVELS[selectedDifficulty]) selectedDifficulty = "easy";
   // Antes de empezar: las tres vidas, grandes, para que se vean de un vistazo.
   function vidasAviso(detalle = "") {
@@ -3018,7 +3020,7 @@
       ${solo.kind === "comp" ? `<div class="comp-topic">${escapeHtml(CT.mode(solo.mode).name)}</div>` : ""}
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${etiqueta}</div><div class="turn-name" aria-hidden="true">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
  ${sinVidas() ? "" : vidasMarkup()}
-      ${enDueloConReloj() && solo.cartaEmpezadaEn && !solo.pendingResult ? relojMarkup(Math.max(0, plazoDuelo() - (Date.now() - solo.cartaEmpezadaEn)), plazoDuelo()) : ""}
+      ${enDueloConReloj() && solo.cartaEmpezadaEn && !solo.pendingResult ? relojMarkup(Math.min(plazoDuelo(), Math.max(0, plazoDuelo() - (Date.now() - solo.cartaEmpezadaEn))), plazoDuelo()) : ""}
       ${soloHidden() ? `<div class="ghost-banner" role="status"><span aria-hidden="true">◌</span><div><b>Fantasma ${solo.difficulty === "expert" ? "permanente" : "· esta jugada"}</b><small>${CT.mode(selectedModeKey).axis === "time" ? "Fechas" : "Cifras"} ocultas ${solo.difficulty === "expert" ? "toda la partida. Guíate por las ilustraciones." : "solo esta jugada."}</small></div></div>` : ""}
       <section class="board-focus-card"><div class="hand-title"><h3>Tu carta</h3></div>${pendingIndex === null ? `<div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}">${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong></div></div>` : `<p class="hint provisional-hand-note">La carta está en la línea como vista previa.</p>`}<p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Toca el hueco donde quieres colocar la carta, o mantén pulsada la carta y arrástrala hasta él"}</p></section>
       <section class="board-timeline-section"><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3></div>${CT.timelineEnds(selectedModeKey)}${CT.timelineMap(selectedModeKey, timelineCards, { hidden: soloHidden() })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
@@ -3038,7 +3040,7 @@
         // suave: la carta todavía no se ve —entra desde el centro— y así el sitio al que
         // llega ya está quieto cuando empieza a moverse.
         CT.dealIn(llegan, {
-          delay: 1000,
+          delay: ESPERA_LLEGADA,
           seguir: carta => {
             const caja = carta.getBoundingClientRect(), marco = wrap.getBoundingClientRect();
             wrap.scrollLeft += caja.left - marco.left - (marco.width - caja.width) / 2;
@@ -3160,8 +3162,10 @@
     // en esta pantalla y se vacía en cuanto se ha visto llegar las cartas.
     recienColocadas = [...(falladaAlLinea ? [falladaAlLinea] : []), ...solo.autoAdded];
     // La carta nueva estrena plazo. Se apunta el instante, no lo que queda: así el tiempo
-    // corre aunque el móvil apague la pantalla o la aplicación se vaya al fondo.
-    if (enDueloConReloj()) solo.cartaEmpezadaEn = Date.now();
+    // corre aunque el móvil apague la pantalla o la aplicación se vaya al fondo. Si el
+    // tablero coloca cartas (la fallada o las de premio), el plazo empieza cuando han caído
+    // todas: verlas llegar no puede comerse segundos de la jugada (en Experto eran 3 de 15).
+    if (enDueloConReloj()) solo.cartaEmpezadaEn = Date.now() + (CT.dealDuration?.(recienColocadas.length, ESPERA_LLEGADA) || 0);
     saveSolo();
     soloView();
   }
@@ -3384,7 +3388,8 @@
     const abierta = cartaEnReloj();
     const barra = app.querySelector(".reloj-bar");
     if (!abierta || !barra) return paraReloj();
-    const restante = abierta.ms - (Date.now() - abierta.empezadaEn);
+    // Mientras llegan las cartas del tablero el plazo aún no ha empezado: la barra sigue llena.
+    const restante = Math.min(abierta.ms, abierta.ms - (Date.now() - abierta.empezadaEn));
     barra.value = Math.max(0, restante);
     barra.classList.toggle("reloj-apura", restante <= 3000);
     const marca = app.querySelector(".reloj-left");

@@ -126,7 +126,8 @@
     const layer=document.createElement('div');layer.className='quick-splash';layer.dataset.quickSplash='';layer.setAttribute('role','button');layer.tabIndex=0;layer.setAttribute('aria-label',`${lead}: ${c.title}. Toca para continuar.`);
     layer.innerHTML=`<div class="quick-splash-inner"><div class="quick-splash-fan" aria-hidden="true">${pick.map(card=>`<img src="${esc(card.image)}" alt="" decoding="async">`).join('')}</div><div class="eyebrow">${esc(lead)}</div><h2>${esc(c.title)}</h2><span class="quick-splash-hint">Toca para continuar</span></div>`;
     app().querySelector('[data-quick-splash]')?.remove();splashLayer=layer;layer.dataset.game=config.historyId||'sin-id';layer.dataset.index=String(index);
-    const close=()=>{layer.dataset.closed='1';if(splashLayer===layer)splashLayer=null;if(!layer.isConnected)return;layer.classList.add('is-leaving');setTimeout(()=>layer.remove(),260);};
+    // Mientras la portada tapa la mesa, el reloj de la jugada no corre: empieza al retirarla (render).
+    const close=()=>{if(layer.dataset.closed)return;layer.dataset.closed='1';if(splashLayer===layer)splashLayer=null;if(!layer.isConnected)return;layer.classList.add('is-leaving');setTimeout(()=>layer.remove(),260);if(state&&page==='game'&&timedTurn())render();};
     layer.addEventListener('click',close);layer.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();close();}});
     app().append(layer);
     CT.Effects?.transition?.('open');
@@ -417,9 +418,10 @@
       record=CT.QuickRoom.record(room);state=E.restore(record);if(freshOwnPlace)CT.Effects?.feedback(state.result.correct);
       // Te toca: el turno acaba de pasar a tu plaza.
       if(previous?.config && previous.actor!==id && room.actor===id && state.phase==='turn')CT.Effects?.transition?.('turn');
-      selected=null;slot=null;render();
       // Al empezar la partida de la sala, la portada del primer mazo, como en el resto de Retos rápidos.
+      // Va antes de pintar la mesa para que el reloj de la primera jugada espere a que se retire.
       if(starting)deckSplash(state.config,0);
+      selected=null;slot=null;render();
     }
     else {
       lobby(code || connection?.code);
@@ -1026,6 +1028,16 @@
     lastPhase = now;
     if (arrived && state.index + 1 === state.config.rounds.length) CT.Effects?.transition?.('end');
   }
+  // Quien mira la jugada de otro en una sala no abre la capa de resultado: la carta bien colocada
+  // cae igualmente con su golpe, una sola vez aunque la sala repinte con cada instantánea.
+  let celebrated = null;
+  function celebrateOnce(r) {
+    const key = `${state.config.historyId || 'sin-id'}:${state.index}:${record?.commands?.length || 0}`;
+    if (!r?.correct || celebrated === key) return;
+    celebrated = key;
+    const placed = [...app().querySelectorAll('.timeline .timeline-card[data-id]')].find(el => el.dataset.id === String(r.cardId));
+    if (placed) CT.celebrateCard?.(placed);
+  }
   function render() {
     page="game";
     stopClock();
@@ -1072,7 +1084,7 @@
     }
     if (state.phase === 'result') {
       const r = state.result, item = get(r.cardId), fresh = noteDiscovery();
-      if(room && !myTurn()){shell(`${heading}${CT.timelineMap(null,state.timeline)}<div class="timeline-wrap"><div class="timeline">${resultLine(c,r,get)}</div></div><section class="panel quick-panel"><h2>${r.correct?'¡Bien colocado!':'No encaja ahí'}</h2><p>${esc(item.title)} · ${esc(item.label)}</p><p>Esperando a que continúe ${esc(p.name)}.</p></section>`);return;}
+      if(room && !myTurn()){shell(`${heading}${CT.timelineMap(null,state.timeline)}<div class="timeline-wrap"><div class="timeline">${resultLine(c,r,get)}</div></div><section class="panel quick-panel"><h2>${r.correct?'¡Bien colocado!':'No encaja ahí'}</h2><p>${esc(item.title)} · ${esc(item.label)}</p><p>Esperando a que continúe ${esc(p.name)}.</p></section>`);celebrateOnce(r);return;}
       shell(`${heading}${CT.timelineMap(null, state.timeline)}<div class="timeline-wrap"><div class="timeline">${resultLine(c, r, get)}</div></div><div class="overlay" data-quick-result data-result-card="${r.correct ? esc(item.id) : ''}"${correctionAttrs(r, item)}><section class="modal quick-result ${r.correct ? 'success' : 'failure'}"><div class="result-mark" aria-hidden="true">${r.correct ? '✓' : '×'}</div><div class="eyebrow" aria-hidden="true">${r.correct ? '¡Bien colocado!' : 'No encaja ahí'}</div><h2><span class="solo-lectores">${r.correct ? '¡Bien colocado!' : 'No encaja ahí'}: </span>${esc(item.title)}${item.artist?`<small class="quick-card-artist">${esc(item.artist)}</small>`:""}</h2>${fresh ? '<div class="quick-new-card"><span aria-hidden="true">✦</span> Nueva carta en tu colección</div>' : ''}<div class="reveal"><div class="year">${esc(item.label)}</div><p>${esc(item.detail)}</p></div><p class="quick-sources">${sourceLinks(item)}</p>
         <p class="quick-result-note">${resultNote(r, p)}</p>
         ${button('ack', room && room.members.length < state.players.length ? 'Continuar y retar a mi amigo' : state.remaining.length ? 'Siguiente carta <span>→</span>' : 'Ver el resultado <span>→</span>', 'btn btn-primary btn-block')}${room ? button('exit','Salir de la sala','btn btn-ghost btn-block') : ''}</section></div>`);
@@ -1084,8 +1096,11 @@
       return;
     }
     const gap = i => slot === i && selected ? `<div class="slot-confirm quick-confirm provisional-placement" data-index="${i}"><div class="slot-confirm-card"><small>Vista previa · sin confirmar</small><strong>${esc(get(selected).title)}</strong><span aria-hidden="true">Valor oculto</span></div>${button('confirm', 'Colocar carta →', 'btn btn-primary btn-block')}${button('cancel', 'Cambiar', 'btn btn-ghost btn-block')}</div>` : `<button class="slot" data-quick="slot" data-index="${i}" ${selected ? '' : 'disabled'} aria-label="${esc(i === 0 ? `Colocar antes de ${get(state.timeline[0]).title}` : i === state.timeline.length ? `Colocar después de ${get(state.timeline[i-1]).title}` : `Colocar entre ${get(state.timeline[i-1]).title} y ${get(state.timeline[i]).title}`)}"><span>${i === 0 ? '−' : '+'}</span></button>`;
-    const ms=Number(state.config.seconds)*1000, timed=timedTurn(), startedAt=timed?turnStartedAt(turnKey()):0;
-    shell(`${heading}${timed?CT.Tiempo.bar(ms-(Date.now()-startedAt),ms):''}${lastNote()}<section><div class="hand-title"><h3>${room ? 'Cartas comunes' : 'Tus cartas'}</h3></div><div class="hand">${state.remaining.filter(id => !(slot !== null && selected === id)).map(id => `<button class="hand-card${selected === id ? ' selected' : ''}" data-quick="select" data-id="${id}" aria-pressed="${selected === id}"${room && !myTurn() ? ' disabled' : ''}><span class="hidden-date">Valor oculto</span>${CT.cardBack('quick')}<strong>${esc(get(id).title)}${get(id).artist?`<small class="quick-card-artist">${esc(get(id).artist)}</small>`:""}</strong><span class="card-arrow">→</span></button>`).join('')}</div>
+    // Con la portada del mazo encima (o a punto de salir), el plazo aún no ha empezado: la barra
+    // se ve llena y el reloj arranca cuando se toca la portada. Antes corría debajo de ella.
+    const covered=nextDeck||(!!splashLayer&&!splashLayer.dataset.closed&&splashLayer.dataset.game===(state.config.historyId||'sin-id')&&splashLayer.dataset.index===String(state.index));
+    const ms=Number(state.config.seconds)*1000, timed=timedTurn(), startedAt=timed&&!covered?turnStartedAt(turnKey()):0;
+    shell(`${heading}${timed?CT.Tiempo.bar(covered?ms:ms-(Date.now()-startedAt),ms):''}${lastNote()}<section><div class="hand-title"><h3>${room ? 'Cartas comunes' : 'Tus cartas'}</h3></div><div class="hand">${state.remaining.filter(id => !(slot !== null && selected === id)).map(id => `<button class="hand-card${selected === id ? ' selected' : ''}" data-quick="select" data-id="${id}" aria-pressed="${selected === id}"${room && !myTurn() ? ' disabled' : ''}><span class="hidden-date">Valor oculto</span>${CT.cardBack('quick')}<strong>${esc(get(id).title)}${get(id).artist?`<small class="quick-card-artist">${esc(get(id).artist)}</small>`:""}</strong><span class="card-arrow">→</span></button>`).join('')}</div>
       <p class="hint">${selected ? 'Toca un hueco y confirma, o arrastra la carta hasta su lugar.' : 'Toca una carta o mantenla pulsada para arrastrarla hasta un hueco.'}</p></section>
       <section class="board-timeline-section"><div class="hand-title"><h3>${esc(timelineTitle(c))}</h3></div>${timelineEnds(c)}${CT.timelineMap(null, state.timeline)}
       <div class="timeline-wrap"><div class="timeline" aria-label="${esc(timelineTitle(c))}: orden de izquierda a derecha">${state.timeline.map((id, i) => gap(i) + cardMarkup(c, get(id))).join('')}${gap(state.timeline.length)}</div></div></section>`);
@@ -1093,7 +1108,7 @@
       if (!myTurn() || !app().querySelector('.quick-shell') || state?.phase !== 'turn' || !state.remaining.includes(id)) return;
       selected = id; slot = index; render(); focusPlacement();
     }});
-    if(timed){const key=turnKey();quickClock=CT.Tiempo.clock({empezadoEn:startedAt,ms,root:app(),onTimeout:()=>{
+    if(timed&&!covered){const key=turnKey();quickClock=CT.Tiempo.clock({empezadoEn:startedAt,ms,root:app(),onTimeout:()=>{
       if(!state||!timedTurn()||turnKey()!==key)return;
       // Se acabó el tiempo: la jugada cuenta como fallo.
       selected=null;slot=null;dispatch(E.timeoutPlacement(state));

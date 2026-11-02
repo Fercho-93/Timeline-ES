@@ -167,7 +167,8 @@ function render() {
   const waiting = current.status === 'waiting';
   const showInvite = waiting && !firstTurn, showBoard = !waiting || firstTurn || current.turnIndex > 0;
   const themes = compModes(current);
-  const kindLabel = themes ? `Competición · tema ${themeAt(current) + 1} de ${themes.length} · ${CT.mode(modeAt(current)).name}` : current.kind === 'cifras' ? 'Escribir la cifra' : 'Ordenar las cartas';
+  // Encima del turno, el mazo que se juega (como en el resto de partidas), sin la consigna «Ordenar las cartas».
+  const kindLabel = themes ? `Competición · tema ${themeAt(current) + 1} de ${themes.length} · ${CT.mode(modeAt(current)).name}` : current.kind === 'cifras' ? 'Escribir la cifra' : CT.mode(current.mode).name;
   // Por qué carta se va: en una competición, dentro del tema que se está jugando.
   const cardOf = () => themes ? `Carta ${Math.min(current.turnIndex - themeAt(current) * perTheme(current) + 1, perTheme(current))} de ${perTheme(current)} del tema` : `Carta ${Math.min(current.turnIndex + 1, current.total)} de ${current.total}`;
   const rival = current.players?.[current.playersOrder?.find(x => x !== uid())]?.alias || '';
@@ -413,6 +414,7 @@ function subscribe(gameId) {
     const next = snap.data(); if (!next) return;
     const previousTurn = current?.turnIndex;
     const wasPlayingAway = current?.status === 'playing' && current.turnUid !== uid();
+    const newPlay=current?.id===gameId && current?.plays && next.plays?.length===current.plays.length+1 ? next.plays.at(-1) : null;
     const ownPlay=current?.plays && next.plays?.length===current.plays.length+1 ? next.plays.at(-1) : null;
     if(ownPlay?.uid===uid())CT.Effects?.feedback(next.kind==='cifras'?ownPlay.points>0:ownPlay.correct===true);
     // El duelo acaba de terminar delante de ti (no al abrir uno ya terminado).
@@ -429,6 +431,12 @@ function subscribe(gameId) {
     prepareTurn();
     if (wasPlayingAway && current.turnUid === uid() && !ended(current)) { CT.Effects?.transition?.('turn'); notify('Tu rival ya ha jugado. Te toca.'); }
     render();
+    // Una carta bien colocada (tuya o de tu rival, si estás mirando) cae en la línea con el
+    // mismo golpe que en el resto de partidas.
+    if (newPlay && next.kind !== 'cifras' && newPlay.correct === true && !newPlay.timeout) {
+      const placed = [...document.querySelectorAll('#app .turn-duel-board .timeline-card[data-id]')].find(el => el.dataset.id === String(newPlay.cardId));
+      if (placed) CT.celebrateCard?.(placed);
+    }
     const pending = pendingMove(gameId);
     if (pending && !snap.metadata?.fromCache) sendPending(pending);
   }, () => notify('No se pudo sincronizar el duelo.'));

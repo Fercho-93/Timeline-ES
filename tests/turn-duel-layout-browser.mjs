@@ -21,7 +21,7 @@ try{
       const card=CT.cards('history').find(item=>CT.animalArt('history',item));
       app.className='';app.dataset.screen='turn-duel';
       app.innerHTML=`<div class="shell turn-duel-shell"><nav class="turn-duel-nav"><button class="icon-btn">←</button><span>CONTINUUM <small>Duelo por turnos</small></span></nav>
-        <section class="turn-duel-screen"><header class="turn-duel-heading"><div><div class="eyebrow">Ordenar las cartas</div><h1>Es tu turno</h1><p>Carta 2 de 10 · Contra Alejandro</p></div><div class="turn-duel-clock"><span><b>15</b><small>s</small></span></div></header>
+        <section class="turn-duel-screen"><header class="turn-duel-heading"><div><div class="eyebrow">Historia de España</div><h1>Es tu turno</h1><p>Carta 2 de 10 · Contra Alejandro</p></div><div class="turn-duel-clock"><span><b>15</b><small>s</small></span></div></header>
         <div class="turn-duel-scores">${['Tú','Alejandro'].map(name=>`<div class="turn-duel-player"><span class="turn-duel-avatar">${name[0]}</span><span class="turn-duel-player-info"><strong>${name}</strong><small>Jugador</small></span><span class="turn-duel-score"><b>0</b><small>aciertos</small></span></div>`).join('')}</div>
         <aside class="turn-duel-last"><b>Última jugada</b><p>Tu rival acertó la posición de una carta histórica.</p><small>Marcador 0 · 0</small></aside>
         <section class="turn-duel-hand"><div class="hand-title"><h3>Tu carta</h3><small>Fecha oculta</small></div><div class="hand hand-solo"><div class="hand-card selected"><span class="hidden-date">Fecha oculta</span>${CT.cardBack('history')}<strong>Comienza la guerra de los Treinta Años</strong></div></div><p class="hint">Toca el hueco donde quieres colocar la carta.</p></section>

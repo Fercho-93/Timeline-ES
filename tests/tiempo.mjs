@@ -127,6 +127,57 @@ console.log('\nRetos rápidos: el plazo viaja en la partida y agotarlo falla la 
   w.close();
 }
 
+console.log('\nExperto: el plazo empieza cuando el tablero ha colocado sus cartas');
+{
+  const w = boot({ 'continuum-difficulty-v1': 'expert' });
+  // jsdom no anima: con `animate` de mentira las cartas del tablero «llegan» como en un móvil.
+  w.Element.prototype.animate = () => ({ finished: Promise.resolve(), cancel() {} });
+  abreMazo(w);
+  click(w, '[data-action="start-free"]');
+  const CT = w.CONTINUUM, partida = () => JSON.parse(w.localStorage.getItem('hilo-solo-history-v1'));
+  const carta = id => CT.cards('history').find(c => c.id === id);
+  const p = partida();
+  click(w, `.slot[data-index="${CT.correctIndex('history', p.timeline.map(carta), carta(p.current))}"]`);
+  click(w, '[data-action="confirm-place"]');
+  click(w, '[data-action="solo-next"]');
+  const tras = partida(), espera = tras.cartaEmpezadaEn - w.Date.now();
+  ok('tras un acierto entran dos cartas del tablero', tras.autoAdded.length === 2);
+  ok('y el plazo de la carta nueva empieza cuando han caído (unos 3 s después)', espera > 2500 && espera <= 3000);
+  ok('mientras llegan, la cuenta atrás sigue entera', /15 s/.test($(w, '.reloj-left').textContent));
+  w.adelanta(16000); await sleep(350);
+  ok('a los 15 s de pulsar «Siguiente» la carta sigue abierta', partida().played === 1 && !partida().pendingResult);
+  w.adelanta(3000); await sleep(350);
+  ok('y se cierra a los 15 s de verdad', partida().played === 2 && partida().pendingResult?.correct === false);
+  w.close();
+}
+
+console.log('\nRetos rápidos: el reloj no corre bajo la portada del siguiente reto');
+{
+  const w = boot();
+  const app = $(w, '#app'), paint = h => { app.innerHTML = h; };
+  w.CONTINUUM.Quick.openSolo(paint);
+  elige(w, 'quick-solo', 15);
+  click(w, '[data-quick="solo-mode"][data-mode="surprise"]');
+  click(w, '.quick-length-chip[data-length="3"]'); click(w, '[data-quick="start-free"]');
+  $(w, '[data-quick-splash]')?.click();
+  click(w, '[data-quick="ready"]');
+  for (let i = 0; i < 40 && !$(w, '[data-quick="next"]'); i++) {
+    if ($(w, '[data-quick="ack"]')) click(w, '[data-quick="ack"]');
+    else { w.adelanta(16000); await sleep(250); }
+  }
+  click(w, '[data-quick="next"]'); await sleep(20);
+  ok('el segundo reto abre con su portada', !!$(w, '[data-quick-splash]'));
+  const guardada = () => JSON.parse(w.localStorage.getItem('continuum-quick-challenges-v1'));
+  const jugadas = guardada().commands.length;
+  ok('con la portada encima la cuenta atrás está entera', /15 s/.test($(w, '.reloj-left').textContent));
+  w.adelanta(20000); await sleep(350);
+  ok('y el tiempo no se gasta debajo de ella', guardada().commands.length === jugadas && !$(w, '[data-quick="ack"]'));
+  $(w, '[data-quick-splash]').click(); await sleep(20);
+  w.adelanta(16000); await sleep(350);
+  ok('al retirarla empieza el plazo de la jugada', guardada().commands.length === jugadas + 1 && !!$(w, '[data-quick="ack"]'));
+  w.close();
+}
+
 console.log('\nMismas cartas: el plazo viaja en el enlace');
 {
   const w = boot();

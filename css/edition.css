@@ -2316,11 +2316,6 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 
 /* ══ 14 · Mesa: carta por jugar, marcador multijugador y partida compacta ══ */
 /* La carta por jugar ocupa el centro y la línea queda como destino inferior. */
-#app.atlas-board .board-question { width: min(100%, 430px); margin: 3px auto 5px; text-align: center; }
-#app.atlas-board .board-question h2 { margin: 0 0 3px; color: var(--edition-ink); font: 700 clamp(1.2rem, calc(5.3 * var(--vw)), 1.65rem)/1.05 var(--font-display); letter-spacing: -.025em; }
-#app.atlas-board .board-axis { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border: 1px solid color-mix(in srgb, var(--edition-brass) 42%, transparent); border-radius: 999px; color: var(--edition-muted); background: color-mix(in srgb, var(--edition-surface) 58%, transparent); font: 650 .625rem/1 var(--ui-font); letter-spacing: .09em; text-transform: uppercase; }
-#app.atlas-board .board-axis strong { color: var(--atlas-selection); }
-#app.atlas-board .board-question p { margin: 4px 0 0; color: var(--edition-muted); font: .7rem/1.25 var(--ui-font); }
 
 #app.atlas-board .board-focus-card { margin-top: 0; }
 #app.atlas-board .board-focus-card > .hand-title { margin-bottom: 3px; }
@@ -2366,7 +2361,6 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 
 @media (max-width: 699px) {
   #app.atlas-board .game-head { padding-block: 2px 4px; }
-  #app.atlas-board .board-question { margin-block: 1px 4px; }
   #app.atlas-board .atlas-hand-section { margin-top: 0; }
   #app.atlas-board .atlas-hand-section > .hint { margin: 2px 0; }
   #app.atlas-board .board-timeline-section .timeline-wrap { flex: 0 1 auto; margin-bottom: 0; }
@@ -2374,7 +2368,6 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 }
 
 @media (max-height: 760px) and (max-width: 699px) {
-  #app.atlas-board .board-question p { display: none; }
   #app.atlas-board .board-focus-card .hand-solo { grid-template-columns: minmax(0, min(calc(48 * var(--vw)), 190px)); }
   #app.atlas-board .board-timeline-section .timeline-card { min-height: 132px; }
   #app.atlas-board .board-timeline-section :is(.slot, .slot-confirm) { min-height: 132px; }
@@ -3178,6 +3171,8 @@ html:not(:has(#app[data-screen="home"]))::before {
     padding-top: 4px; font-size: .85rem;
   }
   #app .turn-duel-board .timeline .animal-timeline-card { width: 116px; min-height: 0; }
+  /* Tu carta, del mismo tamaño que en Jugar solo: antes ocupaba media pantalla y empujaba la línea fuera. */
+  #app[data-screen="turn-duel"] .turn-duel-hand .hand-solo { grid-template-columns: minmax(0, 148px); }
 }
 
 /* La vista ampliada deja el título y la explicación debajo de la lámina, sin recortarla. */
@@ -3508,9 +3503,9 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-last p { margin: 1px 0; font-size: .65rem; }
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand { padding: 0; border: 0; }
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand-title { margin: 1px 0; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand { grid-template-columns: 90px; justify-content: center; margin: 0; padding: 0; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand { grid-template-columns: 112px; justify-content: center; margin: 0; padding: 0; }
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand-card {
-    width: 90px; min-height: 0; height: auto; aspect-ratio: 3 / 4; padding: 5px;
+    width: 112px; min-width: 0; min-height: 0; height: auto; aspect-ratio: 3 / 4; padding: 5px;
   }
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand-card > strong { padding: 3px; font-size: .63rem; line-height: 1.07; }
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand-card.selected::before,
@@ -3522,18 +3517,23 @@ html:not(:has(#app[data-screen="home"]))::before {
     display: flex; flex: 1; align-items: center; min-height: 0; margin: 0; padding: 2px;
   }
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline { align-items: stretch; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card {
-    display: grid; grid-template-columns: 62px minmax(0,1fr); width: 156px; min-height: 0;
-  }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card > .card-visual { grid-column: 1; grid-row: 1; width: 62px; }
+  /* Las cartas de la línea siguen siendo las de Jugar solo (lámina arriba, título y valor
+     debajo), solo que más estrechas para que la mesa quepa sin desplazarse. */
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card { width: 84px; min-height: 0; }
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card > .card-content {
-    grid-column: 2; grid-row: 1; display: flex; flex-direction: column; min-height: 0; padding: 4px;
+    min-height: 0; padding: 3px 5px 4px;
   }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card h3 { font-size: .65rem; line-height: 1.1; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card .year { font-size: .72rem; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card .card-content h3 { margin-bottom: 2px; font-size: .58rem; line-height: 1.08; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card .card-content .year { padding-top: 2px; font-size: .7rem; }
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline :is(.slot,.slot-confirm) { min-height: 110px; }
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .hint,
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-screen > .hint:last-child { display: none; }
+}
+/* Y en los móviles más bajos, tu carta y las de la línea algo más pequeñas, con el mismo formato. */
+@media (max-width: 699px) and (max-height: 600px) {
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand { grid-template-columns: 96px; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand-card { width: 96px; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card { width: 70px; }
 }
 
 /* La anchura adicional se mide a partir del hueco libre de esta partida. */

@@ -321,8 +321,30 @@
     Promise.all(animations.map(animation => animation.finished)).then(clean, clean);
     return () => { clearTimeout(waveTimer); animations.forEach(animation => animation.cancel()); clearWave(); clearImpact(); clean(); };
   }
+  // El mismo golpe de «¡Bien colocado!» (la carta cae, polvo, onda de tinta y sonido) para las
+  // pantallas que no abren la capa de resultado con `data-result-card`: el duelo por turnos y
+  // quien mira la jugada de otro en una sala de Retos rápidos. Así se ve en todas las formas de jugar.
+  function celebrateCard(card) {
+    if (!card?.isConnected || typeof card.animate !== 'function' || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return () => {};
+    const wrap = card.closest('.timeline-wrap');
+    if (wrap) {
+      const box = card.getBoundingClientRect(), view = wrap.getBoundingClientRect();
+      wrap.scrollLeft += box.left - view.left - (view.width - box.width) / 2;
+    }
+    return seatCard(card);
+  }
   // Una llegada termina antes de que empiece la siguiente.
   const TURNO = 1040;
+  const LLEGADA = 920;
+  // Cuánto tarda `dealIn` en dejar `n` cartas en la línea, con la misma espera `delay`. Los
+  // relojes por carta empiezan a contar después: no se descuenta el tiempo de ver llegar
+  // las cartas que pone el tablero.
+  function dealDuration(n, delay = 0) {
+    if (!n) return 0;
+    if (typeof Element === 'undefined' || typeof Element.prototype.animate !== 'function') return 0;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return delay;
+    return delay + (n - 1) * TURNO + LLEGADA;
+  }
   let cancelDeal = null;
   function dealIn(cards, { seguir = null, delay = 0 } = {}) {
     const lista = [...cards].filter(card => card?.isConnected);
@@ -371,7 +393,7 @@
         if (!box.width) return;
         const scale = parseFloat(card.closest('.timeline')?.style.getPropertyValue('--timeline-scale')) || 1;
         const dx = Math.max(-120, Math.min(120, (window.innerWidth / 2 - (box.left + box.width / 2)) / scale + 60));
-        arrivals.push(seatCard(card, {dx, dy: -72 / scale, automatic: true}));
+        arrivals.push(seatCard(card, {dx, dy: -72 / scale, automatic: true, duration: LLEGADA}));
       };
       if (orden === 0) entra();
       else timers.push(setTimeout(entra, orden * TURNO));
@@ -941,6 +963,8 @@
   window.CONTINUUM = window.CONTINUUM || {};
   window.CONTINUUM.paint = paint;
   window.CONTINUUM.dealIn = dealIn;
+  window.CONTINUUM.dealDuration = dealDuration;
+  window.CONTINUUM.celebrateCard = celebrateCard;
   window.CONTINUUM.unrollCollection = sheet => unrollSheet(sheet?.closest('.collection-entry') || sheet, true);
   window.CONTINUUM.resizeContent = resizeContent;
   window.CONTINUUM.announce = announce;

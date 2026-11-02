@@ -22,6 +22,7 @@ Los sonidos de acción usan texturas suaves de papel y madera. Se activan con
 | Zoom y cambios de preferencias | Toque muy suave, solo al cambiar el valor | `js/interfaz/mapa.js`, `js/interfaz/settings.js` |
 | Aviso nuevo en el juego, sala o ajustes | Toque discreto | Funciones `showToast` |
 | Acierto o fallo | Respuestas distintas de madera y papel | `js/interfaz/effects.js`: `feedback` |
+| Carta bien colocada: cae en la línea con polvo, onda de tinta y golpe (todas las modalidades: solo, mismo móvil, salas online y Wi-Fi, duelos por turnos y Retos rápidos, también para quien mira la jugada) | Sello (`stamp`) al tocar la línea | `js/interfaz/a11y.js`: `seatCard` desde `openDialog` (capas con `data-result-card`) o `celebrateCard` |
 | Tu jugada en salas online, por Wi-Fi y duelos por turnos (también al defender un Pulso) | Acierto o fallo, con vibración | `js/online/online.js`, `js/sin-conexion/local-multiplayer.js`, `js/online/duelo-turnos.js`, `js/retos/quick-challenges.js` |
 | Te toca en una sala o duelo, y al pasar el móvil en Retos rápidos | Dos golpes suaves y vibración media | `js/online/online.js`, `js/sin-conexion/local-multiplayer.js`, `js/online/duelo-turnos.js`, `js/retos/quick-challenges.js` |
 | Fin de partida en todos los modos (también duelo de cifras, Wi-Fi, duelos por turnos y Retos rápidos) | Tres toques y vibración media | `js/interfaz/a11y.js` (pantallas de fin), `js/online/duelo-turnos.js`, `js/retos/quick-challenges.js` |
