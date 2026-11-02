@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 861,
+  "cache": 862,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Reloj que empieza cuando las cartas ya han caído (Experto, un solo móvil, salas y Retos rápidos), sin subtítulos «¿Dónde encaja?», golpe de acierto en todas las modalidades, cartas y cabecera iguales en todas las partidas, Retos rápidos en solitario como álbum de mazos agrupados en empezados, nuevos y completos"
+  "reason": "Retos rápidos en solitario con cuatro mazos al azar cada día y tarjeta propia para continuar la partida guardada, además de lo de la 861: reloj que empieza cuando las cartas ya han caído, sin subtítulos «¿Dónde encaja?», golpe de acierto en todas las modalidades y cartas y cabecera iguales en todas las partidas"
 }
