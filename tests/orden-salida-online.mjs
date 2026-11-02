@@ -73,12 +73,12 @@ try {
   const pub = { ...lobby, deckFingerprint: 'x', matchmaking: 'public', capacity: 2, clientVersion: 42, queueKey: KEY, playerOrder: [A, B], players: { [A]: player('Ana'), [B]: player('Bea') } };
   await seedDoc(['rooms', ROOM], pub);
   await seedDoc(['publicQueues', KEY], { queueKey: KEY, roomCode: ROOM, mode: 'history', capacity: 2, clientVersion: 42, deckFingerprint: 'x', status: 'full', updatedAt: Timestamp.now() });
-  // Ana dejó la pantalla de la sala hace 20 segundos.
-  await seedDoc(['rooms', ROOM, 'presence', A], { seenAt: Timestamp.fromMillis(Date.now() - 20000), visible: false });
+  // Ana dejó la pantalla de la sala hace un minuto (el relevo exige 45 s en segundo plano).
+  await seedDoc(['rooms', ROOM, 'presence', A], { seenAt: Timestamp.fromMillis(Date.now() - 60000), visible: false });
   const bea = client(B);
   bea.w.CONTINUUM.Session.calibrate(Date.now(), bea.w.performance.now());
   await bea.load();
-  bea.api.presenceRecords.set(A, { seenAt: Date.now() - 20000, visible: false });
+  bea.api.presenceRecords.set(A, { seenAt: Date.now() - 60000, visible: false });
   await bea.api.claimHost(true);
   data = await roomData();
   ok('Bea toma el relevo sola', data.hostUid === B);
