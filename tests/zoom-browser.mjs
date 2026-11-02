@@ -59,6 +59,9 @@ try {
         const right=outer.right-parseFloat(edge.borderRightWidth),bottom=outer.bottom-parseFloat(edge.borderBottomWidth);
         return {src:img.currentSrc.split('/').slice(-2).join('/'),loaded:img.naturalWidth>0,fit:style.objectFit,filled:Math.abs(box.left-left)<1&&Math.abs(box.right-right)<1&&Math.abs(box.top-top)<1&&Math.abs(box.bottom-bottom)<1};
        });
+       // Si la imagen no carga, se anota qué responde el servidor y si el navegador la puede decodificar: sirve para
+       // distinguir un archivo roto de un motor que no la pinta.
+       if(!fit.loaded) fit.diagnostico=await art.evaluate(async img=>{try{const r=await fetch(img.currentSrc||img.src);const b=await r.blob();return {status:r.status,tipo:r.headers.get('content-type'),bytes:b.size,bitmap:await createImageBitmap(b).then(m=>m.width+'x'+m.height,e=>String(e&&e.name))};}catch(e){return {error:String(e)};}});
        assert.ok(fit.loaded&&fit.filled&&fit.fit==='cover',`${width}px ${theme} ${mode} ${context}: el grabado llena el recuadro sin bandas ni deformación (${JSON.stringify(fit)})`);
        assert.ok(await openingPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${context}: sin desbordamiento horizontal`);
        if(width===390&&theme==='light'&&mode==='history'&&['local','final','revealed'].includes(context)) await openingPage.screenshot({path:`test-results/zoom/${engine}-lamina-${context}.png`,fullPage:true});
