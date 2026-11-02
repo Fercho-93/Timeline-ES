@@ -119,7 +119,7 @@ assert.equal(r.mode, 'beta');
 assert.equal(r.card.title, 'Beta 2');
 assert.deepEqual(r.after.timeline, [...r.before.timeline, 2], 'la línea guardada sigue creciendo, sin vaciarse al cambiar de tema');
 me = 'bea';
-assert.match(w.document.querySelector('.turn-duel-heading').textContent, /tema 2 de 2 · Beta/, 'la cabecera dice qué tema se juega');
+assert.match(w.document.querySelector('.atlas-topbar .topbar-title').textContent, /tema 2 de 2 · Beta/, 'la barra de arriba dice qué tema se juega');
 
 // Turno 3: Bea acierta y la competición termina.
 r = await play('bea', true);

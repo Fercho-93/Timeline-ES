@@ -6,7 +6,7 @@ const server = await servirJuego();
 const url = `http://127.0.0.1:${server.address().port}/`;
 const browser = await chromium.launch(opcionesLanzamiento());
 const problems = [];
-const ARROW = '#app .atlas-back, #app .topbar [data-local-action][aria-label="Volver"], #app .turn-duel-back';
+const ARROW = '#app .atlas-back, #app .topbar [data-local-action][aria-label="Volver"]';
 
 async function session(viewport, date, fn) {
   const ctx = await browser.newContext({viewport, reducedMotion: 'reduce'});

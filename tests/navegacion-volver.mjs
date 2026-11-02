@@ -29,7 +29,7 @@ async function click(selector) {
 }
 // La flecha de la barra superior: cada pantalla que no es el inicio tiene una.
 async function back() {
-  const arrow = app().querySelector('.topbar .atlas-back, .topbar [data-local-action], .turn-duel-back');
+  const arrow = app().querySelector('.topbar .atlas-back, .topbar [data-local-action]');
   assert.ok(arrow, `falta la flecha de volver en ${screen()}`);
   arrow.click();
   await tick();

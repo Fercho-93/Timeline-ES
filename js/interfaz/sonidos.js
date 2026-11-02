@@ -363,7 +363,7 @@
   // panel, elegir una carta…) en los 90 ms siguientes, se oye el toque de madera de menú. Así ningún
   // botón queda mudo y ninguno suena dos veces.
   // Los botones de volver: la flecha de la cabecera (todas las mesas y salas) y los de volver de cada pantalla.
-  const VOLVER = '.atlas-back, .turn-duel-back, [aria-label^="Volver"], [data-action="ui-back"], [data-action="collection-back"], [data-action="back-menu"], [data-online-action="back"], [data-online-action="back-from-timeline"], [data-turn-action="back"], [data-action="public-match-back"], [data-action="enc-back"], [data-action="enc-card-close"]';
+  const VOLVER = '.atlas-back, [aria-label^="Volver"], [data-action="ui-back"], [data-action="collection-back"], [data-action="back-menu"], [data-online-action="back"], [data-online-action="back-from-timeline"], [data-turn-action="back"], [data-action="public-match-back"], [data-action="enc-back"], [data-action="enc-card-close"]';
   function atras() {
     ultimoAtras = ahora(); ultimoSoplo = ultimoAtras;
     racha = 0; aciertos = 0; fallos = 0;

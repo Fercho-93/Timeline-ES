@@ -22,6 +22,10 @@ el total que guardaron.
 - Rivales recientes y favoritos. Retar utiliza la última partida compartida. Los favoritos son
   locales al dispositivo y a la cuenta.
 - Última jugada: quién jugó, el resultado y el marcador, sin enseñar la siguiente carta.
+- La cabecera es la de las demás mesas: volver, el nombre de la partida («Duelo · mazo», o el tema
+  de la competición) y una franja con la carta que va («2 de 10») y una píldora por jugador con sus
+  aciertos; la de quien tiene el turno, resaltada. Empezar, invitar o terminar se cuentan en una nota
+  debajo.
 - Recordatorio a las 48 horas sin actividad: uno por turno o invitación y como máximo uno por
   destinatario cada 24 horas. Caducidad a los 7 días sin actividad, conservando el historial.
 

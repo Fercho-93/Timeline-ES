@@ -20,9 +20,11 @@ try{
       const CT=window.CONTINUUM,app=document.getElementById('app');
       const card=CT.cards('history').find(item=>CT.animalArt('history',item));
       app.className='';app.dataset.screen='turn-duel';
-      app.innerHTML=`<div class="shell turn-duel-shell"><nav class="turn-duel-nav"><button class="icon-btn">←</button><span>CONTINUUM <small>Duelo por turnos</small></span></nav>
-        <section class="turn-duel-screen"><header class="turn-duel-heading"><div><div class="eyebrow">Historia de España</div><h1>Es tu turno</h1><p>Carta 2 de 10 · Contra Alejandro</p></div><div class="turn-duel-clock"><span><b>15</b><small>s</small></span></div></header>
-        <div class="turn-duel-scores">${['Tú','Alejandro'].map(name=>`<div class="turn-duel-player"><span class="turn-duel-avatar">${name[0]}</span><span class="turn-duel-player-info"><strong>${name}</strong><small>Jugador</small></span><span class="turn-duel-score"><b>0</b><small>aciertos</small></span></div>`).join('')}</div>
+      // La misma cabecera que las demás mesas (duelo-turnos.js): barra, franja con la carta y las píldoras.
+      app.innerHTML=`<div class="shell turn-duel-shell">${CT.UI.header('data-turn-action="back"','',true,'Duelo · Historia de España')}
+        <h1 class="solo-lectores">Es tu turno, contra Alejandro</h1>
+        <div class="game-head game-head-slim turn-duel-head"><div class="deck-count"><strong>2</strong><span>de 10</span></div><section class="scoreboard-panel"><div class="scoreboard">${['Tú','Alejandro'].map((name,i)=>`<span class="score ${i?'':'active'}"><i class="score-avatar">${name[0]}</i><span class="score-copy"><b>${name}</b></span><em><strong>0</strong><small>aciertos</small></em></span>`).join('')}</div></section></div>
+        <section class="turn-duel-screen">
         <aside class="turn-duel-last"><b>Última jugada</b><p>Tu rival acertó la posición de una carta histórica.</p><small>Marcador 0 · 0</small></aside>
         <section class="turn-duel-hand"><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected"><span class="hidden-date">Fecha oculta</span>${CT.cardBack('history')}<strong>Comienza la guerra de los Treinta Años</strong></div></div></section>
         <section class="turn-duel-board"><div class="hand-title"><h3>Línea temporal</h3><small>1 carta</small></div><div class="timeline-wrap"><div class="timeline"><button class="slot"><span>+</span></button><article class="timeline-card animal-timeline-card"><div class="card-visual">${CT.animalArt('history',card)}</div><div class="card-content"><h3>${CT.escapeHtml(card.title)}</h3><div class="year">${CT.formatValue('history',card)}</div></div></article><button class="slot"><span>+</span></button></div></div></section></section></div>`;

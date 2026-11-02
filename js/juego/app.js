@@ -4797,7 +4797,7 @@
   };
   CT.navigateBack = backMenu;
   // La flecha de volver de la pantalla visible, la pinte este archivo o un módulo propio.
-  const screenBackArrow = () => app.querySelector('.topbar .atlas-back, .topbar [data-local-action][aria-label="Volver"], .turn-duel-back');
+  const screenBackArrow = () => app.querySelector('.topbar .atlas-back, .topbar [data-local-action][aria-label="Volver"]');
   CT.openQuickPublic = (capacity, table = {}) => {
     screen = 'quick-lobby';
     return CT.Quick.openPublic((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); }, capacity, table);
