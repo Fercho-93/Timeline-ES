@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 855,
+  "cache": 861,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Versión de lanzamiento para probar antes de la App Store: modo público, temporada nueva, saltar turno y sacar de la partida en Retos rápidos, reto diario guardado aparte, reloj que no corre al pasar el móvil, pantalla previa del duelo por turnos, revancha en la sala online y nombres filtrados en mesas y salas"
+  "reason": "Reloj que empieza cuando las cartas ya han caído (Experto, un solo móvil, salas y Retos rápidos), sin subtítulos «¿Dónde encaja?», golpe de acierto en todas las modalidades, cartas y cabecera iguales en todas las partidas, Retos rápidos en solitario como álbum de mazos agrupados en empezados, nuevos y completos"
 }
