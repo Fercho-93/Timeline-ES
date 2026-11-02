@@ -28,13 +28,17 @@ export function overdue(room,uid,now=Date.now()){
   const turn=room.members.filter(m=>m!==room.actor).indexOf(uid);
   return now-last>forceDelay(room)+5000+Math.max(0,turn)*4000;
 }
+// En una mesa pública, si quien no responde ya se quedó sin jugar su turno anterior (forzado por otro), quien lleva la
+// mesa le saca de la partida (`drop`): así deja de costar un plazo entero en cada vuelta.
+function forcedBefore(room){const own=(room.commands||[]).filter(c=>c&&c.by===room.actor);return !!own.at(-1)?.forcedBy;}
 function forceWatch(current,uid,act){
   let trying=false;
   return setInterval(()=>{
     const room=current();
     if(trying||!overdue(room,uid))return;
     trying=true;
-    act({type:'force'}).catch(()=>{}).finally(()=>{setTimeout(()=>{trying=false;},4000);});
+    const drop=room.matchmaking==='public'&&room.host===uid&&room.phase!=='round-end'&&forcedBefore(room);
+    act(drop?{type:'drop',player:room.members.indexOf(room.actor)}:{type:'force'}).catch(()=>{}).finally(()=>{setTimeout(()=>{trying=false;},4000);});
   },5000);
 }
 // El tablón de mesas abiertas (`public-tables.js`): quien lleva la mesa mantiene su ficha.

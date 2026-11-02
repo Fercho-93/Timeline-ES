@@ -149,4 +149,34 @@ console.log('Duelo por turnos: empieza el creador, el amigo entra después y el 
   const pareja=R.reduce(R.reduce(R.create('a','Ana',2),'b',{type:'join',name:'Bea'}),'a',{type:'kick',target:'b'});
   assert.equal(JSON.stringify(pareja.members),'["a"]');
 }
-console.log('Quién empieza en una sala en directo: sorteo, respuesta única y primer turno; expulsar de la sala de espera: OK');
+// En plena partida: quien lleva la sala salta el turno de quien no juega y saca a quien se ha ido.
+{
+  const twoRounds=[{id:'poker',order:E.challenge('poker').cards.map(c=>c.id)},{id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}];
+  let g=R.create('a','Ana',3);g=R.reduce(g,'b',{type:'join',name:'Bea'});g=R.reduce(g,'c',{type:'join',name:'Cid'});
+  g=R.reduce(g,'a',{type:'start',rounds:twoRounds,kind:'network',keep:true});
+  g=R.reduce(g,'a',{type:'place',cardId:'poker-2',index:1});g=R.reduce(g,'a',{type:'ack'});
+  assert.equal(g.actor,'b');
+  // Saltar el turno: la jugada del tiempo agotado, firmada por quien tenía el turno y por quien la fuerza.
+  g=R.reduce(g,'a',{type:'force'});
+  assert.equal(g.commands.at(-1).by,'b');assert.equal(g.commands.at(-1).forcedBy,'a');assert.equal(g.phase,'result');
+  g=R.reduce(g,'a',{type:'force'});assert.equal(g.actor,'c','tras el resultado forzado, sigue la siguiente persona');
+  // Sacar de la partida: solo quien lleva la sala, nunca a sí mismo.
+  assert.throws(()=>R.reduce(g,'b',{type:'drop',player:2}),/No se puede sacar/);
+  assert.throws(()=>R.reduce(g,'a',{type:'drop',player:0}),/No se puede sacar/);
+  g=R.reduce(g,'a',{type:'drop',player:2});
+  assert.equal(g.commands.at(-1).by,'a');
+  assert.equal(R.state(g).players[2].status,'gone');assert.equal(g.actor,'a','si era su turno, la partida sigue con quien toca');
+  R.validate(JSON.parse(JSON.stringify(g)));
+  // En adelante su turno se salta, también en el reto siguiente.
+  for(let guard=0;g.phase!=='finished'&&guard<200;guard++){
+    assert.notEqual(g.actor,'c','quien ha salido no vuelve a jugar');
+    const st=R.state(g);
+    g=R.reduce(g,g.actor,g.phase==='turn'?{type:'place',cardId:st.remaining[0],index:0}:g.phase==='result'?{type:'ack'}:{type:'next'});
+  }
+  assert.equal(g.phase,'finished');
+  assert.throws(()=>R.reduce(g,'a',{type:'drop',player:1}),'con la partida terminada ya no se saca a nadie');
+  // En un duelo por turnos no se saca a nadie: está «Rendirse».
+  let d=R.create('a','Ana',2);d=R.reduce(d,'b',{type:'join',name:'Bea'});d=R.reduce(d,'a',{type:'start',rounds,kind:'duel'});
+  assert.throws(()=>R.reduce(d,'a',{type:'drop',player:1}));
+}
+console.log('Quién empieza en una sala en directo: sorteo, respuesta única y primer turno; expulsar de la sala de espera; saltar turnos y sacar de la partida en juego: OK');

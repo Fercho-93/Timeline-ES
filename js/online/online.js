@@ -1054,6 +1054,29 @@ async function nextTournamentRound() {
   finally {busy=false;}
 }
 
+// Revancha en una sala privada: la misma mesa vuelve a la sala de espera, lista para otro minijuego y otro reparto,
+// como en un solo móvil y por Wi-Fi. La pide quien lleva la sala; la final sigue la numeración de rondas.
+async function rematchRoom() {
+  if (busy || !roomState || roomState.hostUid !== user.uid || roomState.status !== "ended" || roomState.tournament || roomState.matchmaking === "public") return;
+  busy = true;
+  try {
+    await runTransaction(db, async tx => {
+      const data = (await tx.get(roomRef)).data();
+      if (!data || data.status !== "ended" || data.hostUid !== user.uid || data.tournament) return;
+      const players = Object.fromEntries(data.playerOrder.map(uid => [uid, { ...data.players[uid], hand: [] }]));
+      const next = { ...data, status: "lobby", phase: "lobby", players, deck: [], discard: [], timeline: [], current: 0, starter: data.hostUid,
+        turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null, version: data.version + 1, updatedAt: serverTimestamp() };
+      if ("pulseTurn" in data) next.pulseTurn = null;
+      next.finalRoundOffset = data.final?.round || data.finalRoundOffset || 0;
+      for (const key of ["ghost", "pulsePower", "final", "tieQueue", "turnStartedAt"]) delete next[key];
+      tx.set(roomRef, next);
+    });
+    // La carta del minijuego de la partida anterior no vale para esta: quien lleva la sala sorteará otra.
+    await deleteDoc(doc(db, "rooms", roomCode, "starter", user.uid)).catch(() => {});
+  } catch (error) { console.error(error); showToast("No se pudo empezar la revancha. La sala y el resultado siguen guardados."); }
+  finally { busy = false; }
+}
+
 // ── Empezar la partida ───────────────────────────────────────────────────────────────────────────
 async function startRoom(withGhost = true) {
   if (busy || roomState.hostUid !== user.uid) return;
@@ -1675,7 +1698,7 @@ function renderWinner() {
   const lead = roomState.final && !CT.Final.valid(modeKey(), roomState.final) ? "La final se manipuló: este resultado no es válido."
     : CT.Final.verdict({ ganadores: names.length, final: !!roomState.final, quedan: roomState.playerOrder.length });
   const logroMarkup=sessionAchievements.length?`<div class="logros-nuevos" role="status"><div class="eyebrow">${sessionAchievements.length===1?'Logro nuevo':`${sessionAchievements.length} logros nuevos`}</div>${sessionAchievements.map(item=>`<div class="logro-chip"><b>${escapeHtml(item.name)}</b><small>${escapeHtml(item.desc)}</small></div>`).join('')}</div>`:'';
-  paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel winner-online final-composition"><div class="eyebrow">${roomState.tournament ? `Fin del tema ${roomState.tournament.index + 1}` : "Fin de la partida"} · Sala ${roomCode}</div><h1 class="final-title" data-focus tabindex="-1">${title}</h1><p class="final-lead">${lead}</p>${onlineFinalMetrics(roomState.timeline.length,sessionNewDiscoveries,sessionAchievements.length)}${logroMarkup}<div class="actions final-actions"><button class="btn btn-ghost" data-online-action="review-timeline">Ver las ${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"} jugadas</button>${failedHere().length ? `<button class="btn btn-ghost" data-online-action="review-failed">Ver lo que se falló (${failedHere().length})</button>` : ""}${roomState.matchmaking === "public" ? '<button class="btn btn-primary" data-online-action="public-again">Buscar otra partida</button><button class="btn btn-secondary" data-online-action="home">Ir al inicio</button>' : `<button class="btn btn-primary" data-online-action="home">Ir al inicio</button>${roomState.hostUid === user.uid ? '<button class="btn btn-secondary" data-online-action="close-room">Cerrar sala</button>' : ""}`}</div></div></section></div>`, "online-winner");
+  paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel winner-online final-composition"><div class="eyebrow">${roomState.tournament ? `Fin del tema ${roomState.tournament.index + 1}` : "Fin de la partida"} · Sala ${roomCode}</div><h1 class="final-title" data-focus tabindex="-1">${title}</h1><p class="final-lead">${lead}</p>${onlineFinalMetrics(roomState.timeline.length,sessionNewDiscoveries,sessionAchievements.length)}${logroMarkup}<div class="actions final-actions"><button class="btn btn-ghost" data-online-action="review-timeline">Ver las ${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"} jugadas</button>${failedHere().length ? `<button class="btn btn-ghost" data-online-action="review-failed">Ver lo que se falló (${failedHere().length})</button>` : ""}${roomState.matchmaking === "public" ? '<button class="btn btn-primary" data-online-action="public-again">Buscar otra partida</button><button class="btn btn-secondary" data-online-action="home">Ir al inicio</button>' : `${!roomState.tournament && roomState.hostUid === user.uid ? '<button class="btn btn-primary" data-online-action="rematch">Revancha con los mismos jugadores <span>→</span></button>' : ""}<button class="btn ${!roomState.tournament && roomState.hostUid === user.uid ? "btn-secondary" : "btn-primary"}" data-online-action="home">Ir al inicio</button>${roomState.hostUid === user.uid ? '<button class="btn btn-secondary" data-online-action="close-room">Cerrar sala</button>' : ""}`}</div>${roomState.matchmaking !== "public" && !roomState.tournament && roomState.hostUid !== user.uid ? '<p class="hint">Si el anfitrión pide revancha, volveréis todos a la sala de espera.</p>' : ""}</div></section></div>`, "online-winner");
   if(roomState.tournament) {
     const section=appEl.querySelector('.pass-screen');
     section.insertAdjacentHTML('afterbegin',tournamentBoard(uids));
@@ -2057,6 +2080,7 @@ document.addEventListener("click", event => {
   else if (action === "starter-draw") void drawStarterCard();
   else if (action === "starter-guess-submit") void submitStarterGuess();
   else if (action === "competition-next") nextTournamentRound();
+  else if (action === "rematch") void rematchRoom();
   else if (action === "competition-round-start") renderGame();
   else if (action === "select") {
     selectedCardId = Number(target.dataset.id);

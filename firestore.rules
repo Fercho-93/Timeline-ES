@@ -128,13 +128,28 @@ service cloud.firestore {
           && a.config != null && a.config.get('kind','') != 'duel' && a.phase in ['turn','result','round-end']
           && b.diff(a).affectedKeys().hasOnly(['commands','phase','actor','revision','updatedAt'])
           && b.commands.size() == a.commands.size()+1 && b.commands == a.commands.concat([last])
-          && last.get('forcedBy','') == request.auth.uid && last.get('by','') == a.actor && stale(a)
+          // Entre amigos (sala privada), quien lleva la sala puede saltar el turno de alguien cuando quiera; en una mesa
+          // pública, solo pasado el plazo.
+          && last.get('forcedBy','') == request.auth.uid && last.get('by','') == a.actor
+          && (stale(a) || (request.auth.uid == a.host && a.get('matchmaking','private') != 'public'))
           && ((a.phase=='turn' && last.type=='place' && last.keys().hasOnly(['type','cardId','index','by','forcedBy'])
               && last.cardId is string && last.cardId.size() <= 32 && last.index is int && last.index>=0 && last.index<=a.commands.size()+1
               && b.phase=='result' && b.actor==a.actor)
             || (a.phase=='result' && last.keys().hasOnly(['type','by','forcedBy']) && last.type=='ack' && b.phase in ['turn','round-end','finished'])
             || (a.phase=='round-end' && last.keys().hasOnly(['type','by','forcedBy']) && last.type=='next' && b.phase=='turn'))
           && (!(b.phase in ['round-end','finished']) || b.actor==a.host);
+      }
+      // Sacar a alguien de una partida ya empezada (comando `drop`, QuickEngine): solo quien lleva la sala, nunca a sí
+      // mismo y no en un duelo por turnos. En una mesa pública, solo a quien tiene el turno y ha dejado de responder.
+      function dropping(a,b) {
+        let last=b.commands[b.commands.size()-1];
+        return request.auth.uid == a.host && a.config != null && a.config.get('kind','') != 'duel' && a.phase in ['turn','result','round-end']
+          && b.diff(a).affectedKeys().hasOnly(['commands','phase','actor','revision','updatedAt'])
+          && b.commands.size() == a.commands.size()+1 && b.commands == a.commands.concat([last])
+          && last.keys().hasOnly(['type','player','by']) && last.type == 'drop' && last.by == request.auth.uid
+          && last.player is int && last.player >= 0 && last.player < a.members.size() && a.members[last.player] != a.host
+          && (a.get('matchmaking','private') != 'public' || (stale(a) && a.members[last.player] == a.actor))
+          && (!(b.phase in ['round-end','finished']) || b.actor == a.host);
       }
       // Solo se reta por su nombre a quien ya jugó contigo: la sala de la que sale el reto (`sourceRoom`, una
       // revancha o el cara a cara de una sala) tiene que teneros a los dos dentro. Antes cualquiera podía
@@ -221,7 +236,7 @@ service cloud.firestore {
         && (starting(resource.data,request.resource.data) || joining(resource.data,request.resource.data) || drawing(resource.data,request.resource.data) || guessing(resource.data,request.resource.data) || leaving(resource.data,request.resource.data) || playing(resource.data,request.resource.data) || joiningStarted(resource.data,request.resource.data) || resigning(resource.data,request.resource.data) || declining(resource.data,request.resource.data)
           // Al final: expulsar y forzar el turno de un ausente son lo menos frecuente, y así las jugadas (que van
           // cerca del límite de expresiones) no pagan su coste.
-          || kicking(resource.data,request.resource.data) || forcing(resource.data,request.resource.data));
+          || kicking(resource.data,request.resource.data) || forcing(resource.data,request.resource.data) || dropping(resource.data,request.resource.data));
       allow delete: if registered() && request.auth.uid==resource.data.host
         && (!(resource.data.capacity==2 && resource.data.config!=null && resource.data.config.get('kind','')=='duel')
           || (resource.data.members.size()==1 && resource.data.phase!='finished'));
@@ -906,6 +921,33 @@ service cloud.firestore {
           && handAt(prior, hands, 0) && handAt(prior, hands, 1) && handAt(prior, hands, 2)
           && handAt(prior, hands, 3) && handAt(prior, hands, 4) && handAt(prior, hands, 5)
           && handAt(prior, hands, 6) && handAt(prior, hands, 7) && handAt(prior, hands, 8);
+      }
+      // Revancha en una sala privada: con la partida terminada, quien la lleva devuelve la misma mesa a la sala de
+      // espera, con las manos vacías y sin tocar quién es cada cual, como en un solo móvil y por Wi-Fi. La final se
+      // guarda por número de ronda, así que la siguiente partida sigue la numeración (`finalRoundOffset`).
+      function seatReset(prior, next, i) {
+        let u = prior.playerOrder[i];
+        return i >= prior.playerOrder.size() || (next.players[u].hand.size() == 0
+          && next.players[u].keys().hasOnly(['name', 'avatarId', 'hand', 'joinedAt', 'clientVersion', 'pulseUsed', 'shieldRound'])
+          && next.players[u].get('name', '') == prior.players[u].get('name', '')
+          && next.players[u].get('avatarId', null) == prior.players[u].get('avatarId', null));
+      }
+      function validRematch() {
+        let prior = resource.data;
+        let next = request.resource.data;
+        return isHost() && prior.status == 'ended' && !('tournament' in prior) && prior.get('matchmaking', 'private') != 'public'
+          && identityKept()
+          && changed().hasOnly(['status','phase','players','deck','discard','timeline','current','starter','turnsInRound','round','winner','winners','reveal','pulseTurn','ghost','pulsePower','final','tieQueue','turnStartedAt','finalRoundOffset','version','updatedAt'])
+          && next.status == 'lobby' && next.phase == 'lobby' && next.playerOrder == prior.playerOrder
+          && next.players.keys().toSet() == prior.players.keys().toSet()
+          && seatReset(prior, next, 0) && seatReset(prior, next, 1) && seatReset(prior, next, 2) && seatReset(prior, next, 3) && seatReset(prior, next, 4)
+          && seatReset(prior, next, 5) && seatReset(prior, next, 6) && seatReset(prior, next, 7) && seatReset(prior, next, 8)
+          && next.deck == [] && next.discard == [] && next.timeline == [] && next.current == 0 && next.turnsInRound == 0 && next.round == 1
+          && next.starter == prior.hostUid && next.winner == null && next.get('winners', null) == null && next.get('reveal', null) == null
+          && next.get('pulseTurn', null) == null
+          && !('ghost' in next) && !('pulsePower' in next) && !('final' in next) && !('tieQueue' in next) && !('turnStartedAt' in next)
+          && next.get('finalRoundOffset', 0) == ('final' in prior ? prior.final.round : prior.get('finalRoundOffset', 0))
+          && bumped();
       }
       function validTournamentNext() {
         let prior = resource.data;
@@ -1830,6 +1872,7 @@ service cloud.firestore {
 
       allow delete: if registered() && isHost();
       allow update: if registered() && 'tournament' in resource.data && validTournamentNext();
+      allow update: if registered() && validRematch();
     }
   }
 }

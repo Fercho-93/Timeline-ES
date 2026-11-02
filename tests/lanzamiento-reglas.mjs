@@ -2,7 +2,7 @@
 // quien ya jugó contigo, nombres que no se hacen pasar por el juego, documentos que no se pueden inflar, mesas
 // públicas que nadie puede secuestrar, denuncias con cuota y turnos de Retos rápidos que no se quedan parados.
 import { initializeTestEnvironment, assertSucceeds, assertFails } from "@firebase/rules-unit-testing";
-import { doc, setDoc, updateDoc, deleteDoc, serverTimestamp, writeBatch, Timestamp } from "firebase/firestore";
+import { doc, setDoc, updateDoc, deleteDoc, deleteField, serverTimestamp, writeBatch, Timestamp } from "firebase/firestore";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -85,6 +85,27 @@ await check("seguir por quien no pulsa tras ver su resultado", "allow", updateDo
 await seed("quickRooms/DUELOS2345", live({ capacity: 2, members: ["ana", "bea"], names: ["Ana", "Bea"], updatedAt: ago(600000), config: { names: ["Ana", "Bea"], rounds: [{ id: "poker", order: ["poker-1", "poker-2"] }], kind: "duel" } }));
 await check("en un duelo por turnos no se fuerza nada", "deny", updateDoc(doc(ctx("ana"), "quickRooms", "DUELOS2345"), forced("bea", "ana")));
 
+console.log("\nRetos rápidos en juego: saltar turnos y sacar de la partida");
+// Sala privada de tres, en el turno de Bea, que acaba de empezar (no ha pasado su plazo).
+await seed("quickRooms/PRIVAD2345", live({ updatedAt: ago(2000) }));
+await check("quien lleva una sala privada salta el turno de quien no juega, sin esperar al plazo", "allow", updateDoc(doc(ctx("ana"), "quickRooms", "PRIVAD2345"), forced("bea", "ana")));
+await seed("quickRooms/PRIVAD2345", live({ updatedAt: ago(2000) }));
+await check("otra persona de la sala no puede saltarlo antes de tiempo", "deny", updateDoc(doc(ctx("cid"), "quickRooms", "PRIVAD2345"), forced("bea", "cid")));
+const drop = (who, player, over = {}) => ({ commands: [{ type: "drop", player, by: who }], phase: "turn", actor: "cid", revision: 6, updatedAt: serverTimestamp(), ...over });
+await seed("quickRooms/PRIVAD2345", live({ updatedAt: ago(2000) }));
+await check("quien lleva la sala saca a alguien de la partida", "allow", updateDoc(doc(ctx("ana"), "quickRooms", "PRIVAD2345"), drop("ana", 1)));
+await seed("quickRooms/PRIVAD2345", live({ updatedAt: ago(2000) }));
+await check("otra persona no puede sacar a nadie", "deny", updateDoc(doc(ctx("cid"), "quickRooms", "PRIVAD2345"), drop("cid", 1)));
+await seed("quickRooms/PRIVAD2345", live({ updatedAt: ago(2000) }));
+await check("quien lleva la sala no se saca a sí mismo", "deny", updateDoc(doc(ctx("ana"), "quickRooms", "PRIVAD2345"), drop("ana", 0, { actor: "bea" })));
+await seed("quickRooms/MESAPU2345", live({ matchmaking: "public", updatedAt: ago(2000) }));
+await check("en una mesa pública no se saca a quien sigue jugando a tiempo", "deny", updateDoc(doc(ctx("ana"), "quickRooms", "MESAPU2345"), drop("ana", 1)));
+await check("ni se le salta el turno", "deny", updateDoc(doc(ctx("ana"), "quickRooms", "MESAPU2345"), forced("bea", "ana")));
+await seed("quickRooms/MESAPU2345", live({ matchmaking: "public", updatedAt: ago(60000) }));
+await check("en una mesa pública se saca a quien tiene el turno y no responde", "allow", updateDoc(doc(ctx("ana"), "quickRooms", "MESAPU2345"), drop("ana", 1)));
+await seed("quickRooms/MESAPU2345", live({ matchmaking: "public", updatedAt: ago(60000) }));
+await check("pero no a otra persona que no tiene el turno", "deny", updateDoc(doc(ctx("ana"), "quickRooms", "MESAPU2345"), drop("ana", 2, { actor: "bea", phase: "turn" })));
+
 // ── Salas de las colecciones ──
 const HOST = "host-uid", P2 = "p2-uid", P3 = "p3-uid";
 const base = (code, over = {}) => ({ winners: null,
@@ -136,6 +157,31 @@ await seed(`rooms/${PUB}`, publicPlaying({ version: 1, turnSeconds: 0, turnStart
 await check("sin tiempo por jugada, saltar a quien dejó de dar señales", "allow", skipP2());
 await seed(`rooms/${PUB}`, publicPlaying({ version: 1, matchmaking: null, turnStartedAt: ago(5000) })); await presence(P2, 3000);
 await check("entre amigos (sala privada) el anfitrión puede saltar cuando quiera", "allow", skipP2());
+
+console.log("\nRevancha en la sala por internet");
+const REV = "REVA2345";
+const ended = (over = {}) => ({ ...base(REV), status: "ended", phase: "finished", playerOrder: [HOST, P2],
+  players: { [HOST]: { name: "Ana", hand: [], joinedAt: 1, pulseUsed: true, shieldRound: 2 }, [P2]: { name: "Bea", hand: [7, 8], joinedAt: 2, pulseUsed: false, shieldRound: 0 } },
+  deck: [10, 11], discard: [12], timeline: [20, 21, 22], current: 1, turnsInRound: 1, round: 3, winner: HOST, winners: [HOST], reveal: null,
+  final: { round: 3, cardId: 5 }, createdAt: ago(600000), updatedAt: ago(1000), version: 9, ...over });
+const rematch = (who, over = {}) => updateDoc(doc(ctx(who), "rooms", REV), {
+  status: "lobby", phase: "lobby", players: { [HOST]: { name: "Ana", hand: [], joinedAt: 1, pulseUsed: true, shieldRound: 2 }, [P2]: { name: "Bea", hand: [], joinedAt: 2, pulseUsed: false, shieldRound: 0 } },
+  deck: [], discard: [], timeline: [], current: 0, starter: HOST, turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null,
+  final: deleteField(), finalRoundOffset: 3, version: 10, updatedAt: serverTimestamp(), ...over });
+await seed(`rooms/${REV}`, ended());
+await check("quien lleva la sala pide revancha: la misma mesa vuelve a la sala de espera", "allow", rematch(HOST));
+await seed(`rooms/${REV}`, ended());
+await check("otra persona de la sala no puede pedirla", "deny", rematch(P2));
+await seed(`rooms/${REV}`, ended());
+await check("la revancha no puede cambiar el nombre de nadie", "deny", rematch(HOST, { players: { [HOST]: { name: "Ana", hand: [], joinedAt: 1 }, [P2]: { name: "Otra", hand: [], joinedAt: 2 } } }));
+await seed(`rooms/${REV}`, ended());
+await check("ni repartir cartas", "deny", rematch(HOST, { players: { [HOST]: { name: "Ana", hand: [1, 2, 3], joinedAt: 1 }, [P2]: { name: "Bea", hand: [], joinedAt: 2 } } }));
+await seed(`rooms/${REV}`, ended());
+await check("ni reiniciar la numeración de la final", "deny", rematch(HOST, { finalRoundOffset: 0 }));
+await seed(`rooms/${REV}`, ended({ status: "playing", phase: "turn" }));
+await check("con la partida en juego no hay revancha", "deny", rematch(HOST));
+await seed(`rooms/${REV}`, ended({ matchmaking: "public", capacity: 2, clientVersion: 1, queueKey: "history:2:v1:x" }));
+await check("en una mesa pública tampoco: se busca otra partida", "deny", rematch(HOST));
 
 console.log("\nTablón de mesas");
 await seed("quickRooms/MESAQK2345", quick({ capacity: 4, matchmaking: "public", updatedAt: ago(1000) }));

@@ -34,9 +34,14 @@ la lista; no se actualiza en vivo mientras está abierta.
 ## Tiempo, resultados y conexión
 
 El tiempo por carta se elige al crear el duelo: **sin tiempo, 15, 20 o 30 segundos** (`js/juego/tiempo.js`,
-los mismos valores que admiten las reglas). No hay pantalla de «listo»: el plazo empieza al
-descubrir la carta y se guarda en el dispositivo, así que volver a entrar no lo reinicia. Si se
-agota, la jugada cuenta como fallo por tiempo. Sin plazo, lo que se tarda queda solo como dato.
+los mismos valores que admiten las reglas). Con plazo, al abrir el duelo en tu turno se ve primero
+qué carta toca y cuánto tiempo hay; el reloj empieza al pulsar «Ver la carta» (en la primera carta
+de quien crea el duelo, ahí mismo se puede cancelar). La hora de empezar se guarda en el
+dispositivo, así que volver a entrar no lo reinicia. Si se agota, la jugada cuenta como fallo por
+tiempo. Sin plazo no hay esa pantalla y lo que se tarda queda solo como dato.
+
+Abrir el enlace de un duelo ajeno no sienta a nadie: antes se ve quién reta, con qué mazo, cuántas
+cartas y qué plazo, y se elige «Aceptar y jugar» o «Rechazar».
 
 La solución usa los mismos formatos de valor, explicación, posición correcta y valoración de
 cifras del resto del juego. Solo se muestra una carta ya resuelta, nunca la pendiente.

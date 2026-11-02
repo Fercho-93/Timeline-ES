@@ -20,6 +20,8 @@ const inactive = game => !ended(game) && game.updatedAt?.seconds && Date.now() -
 const asVisible = game => inactive(game) ? { ...game, status: 'expired', turnUid: null, resultText: 'Duelo caducado tras siete días sin actividad.' } : game;
 let cachedGames = [], busy = false;
 let preparingTurn = null;
+// ¿Ha empezado ya el reloj de este turno? Con plazo, no hasta que quien juega pulsa «Ver la carta».
+let turnStarted = true;
 let archivedIds = new Set(), blockedPlayers = new Map();
 const sending = new Set();
 let retryTimer = null, delivery = '';
@@ -171,23 +173,29 @@ function render() {
   const rival = current.players?.[current.playersOrder?.find(x => x !== uid())]?.alias || '';
   const finished = ended(current);
   const active = mine && (!waiting || firstTurn) && !finished && !current.timeout && !pending;
-  const heading = finished ? current.status === 'expired' ? 'Duelo caducado' : current.status === 'cancelled' ? 'Duelo cerrado' : 'Duelo terminado' : firstTurn ? 'Empiezas tú' : waiting ? current.invitedUid ? current.invitedUid === uid() ? 'Te han retado' : 'Reto enviado' : 'Invita a tu rival' : statusText(current);
+  const outsider = outsiderOf(current);
+  const seconds = Number(current.seconds) || 0;
+  // Con plazo, antes de ver la carta: qué carta toca, cuánto tiempo hay y, en la primera de quien crea, cancelar.
+  const gate = active && !!card && seconds > 0 && !turnStarted;
+  const heading = finished ? current.status === 'expired' ? 'Duelo caducado' : current.status === 'cancelled' ? 'Duelo cerrado' : 'Duelo terminado' : firstTurn ? 'Empiezas tú' : outsider ? 'Te retan a un duelo' : waiting ? current.invitedUid ? current.invitedUid === uid() ? 'Te han retado' : 'Reto enviado' : 'Invita a tu rival' : statusText(current);
   const waitingHint = current.invitedUid ? 'La invitación se acepta desde «Tus duelos», sin compartir enlaces.' : current.turnIndex ? 'Ya has hecho tu jugada: mándale el enlace a tu rival para que siga.' : 'Comparte el enlace para empezar la partida.';
   const link = shareLink || CT.Links.invitation({turnDuel:current.id});
   const nextTargets = cachedGames.filter(game => game.id !== current.id && game.status === 'playing' && game.turnUid === uid());
   const html = `<div class="shell turn-duel-shell" data-duel-id="${safe(current.id)}" data-turn="${current.turnIndex}">
     <nav class="turn-duel-nav" aria-label="Duelo"><button class="icon-btn turn-duel-back" data-turn-action="back" aria-label="Volver a la pantalla anterior"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 5-7 7 7 7M7 12h14"/></svg></button><span>CONTINUUM <small>Duelo por turnos</small></span><div class="turn-duel-nav-actions"></div></nav>
     <section class="turn-duel-screen">
-      <header class="turn-duel-heading"><div><div class="eyebrow">${safe(kindLabel)}</div><h1 data-focus tabindex="-1">${safe(heading)}</h1><p>${firstTurn ? `${cardOf()} · juegas tú y después invitas a tu rival.` : waiting ? waitingHint : finished ? 'Así queda la partida.' : `${cardOf()}${rival ? ` · Contra ${safe(rival)}` : ''}`}</p></div></header>
+      <header class="turn-duel-heading"><div><div class="eyebrow">${safe(kindLabel)}</div><h1 data-focus tabindex="-1">${safe(heading)}</h1><p>${firstTurn ? `${cardOf()} · juegas tú y después invitas a tu rival.` : outsider ? 'Mira cómo es antes de entrar.' : waiting ? waitingHint : finished ? 'Así queda la partida.' : `${cardOf()}${rival ? ` · Contra ${safe(rival)}` : ''}`}</p></div></header>
       <div class="turn-duel-scores" aria-label="Marcador">${current.playersOrder.map((player, index) => { const name = player === uid() ? (current.players?.[player]?.alias || 'Jugador') : shownAlias(current.players?.[player]?.alias || 'Jugador'); const mine = player === uid(); const activePlayer = current.turnUid === player; return `<div class="turn-duel-player ${activePlayer ? 'is-active' : ''} ${mine ? 'is-you' : ''}" data-player="${safe(player)}"><span class="turn-duel-avatar" aria-hidden="true">${CT.Avatares?.forUser(name, player, { size: 44 }) || safe(name.trim().charAt(0).toUpperCase() || '?')}</span><span class="turn-duel-player-info"><strong>${safe(name)}</strong><small>${mine ? 'Tú' : 'Rival'}</small></span><span class="turn-duel-score"><b>${current.scores?.[player] || 0}</b><small>${current.kind === 'cifras' && (current.plays || []).some(p => (p.points || 0) > 1) ? 'puntos' : 'aciertos'}</small></span>${activePlayer ? '<span class="turn-duel-turn-badge">Turno</span>' : ''}</div>`; }).join('')}</div>
-      ${showInvite ? current.invitedUid ? `<div class="panel turn-duel-share"><h2>${current.invitedUid === uid() ? 'Te han retado' : `Reto enviado a ${safe(current.invitedAlias || 'tu rival')}`}</h2><p>${current.invitedUid === uid() ? (compModes(current) ? 'Mismos temas. Cartas nuevas para otra partida.' : 'Mismo mazo y modalidad. Cartas nuevas para otra partida.') : 'La invitación ya le aparece en «Tus duelos». No necesitas enviar otro enlace.'}</p>${current.invitedUid === uid() ? '<button class="btn btn-primary" data-turn-action="accept">Aceptar el duelo</button><button class="btn btn-ghost" data-turn-action="decline">Rechazar</button>' : ''}</div>` : `<div class="panel turn-duel-share"><span class="turn-duel-share-icon" aria-hidden="true">↗</span><h2>Una partida, dos móviles</h2><p>Envía la invitación por WhatsApp, mensaje o la aplicación que prefieras.</p><button class="btn btn-primary btn-block" data-turn-action="share">Compartir el duelo</button><details><summary>Ver enlace de invitación</summary><code>${safe(link)}</code></details><small>Tu rival empieza su turno cuando abra el enlace.</small></div>` : ''}
+      ${outsider ? `<div class="panel turn-duel-share turn-duel-preview"><h2>${rival ? `${safe(shownAlias(rival))} te reta` : 'Te retan a un duelo'}</h2><p>${safe(kindLabel)} · ${current.total} ${current.total === 1 ? 'carta' : 'cartas'} · ${seconds ? `${seconds} s por carta` : 'sin tiempo por carta'}. Cada uno juega su carta cuando puede; caduca a los 7 días sin actividad.</p><button class="btn btn-primary btn-block" data-turn-action="accept">Aceptar y jugar</button><button class="btn btn-ghost btn-block" data-turn-action="refuse">Rechazar</button></div>` : ''}
+      ${gate ? `<div class="panel turn-duel-gate"><h2>${firstTurn ? 'Tu primera carta' : 'Te toca'}</h2><p>${cardOf()}. Tienes ${seconds} s para ${current.kind === 'cifras' ? 'escribir la cifra' : 'colocarla'}: el tiempo empieza al pulsar «Ver la carta».</p><button class="btn btn-primary btn-block" data-turn-action="start-turn">Ver la carta</button>${firstTurn ? '<button class="btn btn-ghost btn-block" data-turn-action="decline-own">Cancelar el duelo</button>' : ''}</div>` : ''}
+      ${showInvite && !outsider ? current.invitedUid ? `<div class="panel turn-duel-share"><h2>${current.invitedUid === uid() ? 'Te han retado' : `Reto enviado a ${safe(current.invitedAlias || 'tu rival')}`}</h2><p>${current.invitedUid === uid() ? (compModes(current) ? 'Mismos temas. Cartas nuevas para otra partida.' : 'Mismo mazo y modalidad. Cartas nuevas para otra partida.') : 'La invitación ya le aparece en «Tus duelos». No necesitas enviar otro enlace.'}</p>${current.invitedUid === uid() ? '<button class="btn btn-primary" data-turn-action="accept">Aceptar el duelo</button><button class="btn btn-ghost" data-turn-action="decline">Rechazar</button>' : ''}</div>` : `<div class="panel turn-duel-share"><span class="turn-duel-share-icon" aria-hidden="true">↗</span><h2>Una partida, dos móviles</h2><p>Envía la invitación por WhatsApp, mensaje o la aplicación que prefieras.</p><button class="btn btn-primary btn-block" data-turn-action="share">Compartir el duelo</button><details><summary>Ver enlace de invitación</summary><code>${safe(link)}</code></details><small>Tu rival empieza su turno cuando abra el enlace.</small></div>` : ''}
       ${lastMove(current)}
       ${solution(current)}
       ${pending ? `<div class="turn-duel-status" role="status"><b>${sending.has(pending.operationId) ? 'Enviando jugada…' : 'Jugada guardada en este móvil, pendiente de confirmar'}</b><p>No vuelvas a jugar esta carta. Se enviará al recuperar la conexión, sin cambiar tu respuesta ni tu tiempo.</p>${delivery ? `<p>${safe(delivery)}</p>` : ''}<button class="btn btn-secondary" data-turn-action="retry">Comprobar y reintentar</button></div>` : delivery ? `<p class="turn-duel-status" role="status">${safe(delivery)}</p>` : ''}
       ${!waiting && !finished && !mine ? '<p class="turn-duel-status" role="status">Tu rival está jugando. La partida se actualizará sola.</p>' : ''}
-      ${turnClockMarkup(active && !!card)}
-      ${showBoard && current.kind === 'orden' ? orderBoard(current, active ? card : null) : ''}
-      ${active && current.kind === 'cifras' && card ? cifraBoard(current, card) : ''}
+      ${turnClockMarkup(active && !!card && !gate)}
+      ${showBoard && !outsider && current.kind === 'orden' ? orderBoard(current, active && !gate ? card : null) : ''}
+      ${active && !gate && current.kind === 'cifras' && card ? cifraBoard(current, card) : ''}
       ${active && !card ? '<p role="alert">No se pudo cargar la carta. Actualiza Continuum en los dos móviles.</p>' : ''}
       ${finished ? `<p class="turn-duel-status">${safe(current.resultText || 'Gracias por jugar.')}</p>` : ''}
       ${!active && (finished || nextTargets.length) ? `<div class="turn-duel-actions">${finished && current.playersOrder.length === 2 ? '<button class="btn btn-primary" data-turn-action="rematch">Revancha</button>' : ''}${nextTargets.length ? `<button class="btn btn-secondary" data-turn-action="next" aria-label="Ver los duelos pendientes en Tus duelos">Ver los pendientes <small>(${nextTargets.length})</small></button>` : ''}${finished && !nextTargets.length ? '<button class="btn btn-secondary" data-turn-action="next">Volver a Tus duelos</button>' : ''}</div>` : ''}
@@ -205,7 +213,7 @@ function render() {
   }
   if (focused?.dataset.turnAction === 'select-slot') app.querySelector('[data-turn-action="confirm-place"]')?.focus({ preventScroll: true });
   window.scrollTo({ left: 0, top: oldTop, behavior: 'instant' });
-  startTurnClock(active && !!card);
+  startTurnClock(active && !!card && !gate);
 }
 async function place(index) {
   if (!Number.isInteger(index) || index < 0 || !current || index > timelineCards(current).length) return;
@@ -346,9 +354,26 @@ function prepareTurn() {
   if (preparingTurn !== key) {
     preparingTurn = key;
     const saved = Number(guardado(`continuum-duel-turn-start-${key}`));
-    enteredAt = Number(current.seconds) > 0 && saved > 0 && saved <= Date.now() ? saved : Date.now();
-    if (Number(current.seconds) > 0) CT.Storage.setItem(`continuum-duel-turn-start-${key}`, String(enteredAt));
+    // Con plazo, el reloj no empieza al abrir el duelo sino al pulsar «Ver la carta» en la pantalla que avisa del
+    // plazo (`startTurn`). Si ya había empezado (se salió y se vuelve), sigue donde iba.
+    if (Number(current.seconds) > 0) { turnStarted = saved > 0 && saved <= Date.now(); enteredAt = turnStarted ? saved : 0; }
+    else { turnStarted = true; enteredAt = Date.now(); }
   }
+}
+function startTurn() {
+  if (!current || turnStarted) return;
+  enteredAt = Date.now(); turnStarted = true;
+  CT.Storage.setItem(`continuum-duel-turn-start-${current.id}-${current.turnIndex}`, String(enteredAt));
+  render();
+}
+// Un duelo por enlace en el que aún no estás: antes de entrar se ve quién reta, con qué mazo y qué plazo, y se puede
+// rechazar. Antes, abrir el enlace te sentaba directamente y, si te tocaba, el reloj ya corría.
+const outsiderOf = game => !!game && game.status === 'waiting' && !game.invitedUid && !game.playersOrder?.includes(uid());
+async function openExisting(gameId, back) {
+  onBack = back;
+  const game = await getDoc(doc(db, 'turnDuels', gameId)).then(snap => snap.data(), () => null);
+  if (outsiderOf(game)) { subscribe(gameId); return; }
+  return join(gameId, back);
 }
 // La barra y el aviso del plazo del turno, si la partida lo lleva.
 let turnClock = null;
@@ -586,7 +611,7 @@ async function next(back = onBack) {
   if (!target) return notify('No tienes más duelos pendientes de jugar.');
   open({ gameId: target.id, back });
 }
-function open({ mode = 'history', kind = 'orden', gameId = '', back, competition = null } = {}) { stop?.(); current = null; preparingTurn = null; enteredAt = 0; delivery = ''; pendingIndex = null; onBack = back; shareLink = ''; retryPending(); if (gameId) join(gameId, back).catch(() => notify('No se pudo abrir este duelo.')); else create(mode, kind, back, competition).catch(() => notify('No se pudo crear el duelo.')); }
+function open({ mode = 'history', kind = 'orden', gameId = '', back, competition = null } = {}) { stop?.(); current = null; preparingTurn = null; enteredAt = 0; turnStarted = true; delivery = ''; pendingIndex = null; onBack = back; shareLink = ''; retryPending(); if (gameId) openExisting(gameId, back).catch(() => notify('No se pudo abrir este duelo.')); else create(mode, kind, back, competition).catch(() => notify('No se pudo crear el duelo.')); }
 function leave() { stop?.(); stop = null; turnClock?.stop(); turnClock = null; current = null; }
 function close() { leave(); onBack?.(); }
 document.addEventListener('click', e => { const target = e.target.closest('[data-turn-action]'), action = target?.dataset.turnAction; if (action === 'select-slot') { CT.Effects?.tap(); pendingIndex = Number(target.dataset.index); render(); } if (action === 'confirm-place') { CT.Effects?.stamp(); place(pendingIndex); } if (action === 'cancel-place') { pendingIndex = null; render(); } if (action === 'submit-cifra') submitCifra(); if (action === 'share') share(); if (action === 'back') close(); });
@@ -600,7 +625,9 @@ function pending(games = cachedGames) {
 Object.assign(CT.TurnDuel, { isBlocked: player => blockedPlayers.has(player), pendingQuick: rows => rows.filter(x => x.pendiente && !archivedIds.has(x.code)), rivals, rivalStandings, standingsMarkup, favorite, challenge, next, archive, block, headToHead, profileMarkup, reshare, pending });
 document.addEventListener('click', event => {
   const button = event.target.closest('[data-turn-action]');
-  const actions = { retry: retryPending, rematch: () => challenge(current.id), next: () => window.dispatchEvent(new CustomEvent('continuum:duels-list')), accept: () => { askTurnAlerts(); return join(current.id, onBack, true); }, decline: () => cancel(current.id, 'waiting') };
+  const actions = { retry: retryPending, rematch: () => challenge(current.id), next: () => window.dispatchEvent(new CustomEvent('continuum:duels-list')), accept: () => { askTurnAlerts(); return join(current.id, onBack, true); }, decline: () => cancel(current.id, 'waiting'),
+    'start-turn': () => startTurn(), refuse: () => close(),
+    'decline-own': () => { if (!window.confirm('¿Cancelar este duelo? Nadie más podrá entrar con el enlace.')) return; return cancel(current.id, 'waiting').then(() => close()); } };
   const action = actions[button?.dataset.turnAction];
   if (!action || button.disabled) return;
   button.disabled = true;

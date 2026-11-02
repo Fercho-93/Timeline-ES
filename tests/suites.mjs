@@ -18,6 +18,7 @@ export const SUITES = {
     "tests/public-matchmaking.mjs",
     "tests/quick-room.mjs",
     "tests/quick-challenges.mjs",
+    "tests/retos-un-movil.mjs",
     "tests/quick-coleccion.mjs",
     "tests/quick-duelo.mjs",
     "tests/quick-permissions.mjs",

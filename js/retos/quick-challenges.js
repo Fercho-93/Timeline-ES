@@ -4,12 +4,26 @@
   'use strict';
   const CT = window.CONTINUUM, E = CT.QuickEngine, esc = CT.escapeHtml;
   const KEY = 'continuum-quick-challenges-v1';
+  // El reto diario se guarda aparte: antes compartía hueco con las demás partidas y empezar una en un solo móvil
+  // (o una partida libre) borraba un reto diario a medias.
+  const DAILY_KEY = 'continuum-quick-daily-v1';
+  const slotOf = config => config?.kind === 'daily' ? DAILY_KEY : KEY;
   let paint, state, record, selected = null, slot = null, error = '';
   const app = () => document.getElementById('app');
-  function load() {
-    error = '';
+  // Un reto diario a medias guardado con una versión anterior pasa a su hueco propio.
+  function migrateDaily() {
     try {
       const raw = CT.Storage.getItem(KEY);
+      if (!raw || JSON.parse(raw)?.config?.kind !== 'daily') return;
+      if (!CT.Storage.getItem(DAILY_KEY)) CT.Storage.setItem(DAILY_KEY, raw);
+      CT.Storage.removeItem(KEY);
+    } catch { /* sin almacenamiento o guardado dañado: lo resuelve load() */ }
+  }
+  function load(key = KEY) {
+    error = '';
+    migrateDaily();
+    try {
+      const raw = CT.Storage.getItem(key);
       if (!raw) return null;
       const saved = JSON.parse(raw);
       E.restore(saved);
@@ -61,7 +75,7 @@
       }
     }
     record.historySaved = true;
-    if(!room) CT.Storage.setItem(KEY, JSON.stringify(record));
+    if(!room) CT.Storage.setItem(slotOf(record.config), JSON.stringify(record));
   }
   function statsPanel() {
     const history = quickHistory(), games = history.length, points = history.reduce((n,item)=>n + (Number(item.score)||0),0), best = history.reduce((n,item)=>Math.max(n,Number(item.score)||0),0);
@@ -844,7 +858,7 @@
   }
   function save() {
     if(room)return;
-    CT.Storage.setItem(KEY, JSON.stringify(record));
+    CT.Storage.setItem(slotOf(record.config), JSON.stringify(record));
     if(record.config.kind==='free' && state.phase==='round-end' && state.index===record.config.rounds.length-1)CT.Storage.setItem(BEST,JSON.stringify(Math.max(Number(readJSON(BEST,0))||0,state.players[0].score)));
   }
   function dispatch(command) {
@@ -862,8 +876,8 @@
   function scores() {
     const keep = E.keepPlaying(state), n = state.players.length;
     return `<div class="quick-scores" data-n="${n}" style="--cols:${Math.min(n, 4)}" role="group" aria-label="Marcador">${state.players.map((p, i) => {
-      const out = !keep && p.status === 'failed', banked = !keep && p.status === 'banked';
-      const label = `${p.name}: ${keep ? `${p.points + p.score} ${p.points + p.score === 1 ? 'acierto' : 'aciertos'}. Sigue jugando` : `${p.score} asegurados, ${p.points} en juego. ${out ? 'Fuera de este reto' : banked ? 'Se ha plantado' : 'Sigue jugando'}`}`;
+      const gone = p.status === 'gone', out = gone || (!keep && p.status === 'failed'), banked = !keep && p.status === 'banked';
+      const label = `${p.name}: ${gone ? `${p.score} asegurados. Ha salido de la partida` : keep ? `${p.points + p.score} ${p.points + p.score === 1 ? 'acierto' : 'aciertos'}. Sigue jugando` : `${p.score} asegurados, ${p.points} en juego. ${out ? 'Fuera de este reto' : banked ? 'Se ha plantado' : 'Sigue jugando'}`}`;
       const figures = keep ? `<strong>${p.score + p.points}</strong>` : `<strong>${p.score}</strong>${p.points && !out && !banked ? `<small class="quick-score-open">+${p.points}</small>` : ''}${banked ? '<small class="quick-score-state" aria-hidden="true">✓</small>' : out ? '<small class="quick-score-state" aria-hidden="true">✕</small>' : ''}`;
       return `<span class="quick-score${i === state.current ? ' is-active' : ''}${out ? ' is-out' : ''}${banked ? ' is-banked' : ''}"${i === state.current ? ' aria-current="true"' : ''} role="group" aria-label="${esc(label)}"><i class="quick-score-avatar">${playerAvatar(p, i)}</i><span class="quick-score-copy"><b>${esc(p.name)}</b><em>${figures}</em></span></span>`;
     }).join('')}</div>`;
@@ -957,13 +971,28 @@
   // Plazo por jugada (config.seconds). La hora de inicio de cada turno se apunta una vez y se
   // recuerda aunque se repinte o se recargue: volver a entrar no regala un reloj nuevo.
   const TURN_START='continuum-quick-turn-v1';
+  // Al salir con «Guardar y salir» el reloj se congela: se guarda lo que llevaba gastado (`elapsed`) y, al volver, sigue
+  // desde ahí. Recargar la página sin pasar por ahí no lo para.
   function turnStartedAt(key){
-    try{const saved=JSON.parse(CT.Storage.getItem(TURN_START)||'null');if(saved?.key===key&&saved.at<=Date.now())return saved.at;}catch{}
+    try{
+      const saved=JSON.parse(CT.Storage.getItem(TURN_START)||'null');
+      if(saved?.key===key&&Number.isFinite(saved.elapsed)){const at=Date.now()-Math.max(0,saved.elapsed);CT.Storage.setItem(TURN_START,JSON.stringify({key,at}));return at;}
+      if(saved?.key===key&&saved.at<=Date.now())return saved.at;
+    }catch{}
     const at=Date.now();try{CT.Storage.setItem(TURN_START,JSON.stringify({key,at}));}catch{}return at;
   }
   function timedTurn(){return !!state&&state.phase==='turn'&&myTurn()&&Number(state.config.seconds)>0&&!(room&&room.members.length<state.players.length&&state.current!==0);}
   function turnKey(){return `${state.config.historyId||'sin-id'}:${state.index}:${record?.commands?.length||0}`;}
   function stopClock(){quickClock?.stop();quickClock=null;}
+  function pauseClock(){
+    stopClock();
+    if(room||!state||!timedTurn())return;
+    try{const saved=JSON.parse(CT.Storage.getItem(TURN_START)||'null');if(saved?.key===turnKey()&&Number.isFinite(saved.at))CT.Storage.setItem(TURN_START,JSON.stringify({key:saved.key,elapsed:Date.now()-saved.at}));}catch{}
+  }
+  // En un solo móvil con varias personas y tiempo por carta, antes de cada turno se pasa el móvil: el reloj de quien
+  // juega no empieza hasta que pulsa «Empezar mi turno». Antes corría mientras el móvil cambiaba de manos.
+  let readyTurn=null;
+  const needsHandoff=()=>!room&&!!state&&state.players.length>1&&state.phase==='turn'&&Number(state.config.seconds)>0&&readyTurn!==turnKey();
   // Cada acierto propio deja la carta en tu colección de Retos rápidos, como en Grandes colecciones.
   // Solo cuentan los de quien juega en este móvil (solo, reto diario, duelo por enlace) o, en una
   // sala, los de su plaza: en un móvil que se pasan varios no se sabe quién acertó.
@@ -1050,6 +1079,10 @@
       CT.openDialog(app().querySelector('[data-quick-result]'), false);
       return;
     }
+    if (needsHandoff()) {
+      shell(`${heading}<section class="pass-screen"><div class="panel pass-card"><div class="eyebrow">${esc(c.title)}</div><h2 data-focus tabindex="-1">El turno es de<br>${esc(p.name)}</h2><p>Pásale el móvil. Tendrá ${Number(state.config.seconds)} s por carta, que empiezan a contar cuando pulse el botón.</p>${button('turn-ready', 'Empezar mi turno <span>→</span>', 'btn btn-primary btn-block')}</div></section>`);
+      return;
+    }
     const gap = i => slot === i && selected ? `<div class="slot-confirm quick-confirm provisional-placement" data-index="${i}"><div class="slot-confirm-card"><small>Vista previa · sin confirmar</small><strong>${esc(get(selected).title)}</strong><span aria-hidden="true">Valor oculto</span></div>${button('confirm', 'Colocar carta →', 'btn btn-primary btn-block')}${button('cancel', 'Cambiar', 'btn btn-ghost btn-block')}</div>` : `<button class="slot" data-quick="slot" data-index="${i}" ${selected ? '' : 'disabled'} aria-label="${esc(i === 0 ? `Colocar antes de ${get(state.timeline[0]).title}` : i === state.timeline.length ? `Colocar después de ${get(state.timeline[i-1]).title}` : `Colocar entre ${get(state.timeline[i-1]).title} y ${get(state.timeline[i]).title}`)}"><span>${i === 0 ? '−' : '+'}</span></button>`;
     const ms=Number(state.config.seconds)*1000, timed=timedTurn(), startedAt=timed?turnStartedAt(turnKey()):0;
     shell(`${heading}${timed?CT.Tiempo.bar(ms-(Date.now()-startedAt),ms):''}${lastNote()}<section><div class="hand-title"><h3>${room ? 'Cartas comunes' : 'Tus cartas'}</h3></div><div class="hand">${state.remaining.filter(id => !(slot !== null && selected === id)).map(id => `<button class="hand-card${selected === id ? ' selected' : ''}" data-quick="select" data-id="${id}" aria-pressed="${selected === id}"${room && !myTurn() ? ' disabled' : ''}><span class="hidden-date">Valor oculto</span>${CT.cardBack('quick')}<strong>${esc(get(id).title)}${get(id).artist?`<small class="quick-card-artist">${esc(get(id).artist)}</small>`:""}</strong><span class="card-arrow">→</span></button>`).join('')}</div>
@@ -1076,7 +1109,7 @@
     if(connection?.kind==='internet'){toEntry();return;}
     const hadRoom=!!room;
     stopNetwork();
-    CT.Storage.removeItem(KEY);
+    CT.Storage.removeItem(slotOf(record?.config));
     if (hadRoom) CT.Storage.removeItem(NET);
     pendingConfig=null; state=null; record=null; selected=null; slot=null;
     toEntry();
@@ -1084,15 +1117,25 @@
   // Vuelve a la pantalla por la que se entró en Retos rápidos. El reto del día y la mesa
   // pública no tienen una propia: se sale a la pantalla anterior del juego.
   function toEntry() {
+    pauseClock(); readyTurn=null;
     if (backTo) {const back=backTo;backTo=null;stopNetwork();pendingConfig=null;state=null;record=null;selected=null;slot=null;back();return;}
     if (entry === 'free-setup') freeSetup();
     else if (entry === 'duel-setup') duelSetup();
     else {stopNetwork();pendingConfig=null;state=null;record=null;selected=null;slot=null;CT.navigateBack?.();}
   }
+  // Quien lleva una sala privada puede, en plena partida, saltar el turno de quien no juega y sacar a alguien de la
+  // partida (se quedó sin batería, se fue). En una mesa pública lo hace el juego solo con quien deja de responder.
+  function hostControls() {
+    if (!room || room.host !== myId || room.matchmaking === 'public' || room.config?.kind === 'duel' || !['turn', 'result', 'round-end'].includes(room.phase)) return '';
+    const at = room.members.indexOf(room.actor), actor = state.players[at];
+    const skip = room.actor !== myId && room.phase !== 'round-end' && actor ? button('skip-turn', `Saltar el turno de ${esc(actor.name)}`, 'btn btn-secondary btn-block') : '';
+    const drops = room.members.map((uid, i) => uid === myId || !state.players[i] || state.players[i].gone ? '' : `<button class="btn btn-ghost btn-block" data-quick="drop" data-player="${i}">Sacar a ${esc(state.players[i].name)} de la partida</button>`).join('');
+    return skip || drops ? `<div class="manage-players"><div class="section-label">Jugadores</div>${skip}${drops}</div>` : '';
+  }
   function menu() {
     const c = E.challenge(state.config.rounds[state.index].id);
     const layer = document.createElement('div'); layer.className = 'overlay';
-    layer.innerHTML = `<div class="modal"><div class="eyebrow">Retos rápidos</div><h2>Opciones de la partida</h2><p>${esc(c.rule)}. ${esc(c.context)}${c.asOf ? ` Datos a ${esc(c.asOf)}.` : ''}</p><p>${E.keepPlaying(state) ? 'Cada carta bien colocada suma un acierto. Un fallo cuenta como fallo, pero sigues jugando hasta terminar el reto.' : 'Acertar suma un acierto provisional. Plantarse lo asegura; fallar pierde los aciertos de este reto y te retira. Los aciertos anteriores se conservan.'}</p><div class="actions exit-actions">${button('close-menu', 'Seguir jugando', 'btn btn-primary btn-block')}${button('guide', 'Guía', 'btn btn-secondary btn-block')}<button class="btn btn-secondary btn-block" data-settings-action="open">Ajustes</button>${button('formats', room && connection?.kind==='internet' ? (state.config.kind==='duel' ? 'Salir del duelo' : 'Salir de la sala') : 'Guardar y salir', 'btn btn-secondary btn-block')}${room && room.capacity === 2 && room.members.length === 2 && state.config.kind === 'duel' && !room.resigned && room.phase !== 'finished' ? button('resign', 'Rendirme', 'btn btn-ghost btn-block exit-discard') : ''}${room && connection?.kind==='internet' ? '' : button('abandon', 'Salir sin guardar', 'btn btn-ghost btn-block exit-discard')}</div></div>`;
+    layer.innerHTML = `<div class="modal"><div class="eyebrow">Retos rápidos</div><h2>Opciones de la partida</h2><p>${esc(c.rule)}. ${esc(c.context)}${c.asOf ? ` Datos a ${esc(c.asOf)}.` : ''}</p><p>${E.keepPlaying(state) ? 'Cada carta bien colocada suma un acierto. Un fallo cuenta como fallo, pero sigues jugando hasta terminar el reto.' : 'Acertar suma un acierto provisional. Plantarse lo asegura; fallar pierde los aciertos de este reto y te retira. Los aciertos anteriores se conservan.'}</p>${hostControls()}<div class="actions exit-actions">${button('close-menu', 'Seguir jugando', 'btn btn-primary btn-block')}${button('guide', 'Guía', 'btn btn-secondary btn-block')}<button class="btn btn-secondary btn-block" data-settings-action="open">Ajustes</button>${button('formats', room && connection?.kind==='internet' ? (state.config.kind==='duel' ? 'Salir del duelo' : 'Salir de la sala') : 'Guardar y salir', 'btn btn-secondary btn-block')}${room && room.capacity === 2 && room.members.length === 2 && state.config.kind === 'duel' && !room.resigned && room.phase !== 'finished' ? button('resign', 'Rendirme', 'btn btn-ghost btn-block exit-discard') : ''}${room && connection?.kind==='internet' ? '' : button('abandon', 'Salir sin guardar', 'btn btn-ghost btn-block exit-discard')}</div></div>`;
     app().append(layer); CT.openDialog(layer, true);
   }
   document.addEventListener('change', event => {
@@ -1124,6 +1167,13 @@
     const target = event.target.closest('[data-quick]');
     if (!target || !app().contains(target) || !paint) return;
     const action = target.dataset.quick;
+    if (action === 'skip-turn') {CT.closeDialog(); void networkAction({type: 'force'}); return;}
+    if (action === 'drop') {
+      const at = Number(target.dataset.player), name = state?.players?.[at]?.name || 'esta persona';
+      CT.closeDialog();
+      CT.UI.confirmDialog('Dejará de jugar en esta partida: conserva los aciertos que ya tenía asegurados y su turno se salta en adelante.', () => {CT.closeDialog?.(); void networkAction({type: 'drop', player: at});}, {title: `¿Sacar a ${name} de la partida?`, confirmLabel: 'Sacar de la partida', cancelLabel: 'Cancelar'});
+      return;
+    }
     if (action === 'kick') {
       const uid = target.dataset.uid, at = room ? room.members.indexOf(uid) : -1, name = at > 0 ? room.names[at] : 'esta persona';
       CT.UI.confirmDialog('Saldrá de la sala de espera. Si quiere volver, tendrá que entrar de nuevo con el código.', () => {CT.closeDialog?.(); void networkAction({type: 'kick', target: uid});}, {title: `¿Expulsar a ${name}?`, confirmLabel: 'Expulsar', cancelLabel: 'Cancelar'});
@@ -1146,6 +1196,7 @@
     if (action === 'guide') {guide(); return;}
     if (action === 'rematch') {entry='duel-setup'; duelSetup(); return;}
     if (action === 'ready') { if (pendingConfig) begin(pendingConfig); return; }
+    if (action === 'turn-ready') { if (state) { readyTurn = turnKey(); render(); } return; }
     if (action === 'more-lengths') {
       const field = target.closest('.field');
       field?.querySelectorAll('[data-length-extra]').forEach(chip => { chip.hidden = false; });
@@ -1255,10 +1306,10 @@
     // El mazo y la regla del reto rápido de un día, para enseñarlos en la guía sin empezar la partida.
     dailyChallenge(dayValue) {const c=E.challenge(dailyQuick(dayValue).rounds[0].id);return {id:c.id,title:c.title,rule:c.rule,asOf:c.asOf,cards:dailyQuick(dayValue).rounds[0].order.length};},
     // ¿Hay un reto diario rápido de ese día empezado y sin terminar? Entonces se retoma sin portada.
-    dailyPending(dayValue) {const saved=load();return !!(saved?.config?.kind==='daily' && saved.config.day===dayValue && !saved.historySaved);},
+    dailyPending(dayValue) {const saved=load(DAILY_KEY);return !!(saved?.config?.kind==='daily' && saved.config.day===dayValue && !saved.historySaved);},
     startDaily(dayValue, renderPage) {
       paint=renderPage; entry='prepare'; stopNetwork(); page='prepare'; state=null; record=null; selected=null; slot=null;
-      const saved=load();
+      const saved=load(DAILY_KEY);
       if(saved?.config?.kind==='daily' && saved.config.day===dayValue && !saved.historySaved){
         record=saved;state=E.restore(record);render();return;
       }

@@ -27,7 +27,8 @@
   function authors(room) {
     let s = E.create(room.config);
     for (const command of room.commands) {
-      const expected = command?.type === 'next' ? room.host : room.members[s.current];
+      // Pasar de reto y sacar a alguien de la partida los hace quien lleva la sala.
+      const expected = command?.type === 'next' || command?.type === 'drop' ? room.host : room.members[s.current];
       if (command && 'by' in command && command.by !== expected) throw Error('Turno no válido.');
       s = E.step(s, command);
     }
@@ -110,6 +111,15 @@
       const command = now.phase === 'turn' ? E.timeoutPlacement(now) : now.phase === 'result' ? {type: 'ack'} : {type: 'next'};
       if (!E.step(now, command)) throw Error('Jugada no válida.');
       r.commands.push({...command, by: r.actor, forcedBy: id});
+      metadata(r);
+    } else if (action.type === 'drop') {
+      // Sacar a alguien de una partida ya empezada: solo quien lleva la sala, nunca a sí mismo, y no en un duelo por
+      // turnos (ahí está «Rendirse»). En una mesa pública las reglas solo lo permiten con quien ha dejado de responder.
+      const at = action.player;
+      if (!r.config || r.config.kind === 'duel' || id !== r.host || !['turn', 'result', 'round-end'].includes(r.phase) || !Number.isInteger(at) || at < 0 || at >= r.members.length || r.members[at] === r.host) throw Error('No se puede sacar a esa persona ahora.');
+      const command = {type: 'drop', player: at};
+      E.step(state(r), command);
+      r.commands.push(sign(command, id));
       metadata(r);
     } else if (action.type === 'start') {
       // Un duelo por turnos lo empieza quien lo crea, sin esperar al amigo: su sitio queda reservado hasta que abra el enlace.

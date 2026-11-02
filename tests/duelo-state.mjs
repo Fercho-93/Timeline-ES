@@ -134,5 +134,32 @@ try {
   assert.equal(w.document.querySelector('.hand-card'), null); assert.ok(w.document.querySelector('.turn-duel-share'));
   games.set('race',game('race'));
   await assert.rejects(t.cancel('race','waiting'), /ha cambiado/);
-  console.log('OK: sin reloj ni pantalla de listo, offline recovery, lost acknowledgement, idempotency, navigation, timeout, shared solutions, head-to-head, cancellation race.');
+  // Con plazo, el reloj no corre al abrir el duelo: primero se ve qué carta toca y cuánto tiempo hay.
+  const tick = () => new Promise(r => Promise.resolve().then(r));
+  games.set('timed', game('timed', { seconds: 15 }));
+  t.show(clone(games.get('timed')));
+  assert.ok(w.document.querySelector('[data-turn-action="start-turn"]'), 'pantalla previa con el plazo');
+  assert.match(w.document.querySelector('.turn-duel-gate').textContent, /15 s/);
+  assert.equal(w.document.querySelector('.hand-card'), null, 'la carta no se ve antes de empezar');
+  assert.equal(t.deadline(), 0, 'el reloj no ha empezado');
+  now += 60000;
+  w.document.querySelector('[data-turn-action="start-turn"]').click(); await tick(); await tick();
+  assert.ok(w.document.querySelector('.hand-card'), 'al pulsar «Ver la carta» se ve la carta');
+  assert.equal(t.deadline(), now, 'y el reloj empieza entonces, con el plazo entero');
+  t.restore(clone(games.get('timed')));
+  assert.equal(t.deadline(), now, 'salir y volver no reinicia el reloj ya empezado');
+  // La primera carta de quien crea un duelo con plazo: se puede cancelar antes de verla.
+  games.set('timed-first', game('timed-first', { seconds: 20, status: 'waiting', turnUid: null, playersOrder: ['me'], players: { me: { alias: 'Yo' } }, scores: { me: 0 } }));
+  t.show(clone(games.get('timed-first')));
+  assert.ok(w.document.querySelector('[data-turn-action="decline-own"]'), 'quien crea puede cancelar antes de ver su primera carta');
+  // Abrir el enlace de un duelo ajeno: antes de entrar se ve quién reta, el mazo y el plazo, y se puede rechazar.
+  games.set('link', game('link', { seconds: 30, status: 'waiting', turnUid: null, turnIndex: 1, playersOrder: ['them'], players: { them: { alias: 'Rival' } }, scores: { them: 1 } }));
+  t.show(clone(games.get('link')));
+  const preview = w.document.querySelector('.turn-duel-preview');
+  assert.ok(preview, 'vista previa del duelo por enlace');
+  assert.match(preview.textContent, /Rival te reta/); assert.match(preview.textContent, /30 s por carta/);
+  assert.ok(preview.querySelector('[data-turn-action="accept"]') && preview.querySelector('[data-turn-action="refuse"]'), 'aceptar o rechazar');
+  assert.equal(w.document.querySelector('.hand-card'), null);
+  assert.equal(games.get('link').playersOrder.length, 1, 'abrirlo no te sienta en el duelo');
+  console.log('OK: sin reloj ni pantalla de listo, offline recovery, lost acknowledgement, idempotency, navigation, timeout, shared solutions, head-to-head, cancellation race; con plazo, pantalla previa, y vista previa del enlace.');
 } finally { dom.window.close(); }

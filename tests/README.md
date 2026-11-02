@@ -148,6 +148,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `qr-local.mjs` | test | El QR de invitación se genera y se decodifica de verdad con `jsQR`. |
 | `quick-challenges-browser.mjs` | navegador | Retos rápidos en un solo móvil, en Chromium. |
 | `quick-challenges.mjs` | test | Catálogo de Retos rápidos: curiosidades, fuentes trazables y motor. |
+| `retos-un-movil.mjs` | test | Retos rápidos en un solo móvil: el reto diario a medias se guarda aparte (empezar otra partida no lo borra), el reloj no corre mientras se pasa el móvil y «Guardar y salir» lo congela. |
 | `quick-coleccion.mjs` | test | Retos rápidos en solitario: rotación de mazos del día, cada acierto propio entra en la colección y suma en el ranking de descubrimientos. |
 | `quick-duelo.mjs` | test | Duelo de Retos rápidos por enlace con los mismos mazos. |
 | `quick-formats-browser.mjs` | navegador | Formatos de Retos rápidos con varios móviles, cada uno con su nombre. |

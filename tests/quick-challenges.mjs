@@ -5,6 +5,8 @@ import {gameHtml} from './game-fixture.mjs';
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
 const html = gameHtml(read('index.html'));
 const key = 'continuum-quick-challenges-v1';
+// El reto diario se guarda aparte, para que empezar otra partida no lo borre.
+const dailyKey = 'continuum-quick-daily-v1';
 function boot(saved) {
   const w = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g, ''), {runScripts: 'outside-only', url: 'https://continuum.test/'}).window;
   w.scrollTo = () => {}; w.Element.prototype.scrollIntoView = () => {};
@@ -402,7 +404,7 @@ click('[data-quick="ready"]');
 assert.equal(w.document.querySelector('[data-quick="bank"]'), null, 'sin botón de plantarse en solitario');
 let aciertos = 0, jugadas = 0;
 for (;;) {
-  const saved = JSON.parse(w.localStorage.getItem(key)) || JSON.parse(w.localStorage.getItem('continuum-quick-challenges-v1'));
+  const saved = JSON.parse(w.localStorage.getItem(dailyKey));
   const st = E.restore(saved);
   if (st.phase === 'round-end') break;
   const c = E.challenge(st.config.rounds[0].id), cardId = st.remaining[0];
@@ -416,7 +418,7 @@ for (;;) {
   click(`[data-quick="select"][data-id="${cardId}"]`);
   click(`[data-quick="slot"][data-index="${index}"]`);
   click('[data-quick="confirm"]');
-  const after = E.restore(JSON.parse(w.localStorage.getItem(key)));
+  const after = E.restore(JSON.parse(w.localStorage.getItem(dailyKey)));
   if (after.result.correct) aciertos++;
   assert.equal(after.players[0].status, 'active', 'un fallo no saca a quien juega solo');
   const resultado = w.document.querySelector('[data-quick-result]');
@@ -457,7 +459,7 @@ w=boot();CT=w.CONTINUUM;
   CT.Quick.startDaily(ayer,(markup,playing)=>{const app=w.document.getElementById('app');app.innerHTML=markup;app.dataset.screen=playing?'quick-game':'quick-challenges';});
   click('[data-quick="ready"]');
   for (let n = 0; n < 12; n++) {
-    const st = E.restore(JSON.parse(w.localStorage.getItem(key)));
+    const st = E.restore(JSON.parse(w.localStorage.getItem(dailyKey)));
     if (st.phase === 'round-end') break;
     const c = E.challenge(st.config.rounds[0].id), cardId = st.remaining[0];
     const val = id => c.cards.find(card => card.id === id).value * c.direction;

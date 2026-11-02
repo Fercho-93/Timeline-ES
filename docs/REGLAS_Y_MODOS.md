@@ -378,6 +378,12 @@ falla»):
   participante hasta el siguiente; plantarse los asegura y también le retira.
 - **Seguir hasta el final:** un fallo no suma, pero se juega todo el reto y gana quien acierte más.
 
+Si alguien deja de jugar en una sala (se queda sin batería, se va), la partida no se para: pasado su
+plazo y 20 s más (90 s sin plazo), otra persona de la sala juega por ella un fallo. Quien lleva una
+sala privada puede además, desde el menú de la partida, saltar el turno de quien no juega y sacar a
+alguien de la partida: conserva lo asegurado y su turno se salta en adelante. En una mesa pública
+lo hace el juego solo con quien deja de responder. En los duelos por turnos no se fuerza nada.
+
 Los puntos de retos anteriores nunca se pierden. Una carta fallada se coloca correctamente como
 referencia: al fallar se ve el hueco donde iba y, al continuar, entra en la línea. Al agotarse
 las cartas se aseguran los puntos pendientes; también termina el reto si nadie sigue activo. El
@@ -411,7 +417,9 @@ debe mantenerla abierta.
 ### Un solo móvil
 
 De 2 a 9 jugadores (8 en Retos rápidos) se pasan el móvil; no necesita conexión y conserva la partida en el propio
-móvil. El juego no sabe quién sostiene el móvil, así que una partida en un solo móvil cuenta
+móvil. En Retos rápidos con tiempo por carta, antes de cada turno sale «El turno es de…»: el reloj empieza al pulsar
+«Empezar mi turno», no mientras el móvil cambia de manos, y «Guardar y salir» lo congela hasta volver. El reto diario
+se guarda aparte, así que empezar otra partida no lo borra. El juego no sabe quién sostiene el móvil, así que una partida en un solo móvil cuenta
 como jugada, no como ganada (ver [Atlas](#atlas-perfil-estadísticas-y-logros)), y sus cartas no
 entran en la colección de Retos rápidos.
 
@@ -425,14 +433,16 @@ contadores visibles.
 Cada participante envía una señal de actividad cada 45 segundos mientras está visible; la
 interfaz distingue segundo plano, falta de actividad y pérdida de red local. Esto añade
 lecturas y escrituras de Firestore y cuenta en los costes. Tras 90 segundos sin señales del
-anfitrión, o 15 segundos desde una señal de segundo plano, otro participante puede tomar el
-relevo. Las reglas comprueban el plazo y la pertenencia a la sala; el relevo conserva cartas y
+anfitrión, o 45 segundos desde una señal de segundo plano, otro participante puede tomar el
+relevo (en una mesa pública, y en plena partida también en una privada, lo toma solo). Las reglas comprueban el plazo y la pertenencia a la sala; el relevo conserva cartas y
 turno. No es presencia instantánea. La limpieza diaria borra cada sala con su presencia y sus
 demás subcolecciones a los siete días sin actividad.
 
 El anfitrión puede saltar el turno de quien se haya quedado sin batería o expulsar a quien ya no
 juegue, y cualquier participante puede marcharse: sus cartas vuelven al descarte y la partida
-continúa. Cómo se prueban con dos móviles y qué validan las reglas, en
+continúa. Al terminar, en una sala privada quien la lleva puede pedir **revancha con los mismos
+jugadores**: la mesa vuelve a la sala de espera para otro minijuego y otro reparto, como en un solo
+móvil y por Wi‑Fi (en una mesa pública se busca otra partida). Cómo se prueban con dos móviles y qué validan las reglas, en
 [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md).
 
 ### Duelo por enlace

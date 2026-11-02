@@ -38,7 +38,9 @@
     s.starter = (s.index + (s.config.first || 0)) % s.players.length;
     s.current = s.starter;
     s.phase = 'turn'; s.result = null;
-    s.players.forEach(p => {p.points = 0; p.status = 'active'; p.roundScore = 0;});
+    // Quien ha salido de la partida (`gone`, comando `drop`) ya no juega: se salta su turno en cada reto.
+    s.players.forEach(p => {p.points = 0; p.status = p.gone ? 'gone' : 'active'; p.roundScore = 0;});
+    for (let guard = 0; s.players[s.current].gone && guard < s.players.length; guard++) s.current = (s.current + 1) % s.players.length;
   }
   function settle(s) {
     if (!s.remaining.length || s.players.every(p => p.status !== 'active')) {
@@ -73,6 +75,14 @@
       s.result = null; settle(s);
     } else if (command?.type === 'next' && s.phase === 'round-end' && s.index + 1 < s.config.rounds.length) {
       s.index++; startRound(s);
+    } else if (command?.type === 'drop' && ['turn', 'result', 'round-end'].includes(s.phase) && Number.isInteger(command.player)
+        && s.players[command.player] && !s.players[command.player].gone && s.players.some((q, i) => i !== command.player && !q.gone)) {
+      // Sacar a alguien de la partida (se quedó sin batería, no responde): conserva lo asegurado, pierde lo que tenía en
+      // juego y no vuelve a jugar. Si era su turno, o su resultado a la vista, la partida sigue con quien toca.
+      const out = s.players[command.player];
+      out.gone = true; out.points = 0; out.status = 'gone';
+      if (s.phase === 'result' && s.result?.player === command.player) {s.result = null; settle(s);}
+      else if (s.phase === 'turn' && s.current === command.player) settle(s);
     } else throw Error('INVALID_ACTION');
     return s;
   }
