@@ -179,7 +179,7 @@
     }
     box.innerHTML = sorted.map(t => {
       const game = t.kind === 'quick' ? 'Retos rápidos' : CT.MODES[t.mode]?.name || 'Grandes colecciones';
-      const host = t.names?.[0] || 'Explorador';
+      const host = CT.Moderacion?.visible?.(t.names?.[0] || 'Explorador') ?? (t.names?.[0] || 'Explorador');
       const avatar = CT.Avatares?.markup?.(host, { size: 44, id: t.hostAvatar, seed: 'uid:' + t.hostUid }) || '';
       const seats = Array.from({ length: t.capacity }, (_, i) => `<i class="${i < t.players ? 'is-taken' : ''}"></i>`).join('');
       return `<li class="public-table">

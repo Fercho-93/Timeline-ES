@@ -122,6 +122,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `mapa-proyecto.mjs` | test | `MAPA_DEL_PROYECTO.md` explica cada script de `js/` y cada hoja de `css/`, cada uno en la tabla de su carpeta, y no cita ninguno que ya no exista. |
 | `marca.mjs` | test | Nombre Continuum en la web, iOS, manifiesto, paquete, documentación y pantallas, sin la marca antigua. |
 | `mazos.mjs` | test | Integridad de todos los mazos: repeticiones, huecos, espaciado y cifras que el redondeo no confunda. |
+| `lanzamiento-reglas.mjs` | reglas | Lo cerrado antes de las tiendas: retos solo a quien ya jugó contigo, nombres que no se hacen pasar por el juego, documentos que no se inflan, mesas públicas sin secuestro ni expulsiones de quien sigue jugando, cuota de denuncias y turnos de Retos rápidos que se fuerzan si alguien no responde. |
 | `moderacion-reglas.mjs` | reglas | Nombres reservados, el nombre se libera al borrar el perfil, denuncias de solo escritura y topes de tamaño. |
 | `moderacion.mjs` | test | El filtro de nombres (ofensivos y reservados bloqueados, nombres normales intactos) y el botón de denuncia. |
 | `motor-enlaces.mjs` | test | Los enlaces del dominio propio y de GitHub se aceptan, con y sin `www`; otras rutas no. |

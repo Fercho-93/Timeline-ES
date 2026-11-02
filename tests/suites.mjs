@@ -127,6 +127,7 @@ export const SUITES = {
     "tests/final-reglas.mjs",
     "tests/config-remota-reglas.mjs",
     "tests/moderacion-reglas.mjs",
+    "tests/lanzamiento-reglas.mjs",
   ],
   // Navegador de verdad (Playwright): .github/workflows/zoom-visual.yml, o a mano con
   // `npm run test:navegador` (acepta PLAYWRIGHT_MODULE, CHROME_PATH y ENGINES=chromium).

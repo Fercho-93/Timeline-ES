@@ -54,6 +54,7 @@ cuando hacen falta.
 | `manifest.webmanifest`, `icon.svg` | Ficha e icono de la web cuando se instala en el móvil desde el navegador. |
 | `CNAME`, `.nojekyll`, `.well-known/` | Publican la web en GitHub Pages con el dominio `continuumjuego.es`, y demuestran a Apple que el dominio es del juego para que los enlaces abran la app (`.well-known/` lo genera `scripts/domain-associations.mjs`). |
 | `firestore.rules` | Las reglas de seguridad de la base de datos. **Subirlas a `main` las publica en producción.** |
+| `firestore.indexes.json` | Los índices compuestos que necesitan algunas consultas (el ranking ordenado por aciertos y tiempo). Se publican junto con las reglas. |
 | `firebase.json`, `firebase-e2e.json` | Configuración de las herramientas de Firebase para publicar y para probar en local. |
 | `package.json`, `package-lock.json` | La lista de herramientas que necesita el proyecto y los atajos (`npm test`, `npm run build`…). |
 | `capacitor.config.json` | Configuración del envoltorio de app móvil. |
@@ -236,6 +237,7 @@ No se edita a mano.
 | `borrar-cuenta.mjs` | Borra la cuenta de un jugador entera; lo lanza el workflow «Borrar cuenta de un jugador». |
 | `domain-associations.mjs` | Genera los archivos que permiten abrir los enlaces del juego directamente en la app. |
 | `render-intro.mjs` | Graba el vídeo promocional de la intro. |
+| `carga.mjs` | Prueba de carga del online con bots (`npm run carga`): ráfagas de búsquedas, gente mirando el tablón y jugadores que desaparecen a mitad de partida, contra el emulador o un proyecto de pruebas. Mide cuánto se tarda en sentarse, los errores, las mesas de una persona, las lecturas del tablón y las salas paradas. |
 
 ### `functions/` (tareas en la nube)
 
@@ -277,7 +279,7 @@ que en iPhone) y `res/` (iconos, pantallas de carga y textos).
 | --- | --- | --- |
 | `pruebas.yml` | En cada subida | Pasa `npm test` y las reglas, y comprueba que la app móvil se compila. |
 | `zoom-visual.yml` («Pruebas en navegador») | Al cambiar la interfaz | Pasa el grupo `navegador` de `tests/suites.mjs` en navegadores de verdad (pantallas pequeñas, zoom, duelos, navegación) y la partida online de extremo a extremo. |
-| `reglas-firestore.yml` | Al cambiar `firestore.rules` | Prueba las reglas y **las publica en producción**. |
+| `reglas-firestore.yml` | Al cambiar `firestore.rules` o `firestore.indexes.json` | Prueba las reglas y **las publica en producción**, con los índices. |
 | `functions.yml` | Solo a mano | Prueba y publica las Cloud Functions. |
 | `borrar-cuenta.yml` | Solo a mano | Borra la cuenta de un jugador (moderación o petición por correo). |
 | `beta-firmada.yml` | Al cambiar `.github/beta-request.json` | Compila Android e iOS firmadas y sube la de iOS a TestFlight. Solo cuando lo pida el titular. |

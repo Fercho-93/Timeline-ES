@@ -8,7 +8,7 @@ import { initializeTestEnvironment, assertFails } from '@firebase/rules-unit-tes
 import { doc, getDoc, setDoc, updateDoc, runTransaction, serverTimestamp } from 'firebase/firestore';
 const read = name => fs.readFileSync(new URL('../'+name,import.meta.url),'utf8');
 const env = await initializeTestEnvironment({projectId:'demo-ghost',firestore:{host:'127.0.0.1',port:8080,rules:read('firestore.rules')}});
-const ROOM='GHOST123', A='ana', B='bea', C='carlos';
+const ROOM='GHQST723', A='ana', B='bea', C='carlos';
 const db=uid=>env.authenticatedContext(uid, {email_verified:true, firebase:{sign_in_provider:'password'}}).firestore();
 const ref=uid=>doc(db(uid),'rooms',ROOM);
 const snapshot=async()=> (await getDoc(ref(A))).data();

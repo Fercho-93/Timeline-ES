@@ -78,7 +78,9 @@ Atlas → «Tu cuenta y tus datos» → eliminar. Pide confirmación y no se pue
   Al dejar de aparecer se borran todas las filas publicadas y `dailyRanking/{uid}`; si falla por
   falta de conexión, se reintenta en la siguiente apertura.
 - **Por días** (aciertos del reto de ese día, de 0 a 10) y **por semanas** (de lunes a domingo,
-  hasta 70). A igualdad de aciertos gana quien tardó menos (en la semana, la suma de los días).
+  hasta 70). A igualdad de aciertos gana quien tardó menos (en la semana, la suma de los días). El
+  orden lo da el servidor (`orderBy('hits','desc'), orderBy('ms')`, con el índice compuesto de
+  `firestore.indexes.json`); si el índice aún no está, se pide solo por aciertos.
   Cada lunes todos empiezan de cero. Con ‹ › se ven los días y semanas anteriores, hasta 8
   semanas atrás. Se muestran 50 puestos y «Ver más» llega a 200. Se abre desde el inicio, desde el
   final del reto y desde el Atlas.

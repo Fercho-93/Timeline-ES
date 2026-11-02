@@ -142,13 +142,17 @@ async function findFlexible(mode, capacityInput) {
   // grandes primero, pero si no hay ninguna compatible creamos una de 4. No creamos
   // tres salas vacías a la vez, que fragmentaría justo la población que queremos juntar.
   if(capacities.length===1) return {code:await findOrCreate(mode,capacities[0]),capacity:capacities[0]};
-  for(const capacity of capacities){
-    const fingerprint=CT.deckFingerprint(mode);
-    const key=publicQueueKey({mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint});
-    const snap=await getDoc(doc(db,'publicQueues',key));
-    if(snap.exists() && snap.data().status==='waiting' && queueFresh(snap.data())) return {code:await findOrCreate(mode,capacity),capacity};
-  }
+  // Las colas de las tres capacidades se miran a la vez (antes, una detrás de otra).
+  const waiting=await Promise.all(capacities.map(capacity=>queueWaiting(mode,capacity)));
+  const at=waiting.indexOf(true);
+  if(at>=0) return {code:await findOrCreate(mode,capacities[at]),capacity:capacities[at]};
   return {code:await findOrCreate(mode,4),capacity:4};
+}
+// ¿Hay en esta cola una mesa esperando y viva? Una lectura que falla cuenta como «no».
+async function queueWaiting(mode,capacity){
+  const key=publicQueueKey({mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:CT.deckFingerprint(mode)});
+  try{const snap=await getDoc(doc(db,'publicQueues',key));return snap.exists() && snap.data().status==='waiting' && queueFresh(snap.data());}
+  catch{return false;}
 }
 
 // Se baraja antes de buscar: sin mesa esperando, se abre la del primer mazo de la lista, y
@@ -157,14 +161,31 @@ async function findAcrossModes(modes, capacityInput) {
   const pool=CT.shuffle([...new Set(modes.filter(mode=>CT.MODES?.[mode] && mode!=='mixed'))]);
   if(!pool.length) throw Error('NO_PUBLIC_MODES');
   const capacities=capacityOrder(capacityInput);
-  for(const capacity of capacities){
-    for(const mode of pool){
-      const key=publicQueueKey({mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:CT.deckFingerprint(mode)});
-      const snap=await getDoc(doc(db,'publicQueues',key));
-      if(snap.exists() && snap.data().status==='waiting' && queueFresh(snap.data())) return {mode,...await findFlexible(mode,capacity)};
-    }
-  }
+  // Todas las colas (mazos × capacidades) se leen a la vez: antes eran ~87 lecturas en fila, de 5 a 13 s en un
+  // móvil, y dos personas buscando a la vez solían acabar cada una en una mesa vacía de un mazo distinto.
+  const pairs=capacities.flatMap(capacity=>pool.map(mode=>({mode,capacity})));
+  const waiting=await Promise.all(pairs.map(({mode,capacity})=>queueWaiting(mode,capacity)));
+  const found=pairs.find((_,i)=>waiting[i]);
+  if(found) return {mode:found.mode,...await findFlexible(found.mode,found.capacity)};
   return {mode:pool[0],...await findFlexible(pool[0],capacities[0])};
 }
 
-export { findOrCreate, findFlexible, findAcrossModes, createTable, joinTable, CLIENT_VERSION };
+// Quien dejó de esperar (se agotó el tiempo de búsqueda) pero acabó sentado igualmente, porque la búsqueda terminó
+// tarde: se libera la plaza para que no quede una persona fantasma en la mesa. Si era la única, la mesa se cierra.
+async function abandonSeat(code){
+  const user=auth.currentUser;
+  if(!user||!code) return;
+  const ref=doc(db,'rooms',code);
+  await runTransaction(db,async tx=>{
+    const snap=await tx.get(ref);
+    if(!snap.exists()) return;
+    const room=snap.data();
+    if(room.status!=='lobby'||!room.playerOrder.includes(user.uid)) return;
+    const playerOrder=room.playerOrder.filter(uid=>uid!==user.uid);
+    if(!playerOrder.length){ if(room.hostUid===user.uid) tx.delete(ref); return; }
+    const players={...room.players}; delete players[user.uid];
+    tx.update(ref,{players,playerOrder,...(room.hostUid===user.uid?{hostUid:playerOrder[0]}:{}),version:room.version+1,updatedAt:serverTimestamp()});
+  }).catch(error=>console.warn('PUBLIC_ABANDON',error?.code||error));
+}
+
+export { findOrCreate, findFlexible, findAcrossModes, createTable, joinTable, abandonSeat, CLIENT_VERSION };

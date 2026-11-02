@@ -3,7 +3,7 @@
 // sentado. Solo la escribe el móvil que lleva la mesa; el resto la lista para elegir
 // dónde entrar. La sala sigue siendo la fuente de verdad: la ficha solo sirve para verla.
 import { db } from '../nube/firebase-client.js';
-import { collection, deleteDoc, doc, getDoc, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc } from '../../vendor/firebase/firebase-firestore.js';
+import { collection, deleteDoc, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, Timestamp, where } from '../../vendor/firebase/firebase-firestore.js';
 import { STALE_MS } from './public-matchmaking.js';
 
 // Quien lleva la mesa renueva la ficha cada 45 s; sin renovar en `STALE_MS` (dos minutos), la
@@ -40,13 +40,34 @@ export async function readTable(code) {
   catch { return null; }
 }
 
-// Las fichas más recientes primero; quien mira decide cuáles puede usar (mazo, versión).
-export function watchTables(onChange, onError) {
-  const tables = query(collection(db, 'publicTables'), orderBy('updatedAt', 'desc'), limit(50));
-  return onSnapshot(tables, snap => {
-    const list = snap.docs.map(d => ({ ...d.data(), code: d.id }));
-    onChange(list);
-    // Las abandonadas se retiran del tablón al verlas (unas pocas cada vez).
-    list.filter(t => !tableFresh(t)).slice(0, 3).forEach(t => { void removeTable(t.code); });
-  }, onError);
+// Cada cuánto se vuelve a mirar el tablón mientras está a la vista.
+export const POLL_MS = 20000;
+// Las fichas vivas, las renovadas más recientemente primero; quien mira decide cuáles puede usar (mazo, versión).
+// Se consulta cada `POLL_MS` en vez de escuchar en directo: cada mesa se renueva cada 40 s, así que escuchar hacía
+// que cada persona mirando recibiera todas las renovaciones de todas las mesas (lecturas que crecían con mesas ×
+// personas). Así cuesta como mucho 50 lecturas cada 20 s por persona, haya las mesas que haya. Las abandonadas no
+// llegan (el filtro de hora va en el servidor, con un minuto de margen por si el reloj del móvil va adelantado) y
+// las borra la limpieza diaria, no quien mira.
+export function watchTables(onChange, onError, every = POLL_MS) {
+  let stopped = false, timer = null, loading = false;
+  const load = async () => {
+    clearTimeout(timer);
+    if (stopped) return;
+    if (document.visibilityState === 'hidden') { timer = setTimeout(load, every); return; }
+    if (!loading) {
+      loading = true;
+      try {
+        const since = Timestamp.fromMillis((window.CONTINUUM?.Session?.now?.() ?? Date.now()) - STALE_MS - 60000);
+        const snap = await getDocs(query(collection(db, 'publicTables'), where('updatedAt', '>', since), orderBy('updatedAt', 'desc'), limit(50)));
+        if (!stopped) onChange(snap.docs.map(d => ({ ...d.data(), code: d.id })));
+      } catch (error) { if (!stopped) onError?.(error); }
+      finally { loading = false; }
+    }
+    if (!stopped) timer = setTimeout(load, every);
+  };
+  // Al volver a la app se mira enseguida, sin esperar al siguiente turno.
+  const wake = () => { if (document.visibilityState === 'visible') void load(); };
+  document.addEventListener('visibilitychange', wake);
+  void load();
+  return () => { stopped = true; clearTimeout(timer); document.removeEventListener('visibilitychange', wake); };
 }

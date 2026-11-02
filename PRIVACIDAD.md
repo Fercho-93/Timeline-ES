@@ -84,7 +84,7 @@ Desde Ajustes puedes enviar un comentario: se abre un correo dirigido a feedback
 
 ## Seguridad y prevención de abuso
 
-Para comprobar que las peticiones llegan del juego y no de un programa automático, se usa Firebase App Check. En la web funciona con reCAPTCHA Enterprise de Google, que analiza señales técnicas del navegador y la dirección IP; en la app de iPhone, con App Attest de Apple, que certifica que la app es la original. **Base jurídica:** el interés legítimo en proteger el juego y a quienes juegan (art. 6.1.f del RGPD).
+Para comprobar que las peticiones llegan del juego y no de un programa automático, se usa Firebase App Check. En la web funciona con reCAPTCHA Enterprise de Google, que analiza señales técnicas del navegador y la dirección IP; en la app de iPhone, con App Attest de Apple, que certifica que la app es la original. Para frenar los abusos también se guarda, durante siete días, la hora de la última partida que creaste y la de tu última denuncia (con a quién iba): así nadie puede crear partidas o enviar denuncias en bucle. Se borran antes si eliminas tu cuenta. **Base jurídica:** el interés legítimo en proteger el juego y a quienes juegan (art. 6.1.f del RGPD).
 
 ## Avisos
 

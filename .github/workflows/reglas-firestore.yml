@@ -5,7 +5,7 @@ name: Publicar reglas de Firestore
 # pruebas estén en verde, que es exactamente lo que pasó con la puntuación de la
 # competición. Este flujo cierra esa distancia sin necesidad de un ordenador.
 #
-# Se dispara solo cuando cambia `firestore.rules` en main, y también a mano desde la
+# Se dispara solo cuando cambia `firestore.rules` (o `firestore.indexes.json`) en main, y también a mano desde la
 # pestaña Actions —botón «Run workflow»—, que funciona igual desde el móvil.
 #
 # Antes de publicar se pasan las pruebas de reglas contra el emulador: si fallan, no se
@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['firestore.rules', '.github/workflows/reglas-firestore.yml']
+    paths: ['firestore.rules', 'firestore.indexes.json', '.github/workflows/reglas-firestore.yml']
 
 permissions:
   contents: read
@@ -58,7 +58,9 @@ jobs:
       - name: Publicar en el proyecto
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/cuenta.json
-        run: npx firebase deploy --only firestore:rules --project timeline-es --non-interactive
+        # Los índices compuestos (firestore.indexes.json) van con las reglas: el ranking los necesita. Publicar
+        # un índice no borra los que haya creados a mano en la consola (eso solo lo haría `--force`).
+        run: npx firebase deploy --only firestore:rules,firestore:indexes --project timeline-es --non-interactive
       - name: Borrar la credencial
         if: always()
         run: rm -f "$RUNNER_TEMP/cuenta.json"

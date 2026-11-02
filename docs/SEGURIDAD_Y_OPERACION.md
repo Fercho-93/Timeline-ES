@@ -54,6 +54,25 @@ dispositivo.
   para el día o la semana en curso según la hora del servidor, y con al menos un segundo por
   acierto (`firestore.rules`). No lo hace infalible —sigue siendo declarado por el móvil—, pero
   corta las puntuaciones imposibles y las de otros días.
+- **Retos solo a quien ya jugó contigo.** Un reto de Retos rápidos con rival fijo (`invitedUid`)
+  exige la sala de la que sale (`sourceRoom`) con las dos personas dentro, como ya pasaba en los
+  duelos por turnos. Antes cualquiera podía retar a un identificador sacado del ranking. Las
+  versiones anteriores de la app se aceptan sin `sourceRoom` hasta el 20 de noviembre de 2026.
+- **Nombres que ven los demás.** En salas, mesas, duelos y tablón, las reglas exigen las mismas
+  letras que el alias de la cuenta y rechazan los que se hacen pasar por el juego (`publicName`).
+  Lo ofensivo lo filtra el cliente al escribir y al enseñar nombres ajenos (`CT.Moderacion.visible`
+  muestra «Jugador» en su lugar).
+- **Documentos con tope.** Las salas solo admiten los campos que escribe el juego, la hora de
+  entrada y la versión tienen tipo, y los duelos por turnos validan su identificador, la forma de
+  cada jugada y que lo que entra en la línea sean cartas: antes se podía inflar un documento hasta
+  1 MB y hacerlo pesar en cada lectura y en la limpieza.
+- **Mesas públicas.** Una ficha del tablón no cambia de tipo y su código va con su tipo (8
+  caracteres las salas, 10 las de Retos), así que nadie puede secuestrar la de otra mesa. Para
+  quitar la sala al anfitrión hacen falta 45 s en segundo plano (antes 15). En una mesa pública ya
+  empezada solo se echa o se salta el turno de quien ha dejado de dar señales o ha agotado su tiempo.
+  La cola de la partida rápida solo la renueva quien está en la mesa.
+- **Denuncias con cuota.** Una cada 15 s por cuenta (`reportQuota`, en la misma operación); el
+  destinatario tiene forma de identificador.
 - **Edad.** El juego pregunta una vez si se tienen 14 años o más (`js/jugador/edad.js`); sin permiso de los
   padres no se conecta al servidor (`js/nube/app-config.js`) ni deja activar el ranking.
 - **Borrado y limpieza.** Borrado completo de la cuenta desde el juego (lo hace el servidor con

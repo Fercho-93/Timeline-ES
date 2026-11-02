@@ -459,7 +459,7 @@
       : left()===0 || count>=cap ? `<div class="public-status-title">Empezando la partida…</div><p>Preparando los retos.</p>`
       : `<div class="public-status-title">La partida empieza en <b id="quick-public-clock" class="public-clock">${clock(left())}</b></div><p>Puede entrar alguien más (${count} de ${cap}). Si entra, la cuenta vuelve a 30 s.</p>`;
     const seats=Array.from({length:cap},(_,i)=>{
-      const name=room.names[i], mine=room.members[i]===myId;
+      const mine=room.members[i]===myId, name=mine?room.names[i]:room.names[i]&&(CT.Moderacion?.visible?.(room.names[i])??room.names[i]);
       return name ? `<li class="public-seat${mine?' is-you':''}"><span class="public-seat-avatar">${playerAvatar({name},i)}</span><span class="public-seat-copy"><b>${esc(name)}${mine?' <span class="public-you">tú</span>':''}</b><small>En la mesa</small>${mine?'':CT.Moderacion?.botonDenuncia(room.members[i],name,'mesa')||''}</span></li>`
         : `<li class="public-seat is-empty"><span class="public-seat-avatar" aria-hidden="true">+</span><span class="public-seat-copy"><b>Plaza libre</b><small>Esperando a alguien…</small></span></li>`;
     }).join('');
@@ -485,12 +485,13 @@
     const cfg=room.config,me=room.members.indexOf(uid),host=room.members[0]===uid;
     const details={length:cfg.rounds.length,keep:cfg.keep!==false,firstName:cfg.names[cfg.first||0],host,canCancel:host&&room.members.length===1&&room.phase!=='finished',canResign:room.members.length===2&&room.phase!=='finished'};
     // Un reto que te han mandado y aún no has aceptado (o que has rechazado).
-    if(me<0&&room.declined)return {rival:room.names[0],rivalUid:room.host,me:'',deck:E.challenge(cfg.rounds[0].id).title,marcador:'',updatedAt:at,grupo:'historial',pendiente:false,estado:'Rechazaste el reto',detalle:'Cerrado',done:true,...details};
-    if(me<0)return {rival:room.names[0],rivalUid:room.host,me:'',deck:E.challenge(cfg.rounds[0].id).title,marcador:'',updatedAt:at,grupo:'retado',pendiente:true,estado:`${room.names[0]} te ha retado`,detalle:'Acéptalo para empezar',invited:true,...details};
+    const shown=n=>CT.Moderacion?.visible?.(n)??n;
+    if(me<0&&room.declined)return {rival:shown(room.names[0]),rivalUid:room.host,rivalIn:false,me:'',deck:E.challenge(cfg.rounds[0].id).title,marcador:'',updatedAt:at,grupo:'historial',pendiente:false,estado:'Rechazaste el reto',detalle:'Cerrado',done:true,...details};
+    if(me<0)return {rival:shown(room.names[0]),rivalUid:room.host,rivalIn:false,me:'',deck:E.challenge(cfg.rounds[0].id).title,marcador:'',updatedAt:at,grupo:'retado',pendiente:true,estado:`${shown(room.names[0])} te ha retado`,detalle:'Acéptalo para empezar',invited:true,...details};
     const s=E.restore(CT.QuickRoom.record(room)),other=1-me,friendIn=room.members.length>1;
-    const rival=friendIn?room.names[other]:room.invitedName||'tu amigo',c=E.challenge(s.config.rounds[s.index].id),total=s.config.rounds[s.index].order.length-1;
+    const rival=shown(friendIn?room.names[other]:room.invitedName||'tu amigo'),c=E.challenge(s.config.rounds[s.index].id),total=s.config.rounds[s.index].order.length-1;
     const mine=p=>p.score+p.points,mios=mine(s.players[me]),suyos=mine(s.players[other]);
-    const base={rival,rivalUid:friendIn?room.members[other]:room.invitedUid||null,me:room.names[me],deck:c.title,marcador:`Tú ${mios} · ${rival} ${suyos} aciertos`,updatedAt:at,...details};
+    const base={rival,rivalUid:friendIn?room.members[other]:room.invitedUid||null,rivalIn:friendIn,me:room.names[me],deck:c.title,marcador:`Tú ${mios} · ${rival} ${suyos} aciertos`,updatedAt:at,...details};
     const where=`Mazo ${s.index+1} de ${s.config.rounds.length} · carta ${Math.max(1,Math.min(total,s.phase==='turn'?s.timeline.length:s.timeline.length-1))} de ${total}`;
     if(room.declined)return {...base,grupo:'historial',pendiente:false,estado:'Cancelado: rechazó tu reto',detalle:'Cerrado',done:true,marcador:''};
     if(room.resigned){const yo=room.resigned===uid;return {...base,grupo:'historial',pendiente:false,estado:yo?'Te rendiste':'Ganaste: tu rival se rindió',detalle:'Terminado',done:true,result:yo?'loss':'win'};}
@@ -525,7 +526,10 @@
     const row=(readJSON(DUELS,[])||[]).find(x=>x.code===code);
     if(!row||!row.rivalUid)throw Error('No se encuentra ese duelo.');
     if(CT.TurnDuel?.isBlocked?.(row.rivalUid))throw Error('Has bloqueado los retos de este rival.');
-    await createDuelRoom({renderPage,name:row.me,length:row.length,keep:row.keep,iStart:row.me!==row.firstName,invite:{uid:row.rivalUid,name:row.rival},back});
+    // Solo se reta por su nombre a quien llegó a jugar en esa sala (las reglas lo exigen con `sourceRoom`); si no
+    // entró nunca, el duelo nuevo se comparte por enlace, como uno sin rival.
+    const invite=row.rivalIn===false?null:{uid:row.rivalUid,name:row.rival,source:code};
+    await createDuelRoom({renderPage,name:row.me,length:row.length,keep:row.keep,iStart:row.me!==row.firstName,invite,back});
   }
   async function declineInvite(code) {await CT.QuickNetwork.actOnce(code,{type:'decline'});}
   // Un reto que te han mandado se ve antes de entrar: se acepta (entras y juegas tu turno) o se rechaza (el duelo se cierra).
@@ -594,7 +598,7 @@
     if(cap===2 && (duelRoom || (!host && room.invitedUid))) {duelWaiting(code,host);return;}
     const slots=SEAT_SLOTS[cap]||SEAT_SLOTS[8], table=Array(9).fill('<div class="table-seat is-unused" aria-hidden="true"></div>');
     slots.forEach((slot,i)=>{
-      const name=room.names[i], mine=room.members[i]===myId;
+      const mine=room.members[i]===myId, name=mine?room.names[i]:room.names[i]&&(CT.Moderacion?.visible?.(room.names[i])??room.names[i]);
       table[slot]=name
         ? `<div class="table-seat occupied${mine?' is-you':''}"><span class="seat-avatar">${CT.Avatares.forUser(name,room.members[i],{size:44})}</span><strong>${esc(name)}${mine?' · tú':''}</strong><small>${room.members[i]===room.host?'Anfitrión':`Plaza ${i+1}`}</small><i class="ready-seal">Listo</i>${host&&room.members[i]!==room.host?`<button class="kick-btn" data-quick="kick" data-uid="${esc(room.members[i])}" aria-label="Expulsar a ${esc(name)}">×</button>`:''}</div>`
         : `<div class="table-seat empty" aria-label="Plaza ${i+1} libre"><span>+</span><small>Libre</small></div>`;
@@ -737,7 +741,7 @@
     if(action==='start-room'){const count=Number(app().querySelector('#quick-net-length')?.value)||roomLength||3;await networkAction({type:'start',rounds:rounds(count,null,null,E.MULTI_CARDS),kind:duelRoom?'duel':'network',historyId:historyId(),keep:duelKeep(),seconds:CT.Tiempo.get('amigos',15),...(duelRoom?{first:duelFirst}:(()=>{const order=room?CT.QuickRoom.starterOrder(room):null;return Number.isInteger(order?.[0])?{first:order[0]}:{};})())});return true;}
     if(action==='rematch-room'){
       const cfg=state.config, me=state.players[room.members.indexOf(myId)].name, other=room.members.find(m=>m!==myId);
-      await createDuelRoom({renderPage:paint,name:me,length:cfg.rounds.length,keep:cfg.keep!==false,iStart:me!==cfg.names[cfg.first||0],invite:other?{uid:other,name:room.names[room.members.indexOf(other)]}:null,back:backTo});
+      await createDuelRoom({renderPage:paint,name:me,length:cfg.rounds.length,keep:cfg.keep!==false,iStart:me!==cfg.names[cfg.first||0],invite:other?{uid:other,name:room.names[room.members.indexOf(other)],source:connection?.code}:null,back:backTo});
       return true;
     }
     if(action==='accept-invite'){const code=previewCode;await openRoom(paint,code,backTo);return true;}

@@ -223,16 +223,27 @@ function reportDialog({ uid, alias, context }) {
     try {
       const batch = writeBatch(db);
       batch.set(doc(db, 'reports', `${identity.uid}_${target}`), { reporter: identity.uid, target, targetAlias: name, reason, context: REPORT_CONTEXTS.includes(context) ? context : 'sala', createdAt: serverTimestamp() });
+      // Cuota de denuncias (firestore.rules): una cada 15 s por cuenta, para que un script no inunde la revisión.
+      batch.set(doc(db, 'reportQuota', identity.uid), { lastAt: serverTimestamp(), target });
       await batch.commit();
       message.textContent = 'Gracias. Hemos recibido tu denuncia y la revisaremos.';
       send.hidden = true; document.getElementById('report-cancel').textContent = 'Cerrar';
       offerBlock();
     } catch (error) {
-      // Las reglas solo dejan una denuncia por pareja: «sin permiso» aquí es «ya la enviaste».
-      if (error?.code === 'permission-denied') { message.textContent = 'Ya habías denunciado a esta persona. Gracias.'; send.hidden = true; document.getElementById('report-cancel').textContent = 'Cerrar'; offerBlock(); }
+      // Las reglas solo dejan una denuncia por pareja: «sin permiso» aquí es «ya la enviaste» (o, si acabas de
+      // denunciar a otra persona, que hay que esperar unos segundos).
+      if (error?.code === 'permission-denied' && await reportedRecently()) { message.textContent = 'Acabas de enviar otra denuncia. Espera unos segundos e inténtalo de nuevo.'; send.disabled = false; }
+      else if (error?.code === 'permission-denied') { message.textContent = 'Ya habías denunciado a esta persona. Gracias.'; send.hidden = true; document.getElementById('report-cancel').textContent = 'Cerrar'; offerBlock(); }
       else { message.textContent = 'No se pudo enviar la denuncia. Comprueba tu conexión e inténtalo de nuevo.'; send.disabled = false; }
     }
   };
+}
+// ¿La última denuncia de esta cuenta fue hace menos de 15 s? Así se distingue la espera de «ya la habías enviado».
+async function reportedRecently() {
+  try {
+    const last = (await getDocFromServer(doc(db, 'reportQuota', identity.uid))).data()?.lastAt?.toMillis?.();
+    return Number.isFinite(last) && Date.now() - last < 20000;
+  } catch { return false; }
 }
 function editNameScreen() {
   accountDialog(`<div class="overlay"><section class="modal"><h2>Cambiar nombre</h2><p>Este nombre será público en el ranking. No uses datos personales.</p><label>Nombre<input id="account-alias" minlength="2" maxlength="24" autocomplete="nickname" value="${esc(profile.alias)}"></label><p id="account-delete-message" role="status"></p><button class="btn btn-primary" data-account-action="rename">Guardar nombre</button><button class="btn btn-secondary" data-account-action="close">Cancelar</button></section></div>`,true);
@@ -630,7 +641,7 @@ async function purgeServerData(uid, aliasKey) {
     ...await list('duelPreferences', uid, 'blocked'),
     ...await list('duelPreferences', uid, 'archived')]);
   // Aparte: con unas reglas anteriores estos dos no se podían borrar, y no deben frenar el resto.
-  await deleteAll([doc(db, 'creationQuota', uid), doc(db, 'roomCreation', uid)]).catch(() => {});
+  await deleteAll([doc(db, 'creationQuota', uid), doc(db, 'roomCreation', uid), doc(db, 'reportQuota', uid)]).catch(() => {});
   const batch = writeBatch(db);
   if (aliasKey) batch.delete(nameRef(aliasKey));
   batch.delete(r.ranking); batch.delete(doc(db, 'socialRanking', uid)); batch.delete(r.progress); batch.delete(r.profile);
@@ -708,7 +719,13 @@ async function ranking(tab = 'day', key = '', all = false) {
   const actual = semana ? per.weekKey : per.today, oldest = shiftKey(per.weekKey, -7 * RANKING_BACK_WEEKS);
   key = key && key <= actual && key >= oldest ? key : actual;
   rankingView = { tab: semana ? 'week' : 'day', key, all };
-  const snap=await getDocsFromServer(query(collection(db, semana ? 'weeklyScores' : 'dailyScores', key, 'players'),orderBy('hits','desc'),limit(all ? RANKING_ALL : RANKING_PAGE)));
+  // Más aciertos y, a igualdad, menos tiempo, ordenado ya en el servidor (índice compuesto en
+  // firestore.indexes.json): antes solo se pedían los primeros por aciertos y se desempataba aquí, así que con más
+  // de una página de 10/10 el podio lo decidía el identificador y no el tiempo. Si el índice aún no existe (recién
+  // publicado), se cae a la consulta de antes.
+  const scores=collection(db, semana ? 'weeklyScores' : 'dailyScores', key, 'players'), size=all ? RANKING_ALL : RANKING_PAGE;
+  const snap=await getDocsFromServer(query(scores,orderBy('hits','desc'),orderBy('ms','asc'),limit(size)))
+    .catch(error=>{if(error?.code!=='failed-precondition')throw error;return getDocsFromServer(query(scores,orderBy('hits','desc'),limit(size)));});
   const hits = v => Number(v.hits) || 0, ms = v => Number.isFinite(Number(v.ms)) ? Number(v.ms) : Infinity;
   const entries=notBlocked(snap.docs.map(d=>({id:d.id,...d.data()})));
   // Más aciertos primero; a igualdad, quien tardó menos. Solo comparten puesto aciertos y tiempo idénticos.
@@ -720,8 +737,8 @@ async function ranking(tab = 'day', key = '', all = false) {
   const rankAvatar = (v, size) => CT.Avatares.markup(v.alias, { size, seed: 'uid:' + v.id, id: v.id === uid ? CT.Avatares.ownId() : v.avatar });
   const you = v => v.id===uid?'<small class="ranking-you">Tú</small>':'';
   const time = v => Number.isFinite(ms(v)) ? `<small class="ranking-time">${duration(ms(v))}</small>` : '';
-  const player=(v,i)=>`<tr class="${v.id===uid?'is-you':''}"><td><span class="ranking-place">${position(i)}</span></td><td><span aria-hidden="true">${rankAvatar(v, 32)}</span> <span class="ranking-name">${esc(v.alias)}</span>${you(v)}${v.id===uid?'':CT.Moderacion?.botonDenuncia(v.id,v.alias,'ranking',true)||''}</td><td><b>${hits(v)}</b>${time(v)}</td></tr>`;
-  const podium=entries.slice(0,3).map((v,i)=>`<article class="ranking-medallion ranking-medallion-${i+1}${v.id===uid?' is-you':''}"><span class="ranking-medal" aria-label="Puesto ${position(i)}">${['Ⅰ','Ⅱ','Ⅲ'][i]}</span><span class="ranking-avatar" aria-hidden="true">${rankAvatar(v, 46)}</span><b>${esc(v.alias)}</b>${you(v)}${v.id===uid?'':CT.Moderacion?.botonDenuncia(v.id,v.alias,'ranking',true)||''}<strong>${hits(v)}</strong><span>aciertos</span>${time(v)}</article>`).join('');
+  const player=(v,i)=>`<tr class="${v.id===uid?'is-you':''}"><td><span class="ranking-place">${position(i)}</span></td><td><span aria-hidden="true">${rankAvatar(v, 32)}</span> <span class="ranking-name">${esc(v.id===uid?v.alias:(CT.Moderacion?.visible?.(v.alias)??v.alias))}</span>${you(v)}${v.id===uid?'':CT.Moderacion?.botonDenuncia(v.id,v.alias,'ranking',true)||''}</td><td><b>${hits(v)}</b>${time(v)}</td></tr>`;
+  const podium=entries.slice(0,3).map((v,i)=>`<article class="ranking-medallion ranking-medallion-${i+1}${v.id===uid?' is-you':''}"><span class="ranking-medal" aria-label="Puesto ${position(i)}">${['Ⅰ','Ⅱ','Ⅲ'][i]}</span><span class="ranking-avatar" aria-hidden="true">${rankAvatar(v, 46)}</span><b>${esc(v.id===uid?v.alias:(CT.Moderacion?.visible?.(v.alias)??v.alias))}</b>${you(v)}${v.id===uid?'':CT.Moderacion?.botonDenuncia(v.id,v.alias,'ranking',true)||''}<strong>${hits(v)}</strong><span>aciertos</span>${time(v)}</article>`).join('');
   const esActual = key === actual;
   const fecha = k => new Date(`${k}T12:00:00`).toLocaleDateString('es-ES', {weekday: semana ? undefined : 'long', day:'numeric', month:'long'});
   const titulo = semana ? (esActual ? 'Esta semana' : `Semana del ${fecha(key)}`) : (esActual ? 'Hoy' : fecha(key).replace(/^./, c => c.toUpperCase()));
@@ -760,8 +777,8 @@ async function discoveryRanking(section = 'all', all = false) {
   const localValue = {all: local.found, collections: local.foundCollections, quick: local.foundQuick}[section];
   const rankAvatar = (v, size) => CT.Avatares.markup(v.alias, { size, seed: 'uid:' + v.id, id: v.id === uid ? CT.Avatares.ownId() : v.avatar });
   const you = v => v.id === uid ? '<small class="ranking-you">Tú</small>' : '';
-  const player = (v, i) => `<tr class="${v.id === uid ? 'is-you' : ''}"><td><span class="ranking-place">${position(i)}</span></td><td><span aria-hidden="true">${rankAvatar(v, 32)}</span> <span class="ranking-name">${esc(v.alias)}</span>${you(v)}${v.id===uid?'':CT.Moderacion?.botonDenuncia(v.id,v.alias,'ranking',true)||''}</td><td><b>${value(v)}</b></td></tr>`;
-  const podium = entries.slice(0, 3).map((v, i) => `<article class="ranking-medallion ranking-medallion-${i + 1}${v.id === uid ? ' is-you' : ''}"><span class="ranking-medal" aria-label="Puesto ${position(i)}">${['Ⅰ','Ⅱ','Ⅲ'][i]}</span><span class="ranking-avatar" aria-hidden="true">${rankAvatar(v, 46)}</span><b>${esc(v.alias)}</b>${you(v)}${v.id===uid?'':CT.Moderacion?.botonDenuncia(v.id,v.alias,'ranking',true)||''}<strong>${value(v)}</strong><span>cartas</span></article>`).join('');
+  const player = (v, i) => `<tr class="${v.id === uid ? 'is-you' : ''}"><td><span class="ranking-place">${position(i)}</span></td><td><span aria-hidden="true">${rankAvatar(v, 32)}</span> <span class="ranking-name">${esc(v.id===uid?v.alias:(CT.Moderacion?.visible?.(v.alias)??v.alias))}</span>${you(v)}${v.id===uid?'':CT.Moderacion?.botonDenuncia(v.id,v.alias,'ranking',true)||''}</td><td><b>${value(v)}</b></td></tr>`;
+  const podium = entries.slice(0, 3).map((v, i) => `<article class="ranking-medallion ranking-medallion-${i + 1}${v.id === uid ? ' is-you' : ''}"><span class="ranking-medal" aria-label="Puesto ${position(i)}">${['Ⅰ','Ⅱ','Ⅲ'][i]}</span><span class="ranking-avatar" aria-hidden="true">${rankAvatar(v, 46)}</span><b>${esc(v.id===uid?v.alias:(CT.Moderacion?.visible?.(v.alias)??v.alias))}</b>${you(v)}${v.id===uid?'':CT.Moderacion?.botonDenuncia(v.id,v.alias,'ranking',true)||''}<strong>${value(v)}</strong><span>cartas</span></article>`).join('');
   const tabs = `<div class="ranking-tabs" role="group" aria-label="Tabla"><button type="button" class="btn btn-secondary" data-account-action="ranking-day" aria-pressed="false">Por días</button><button type="button" class="btn btn-secondary" data-account-action="ranking-week" aria-pressed="false">Por semanas</button><button type="button" class="btn btn-primary" data-account-action="ranking-discoveries" aria-pressed="true">Cartas</button></div>`;
   const sections = `<div class="ranking-tabs ranking-sections" role="group" aria-label="Sección">${Object.entries(FOUND_SECTIONS).map(([key, [, name]]) => `<button type="button" class="btn ${key === section ? 'btn-primary' : 'btn-secondary'}" data-account-action="ranking-found-${key}" aria-pressed="${key === section}">${esc(name)}</button>`).join('')}</div>`;
   const personal = mine >= 0 ? `<span>Tu puesto <b>#${position(mine)}</b></span><span><b>${value(own)}</b> cartas</span>`

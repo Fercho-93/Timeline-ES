@@ -10,11 +10,21 @@ service cloud.firestore {
     function registered() {
       return request.auth != null;
     }
+    // Nombre que ven otras personas (salas, mesas, duelos): las mismas letras que admite el alias de la cuenta
+    // (js/jugador/identidad.js) y nada que haga pasar a alguien por el juego o por quien lo gestiona (las mismas
+    // palabras que `reservedName` y que js/jugador/moderacion.js). Lo ofensivo lo filtra el cliente al escribir y al
+    // enseñar nombres ajenos: una lista de palabras no cabe aquí.
+    function publicName(n, max) {
+      return n is string && n.size() >= 1 && n.size() <= max
+        && n.matches('^[a-zA-Z0-9áéíóúüñÁÉÍÓÚÜÑ_-]([a-zA-Z0-9áéíóúüñÁÉÍÓÚÜÑ _-]*[a-zA-Z0-9áéíóúüñÁÉÍÓÚÜÑ_-])?$')
+        && !n.lower().matches('.*c[o0]nt[i1]nu+m.*')
+        && !n.lower().matches('(.*[^a-z0-9áéíóúüñ])?(admin|administrador|administrator|moderador|moderator|mod|soporte|support|staff|oficial|official|sistema|system|root)([^a-z0-9áéíóúüñ].*)?');
+    }
     // Retos rápidos: historial inmutable de comandos. Cada participante escribe
     // únicamente durante su turno; todos reconstruyen el marcador con el mismo motor.
     match /quickRooms/{code} {
       function valid(d) {
-        return d.keys().hasOnly(['version','capacity','host','members','names','config','commands','revision','phase','actor','catalog','matchmaking','invitedUid','invitedName','resigned','declined','starter','updatedAt'])
+        return d.keys().hasOnly(['version','capacity','host','members','names','config','commands','revision','phase','actor','catalog','matchmaking','invitedUid','invitedName','sourceRoom','resigned','declined','starter','updatedAt'])
           && (!('invitedUid' in d.keys()) || (d.invitedUid is string && d.invitedUid.size() > 0 && d.invitedUid.size() <= 128 && d.invitedUid != d.host))
           && (!('invitedName' in d.keys()) || (d.invitedName is string && d.invitedName.size() <= 24))
           && (!('resigned' in d.keys()) || d.resigned in d.members)
@@ -48,7 +58,8 @@ service cloud.firestore {
           && b.diff(a).affectedKeys().hasOnly(['members','names','revision','updatedAt'])
           && b.members == a.members.concat([request.auth.uid])
           && b.names.size() == a.names.size()+1
-          && b.names == a.names.concat([b.names[b.names.size()-1]]);
+          && b.names == a.names.concat([b.names[b.names.size()-1]])
+          && publicName(b.names[b.names.size()-1], 24);
       }
       // Duelo por turnos ya empezado por quien lo creó: el amigo entra al abrir el enlace y la partida sigue donde está.
       function joiningStarted(a,b) {
@@ -57,7 +68,7 @@ service cloud.firestore {
           && a.get('invitedUid', request.auth.uid) == request.auth.uid
           && b.diff(a).affectedKeys().hasOnly(['members','names','config','actor','revision','updatedAt'])
           && b.members == a.members.concat([request.auth.uid])
-          && b.names.size() == 2 && b.names == a.names.concat([b.names[1]])
+          && b.names.size() == 2 && b.names == a.names.concat([b.names[1]]) && publicName(b.names[1], 24)
           && b.config.diff(a.config).affectedKeys().hasOnly(['names']) && b.config.names == b.names
           && b.phase == a.phase;
       }
@@ -101,6 +112,40 @@ service cloud.firestore {
           && b.members.size() == a.members.size() - 1 && b.members[0] == a.host
           && (dropAt(a,b,1) || dropAt(a,b,2) || dropAt(a,b,3) || dropAt(a,b,4) || dropAt(a,b,5) || dropAt(a,b,6) || dropAt(a,b,7));
       }
+      // Turno de quien no responde (cerró la app, se quedó sin red): pasado el plazo de la jugada y un margen
+      // —o 90 s si la mesa no tiene plazo—, cualquier otra persona de la sala juega por ella lo que haría el
+      // tiempo agotado: en su turno, la carta en un hueco que falla (QuickEngine.timeoutPlacement); en el
+      // resultado, seguir; al acabar un reto, pasar al siguiente (lo que haría quien lleva la sala). El comando
+      // va firmado por quien tenía que jugar (`by`, así el motor lo acepta sin cambios y los clientes
+      // anteriores lo entienden) y por quien lo fuerza (`forcedBy`). Los duelos por turnos se juegan cuando
+      // cada uno puede, así que ahí no se fuerza nada.
+      function stale(a) {
+        return request.time > a.updatedAt + duration.value(a.config.get('seconds', 0) > 0 ? a.config.seconds + 20 : 90, 's');
+      }
+      function forcing(a,b) {
+        let last=b.commands[b.commands.size()-1];
+        return request.auth.uid in a.members && request.auth.uid != a.actor
+          && a.config != null && a.config.get('kind','') != 'duel' && a.phase in ['turn','result','round-end']
+          && b.diff(a).affectedKeys().hasOnly(['commands','phase','actor','revision','updatedAt'])
+          && b.commands.size() == a.commands.size()+1 && b.commands == a.commands.concat([last])
+          && last.get('forcedBy','') == request.auth.uid && last.get('by','') == a.actor && stale(a)
+          && ((a.phase=='turn' && last.type=='place' && last.keys().hasOnly(['type','cardId','index','by','forcedBy'])
+              && last.cardId is string && last.cardId.size() <= 32 && last.index is int && last.index>=0 && last.index<=a.commands.size()+1
+              && b.phase=='result' && b.actor==a.actor)
+            || (a.phase=='result' && last.keys().hasOnly(['type','by','forcedBy']) && last.type=='ack' && b.phase in ['turn','round-end','finished'])
+            || (a.phase=='round-end' && last.keys().hasOnly(['type','by','forcedBy']) && last.type=='next' && b.phase=='turn'))
+          && (!(b.phase in ['round-end','finished']) || b.actor==a.host);
+      }
+      // Solo se reta por su nombre a quien ya jugó contigo: la sala de la que sale el reto (`sourceRoom`, una
+      // revancha o el cara a cara de una sala) tiene que teneros a los dos dentro. Antes cualquiera podía
+      // mandar un reto a cualquier identificador sacado del ranking. Las versiones anteriores de la app no
+      // mandan `sourceRoom`: se aceptan hasta el 20 de noviembre de 2026 para no romper la beta.
+      function invitedFrom(d) {
+        return ('sourceRoom' in d.keys() && d.sourceRoom is string && d.sourceRoom.matches('^[A-Z2-9]{10}$')
+            && request.auth.uid in get(/databases/$(database)/documents/quickRooms/$(d.sourceRoom)).data.members
+            && d.invitedUid in get(/databases/$(database)/documents/quickRooms/$(d.sourceRoom)).data.members)
+          || (!('sourceRoom' in d.keys()) && request.time < timestamp.date(2026, 11, 20));
+      }
       // Quién empieza: quien lleva la sala sortea una carta (y repetirlo borra las respuestas) y cada
       // persona responde una vez, solo con su propia cifra.
       function drawing(a,b) {
@@ -132,7 +177,7 @@ service cloud.firestore {
           && (!('first' in b.config.keys()) || ((b.config.first in [0,1] && a.members.size() == 1)
               || (a.members.size() >= 2 && b.config.first is int && b.config.first >= 0 && b.config.first < a.members.size())))
           && (b.config.names == a.names || (a.members.size() == 1 && b.config.names.size() == 2 && b.config.names[0] == a.names[0]
-              && b.config.names[1] is string && b.config.names[1].size() > 0 && b.config.names[1].size() <= 24))
+              && publicName(b.config.names[1], 24)))
           && b.config.rounds is list && b.config.rounds.size() in [1,3,5]
           && (!('kind' in b.config.keys()) || b.config.kind in ['duel','network','public'])
           && (!('historyId' in b.config.keys()) || b.config.historyId == null || (b.config.historyId is string && b.config.historyId.size() <= 64))
@@ -164,15 +209,19 @@ service cloud.firestore {
       allow list: if registered() && (request.auth.uid in resource.data.members || resource.data.get('invitedUid','') == request.auth.uid);
       allow create: if registered() && code.matches('^[A-Z2-9]{10}$') && quotaFor(code) && valid(request.resource.data)
         && request.resource.data.host==request.auth.uid && request.resource.data.members==[request.auth.uid]
-        && (!('invitedUid' in request.resource.data.keys()) || !blocked(request.auth.uid, request.resource.data.invitedUid))
+        && publicName(request.resource.data.names[0], 24)
+        && (!('invitedUid' in request.resource.data.keys()) || (!blocked(request.auth.uid, request.resource.data.invitedUid) && invitedFrom(request.resource.data)))
+        && (request.resource.data.get('invitedName', '') == '' || publicName(request.resource.data.invitedName, 24))
+        && (!('sourceRoom' in request.resource.data.keys()) || 'invitedUid' in request.resource.data.keys())
         && !('resigned' in request.resource.data.keys()) && !('declined' in request.resource.data.keys())
         && request.resource.data.config==null && request.resource.data.commands==[]
         && request.resource.data.revision==0 && request.resource.data.phase=='lobby';
       allow update: if registered() && valid(request.resource.data)
         && request.resource.data.revision==resource.data.revision+1
         && (starting(resource.data,request.resource.data) || joining(resource.data,request.resource.data) || drawing(resource.data,request.resource.data) || guessing(resource.data,request.resource.data) || leaving(resource.data,request.resource.data) || playing(resource.data,request.resource.data) || joiningStarted(resource.data,request.resource.data) || resigning(resource.data,request.resource.data) || declining(resource.data,request.resource.data)
-          // Al final: expulsar es lo menos frecuente, y así las jugadas (que van cerca del límite de expresiones) no pagan su coste.
-          || kicking(resource.data,request.resource.data));
+          // Al final: expulsar y forzar el turno de un ausente son lo menos frecuente, y así las jugadas (que van
+          // cerca del límite de expresiones) no pagan su coste.
+          || kicking(resource.data,request.resource.data) || forcing(resource.data,request.resource.data));
       allow delete: if registered() && request.auth.uid==resource.data.host
         && (!(resource.data.capacity==2 && resource.data.config!=null && resource.data.config.get('kind','')=='duel')
           || (resource.data.members.size()==1 && resource.data.phase!='finished'));
@@ -181,7 +230,9 @@ service cloud.firestore {
     match /quickPublicQueues/{key} {
       function validQueue(d) {
         let room=getAfter(/databases/$(database)/documents/quickRooms/$(d.code)).data;
-        return d.keys().hasOnly(['code','status','capacity','updatedAt'])
+        // `quick:{plazas}:v{versión}:{huella}` y, repartida en varias colas, `:{n}` (js/retos/quick-online.js).
+        return key.matches('^quick:[2-4]:v[0-9]{1,3}:-?[0-9]{1,16}(:[0-9])?$') && key.split(':')[1] == string(d.capacity)
+          && d.keys().hasOnly(['code','status','capacity','updatedAt'])
           && d.code is string && d.code.matches('^[A-Z2-9]{10}$')
           && d.status in ['waiting','full'] && d.capacity in [2,3,4]
           && d.updatedAt == request.time
@@ -284,11 +335,14 @@ service cloud.firestore {
           && request.resource.data.scores[request.auth.uid] == 0
           && request.resource.data.players.keys().hasOnly([request.auth.uid])
           && request.resource.data.players[request.auth.uid].keys().hasOnly(['alias'])
-          && request.resource.data.players[request.auth.uid].alias is string
-          && request.resource.data.players[request.auth.uid].alias.size() <= 24
+          && publicName(request.resource.data.players[request.auth.uid].alias, 24)
           && request.resource.data.timeline is list && request.resource.data.timeline.size() <= 1
-          && (!('invitedAlias' in request.resource.data)
-            || (request.resource.data.invitedAlias is string && request.resource.data.invitedAlias.size() <= 24));
+          && (request.resource.data.timeline.size() == 0 || request.resource.data.timeline[0] is int)
+          && (!('invitedAlias' in request.resource.data) || publicName(request.resource.data.invitedAlias, 24))
+          // El identificador guardado es el del documento, y lo de la revancha solo viaja con un rival fijo:
+          // antes cualquiera de los tres admitía un texto de hasta 1 MB.
+          && request.resource.data.get('id', duelId) == duelId
+          && (('invitedUid' in request.resource.data) || (!('sourceDuel' in request.resource.data) && !('invitationRound' in request.resource.data)));
       }
       allow create: if validCreate();
       allow get: if registered() && !exists(/databases/$(database)/documents/turnDuels/$(duelId));
@@ -324,15 +378,29 @@ service cloud.firestore {
             && d.playersOrder[1] == request.auth.uid
             && d.players.diff(r.players).affectedKeys().hasOnly([request.auth.uid])
             && d.players[request.auth.uid].keys().hasOnly(['alias'])
-            && d.players[request.auth.uid].alias is string && d.players[request.auth.uid].alias.size() <= 24
+            && publicName(d.players[request.auth.uid].alias, 24)
             && d.scores.diff(r.scores).affectedKeys().hasOnly([request.auth.uid])
             && d.scores[request.auth.uid] == 0
             && d.status == 'playing'
             && d.turnUid == d.playersOrder[(r.turnIndex + r.get('starter', 0)) % 2]
             && d.plays == r.plays
             && (d.timeline == r.timeline
-              || (r.kind == 'orden' && r.timeline.size() == 0 && d.timeline.size() == 1))
+              || (r.kind == 'orden' && r.timeline.size() == 0 && d.timeline.size() == 1 && d.timeline[0] is int))
             && d.turnIndex == r.turnIndex);
+      }
+      // Una jugada lleva solo lo que escribe el juego (js/online/duelo-turnos.js), con tope: antes admitía
+      // cualquier campo de cualquier tamaño. Y lo que se añade a la línea son identificadores de carta.
+      function validPlayShape(p) {
+        return p.keys().hasOnly(['uid','cardId','operationId','ms','timeout','at','respuesta','points','index','correct'])
+          && (!('operationId' in p) || (p.operationId is string && p.operationId.size() <= 64))
+          && (!('ms' in p) || p.ms == null || p.ms is number)
+          && (!('timeout' in p) || p.timeout == null || p.timeout is bool)
+          && (!('at' in p) || p.at is timestamp)
+          && (!('correct' in p) || p.correct is bool);
+      }
+      function newCards(d, r) {
+        let added = d.timeline.removeAll(r.timeline);
+        return added.size() <= 2 && (added.size() < 1 || added[0] is int) && (added.size() < 2 || added[1] is int);
       }
       function creatorOk() {
         let d = request.resource.data; let r = resource.data; let me = request.auth.uid; let p = d.plays[0]; let s1 = d.scores[me]; let s0 = r.scores[me];
@@ -345,7 +413,7 @@ service cloud.firestore {
             && d.updatedAt == request.time
             && (d.get('resultText', null) == null || (d.resultText is string && d.resultText.size() <= 160))
             && d.turnIndex == 1 && d.plays.size() == 1
-            && p.uid == me && p.cardId is int
+            && p.uid == me && p.cardId is int && validPlayShape(p) && newCards(d, r)
             && d.scores.diff(r.scores).affectedKeys().hasOnly([me])
             && (
               (r.kind == 'orden' && p.index is int
@@ -372,7 +440,7 @@ service cloud.firestore {
             && d.turnIndex == i + 1
             && d.plays.size() == r.plays.size() + 1
             && p.uid == me
-            && p.cardId is int
+            && p.cardId is int && validPlayShape(p) && newCards(d, r)
             && d.scores.diff(r.scores).affectedKeys().hasOnly([me])
             && (
               (r.kind == 'orden'
@@ -613,6 +681,23 @@ service cloud.firestore {
     // Denuncias de nombres (botón «Denunciar»): cualquiera con sesión puede escribir una, una sola por
     // pareja denunciante-denunciado, y nadie puede leerlas desde el juego: las lee quien administra el
     // proyecto en la consola de Firebase (ver CONFIGURAR_MULTIJUGADOR.md). Se borran a los 90 días.
+    function reportQuotaKept() {
+      let q = getAfter(/databases/$(database)/documents/reportQuota/$(request.auth.uid));
+      return q != null && q.data.lastAt == request.time;
+    }
+    match /reportQuota/{owner} {
+      allow get: if registered() && request.auth.uid == owner;
+      allow create, update: if registered() && request.auth.uid == owner
+        && request.resource.data.keys().hasOnly(['lastAt','target'])
+        && request.resource.data.lastAt == request.time
+        && request.resource.data.target is string && request.resource.data.target.size() <= 128
+        && (!exists(/databases/$(database)/documents/reportQuota/$(owner)) || request.time >= resource.data.lastAt + duration.value(15,'s'))
+        && existsAfter(/databases/$(database)/documents/reports/$(owner + '_' + request.resource.data.target))
+        && !exists(/databases/$(database)/documents/reports/$(owner + '_' + request.resource.data.target));
+      allow list: if false;
+      // Se borra con la cuenta, pasada la espera.
+      allow delete: if registered() && request.auth.uid == owner && request.time >= resource.data.lastAt + duration.value(15,'s');
+    }
     match /reports/{reportId} {
       allow create: if registered()
         && request.resource.data.keys().hasOnly(['reporter', 'target', 'targetAlias', 'reason', 'context', 'createdAt'])
@@ -620,6 +705,10 @@ service cloud.firestore {
         && request.resource.data.target is string && request.resource.data.target.size() > 0 && request.resource.data.target.size() <= 128
         && request.resource.data.target != request.auth.uid
         && reportId == request.auth.uid + '_' + request.resource.data.target
+        && request.resource.data.target.matches('^[A-Za-z0-9_-]{1,128}$')
+        // Una denuncia cada 15 s por cuenta (`reportQuota`, en la misma operación): un script no puede inundar la
+        // revisión. Las versiones anteriores de la app no la escriben: se aceptan sin ella hasta el 20 de noviembre.
+        && (reportQuotaKept() || request.time < timestamp.date(2026, 11, 20))
         && request.resource.data.targetAlias is string && request.resource.data.targetAlias.size() <= 24
         && request.resource.data.reason in ['nombre-ofensivo', 'suplantacion', 'otro']
         && request.resource.data.context in ['ranking', 'mesa', 'duelo', 'sala']
@@ -636,7 +725,7 @@ service cloud.firestore {
     // jugadores, con su configuración. Solo la escribe quien lleva la mesa, y cualquiera
     // con perfil la puede listar para elegir dónde entrar. La sala sigue mandando.
     match /publicTables/{code} {
-      function nameOk(d, i) { return d.names.size() <= i || (d.names[i] is string && d.names[i].size() >= 1 && d.names[i].size() <= 24); }
+      function nameOk(d, i) { return d.names.size() <= i || publicName(d.names[i], 24); }
       function roomAfter() { return getAfter(/databases/$(database)/documents/rooms/$(code)).data; }
       function quickAfter() { return getAfter(/databases/$(database)/documents/quickRooms/$(code)).data; }
       function hostsRoom(d) {
@@ -649,7 +738,7 @@ service cloud.firestore {
       function validTable(d) {
         return d.keys().hasOnly(['kind','code','mode','capacity','seconds','players','names','hostUid','hostAvatar','clientVersion','fingerprint','length','keep','handSize','updatedAt'])
           && code.matches('^[A-Z2-9]{8,10}$') && d.code == code
-          && d.kind in ['collections','quick']
+          && d.kind in ['collections','quick'] && code.size() == (d.kind == 'collections' ? 8 : 10)
           && d.mode is string && d.mode.size() >= 1 && d.mode.size() <= 32
           && d.capacity is int && d.capacity >= 2 && d.capacity <= 4
           && d.seconds in [0, 15, 20, 30]
@@ -667,7 +756,10 @@ service cloud.firestore {
       }
       allow get: if registered();
       allow list: if registered() && request.query.limit != null && request.query.limit <= 50;
-      allow create, update: if registered() && validTable(request.resource.data);
+      allow create: if registered() && validTable(request.resource.data);
+      // Al renovarla no cambia de tipo: antes, con una sala propia del mismo código, se podía convertir la ficha
+      // de una mesa ajena en una de las colecciones y llevarse a quien pulsara «Unirme».
+      allow update: if registered() && validTable(request.resource.data) && request.resource.data.kind == resource.data.kind;
       // La quita quien la escribió, quien lleva ahora la mesa (hubo relevo), o cualquiera si
       // está abandonada o su sala ya no espera jugadores.
       allow delete: if registered() && (resource.data.hostUid == request.auth.uid
@@ -705,7 +797,9 @@ service cloud.firestore {
         && getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode)).data.hostUid == request.auth.uid;
       allow update: if validQueue(request.resource.data)
         && ((request.resource.data.roomCode == resource.data.roomCode
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt']))
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt'])
+              // Antes cualquiera podía renovar la cola de otra mesa y tenerla «viva» sin nadie dentro.
+              && request.auth.uid in getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode)).data.playerOrder)
           || ((resource.data.status == 'full'
                 // Mesa abandonada: quien espera en ella renueva la cola cada 45 s; si nadie
                 // lo ha hecho en dos minutos, otra persona puede abrir una mesa nueva.
@@ -776,7 +870,11 @@ service cloud.firestore {
       // servidor: nadie puede fecharla a mano ni adelantarla, que es lo único que evita
       // que una sala abandonada burle la directiva de TTL que la borra sola.
       function bumped() { return request.resource.data.version == resource.data.version + 1 && request.resource.data.updatedAt == request.time; }
-      function validName(name) { return name is string && name.size() >= 1 && name.size() <= 18; }
+      function validName(name) { return publicName(name, 18); }
+      // La ficha de cada persona: hora de entrada (milisegundos del móvil) y versión, con su tipo.
+      function validSeat(p) {
+        return p.get('joinedAt', 0) is number && p.get('clientVersion', 1) is int;
+      }
 
       // Identidad de la sala: nunca cambia después de crearla.
       function identityKept() {
@@ -1096,6 +1194,7 @@ service cloud.firestore {
           && request.resource.data.players[request.auth.uid].hand.size() == 0
           // Solo las claves que escribe el juego y con tope: antes la ficha admitía cualquier clave, de cualquier tamaño.
           && request.resource.data.players[request.auth.uid].keys().hasOnly(['name', 'avatarId', 'hand', 'joinedAt', 'clientVersion'])
+          && validSeat(request.resource.data.players[request.auth.uid])
           && (request.resource.data.players[request.auth.uid].get('avatarId', null) == null
             || (request.resource.data.players[request.auth.uid].avatarId is string && request.resource.data.players[request.auth.uid].avatarId.size() <= 40))
           && bumped();
@@ -1496,10 +1595,20 @@ service cloud.firestore {
         return request.resource.data.discard == (resource.data.phase == 'pulse' ? resource.data.discard.concat([resource.data.pulseTurn.cardId]) : resource.data.discard)
           && request.resource.data.get('pulseTurn', null) == (resource.data.phase == 'pulse' ? null : resource.data.get('pulseTurn', null));
       }
+      // En una mesa pública, el anfitrión solo salta el turno de quien ha agotado su tiempo (con 3 s de margen
+      // por la diferencia de relojes) o ha dejado de dar señales. Entre amigos, en una sala privada, puede siempre.
+      function skipAllowed() {
+        let seconds = resource.data.get('turnSeconds', 20);
+        return resource.data.get('matchmaking', 'private') != 'public' || resource.data.phase != 'turn'
+          || (seconds > 0 && resource.data.get('turnStartedAt', null) is timestamp
+            && request.time > resource.data.turnStartedAt + duration.value(seconds - 3, 's'))
+          || seatStale(resource.data.playerOrder[resource.data.current]);
+      }
       function validSkip() {
         return isHost()
           && resource.data.phase != 'tiebreak'
           && resource.data.status == 'playing'
+          && skipAllowed()
           && request.resource.data.reveal == null
           && skipCleanup()
           // Si el turno saltado cierra la vuelta y una sola persona se ha quedado sin
@@ -1558,6 +1667,10 @@ service cloud.firestore {
           && request.resource.data.deck.size() == resource.data.deck.size()
           && request.resource.data.timeline.size() == resource.data.timeline.size()
           && request.resource.data.get('pulseTurn', null) == (cancelPulse ? null : resource.data.get('pulseTurn', null))
+          // En una mesa pública ya empezada, a otra persona solo se la saca si ha dejado de dar señales: así
+          // nadie gana echando a quien sigue jugando (por ejemplo, tras quedarse con la mesa).
+          && (resource.data.status != 'playing' || resource.data.get('matchmaking', 'private') != 'public'
+            || !(request.auth.uid in request.resource.data.playerOrder) || seatStale(removed[0]))
           && (resource.data.status != 'playing'
               // Fuera de partida (vestíbulo o ya terminada) nada de esto se toca.
               ? (request.resource.data.status == resource.data.status && request.resource.data.phase == resource.data.phase
@@ -1566,10 +1679,17 @@ service cloud.firestore {
           && bumped();
       }
 
+      // ¿Ha dejado de dar señales esta persona? Sin presencia, cuenta desde la última escritura de la sala.
+      function seatStale(who) {
+        let path = /databases/$(database)/documents/rooms/$(roomId)/presence/$(who);
+        let seen = exists(path) ? get(path).data : {'seenAt': resource.data.updatedAt, 'visible': true};
+        return seen.seenAt is timestamp && request.time > seen.seenAt + duration.value(seen.visible ? 90 : 45, 's');
+      }
       function hostStale() {
         let path = /databases/$(database)/documents/rooms/$(roomId)/presence/$(resource.data.hostUid);
         let host = exists(path) ? get(path).data : {'seenAt': resource.data.updatedAt, 'visible': true};
-        return host.seenAt is timestamp && request.time > host.seenAt + duration.value(host.visible ? 90 : 15, 's');
+        // En segundo plano, 45 s (antes 15): contestar un mensaje no debe costar la sala.
+        return host.seenAt is timestamp && request.time > host.seenAt + duration.value(host.visible ? 90 : 45, 's');
       }
       // Mesa pública que aún espera jugadores: quien la lleva puede irse sin dejar la
       // plaza ocupada, y pasa a llevarla quien queda primero.
@@ -1621,6 +1741,12 @@ service cloud.firestore {
       allow list: if false;
 
       allow create: if registered()
+        // Código de sala de ocho caracteres (CT.Links.roomCode y makePublicRoomCode): así no coincide con el de
+        // una mesa de Retos rápidos (diez) y nadie puede suplantar la ficha del tablón de otra mesa.
+        && roomId.matches('^[A-HJ-NP-Z2-9]{8}$')
+        // Solo los campos que escribe el juego al crear (js/online/online.js y public-matchmaking-online.js).
+        && request.resource.data.keys().hasOnly(['roomCode','tournament','mode','deckFingerprint','hostUid','status','phase','version','handSize','turnSeconds','poderes','capacity','playerOrder','players','deck','discard','timeline','current','starter','turnsInRound','round','winner','winners','reveal','createdAt','updatedAt','matchmaking','clientVersion','queueKey','finalRoundOffset'])
+        && validSeat(request.resource.data.players[request.auth.uid])
         && request.resource.data.get('finalRoundOffset',0) == 0
         && (request.resource.data.get('matchmaking','private') == 'public' || !('capacity' in request.resource.data)
           || (request.resource.data.capacity is int && request.resource.data.capacity >= 2 && request.resource.data.capacity <= 9))

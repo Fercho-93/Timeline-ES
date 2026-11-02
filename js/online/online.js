@@ -35,6 +35,8 @@ const appEl = document.getElementById("app");
 // cuando este módulo se descarga: se pide al entrar en el modo de varios móviles.
 const CT = window.CONTINUUM;
 const { escapeHtml, shuffle, announce } = CT;
+// Nombre de otra persona tal como se enseña: uno ofensivo o que se haga pasar por el juego se ve neutro (moderacion.js).
+const shownName = name => CT.Moderacion?.visible?.(name) ?? name;
 // Igual que en el juego local: pintar conserva el foco del teclado, y las capas se abren
 // como diálogos de verdad. Está en `a11y.js`, compartido por los dos motores.
 const paint = (html, pantalla) => { if (CT.Accounts && !CT.Accounts.ready) return; CT.Scene.apply(modeKey(), pantalla); CT.paint(appEl, html, pantalla); queueMicrotask(renderPresence); };
@@ -227,7 +229,15 @@ function canClaimHost() {
   if (!roomState || !user || roomState.hostUid === user.uid || !navigator.onLine || roomState.status === "ended") return false;
   const now = CT.Session.now(), host = presenceRecords.get(roomState.hostUid);
   const last = host?.seenAt ?? roomState.updatedAt?.toMillis?.();
-  return now !== null && Number.isFinite(last) && now - last > (host?.visible === false ? 15000 : 90000);
+  return now !== null && Number.isFinite(last) && now - last > (host?.visible === false ? 45000 : 90000);
+}
+// ¿Ha dejado de dar señales esta persona? Los mismos plazos que exigen las reglas (`seatStale`): 90 s sin señal, o
+// 45 s con la app en segundo plano; sin ninguna señal, un minuto desde que se sentó. Con 5 s de margen por los relojes.
+function seatGone(uid) {
+  const now = CT.Session.now(), record = presenceRecords.get(uid);
+  if (now === null || !roomState?.players?.[uid]) return false;
+  if (!record) return now - (roomState.players[uid].joinedAt || now) > 65000;
+  return now - record.seenAt > (record.visible === false ? 50000 : 95000);
 }
 function renderPresence() {
   if (!roomState || !user) return;
@@ -236,7 +246,9 @@ function renderPresence() {
   // En una mesa pública el estado de cada persona ya se ve en la lista de jugadores: la
   // caja de conexión solo aparece si hay un problema de verdad.
   const publicOk = roomState.matchmaking === "public" && navigator.onLine && !/Sin confirmación/.test(connectionMessage);
-  if (roomState.status === "playing" || publicOk) {
+  // En plena partida la caja solo sale si el anfitrión ha dejado de dar señales: para poder tomar el relevo
+  // (si no, nadie podría saltar el turno de quien se ha ido y la sala se quedaría parada).
+  if ((roomState.status === "playing" && !canClaimHost()) || (roomState.status !== "playing" && publicOk)) {
     appEl.querySelector("#room-connection")?.remove();
     return;
   }
@@ -248,7 +260,7 @@ function renderPresence() {
   const task = roomState.phase === "pulse" ? (roomState.pulseTurn?.stage === "defensa" ? roomState.pulseTurn.targetUid : current) : current;
   const instruction = roomState.status === "playing" ? (roomState.phase === "reveal" ? "Resultado listo: podéis continuar." : task === user.uid ? (roomState.phase === "pulse" ? "Te toca colocar la carta del Pulso." : "Te toca elegir una carta y colocarla.") : "Esperando a " + (roomState.players[task]?.name || "otro participante") + ".") : "";
   box.innerHTML = '<p role="status">' + escapeHtml(navigator.onLine ? connectionMessage : "Sin conexión. La sala se recuperará al volver la red.") + ' ' + escapeHtml(instruction) + '</p><details><summary>Conexión de participantes</summary><ul>'
-    + roomState.playerOrder.map(uid => '<li>' + escapeHtml(roomState.players[uid].name) + ': ' + escapeHtml(CT.Session.presence(presenceRecords.get(uid))) + '</li>').join("") + '</ul></details>'
+    + roomState.playerOrder.map(uid => '<li>' + escapeHtml(shownName(roomState.players[uid].name)) + ': ' + escapeHtml(CT.Session.presence(presenceRecords.get(uid))) + '</li>').join("") + '</ul></details>'
     + (canClaimHost() ? '<button class="btn btn-secondary" data-online-action="claim-host">Tomar relevo del anfitrión</button>' : '');
 }
 async function claimHost(auto = false) {
@@ -315,8 +327,11 @@ function syncPublicTable() {
 // relevo». Si el anfitrión deja de dar señales, lo toma solo la primera persona de la mesa
 // que sigue conectada (las reglas solo lo permiten con el anfitrión ausente, y la
 // transacción impide que lo tomen dos a la vez).
+// En plena partida pasa lo mismo en una sala privada: si quien la lleva se va, nadie más puede saltar turnos ni
+// seguir, así que el relevo también es automático. En la sala de espera privada se ofrece el botón.
 function maybeAutoRelay() {
-  if (!roomState || !user || roomState.matchmaking !== "public" || busy || !canClaimHost()) return;
+  maybeClearSeats();
+  if (!roomState || !user || (roomState.matchmaking !== "public" && roomState.status !== "playing") || busy || !canClaimHost()) return;
   const now = CT.Session.now();
   const alive = uid => {
     if (uid === user.uid) return true;
@@ -325,6 +340,22 @@ function maybeAutoRelay() {
   };
   const candidate = roomState.playerOrder.find(uid => uid !== roomState.hostUid && alive(uid));
   if (candidate === user.uid) void claimHost(true);
+}
+// Plazas fantasma de una mesa pública: quien cerró la app sigue sentado. Quien lleva la mesa le saca en la sala de
+// espera (para que no empiece la partida con él) y, ya empezada, cuando le toca y no da señales (las reglas solo
+// dejan sacar a quien ha dejado de darlas). Una persona cada vez.
+let clearingSeat = null;
+function maybeClearSeats() {
+  if (!roomState || !user || roomState.matchmaking !== "public" || roomState.hostUid !== user.uid || busy || clearingSeat) return;
+  const others = roomState.playerOrder.filter(uid => uid !== user.uid);
+  const target = roomState.status === "lobby" ? others.find(seatGone)
+    : roomState.status === "playing" && roomState.phase === "turn" ? others.find(uid => uid === roomState.playerOrder[roomState.current] && seatGone(uid)) : null;
+  if (!target) return;
+  clearingSeat = target;
+  const name = shownName(roomState.players[target]?.name || "Alguien");
+  removePlayer(target, { silent: true })
+    .then(done => { if (done) showToast(`${name} ha dejado de responder y ya no está en la mesa`); })
+    .finally(() => { setTimeout(() => { clearingSeat = null; }, 10000); });
 }
 
 // La cola pública vuelve a ofrecer esta mesa cuando se queda una plaza libre en la sala
@@ -798,7 +829,7 @@ function starterPanelMarkupContent(isHost) {
   const winner = ranking[0];
   const valueOf = uid => starterRecords.get(uid)?.value;
   const lista = CT.StarterPresentation.order(ranking.map(uid => ({name: roomState.players[uid].name + (uid === user.uid ? " · tú" : ""), value: CT.Duelo.Cifras.formato(modeKey(), valueOf(uid))})));
-  const resultado = `${cardMarkup(true)}${lista}<p>${escapeHtml(roomState.players[winner].name)} se ha acercado más y empieza.</p>`;
+  const resultado = `${cardMarkup(true)}${lista}<p>${escapeHtml(shownName(roomState.players[winner].name))} se ha acercado más y empieza.</p>`;
   if (!isHost) return `${resultado}<p class="hint">Esperando al anfitrión para empezar.</p>`;
   return `${resultado}${repetir}<button class="btn btn-primary btn-block" data-online-action="start" ${roomState.playerOrder.length < 2 ? "disabled" : ""}>Empezar <span>→</span></button>`;
 }
@@ -837,7 +868,7 @@ function renderLobby() {
   const seats = Array.from({length:capacity},(_,index)=>{
     const uid=roomState.playerOrder[index], player=uid ? roomState.players[uid] : null;
     if(!player) return `<div class="table-seat empty" data-seat="${index+1}" aria-label="Plaza ${index+1} libre"><span>+</span><small>Libre</small></div>`;
-    return `<div class="table-seat occupied${uid===user.uid?' is-you':''}" data-seat="${index+1}"><span class="seat-avatar">${CT.Avatares.markup(player.name,{size:44,seed:'uid:'+uid,id:uid===user.uid?CT.Avatares.ownId():player.avatarId})}</span><strong>${escapeHtml(player.name)}${uid===user.uid?' · tú':''}</strong><small>${uid===roomState.hostUid?'Anfitrión':`Plaza ${index+1}`}</small><i class="ready-seal">Listo</i>${isHost&&uid!==roomState.hostUid?`<button class="kick-btn" data-online-action="kick" data-uid="${uid}" aria-label="Expulsar a ${escapeHtml(player.name)}">×</button>`:''}</div>`;
+    return `<div class="table-seat occupied${uid===user.uid?' is-you':''}" data-seat="${index+1}"><span class="seat-avatar">${CT.Avatares.markup(player.name,{size:44,seed:'uid:'+uid,id:uid===user.uid?CT.Avatares.ownId():player.avatarId})}</span><strong>${escapeHtml(shownName(player.name))}${uid===user.uid?' · tú':''}</strong><small>${uid===roomState.hostUid?'Anfitrión':`Plaza ${index+1}`}</small><i class="ready-seal">Listo</i>${isHost&&uid!==roomState.hostUid?`<button class="kick-btn" data-online-action="kick" data-uid="${uid}" aria-label="Expulsar a ${escapeHtml(shownName(player.name))}">×</button>`:''}</div>`;
   }).join('');
   paint(`<div class="shell online-shell">${header(`<button class="icon-btn" data-online-action="guide">Guía</button><button class="icon-btn" data-online-action="lobby-exit">Salir</button>`)}
     <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la sala</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${roomCode}</strong><div class="room-invite-actions"><button data-online-action="share">Compartir enlace</button><button data-online-action="qr">Mostrar QR</button></div></div></section>
@@ -909,7 +940,7 @@ function publicRosterMarkup() {
     const state = !mine && seatSilent(uid) ? ["Sin señal", "is-silent"]
       : cardDrawn ? (answeredStarter(uid) ? ["Ha respondido ✓", "is-done"] : ["Pensando su cifra…", "is-thinking"])
       : ["En la mesa", "is-ready"];
-    return `<li class="public-seat ${state[1]}${mine ? " is-you" : ""}"><span class="public-seat-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'uid:' + uid, id: mine ? CT.Avatares.ownId() : player.avatarId })}</span><span class="public-seat-copy"><b>${escapeHtml(player.name)}${mine ? ' <span class="public-you">tú</span>' : ""}</b><small>${state[0]}</small>${mine ? '' : CT.Moderacion?.botonDenuncia(uid, player.name, 'mesa') || ''}</span></li>`;
+    return `<li class="public-seat ${state[1]}${mine ? " is-you" : ""}"><span class="public-seat-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'uid:' + uid, id: mine ? CT.Avatares.ownId() : player.avatarId })}</span><span class="public-seat-copy"><b>${escapeHtml(shownName(player.name))}${mine ? ' <span class="public-you">tú</span>' : ""}</b><small>${state[0]}</small>${mine ? '' : CT.Moderacion?.botonDenuncia(uid, player.name, 'mesa') || ''}</span></li>`;
   }).join("");
 }
 
@@ -1161,20 +1192,20 @@ function renderGame() {
   // vuelve a empezar de cero en su pantalla.
   const secondsLeft = roomState.phase === "turn" && turnSeconds() ? (turnRemaining() ?? turnSeconds()) : null;
   paint(`<div class="shell">${header()}
-    <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, vuelta ${roomState.round}</h1>
-    <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length}` : `Vuelta ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}`}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo restante para esta carta"><strong id="turn-timer-value">${secondsLeft}</strong><span>s</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
-    <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores</div><div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i class="score-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'uid:' + uid, id: uid === user.uid ? CT.Avatares.ownId() : player.avatarId })}</i><span class="score-copy"><b>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(player.hand.length)}%"></i></span></span><em><strong>${player.hand.length}</strong><small>cartas</small></em></span>`; }).join("")}</div></section>
-    ${pulsing ? `<div class="pulse-banner"><span aria-hidden="true">ϟ</span> Pulso · <b>${escapeHtml(currentPlayer.name)}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
+    <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(shownName(currentPlayer.name))}`}, vuelta ${roomState.round}</h1>
+    <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length}` : `Vuelta ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}`}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(shownName(currentPlayer.name))}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo restante para esta carta"><strong id="turn-timer-value">${secondsLeft}</strong><span>s</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
+    <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores</div><div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i class="score-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'uid:' + uid, id: uid === user.uid ? CT.Avatares.ownId() : player.avatarId })}</i><span class="score-copy"><b>${escapeHtml(shownName(player.name))}${uid === user.uid ? " · tú" : ""}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(player.hand.length)}%"></i></span></span><em><strong>${player.hand.length}</strong><small>cartas</small></em></span>`; }).join("")}</div></section>
+    ${pulsing ? `<div class="pulse-banner"><span aria-hidden="true">ϟ</span> Pulso · <b>${escapeHtml(shownName(currentPlayer.name))}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
     ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
     ${boardQuestion()}
     ${pulsing
-      ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>${defensa ? `te reta ${escapeHtml(currentPlayer.name)}` : `contra ${escapeHtml(pulseTargetName)}`}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}">${categoryBadge(pulseCard)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${myPulse
+      ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>${defensa ? `te reta ${escapeHtml(shownName(currentPlayer.name))}` : `contra ${escapeHtml(pulseTargetName)}`}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}">${categoryBadge(pulseCard)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${myPulse
         ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro"
-          : defensa ? `Colócala tú también. Si aciertas, no te llevas ninguna carta de ${escapeHtml(currentPlayer.name)}`
+          : defensa ? `Colócala tú también. Si aciertas, no te llevas ninguna carta de ${escapeHtml(shownName(currentPlayer.name))}`
           : `Colócala. Si aciertas y ${escapeHtml(pulseTargetName)} falla, le pasas una carta tuya`)
         : defensa ? `${escapeHtml(pulseTargetName)} está colocando la misma carta…`
-        : `${escapeHtml(currentPlayer.name)} está colocando la carta del Pulso…`}</p></section>`
-      : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${pendingIndex === null && selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" aria-pressed="${pendingIndex === null && selectedCardId === id}" ${myTurn ? "" : "disabled"}>${categoryBadge(card)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p>${myTurn && !roomState.pulsePower && pulseAvailable() ? `<button class="btn btn-secondary btn-block pulse-btn" data-online-action="pulse-open"><span aria-hidden="true">ϟ</span> Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`}
+        : `${escapeHtml(shownName(currentPlayer.name))} está colocando la carta del Pulso…`}</p></section>`
+      : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${pendingIndex === null && selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" aria-pressed="${pendingIndex === null && selectedCardId === id}" ${myTurn ? "" : "disabled"}>${categoryBadge(card)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco") : `${escapeHtml(shownName(currentPlayer.name))} está pensando dónde colocar su carta…`}</p>${myTurn && !roomState.pulsePower && pulseAvailable() ? `<button class="btn btn-secondary btn-block pulse-btn" data-online-action="pulse-open"><span aria-hidden="true">ϟ</span> Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`}
     <section class="board-timeline-section"><div class="hand-title"><h3>${timelineTitle()}</h3></div>${CT.timelineEnds(modeKey())}${CT.timelineMap(modeKey(), timelineCards, { hidden: !!roomState.ghost?.pending.length })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
     ${!pulsing && roomState.phase !== "reveal" ? CT.Ghost.power(roomState.ghost, user.uid, roomState.timeline.length, me.hand.length, 'data-online-action="ghost-use"', myTurn) : ""}
     ${roomState.phase === "reveal" ? revealOverlay(currentUid) : ""}
@@ -1310,7 +1341,7 @@ function pulseAvailable() {
 function openPulse() {
   const opciones = pulseTargetUids().map(uid => {
     const player = roomState.players[uid];
-    return `<button class="btn btn-secondary btn-block pulse-target" data-online-action="pulse-target" data-target="${uid}"><b>${escapeHtml(player.name)}</b><small>${player.hand.length} ${player.hand.length === 1 ? "carta" : "cartas"}</small></button>`;
+    return `<button class="btn btn-secondary btn-block pulse-target" data-online-action="pulse-target" data-target="${uid}"><b>${escapeHtml(shownName(player.name))}</b><small>${player.hand.length} ${player.hand.length === 1 ? "carta" : "cartas"}</small></button>`;
   }).join("");
   appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-pulse-overlay><div class="modal">
     <div class="eyebrow">Pulso</div>
@@ -1637,7 +1668,7 @@ async function nextOnlineFinal() {
 function renderWinner() {
   clearTurnTimer();
   const uids = (roomState.winners || [roomState.winner]).filter(uid => roomState.players[uid]);
-  const names = uids.map(uid => escapeHtml(roomState.players[uid].name));
+  const names = uids.map(uid => escapeHtml(shownName(roomState.players[uid].name)));
   // En una competición esta pantalla cierra un tema; quién gana la competición lo dice el marcador.
   const delTema = roomState.tournament ? " el tema" : "";
   const title = names.length === 1 ? `${names[0]} gana${delTema}` : `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]} ganan${delTema}`;
@@ -1701,8 +1732,8 @@ function roomMenu() {
       ${canClaimHost() ? '<button class="btn btn-secondary" data-online-action="claim-host">Tomar relevo del anfitrión</button>' : ""}
       ${isHost && playing && !inFinal ? `<button class="btn btn-ghost" data-online-action="skip">Saltar el turno de ${escapeHtml(currentName)}</button>` : ""}
     </div>
-    ${isHost && others.length && !inFinal ? `<div class="manage-players"><div class="section-label">Jugadores</div>${others.map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, roomState.matchmaking === 'public' ? 'mesa' : 'sala') || ''}<button class="kick-btn" data-online-action="kick" data-uid="${uid}">Expulsar</button></div>`).join("")}</div>` : ""}
-    ${!(isHost && others.length && !inFinal) && roomState?.playerOrder?.some(uid => uid !== user.uid) ? `<div class="manage-players"><div class="section-label">Jugadores</div>${roomState.playerOrder.filter(uid => uid !== user.uid).map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, roomState.matchmaking === 'public' ? 'mesa' : 'sala') || ''}</div>`).join("")}</div>` : ""}
+    ${isHost && others.length && !inFinal ? `<div class="manage-players"><div class="section-label">Jugadores</div>${others.map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(shownName(roomState.players[uid].name))}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, roomState.matchmaking === 'public' ? 'mesa' : 'sala') || ''}<button class="kick-btn" data-online-action="kick" data-uid="${uid}">Expulsar</button></div>`).join("")}</div>` : ""}
+    ${!(isHost && others.length && !inFinal) && roomState?.playerOrder?.some(uid => uid !== user.uid) ? `<div class="manage-players"><div class="section-label">Jugadores</div>${roomState.playerOrder.filter(uid => uid !== user.uid).map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(shownName(roomState.players[uid].name))}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, roomState.matchmaking === 'public' ? 'mesa' : 'sala') || ''}</div>`).join("")}</div>` : ""}
     ${inFinal ? '<p>La final espera a todos los finalistas. Si alguien se desconecta, puede volver a entrar y responder.</p>' : ''}
     <div class="actions actions-columna">
       ${isHost && playing ? '<button class="btn btn-ghost" data-online-action="close-room">Terminar partida y cerrar sala</button>' : isHost ? '<button class="btn btn-ghost" data-online-action="close-room">Cerrar la sala</button>' : inFinal ? '<button class="btn btn-ghost" data-online-action="home">Ir al inicio</button>' : `<button class="btn btn-ghost" data-online-action="leave-room">${playing ? "Salir de la partida" : "Salir de la sala"}</button>`}
@@ -1787,9 +1818,9 @@ async function skipTurn(expectedVersion = null) {
 }
 
 // Expulsar (anfitrión) o marcharse: las cartas de quien sale vuelven al descarte.
-async function removePlayer(targetUid) {
-  if (busy) return;
-  if (targetUid !== user.uid && roomState?.hostUid !== user.uid) return;
+async function removePlayer(targetUid, { silent = false } = {}) {
+  if (busy) return false;
+  if (targetUid !== user.uid && roomState?.hostUid !== user.uid) return false;
   busy = true;
   const publicLobby = roomState?.matchmaking === "public" && roomState.status === "lobby";
   const code = roomCode, queueKey = roomState?.queueKey;
@@ -1832,9 +1863,11 @@ async function removePlayer(targetUid) {
       transaction.update(roomRef, update);
     });
     if (publicLobby) void reopenPublicQueue(code, queueKey);
+    return true;
   } catch (error) {
     console.error(error);
-    showToast(error.message === "HOST" ? "El anfitrión no puede salir: cierra la sala" : "No se pudo actualizar la sala");
+    if (!silent) showToast(error.message === "HOST" ? "El anfitrión no puede salir: cierra la sala" : "No se pudo actualizar la sala");
+    return false;
   } finally { busy = false; }
 }
 

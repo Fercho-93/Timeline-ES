@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {initializeTestEnvironment,assertSucceeds,assertFails} from '@firebase/rules-unit-testing';
-import {collection,deleteDoc,getDocs,query,where,doc,getDoc,setDoc,updateDoc,serverTimestamp,runTransaction,onSnapshot,writeBatch} from 'firebase/firestore';
+import {collection,deleteDoc,getDocs,query,where,limit,doc,getDoc,setDoc,updateDoc,serverTimestamp,runTransaction,onSnapshot,writeBatch} from 'firebase/firestore';
 import {queueFresh} from '../js/online/public-matchmaking.js';
 const env=await initializeTestEnvironment({projectId:'demo-hilo',firestore:{rules:fs.readFileSync('firestore.rules','utf8'),host:'127.0.0.1',port:8080}});
 const w={};for(const p of ['mazos/cards.js','mazos/movies.js','mazos/music.js','mazos/videogames.js','mazos/animals.js','mazos/lifespan.js','mazos/speed.js','mazos/inventos.js','mazos/mundo.js','mazos/astronomy.js','mazos/medicine.js','mazos/countries.js','mazos/population.js','mazos/idiomas.js','mazos/distances.js','js/juego/modes.js','js/juego/engine.js','mazos/quick-challenges-data.js','js/retos/quick-challenges-engine.js','js/jugador/cartera.js','js/juego/tournament.js','js/juego/final.js','js/retos/quick-room.js'])vm.runInNewContext(fs.readFileSync(p,'utf8'),{window:w});
@@ -81,7 +81,7 @@ try {
   // Antes de cada alta el cliente espera a que pase la cuota; aquí se simula vaciándola.
   w.CONTINUUM.creationSlot=async()=>{for(const uid of ['host','guest','outsider'])await libre(uid);};
   w.CONTINUUM.QuickRoom={...R,create:(...args)=>JSON.parse(JSON.stringify(R.create(...args))),reduce:(...args)=>JSON.parse(JSON.stringify(R.reduce(...args)))};
-  const adapter=(uid,db,api=false)=>new Function('auth','db','collection','getDocs','query','where','getDoc','doc','runTransaction','onSnapshot','serverTimestamp','window',source+'\nreturn '+(api?'{connect,actOnce,cancelRoom}':'connect')+';')({currentUser:{uid},authStateReady:async()=>{}},db,collection,getDocs,query,where,getDoc,doc,runTransaction,onSnapshot,serverTimestamp,w);
+  const adapter=(uid,db,api=false)=>new Function('auth','db','collection','getDocs','query','where','limit','getDoc','doc','runTransaction','onSnapshot','serverTimestamp','window',source+'\nreturn '+(api?'{connect,actOnce,cancelRoom}':'connect')+';')({currentUser:{uid},authStateReady:async()=>{}},db,collection,getDocs,query,where,limit,getDoc,doc,runTransaction,onSnapshot,serverTimestamp,w);
   const rooms={};let failures=[];
   const h=await adapter('host',host)({name:'Ana',create:true,onChange:r=>rooms.h=r,onError:e=>failures.push(e)});
   const g=await adapter('guest',guest)({name:'Bea',code:h.code,onChange:r=>rooms.g=r,onError:e=>failures.push(e)});
@@ -111,7 +111,9 @@ try {
   const second=await publicAdapter('guest',guest)({name:'Bea',capacity:2,onChange:r=>publicRooms.guest=r,onError:e=>failures.push(e)});
   assert.equal(first.code,second.code);
   await wait(()=>publicRooms.host?.members.length===2 && publicRooms.guest?.members.length===2);
-  const queue=await getDoc(doc(host,'quickPublicQueues','quick:2:v1:1'));
+  // La cola está repartida en cuatro documentos (`quick:2:v1:1:0` … `:3`): el de esta mesa queda lleno.
+  const shards=await Promise.all([0,1,2,3].map(i=>getDoc(doc(host,'quickPublicQueues','quick:2:v1:1:'+i))));
+  const queue=shards.find(q=>q.exists()&&q.data().code===first.code);
   assert.equal(queue.data().status,'full');
   // Con dos personas la mesa sortea sola la carta de «quién empieza» y no arranca hasta que las dos responden.
   await wait(()=>publicRooms.host?.starter && publicRooms.guest?.starter);
@@ -132,16 +134,20 @@ try {
   await env.withSecurityRulesDisabled(async c=>{
     const d=c.firestore();
     await setDoc(doc(d,'quickRooms','ZZZZZZZZZ2'),{...JSON.parse(JSON.stringify(R.create('fantasma','Nadie',2))),catalog:1,matchmaking:'public',updatedAt:viejo});
-    await setDoc(doc(d,'quickPublicQueues','quick:2:v1:1'),{code:'ZZZZZZZZZ2',status:'waiting',capacity:2,updatedAt:viejo});
+    for(const i of [0,1,2,3])await setDoc(doc(d,'quickPublicQueues','quick:2:v1:1:'+i),{code:'ZZZZZZZZZ2',status:'waiting',capacity:2,updatedAt:viejo});
   });
   const nueva=await publicAdapter('guest',guest)({name:'Bea',capacity:2,onChange:()=>{},onError:e=>failures.push(e)});
   assert.notEqual(nueva.code,'ZZZZZZZZZ2','no entra en la mesa abandonada');
-  assert.equal((await getDoc(doc(guest,'quickPublicQueues','quick:2:v1:1'))).data().code,nueva.code);
+  const nuevaKey=(await Promise.all([0,1,2,3].map(async i=>({i,q:await getDoc(doc(guest,'quickPublicQueues','quick:2:v1:1:'+i))})))).find(x=>x.q.data().code===nueva.code);
+  assert.ok(nuevaKey,'una de las colas apunta a la mesa nueva');
+  const nuevaRef=db=>doc(db,'quickPublicQueues','quick:2:v1:1:'+nuevaKey.i);
   // Solo quien abrió la mesa la mantiene viva en la búsqueda.
-  await assertSucceeds(updateDoc(doc(guest,'quickPublicQueues','quick:2:v1:1'),{updatedAt:serverTimestamp()}));
-  await assertFails(updateDoc(doc(out,'quickPublicQueues','quick:2:v1:1'),{updatedAt:serverTimestamp()}));
+  await assertSucceeds(updateDoc(nuevaRef(guest),{updatedAt:serverTimestamp()}));
+  await assertFails(updateDoc(nuevaRef(out),{updatedAt:serverTimestamp()}));
   // Una mesa viva no se puede sustituir.
-  await assertFails(env.withSecurityRulesDisabled(async()=>{}).then(()=>setDoc(doc(out,'quickPublicQueues','quick:2:v1:1'),{code:'YYYYYYYYY2',status:'waiting',capacity:2,updatedAt:serverTimestamp()})));
+  await assertFails(env.withSecurityRulesDisabled(async()=>{}).then(()=>setDoc(nuevaRef(out),{code:'YYYYYYYYY2',status:'waiting',capacity:2,updatedAt:serverTimestamp()})));
+  // La clave de la cola dice su capacidad: no se puede abrir una cola de 4 que apunte a una mesa de 2.
+  await assertFails(setDoc(doc(guest,'quickPublicQueues','quick:4:v1:1:0'),{code:nueva.code,status:'waiting',capacity:2,updatedAt:serverTimestamp()}));
   assert.deepEqual(failures,[]);
   nueva.close();
   // Quién empieza en una sala en directo: sortea quien la lleva, cada uno responde una vez y solo la suya.
@@ -267,7 +273,7 @@ try {
   await assertSucceeds(getDocs(query(collection(guest,'quickRooms'),where('members','array-contains','guest'))));
   await assertFails(getDocs(query(collection(out,'quickRooms'),where('members','array-contains','guest'))));
   await assertFails(getDocs(collection(guest,'quickRooms')));
-  const minePeek=new Function('auth','db','collection','getDocs','query','where','getDoc','doc','runTransaction','onSnapshot','serverTimestamp','window',source+'\nreturn mine;')({currentUser:{uid:'guest'},authStateReady:async()=>{}},guest,collection,getDocs,query,where,getDoc,doc,runTransaction,onSnapshot,serverTimestamp,w);
+  const minePeek=new Function('auth','db','collection','getDocs','query','where','limit','getDoc','doc','runTransaction','onSnapshot','serverTimestamp','window',source+'\nreturn mine;')({currentUser:{uid:'guest'},authStateReady:async()=>{}},guest,collection,getDocs,query,where,limit,getDoc,doc,runTransaction,onSnapshot,serverTimestamp,w);
   const mias=await minePeek();assert.equal(mias.length,1);assert.equal(mias[0].code,'ABCDEFGH23');assert.equal(mias[0].room.members.includes('guest'),true);
   // Archivar un duelo terminado de Retos rápidos va con la cuenta, como en las colecciones.
   {

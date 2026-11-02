@@ -100,6 +100,17 @@
       // Rendirse en un duelo por turnos con los dos dentro: el rival gana y el duelo queda en el historial.
       if (r.capacity !== 2 || r.members.length !== 2 || r.config?.kind !== 'duel' || r.phase === 'finished' || !r.members.includes(id)) throw Error('No te puedes rendir ahora.');
       r.resigned = id; metadata(r);
+    } else if (action.type === 'force') {
+      // Jugar por quien no responde (cerró la app o se quedó sin red), pasado su plazo: lo mismo que haría el tiempo
+      // agotado. El comando va firmado por quien tenía que jugar (`by`) y por quien lo fuerza (`forcedBy`); las reglas
+      // exigen que haya pasado el plazo (firestore.rules, `forcing`). En un duelo por turnos no se fuerza: se juega
+      // cuando cada uno puede.
+      if (!r.config || r.config.kind === 'duel' || !['turn', 'result', 'round-end'].includes(r.phase) || !r.members.includes(id) || id === r.actor) throw Error('No se puede jugar por otra persona ahora.');
+      const now = state(r);
+      const command = now.phase === 'turn' ? E.timeoutPlacement(now) : now.phase === 'result' ? {type: 'ack'} : {type: 'next'};
+      if (!E.step(now, command)) throw Error('Jugada no válida.');
+      r.commands.push({...command, by: r.actor, forcedBy: id});
+      metadata(r);
     } else if (action.type === 'start') {
       // Un duelo por turnos lo empieza quien lo crea, sin esperar al amigo: su sitio queda reservado hasta que abra el enlace.
       const alone = r.capacity === 2 && r.members.length === 1 && action.kind === 'duel' && r.matchmaking !== 'public';

@@ -3,11 +3,11 @@ import fs from 'node:fs';
 import { initializeTestEnvironment } from '@firebase/rules-unit-testing';
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 const env = await initializeTestEnvironment({ projectId: 'demo-sorteo', firestore: { host: '127.0.0.1', port: 8080, rules: fs.readFileSync(new URL('../firestore.rules', import.meta.url), 'utf8') } });
-const room = { hostUid: 'ana', roomCode: 'SORT1234', mode: 'history', deckFingerprint: 'test', playerOrder: ['ana', 'bea'], players: { ana: { name: 'Ana', hand: [] }, bea: { name: 'Bea', hand: [] } }, status: 'lobby', phase: 'lobby', version: 1, updatedAt: Timestamp.fromMillis(Date.now() - 100000), createdAt: Timestamp.fromMillis(Date.now() - 100000) };
+const room = { hostUid: 'ana', roomCode: 'SQRT5234', mode: 'history', deckFingerprint: 'test', playerOrder: ['ana', 'bea'], players: { ana: { name: 'Ana', hand: [] }, bea: { name: 'Bea', hand: [] } }, status: 'lobby', phase: 'lobby', version: 1, updatedAt: Timestamp.fromMillis(Date.now() - 100000), createdAt: Timestamp.fromMillis(Date.now() - 100000) };
 const ctx = uid => env.authenticatedContext(uid, { email_verified: true, firebase: { sign_in_provider: 'password' } }).firestore();
-const starter = (uid, other = uid) => doc(ctx(uid), 'rooms', 'SORT1234', 'starter', other);
+const starter = (uid, other = uid) => doc(ctx(uid), 'rooms', 'SQRT5234', 'starter', other);
 async function seed(overrides = {}) {
-  await env.withSecurityRulesDisabled(async tx => { await setDoc(doc(tx.firestore(), 'rooms', 'SORT1234'), { ...room, ...overrides }); });
+  await env.withSecurityRulesDisabled(async tx => { await setDoc(doc(tx.firestore(), 'rooms', 'SQRT5234'), { ...room, ...overrides }); });
 }
 let fail = 0;
 // El SDK de pruebas de reglas a veces deja el aviso de un intento fallido a medias antes

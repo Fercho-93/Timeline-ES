@@ -108,6 +108,7 @@ const DELETES = {
   '/publicTables/{code}': 'quien la lleva, o cualquiera si está abandonada (ficha efímera de un día)',
   '/creationQuota/{owner}': 'su dueño, pasados 10 s',
   '/roomCreation/{owner}': 'su dueño, pasados 30 s',
+  '/reportQuota/{owner}': 'su dueño, pasados 15 s (al borrar la cuenta)',
   '/rooms/{roomId}/presence/{playerId}': 'cada participante, la suya',
   '/rooms/{roomId}/starter/{playerId}': 'cada participante, la suya',
   '/rooms/{roomId}': 'quien lleva la sala',

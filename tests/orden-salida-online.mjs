@@ -10,7 +10,7 @@ import { initializeTestEnvironment } from '@firebase/rules-unit-testing';
 import { doc, getDoc, setDoc, runTransaction, serverTimestamp, Timestamp } from 'firebase/firestore';
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
 const env = await initializeTestEnvironment({ projectId: 'demo-orden', firestore: { host: '127.0.0.1', port: 8080, rules: read('firestore.rules') } });
-const ROOM = 'ORDEN234', A = 'ana', B = 'bea', C = 'cid';
+const ROOM = 'QRDEN234', A = 'ana', B = 'bea', C = 'cid';
 const db = uid => env.authenticatedContext(uid, { email_verified: true, firebase: { sign_in_provider: 'password' } }).firestore();
 const seedDoc = (path, data) => env.withSecurityRulesDisabled(c => setDoc(doc(c.firestore(), ...path), data));
 const readDoc = async (...path) => { let data; await env.withSecurityRulesDisabled(async c => { data = (await getDoc(doc(c.firestore(), ...path))).data(); }); return data; };

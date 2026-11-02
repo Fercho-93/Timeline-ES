@@ -127,6 +127,22 @@ recomienda? Solo después, cómo se monetiza. Las preguntas de pago ayudan ahí,
 condicionar el diseño antes de comprobar que el juego funciona. No se han recogido testimonios:
 no inventar resultados de testers.
 
+## Prueba de carga
+
+Antes de abrir las mesas públicas a desconocidos, `scripts/carga.mjs` (`npm run carga`) lanza bots
+contra el emulador o contra un proyecto de Firebase de pruebas (nunca el de producción):
+
+- `CARGA="--escenario rafaga --bots 100" npm run carga`: muchas búsquedas de Retos rápidos a la vez.
+- `CARGA="--escenario tablon --bots 200 --mesas 100" npm run carga`: gente mirando el tablón.
+- `CARGA="--escenario fantasmas --bots 12 --fantasmas 0.25" npm run carga`: un cuarto de los
+  jugadores cierra la app a mitad de partida.
+
+Se da por bueno con: sentarse en menos de 5 s en el 95 % de las búsquedas, menos del 1 % de
+errores, ninguna sala parada y lecturas del tablón que no crezcan con el número de mesas. El
+emulador sirve para lo funcional y para los choques entre transacciones, pero no reproduce la red
+ni los índices: las cifras de tiempo valen contra el proyecto de pruebas. Además, una prueba a mano
+con 4 móviles (2 iPhone) pasando a segundo plano y cerrando la app en cada modo.
+
 ## Criterios para ampliar la beta
 
 Se amplía la beta cuando:

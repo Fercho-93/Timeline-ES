@@ -42,11 +42,23 @@
   const ofensivo = nombre => formas(nombre).some(f => palabras(f).some(p => PALABRAS.has(p)) || FRAGMENTOS.some(x => junto(f).includes(x)));
   const reservado = nombre => formas(nombre).some(f => junto(f).includes("continuum") || palabras(f).some(p => RESERVADAS.has(p)));
 
+  // Las letras que admite el servidor en cualquier nombre que vean otras personas (firestore.rules, `publicName`),
+  // las mismas que el alias de la cuenta (js/jugador/identidad.js).
+  const LETRAS = /^[a-z0-9áéíóúüñ_-](?:[a-z0-9áéíóúüñ _-]*[a-z0-9áéíóúüñ_-])?$/i;
+
   // El motivo si el nombre no vale, o `null` si vale.
   function problema(nombre) {
+    if (!LETRAS.test(String(nombre ?? "").trim())) return "Usa letras, números, espacios, guion o guion bajo.";
     if (reservado(nombre)) return "Ese nombre está reservado. Elige otro.";
     if (ofensivo(nombre)) return "Ese nombre no está permitido. Elige otro.";
     return null;
+  }
+  // Cómo se enseña el nombre de otra persona: tal cual, salvo que sea ofensivo o se haga pasar por el juego (lo
+  // escribió una versión antigua o un cliente modificado). Entonces se ve un nombre neutro hasta que alguien lo
+  // denuncie y se revise.
+  function visible(nombre, respaldo = "Jugador") {
+    const texto = String(nombre ?? "");
+    return texto && !reservado(texto) && !ofensivo(texto) ? texto : respaldo;
   }
 
   const escapa = texto => CT.escapeHtml(texto);
@@ -59,5 +71,5 @@
     return `<button type="button" class="report-btn${compacto ? " report-compact" : ""}" data-report-uid="${escapa(uid)}" data-report-alias="${escapa(nombre)}" data-report-context="${contexto}" aria-haspopup="dialog" aria-label="Denunciar o bloquear a ${escapa(nombre)}" title="Denunciar o bloquear">${compacto ? "⋯" : "Denunciar o bloquear"}</button>`;
   }
 
-  CT.Moderacion = { problema, ofensivo, reservado, botonDenuncia };
+  CT.Moderacion = { problema, visible, ofensivo, reservado, botonDenuncia };
 })();

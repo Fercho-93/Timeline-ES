@@ -1,15 +1,42 @@
 // Retos rápidos por internet: salas y duelos guardados en Firestore, con cada jugada firmada por su autor.
 import {auth, db} from '../nube/firebase-client.js';
-import {collection, doc, getDoc, getDocs, query, where, runTransaction, onSnapshot, serverTimestamp} from '../../vendor/firebase/firebase-firestore.js';
+import {collection, doc, getDoc, getDocs, query, where, limit, runTransaction, onSnapshot, serverTimestamp} from '../../vendor/firebase/firebase-firestore.js';
 import {queueFresh} from '../online/public-matchmaking.js';
 const CT=window.CONTINUUM, R=CT.QuickRoom;
 export const PUBLIC_VERSION=1;
-function publicKey(capacity){return 'quick:'+capacity+':v'+PUBLIC_VERSION+':'+CT.QuickNetwork.fingerprint();}
+// La cola de la partida rápida está repartida en QUEUE_SHARDS documentos por capacidad: con una sola, cada entrada
+// invalidaba las transacciones de quien buscaba a la vez y, por encima de 2–3 búsquedas por segundo, la búsqueda
+// fallaba. Quien busca mira todas las de su capacidad a la vez y entra en la primera con una mesa esperando; si no
+// hay ninguna, abre una mesa en una al azar.
+const QUEUE_SHARDS=4;
+function publicKey(capacity,shard){return 'quick:'+capacity+':v'+PUBLIC_VERSION+':'+CT.QuickNetwork.fingerprint()+':'+shard;}
+const shardOrder=()=>CT.shuffle(Array.from({length:QUEUE_SHARDS},(_,i)=>i));
 // Solo quien abre una mesa pública puede empezarla, así que la mesa vive mientras esa
 // persona siga esperando: su móvil renueva la cola cada 45 s. Una cola sin renovar en dos
 // minutos es una mesa abandonada (`queueFresh`, public-matchmaking.js): la búsqueda no entra y
 // abre otra en su lugar.
 const PUBLIC_WAIT_MS=30000;
+// Quien no responde (cerró la app o se quedó sin red) no deja la sala parada: pasado su plazo de jugada y un margen
+// —o 90 s si la sala no tiene plazo—, otra persona de la sala juega por él lo que haría el tiempo agotado (`force` en
+// QuickRoom; las reglas comprueban el plazo con la hora del servidor). Lo intenta primero quien va antes en la mesa y
+// el resto unos segundos después, por si esa persona tampoco está. En los duelos por turnos no se fuerza nada.
+const forceDelay=room=>{const s=Number(room?.config?.seconds)||0;return (s>0?s+20:90)*1000;};
+export function overdue(room,uid,now=Date.now()){
+  if(!room?.config||room.config.kind==='duel'||!['turn','result','round-end'].includes(room.phase)||room.actor===uid||!room.members?.includes(uid))return false;
+  const last=room.updatedAt?.toMillis?.();
+  if(!Number.isFinite(last))return false;
+  const turn=room.members.filter(m=>m!==room.actor).indexOf(uid);
+  return now-last>forceDelay(room)+5000+Math.max(0,turn)*4000;
+}
+function forceWatch(current,uid,act){
+  let trying=false;
+  return setInterval(()=>{
+    const room=current();
+    if(trying||!overdue(room,uid))return;
+    trying=true;
+    act({type:'force'}).catch(()=>{}).finally(()=>{setTimeout(()=>{trying=false;},4000);});
+  },5000);
+}
 // El tablón de mesas abiertas (`public-tables.js`): quien lleva la mesa mantiene su ficha.
 // Se carga aparte y sin bloquear: si no está, la mesa funciona igual por la cola.
 let tablesModule=null;
@@ -36,13 +63,17 @@ async function claimTable({uid,name,create,code,capacity}){
     if(room.members.includes(uid))return;
     if(room.matchmaking!=='public'||room.phase!=='lobby'||room.members.length>=room.capacity)throw Error('Esa mesa ya está completa o ha empezado. Elige otra en la lista.');
     if(room.catalog!==CT.QuickNetwork.fingerprint())throw Error('Esa mesa usa otra versión de los retos. Actualiza Continuum o elige otra.');
-    const qref=doc(db,'quickPublicQueues',publicKey(room.capacity)), queue=await tx.get(qref);
     const next=R.reduce(room,uid,{type:'join',name});
+    // Si con esta plaza se llena y alguna cola de la partida rápida apuntaba a ella, se marca llena.
+    const full=next.members.length===room.capacity;
+    const qrefs=full?Array.from({length:QUEUE_SHARDS},(_,i)=>doc(db,'quickPublicQueues',publicKey(room.capacity,i))):[];
+    const queues=await Promise.all(qrefs.map(q=>tx.get(q)));
     tx.update(ref,{...next,updatedAt:serverTimestamp()});
-    if(next.members.length===room.capacity&&queue.exists()&&queue.data().code===code&&queue.data().status==='waiting')tx.update(qref,{status:'full',updatedAt:serverTimestamp()});
+    queues.forEach((queue,i)=>{if(queue.exists()&&queue.data().code===code&&queue.data().status==='waiting')tx.update(qrefs[i],{status:'full',updatedAt:serverTimestamp()});});
   });
   return code;
 }
+const SEARCH_RETRIES=4;
 async function publicConnect(options) {
   const {name,capacity=4,allowStale=false}=options;
   await auth.authStateReady(); const uid=auth.currentUser?.uid;
@@ -52,12 +83,12 @@ async function publicConnect(options) {
     return watchPublic({...options,uid,code,seconds:options.create?options.seconds:undefined,length:options.create?options.length:undefined,keep:options.create?options.keep:undefined});
   }
   const capacities=[2,3,4].includes(Number(capacity))?[Number(capacity)]:[4,3,2];
-  let chosen=null;
-  for(const cap of capacities){
-    const key=publicKey(cap), qref=doc(db,'quickPublicQueues',key), qs=await getDoc(qref);
-    if(qs.exists()&&qs.data().status==='waiting'&&(allowStale||queueFresh(qs.data()))){chosen={cap,key};break;}
-  }
-  if(!chosen){const cap=capacities[0];chosen={cap,key:publicKey(cap)};}
+  // Todas las colas (capacidades × repartos) se leen a la vez; gana la primera capacidad con una mesa esperando.
+  const candidates=capacities.flatMap(cap=>shardOrder().map(shard=>({cap,key:publicKey(cap,shard)})));
+  const open=await Promise.all(candidates.map(({key})=>getDoc(doc(db,'quickPublicQueues',key))
+    .then(qs=>qs.exists()&&qs.data().status==='waiting'&&(allowStale||queueFresh(qs.data())),()=>false)));
+  let chosen=candidates.find((_,i)=>open[i])||null;
+  if(!chosen){const cap=capacities[0];chosen={cap,key:publicKey(cap,shardOrder()[0])};}
   const qref=doc(db,'quickPublicQueues',chosen.key);
   // Una mesa que ya ha empezado no la puede leer quien no está en ella, y leerla dentro de
   // la transacción haría fallar la búsqueda: se comprueba antes y, si es así, se abre otra.
@@ -91,9 +122,13 @@ async function publicConnect(options) {
   }).catch(error=>{
     // Con las reglas anteriores no se puede sustituir una mesa abandonada: se entra como antes.
     if(!allowStale&&error?.code==='permission-denied')return null;
+    // Muchas búsquedas a la vez: quien pierde la carrera por la última plaza recibe un «sin permiso» (la mesa ya
+    // estaba llena) o un conflicto. Se vuelve a buscar tras una espera al azar, hasta SEARCH_RETRIES veces.
+    if(['permission-denied','aborted','failed-precondition'].includes(error?.code)&&(options.retry||0)<SEARCH_RETRIES)return undefined;
     throw error;
   });
   if(code===null)return publicConnect({...options,allowStale:true});
+  if(code===undefined){await new Promise(r=>setTimeout(r,250+Math.random()*1000*((options.retry||0)+1)));return publicConnect({...options,retry:(options.retry||0)+1});}
   // La partida rápida va con 30 s por carta, como la de Grandes colecciones: con desconocidos,
   // sin plazo una mesa puede quedarse esperando a quien ya no está.
   return watchPublic({...options,uid,code,seconds:30,length:3,keep:false,queueRef:qref});
@@ -184,7 +219,8 @@ async function watchPublic({uid,code,seconds,length,keep,queueRef:qref=null,onCh
     catch{}
   };
   const keepTimer=setInterval(keepAlive,45000);
-  const close=()=>{clearInterval(keepTimer);clearInterval(startTimer);stop();};
+  const forceTimer=forceWatch(()=>latest,uid,action=>api.act(action));
+  const close=()=>{clearInterval(keepTimer);clearInterval(startTimer);clearInterval(forceTimer);stop();};
   // Dejar de buscar: se libera la plaza (o se cierra la mesa si no quedaba nadie más).
   async function leave(){
     close();
@@ -208,7 +244,7 @@ export async function mine(){
   // Las tuyas y los retos que te han mandado (todavía sin aceptar), como en los duelos de las colecciones.
   const [mineSnap,invitedSnap]=await Promise.all([
     getDocs(query(collection(db,'quickRooms'),where('members','array-contains',uid))),
-    getDocs(query(collection(db,'quickRooms'),where('invitedUid','==',uid)))
+    getDocs(query(collection(db,'quickRooms'),where('invitedUid','==',uid),limit(50)))
   ]);
   const docs=[...new Map([...mineSnap.docs,...invitedSnap.docs].map(d=>[d.id,d])).values()];
   const found=[];
@@ -249,6 +285,8 @@ export async function actOnce(code,action,expected){
     tx.update(ref,{...R.reduce(room,uid,action),updatedAt:serverTimestamp()});
   });
 }
+// `invite`: reto dirigido a quien ya jugó contigo en la sala `invite.source` (las reglas lo comprueban). Sin esa sala
+// (por ejemplo, una revancha de una partida por Wi-Fi) el duelo se crea sin rival fijo y se comparte por enlace.
 export async function connect({code, name, create=false, capacity=4, invite=null, onChange, onError}) {
   await auth.authStateReady();
   const uid=auth.currentUser?.uid;
@@ -262,7 +300,7 @@ export async function connect({code, name, create=false, capacity=4, invite=null
     const snap=await tx.get(ref);
     if(create) {
       if(snap.exists())throw Error('Ese código ya existe. Vuelve a crear la sala.');
-      tx.set(ref,{...R.create(uid,name,capacity),...(invite?.uid?{invitedUid:String(invite.uid).slice(0,128),invitedName:String(invite.name||'').slice(0,24)}:{}),catalog:CT.QuickNetwork.fingerprint(),updatedAt:serverTimestamp()});
+      tx.set(ref,{...R.create(uid,name,capacity),...(invite?.uid&&/^[A-Z2-9]{10}$/.test(String(invite.source||''))?{invitedUid:String(invite.uid).slice(0,128),invitedName:String(invite.name||'').slice(0,24),sourceRoom:String(invite.source)}:{}),catalog:CT.QuickNetwork.fingerprint(),updatedAt:serverTimestamp()});
       tx.set(doc(db,'creationQuota',uid),{lastCreatedAt:serverTimestamp(),kind:'quickRoom',target:code});
     } else {
       if(!snap.exists())throw Error('No se encuentra esta sala.');
@@ -275,7 +313,7 @@ export async function connect({code, name, create=false, capacity=4, invite=null
   const stop=onSnapshot(ref,snap=>{
     try{if(!snap.exists())throw Error('La sala ya no existe.');latest=R.validate(snap.data());onChange(latest,uid,code);}catch(error){onError(error);}
   },onError);
-  return {kind:'internet',code, get host(){return latest?.host===uid;},close:stop,
+  const room={kind:'internet',code, get host(){return latest?.host===uid;},close(){clearInterval(watch);stop();},
     async act(action) {
       if(!latest)throw Error('Espera a que se cargue la sala.');
       const revision=latest.revision;
@@ -286,4 +324,6 @@ export async function connect({code, name, create=false, capacity=4, invite=null
       });
     }
   };
+  const watch=forceWatch(()=>latest,uid,action=>room.act(action));
+  return room;
 }

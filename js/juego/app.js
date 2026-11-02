@@ -4298,7 +4298,8 @@
         const pending = table.create
           ? matchmaking.createTable(table.mode, table.capacity, table.seconds, table.handSize).then(code => ({ code, mode: table.mode }))
           : matchmaking.joinTable(table.code).then(mode => ({ code: table.code, mode }));
-        const { code, mode } = await Promise.race([pending, new Promise((_, reject) => { timer = setTimeout(() => reject(Error("MATCH_TIMEOUT")), 30000); })]).finally(() => clearTimeout(timer));
+        // Si se agota la espera pero la búsqueda termina después, la plaza que se ocupó tarde se libera.
+        const { code, mode } = await Promise.race([pending, new Promise((_, reject) => { timer = setTimeout(() => { reject(Error("MATCH_TIMEOUT")); pending.then(late => matchmaking.abandonSeat(late.code), () => {}); }, 30000); })]).finally(() => clearTimeout(timer));
         const online = await import("../online/online.js");
         await online.openOnlineMode({ roomCode: code, modeKey: mode, onBack: () => CT.ModeHubs ? CT.ModeHubs.open("hub-online") : home() });
         return;
@@ -4312,9 +4313,11 @@
         : intent ? available : [selectedModeKey];
       // Sin límite, una conexión colgada dejaba el spinner para siempre.
       let timer;
+      const search=matchmaking.findAcrossModes(pool.length?pool:[selectedModeKey],capacity);
       const found=await Promise.race([
-        matchmaking.findAcrossModes(pool.length?pool:[selectedModeKey],capacity),
-        new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('MATCH_TIMEOUT')),30000);})
+        search,
+        // Si se agota la espera pero la búsqueda termina después, la plaza que se ocupó tarde se libera.
+        new Promise((_,reject)=>{timer=setTimeout(()=>{reject(Error('MATCH_TIMEOUT'));search.then(late=>matchmaking.abandonSeat(late.code),()=>{});},30000);})
       ]).finally(()=>clearTimeout(timer));
       const {code,mode}=found;
       const online = await import("../online/online.js");

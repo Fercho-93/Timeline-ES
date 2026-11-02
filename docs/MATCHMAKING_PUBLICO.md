@@ -62,19 +62,40 @@ persona.
   privadas: el anfitrión técnico reparte una carta automáticamente y cada persona tiene 20
   segundos para escribir su cifra y el resultado se enseña 8 segundos. La mesa se sienta por orden de cercanía; quien no respondió
   juega al final.
-- **Relevo automático.** Si el anfitrión técnico deja de dar señales (15 s si dejó la pantalla de
+- **Relevo automático.** Si el anfitrión técnico deja de dar señales (45 s si dejó la pantalla de
   la sala o la app pasó a segundo plano, 90 s si simplemente dejó de responder), la primera
   persona conectada toma el relevo sin pulsar nada. En la sala de espera, además, se saca de la
-  mesa a quien se fue y la cola vuelve a ofrecerla (`status: waiting`).
+  mesa a quien se fue y la cola vuelve a ofrecerla (`status: waiting`). En plena partida el relevo
+  también es automático en las salas privadas.
+- **Plazas fantasma.** Quien lleva la mesa saca a quien deja de dar señales: en la sala de espera,
+  para que la partida no empiece con él, y ya en juego, cuando le toca. Las reglas solo dejan sacar o
+  saltar el turno de alguien en una mesa pública si ha dejado de dar señales (90 s, o 45 s en segundo
+  plano) o ha agotado su tiempo (`seatStale` y `skipAllowed` en `firestore.rules`).
+- **Búsqueda que termina tarde.** Si la espera de 30 s se agota pero la búsqueda acaba sentando a la
+  persona, la plaza se libera (`abandonSeat`): no queda nadie fantasma.
 - **Reglas antiguas.** Reordenar la mesa al empezar necesita las reglas actuales (`validStart`
   admite una permutación de `playerOrder`). Con reglas anteriores, el cliente reintenta sin
   reordenar.
 - **Mesas abandonadas.** Mientras alguien espera en una mesa con plazas libres, su móvil renueva
   la cola cada 45 s. Una cola sin renovar en dos minutos se da por abandonada: la búsqueda no
   entra en ella y abre una mesa nueva.
-- **Retos rápidos.** Sus mesas usan `quickPublicQueues` y solo las puede empezar quien las abrió
-  (no hay relevo). Esa persona renueva la cola cada 45 s; quien estaba esperando en una mesa
-  abandonada recibe un aviso para volver a buscar.
+- **Retos rápidos.** Sus mesas usan `quickPublicQueues`, repartida en cuatro documentos por
+  capacidad (`quick:{plazas}:v1:{huella}:{0-3}`): con uno solo, por encima de 2–3 búsquedas por
+  segundo las transacciones chocaban y la búsqueda fallaba. Quien busca lee las cuatro a la vez y
+  entra en la primera con una mesa esperando; si pierde la carrera por la última plaza, vuelve a
+  buscar tras una espera al azar (hasta cuatro veces). Solo puede empezar la mesa quien la abrió.
+  Esa persona renueva la cola cada 45 s; quien estaba esperando en una mesa abandonada recibe un
+  aviso para volver a buscar.
+- **Turno de quien no responde (Retos rápidos).** Pasado su plazo y 20 s más (90 s si la mesa no
+  tiene plazo), otra persona de la sala juega por ella lo que haría el tiempo agotado: un fallo, seguir
+  tras el resultado o pasar de reto. El comando va firmado por quien tenía que jugar (`by`) y por
+  quien lo fuerza (`forcedBy`), y las reglas comprueban el plazo con la hora del servidor (`forcing`).
+  En los duelos por turnos no se fuerza nada.
+- **Al azar.** Las colas de todos los mazos y capacidades se leen a la vez (antes, unas 87
+  lecturas en fila).
+- **Tablón.** Se consulta cada 20 s mientras está a la vista, con el filtro de hora en el servidor,
+  en vez de escuchar en directo: así cuesta como mucho 50 lecturas cada 20 s por persona, haya las
+  mesas que haya. Las fichas abandonadas las borra la limpieza diaria.
 
 ## Sala de espera
 
