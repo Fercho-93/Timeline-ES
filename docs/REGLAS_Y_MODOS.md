@@ -360,8 +360,8 @@ tablero compartido.
 En solitario, cada reto se juega con 10 cartas que colocar (`QuickEngine.SOLO_CARDS`) más la que abre
 la línea, igual que una ronda de Grandes colecciones y el reto diario; salen primero las que aún no
 están en la colección, y un mazo más pequeño se juega entero. La pantalla de solitario es un
-álbum: todos los mazos a la vista (primero los empezados, luego los nuevos y al final los
-completos), cada uno con lo descubierto, y un botón «Al azar» que elige uno sin completar. La meta
+álbum: todos los mazos a la vista en tres grupos, «Empezados», «Nuevos» y «Completos» (cada uno
+en el orden del catálogo, y los mismos grupos en «Tu colección»), con lo descubierto de cada mazo, y un botón «Al azar» que elige uno sin completar. La meta
 es completar mazos. Hasta noviembre de 2026 había «mazos del día» (cuatro que rotaban) y «partida
 sorpresa» (varios mazos ocultos seguidos); se quitaron porque repetían el Reto diario y la
 Competición. Una partida guardada de varios mazos se sigue pudiendo continuar. Cada carta que quien juega coloca bien entra en su

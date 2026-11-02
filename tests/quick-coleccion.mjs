@@ -24,6 +24,9 @@ w.document.querySelector('[data-action="quick-challenges"]').click();
 const tiles = [...w.document.querySelectorAll('[data-quick="play-deck"]')];
 assert.equal(tiles.length, CT.QuickCatalog.challenges.length, 'todos los mazos a la vista');
 assert.deepEqual(tiles.map(t => t.dataset.deck), plain(CT.QuickCatalog.challenges.map(c => c.id)), 'sin nada descubierto, en el orden del catálogo');
+const grupos = () => [...w.document.querySelectorAll('[data-deck-group]')].map(g => [g.dataset.deckGroup, g.querySelectorAll('[data-deck]').length]);
+assert.deepEqual(grupos(), [['new', CT.QuickCatalog.challenges.length]], 'sin nada descubierto, todos en «Nuevos» y sin grupos vacíos');
+assert.match(w.document.querySelector('.quick-deck-group-title').textContent, /Nuevos\s*29/);
 assert.match(tiles[0].textContent, /Descubiertas 0 de \d+/);
 assert.ok(w.document.querySelector('[data-quick="play-random"]'), 'y un botón para jugar uno al azar');
 assert.equal(w.document.querySelector('[data-quick="solo-mode"], [data-quick="start-free"]'), null, 'ya no hay mazos del día ni partida sorpresa');
@@ -84,7 +87,8 @@ assert.match(abierto.textContent, new RegExp(deck.title.replace(/[.*+?^${}()|[\]
 assert.equal(abierto.querySelectorAll('.quick-album-card.is-found').length, jugadas - 2);
 assert.equal(abierto.querySelectorAll('.quick-album-card.is-locked').length, deck.cards.length - jugadas + 2);
 assert.equal(album.querySelectorAll('.quick-album-deck [data-quick="play-deck"]').length, CT.QuickCatalog.challenges.length, 'cualquier mazo se puede jugar desde la colección');
-assert.equal(album.querySelector('.quick-album-deck').querySelector('b').textContent, deck.title, 'el mazo empezado va el primero');
+assert.deepEqual(grupos(), [['started', 1], ['new', CT.QuickCatalog.challenges.length - 1]], 'la colección agrupa igual: empezados y nuevos');
+assert.equal(album.querySelector('[data-deck-group="started"] .quick-album-deck b').textContent, deck.title, 'el mazo empezado va en «Empezados»');
 // Al volver a jugarlo salen primero las cartas que aún faltan en la colección.
 abierto.querySelector('[data-quick="play-deck"]').click();
 w.document.querySelector('[data-quick="ready"]').click();
@@ -95,7 +99,16 @@ assert.equal(otra.filter(id => !vistas.has(id)).length, Math.min(faltan, otra.le
 // En el álbum, el mazo empezado sube arriba; «Al azar» elige uno sin completar, con 10 cartas.
 CT.ModeHubs.open('hub-solo');
 w.document.querySelector('[data-action="quick-challenges"]').click();
-assert.equal(w.document.querySelector('[data-quick="play-deck"]').dataset.deck, deckId, 'el mazo empezado va el primero');
+assert.equal(w.document.querySelector('[data-deck-group="started"] [data-quick="play-deck"]').dataset.deck, deckId, 'el mazo empezado va en «Empezados», arriba');
+assert.deepEqual(grupos().map(g => g[0]), ['started', 'new']);
+// Un mazo completo pasa a «Completos», al final, y «Al azar» ya no lo elige.
+const pequeno = [...CT.QuickCatalog.challenges].sort((a, b) => a.cards.length - b.cards.length)[0];
+pequeno.cards.forEach(c => CT.Progreso.discoverQuick(c.id));
+CT.ModeHubs.open('hub-solo');
+w.document.querySelector('[data-action="quick-challenges"]').click();
+assert.deepEqual(grupos().map(g => g[0]), ['started', 'new', 'complete']);
+assert.equal(w.document.querySelector('[data-deck-group="complete"] [data-quick="play-deck"]').dataset.deck, pequeno.id);
+assert.match(w.document.querySelector('.solo-dominadas').textContent, /1 de 29 mazos completos/);
 const completos = new Set(CT.QuickCatalog.challenges.filter(c => c.cards.every(card => CT.Progreso.quickSeenCards().has(card.id))).map(c => c.id));
 for (let i = 0; i < 5; i++) {
   w.document.querySelector('[data-quick="play-random"]').click();

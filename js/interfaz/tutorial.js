@@ -198,7 +198,7 @@
         ["Jugar solo", "Retos rápidos"], "En «Jugar solo» también tienes «Retos rápidos»."),
       { chapter: 1, title: "Retos rápidos", duration: 9800,
         html: `<div class="tv-board">${path(["Jugar solo", "Retos rápidos"])}${quickExample()}<div class="tv-tiles">
-          ${tile("▦", "Elige un mazo", "Todos a la vista, con tu progreso")}${tile("?", "Al azar", "Uno que aún no tengas completo")}</div></div>`,
+          ${tile("▦", "Elige un mazo", "Empezados, nuevos y completos")}${tile("?", "Al azar", "Uno que aún no tengas completo")}</div></div>`,
         steps: [
           [0, c => { c.say("Mazos cortos, cada uno con su propia regla de orden."); c.add(".tv-deck", "is-in"); }],
           [3400, c => { c.say("Elige un mazo y complétalo: cada acierto queda en tu colección."); c.stagger(".tv-tile", 500); }],
