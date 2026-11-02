@@ -151,6 +151,23 @@ console.log('\nExperto: el plazo empieza cuando el tablero ha colocado sus carta
   w.close();
 }
 
+console.log('\nUn solo móvil: el plazo empieza cuando la mano ha subido');
+{
+  const w = boot();
+  w.Element.prototype.animate = () => ({ finished: Promise.resolve(), cancel() {} });
+  abreMazo(w, 'local');
+  elige(w, 'local', 15);
+  w.document.getElementById('hand-size').value = '4';
+  click(w, '[data-action="start"]');
+  while ($(w, '#starter-guess-input')) { $(w, '#starter-guess-input').value = '1900'; click(w, '[data-action="starter-guess-submit"]'); }
+  click(w, '[data-action="starter-start"]');
+  click(w, '[data-action="ready"]');
+  const espera = JSON.parse(w.localStorage.getItem(PARTIDA_LOCAL)).turnClock.at - w.Date.now();
+  ok('las cuatro cartas tardan en subir y el plazo empieza después', espera > 800 && espera <= 1000);
+  ok('mientras suben, la cuenta atrás está entera', /15 s/.test($(w, '.reloj-left').textContent));
+  w.close();
+}
+
 console.log('\nRetos rápidos: el reloj no corre bajo la portada del siguiente reto');
 {
   const w = boot();

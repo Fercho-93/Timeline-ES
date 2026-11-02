@@ -169,7 +169,7 @@ try {
   const realM = await cardValue(m1);
   await answer(m1, Math.round(realM)); await answer(m2, Math.round(realM + 10));
   await Promise.all([m1, m2].map(p => p.waitScreen('online-game', 20000)));
-  const reloj = Number(await m1.page.locator('#turn-timer-value').textContent().catch(() => 'NaN'));
+  const reloj = parseInt(await m1.page.locator('#turn-timer .reloj-left').textContent().catch(() => 'NaN'), 10);
   ok(`y la partida empieza con ese tiempo por turno (${reloj} s)`, reloj > 0 && reloj <= 17);
   await crear(k1, { kind: 'quick', capacity: 2, seconds: 20, length: 1, keep: 'seguir' });
   await k1.page.waitForTimeout(1500);

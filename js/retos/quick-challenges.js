@@ -926,6 +926,12 @@
       ? `${link(item.source, 'Fuente del dato')} · ${link(item.curiositySource, 'Fuente de la curiosidad')}`
       : link(item.source, 'Consultar fuente');
   }
+  // La lámina en el aviso de resultado, igual que en Grandes colecciones (`CT.Art.button`): se ve
+  // aquí mismo y se puede ampliar.
+  function resultArt(item) {
+    if (!item.image) return '';
+    return `<button class="art-thumb" data-art-src="${esc(item.image)}" data-art-title="${esc(item.title)}" aria-label="Ver la ilustración de ${esc(item.title)} a pantalla completa"><img src="${esc(item.image)}" alt="" width="400" height="600" decoding="async"><span aria-hidden="true">Ampliar</span></button>`;
+  }
   function cardMarkup(c, item) {
     return `<article class="timeline-card card-flippable animal-timeline-card" data-id="${item.id}" role="button" tabindex="0" aria-pressed="false" aria-label="${esc(item.title)}. Toca para ver la explicación."><div class="card-category">${esc(c.title)}</div><div class="card-visual"><img class="animal-card-art" src="${esc(item.image || 'assets/hero-quick-400.webp')}" alt="" width="400" height="600"></div><div class="card-content"><h3>${esc(item.title)}${item.artist?`<small class="quick-card-artist">${esc(item.artist)}</small>`:""}</h3><p>${esc(item.detail)}</p><div class="year">${esc(item.label)}</div></div></article>`;
   }
@@ -1085,7 +1091,7 @@
     if (state.phase === 'result') {
       const r = state.result, item = get(r.cardId), fresh = noteDiscovery();
       if(room && !myTurn()){shell(`${heading}${CT.timelineMap(null,state.timeline)}<div class="timeline-wrap"><div class="timeline">${resultLine(c,r,get)}</div></div><section class="panel quick-panel"><h2>${r.correct?'¡Bien colocado!':'No encaja ahí'}</h2><p>${esc(item.title)} · ${esc(item.label)}</p><p>Esperando a que continúe ${esc(p.name)}.</p></section>`);celebrateOnce(r);return;}
-      shell(`${heading}${CT.timelineMap(null, state.timeline)}<div class="timeline-wrap"><div class="timeline">${resultLine(c, r, get)}</div></div><div class="overlay" data-quick-result data-result-card="${r.correct ? esc(item.id) : ''}"${correctionAttrs(r, item)}><section class="modal quick-result ${r.correct ? 'success' : 'failure'}"><div class="result-mark" aria-hidden="true">${r.correct ? '✓' : '×'}</div><div class="eyebrow" aria-hidden="true">${r.correct ? '¡Bien colocado!' : 'No encaja ahí'}</div><h2><span class="solo-lectores">${r.correct ? '¡Bien colocado!' : 'No encaja ahí'}: </span>${esc(item.title)}${item.artist?`<small class="quick-card-artist">${esc(item.artist)}</small>`:""}</h2>${fresh ? '<div class="quick-new-card"><span aria-hidden="true">✦</span> Nueva carta en tu colección</div>' : ''}<div class="reveal"><div class="year">${esc(item.label)}</div><p>${esc(item.detail)}</p></div><p class="quick-sources">${sourceLinks(item)}</p>
+      shell(`${heading}${CT.timelineMap(null, state.timeline)}<div class="timeline-wrap"><div class="timeline">${resultLine(c, r, get)}</div></div><div class="overlay" data-quick-result data-result-card="${r.correct ? esc(item.id) : ''}"${correctionAttrs(r, item)}><section class="modal quick-result ${r.correct ? 'success' : 'failure'}"><div class="result-mark" aria-hidden="true">${r.correct ? '✓' : '×'}</div><div class="eyebrow" aria-hidden="true">${r.correct ? '¡Bien colocado!' : 'No encaja ahí'}</div><h2><span class="solo-lectores">${r.correct ? '¡Bien colocado!' : 'No encaja ahí'}: </span>${esc(item.title)}${item.artist?`<small class="quick-card-artist">${esc(item.artist)}</small>`:""}</h2>${fresh ? '<div class="quick-new-card"><span aria-hidden="true">✦</span> Nueva carta en tu colección</div>' : ''}<div class="reveal">${resultArt(item)}<div class="year">${esc(item.label)}</div><p>${esc(item.detail)}</p></div><p class="quick-sources">${sourceLinks(item)}</p>
         <p class="quick-result-note">${resultNote(r, p)}</p>
         ${button('ack', room && room.members.length < state.players.length ? 'Continuar y retar a mi amigo' : state.remaining.length ? 'Siguiente carta <span>→</span>' : 'Ver el resultado <span>→</span>', 'btn btn-primary btn-block')}${room ? button('exit','Salir de la sala','btn btn-ghost btn-block') : ''}</section></div>`);
       CT.openDialog(app().querySelector('[data-quick-result]'), false);

@@ -3621,8 +3621,6 @@ html:not(:has(#app[data-screen="home"]))::before {
 #app.atlas-board .quick-shell .game-head .turn-label { color: var(--edition-rust); font: 700 .8rem/1.2 var(--font-display); letter-spacing: .03em; text-transform: uppercase; }
 #app.atlas-board[data-board-fit="tight"] .quick-shell .game-head .turn-label { font-size: .78rem; line-height: 1.15; }
 #app.atlas-board .quick-shell .timeline .timeline-card > .card-category { display: none; }
-#app.atlas-board .quick-shell .timeline .timeline-card:has(.animal-card-art) .card-content h3 { font: 400 .82rem/1.15 var(--font-display); }
-#app.atlas-board .quick-shell .timeline .timeline-card:has(.animal-card-art) .card-content .year { font: 700 .92rem/1.15 var(--font-display); color: var(--terracota); }
 
 /* Retos rápidos: título del mazo pegado a la línea divisoria y extremos de la línea de cartas. */
 #app.atlas-board .quick-shell .game-head { align-items: end; }
@@ -5680,3 +5678,18 @@ html body #app .table-seat .kick-btn::before { content: ""; position: absolute; 
 .settings-chip { min-height: 36px; padding: 6px 12px; border: 1px solid var(--edition-line); border-radius: 999px; background: transparent; color: var(--edition-muted); font: 600 .8rem/1 var(--ui-font); cursor: pointer; }
 .settings-chip.is-on { border-color: var(--edition-brass); color: var(--edition-ink); background: color-mix(in srgb, var(--edition-brass) 14%, transparent); }
 .settings-chip:focus-visible { outline: 2px solid var(--edition-brass); outline-offset: 2px; }
+
+/* Títulos y cartas iguales en todas las mesas. La mano de las partidas con amigos (un solo
+   móvil, salas online y Wi-Fi, Retos rápidos) lleva el mismo rótulo pequeño que «Tu carta» de
+   Jugar solo, y el duelo por turnos, que vive fuera de la mesa atlas, copia ese rótulo, los
+   extremos de la línea y la carta elegida sin la marca ✓. */
+#app.atlas-board .atlas-hand-section > .hand-title h3,
+#app[data-screen="turn-duel"] .turn-duel-hand > .hand-title h3 { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; }
+#app.atlas-board .atlas-hand-section > .hand-title,
+#app.atlas-board .atlas-hand-section > .hand-title h3 { justify-content: flex-start; text-align: left; margin-left: 0; margin-right: auto; }
+#app.atlas-board[data-platform][data-screen] .atlas-hand-section > .hand-title { padding-left: 4px; padding-right: 0; }
+#app[data-screen="turn-duel"] .turn-duel-hand .hand-card.selected::before,
+#app[data-screen="turn-duel"] .turn-duel-hand .hand-card.selected::after { display: none; }
+#app[data-screen="turn-duel"] .timeline-ends { display: flex; justify-content: space-between; gap: 8px; margin: 4px 2px 2px; color: var(--edition-rust); font: 700 .66rem/1.5 var(--font-display); letter-spacing: .06em; text-transform: uppercase; }
+#app[data-screen="turn-duel"] .timeline-ends > span { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+:root[data-theme="dark"] #app[data-screen="turn-duel"] .timeline-ends { color: #e9b48f; }

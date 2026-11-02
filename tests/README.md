@@ -179,7 +179,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `sorteo-online-reglas.mjs` | reglas | El sorteo de quién empieza en las salas online contra las reglas. |
 | `tablet-browser.mjs` | navegador | Tabletas en un navegador real: dos columnas con medidas reales en horizontal, mesa a escala en vertical y en móvil. |
 | `tablet.mjs` | test | `css/tablet.css` y cuándo la mesa deja de escalarse como un iPhone (móvil, tableta vertical y tableta horizontal). |
-| `tiempo.mjs` | test | Tiempo por carta (sin tiempo, 15, 20 o 30 s) en todas las configuraciones; al agotarse, fallo. El plazo no corre mientras el tablero coloca cartas (Experto) ni bajo la portada del siguiente reto rápido. |
+| `tiempo.mjs` | test | Tiempo por carta (sin tiempo, 15, 20 o 30 s) en todas las configuraciones; al agotarse, fallo. El plazo no corre mientras el tablero coloca cartas (Experto), mientras sube la mano en un solo móvil ni bajo la portada del siguiente reto rápido. |
 | `tournament.mjs` | test | Competición por rondas desde un solo móvil y sus ajustes. |
 | `transitions-browser.mjs` | navegador | Transiciones en Chromium móvil, con y sin movimiento reducido. |
 | `transporte-local.mjs` | test | Señal WebRTC compacta para el QR y mensajes del canal. |

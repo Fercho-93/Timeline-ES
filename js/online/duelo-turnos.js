@@ -125,8 +125,8 @@ function orderBoard(game, card) {
       : `<button class="slot" data-turn-action="select-slot" data-index="${index}" aria-label="Colocar en la posición ${index + 1} de ${line.length + 1}"><span>${index === 0 ? "−" : "+"}</span></button>`);
     if (index < line.length) slots.push(timelineCardMarkup(game, line[index]));
   }
-  const hand = card ? `<section class="turn-duel-hand"><div class="hand-title"><h3>Tu carta</h3><small>${safe(CT.hiddenLabel(modeAt(game)))}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}">${CT.categoryBadge(modeAt(game), card)}<span class="hidden-date">${safe(CT.hiddenLabel(modeAt(game)))}</span>${CT.cardBack(modeAt(game))}<strong>${safe(card.title)}</strong></div></div><p class="hint">${pendingIndex === null ? 'Toca el hueco donde quieres colocar la carta.' : 'Confirma el hueco elegido o toca otro.'}</p></section>` : '';
-  return `${hand}<section class="turn-duel-board"><div class="hand-title"><h3>${safe(CT.timelineTitle(modeAt(game)))}</h3></div>${CT.timelineEnds(modeAt(game))}${CT.timelineMap?.(modeAt(game), line) || ''}<div class="timeline-wrap" tabindex="0" role="region" aria-label="Mesa de cartas, desplaza para ver más"><div class="timeline">${slots.join('')}</div></div><p class="hint">Desliza la línea para ver todas las cartas.</p></section>`;
+  const hand = card ? `<section class="turn-duel-hand"><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}">${CT.categoryBadge(modeAt(game), card)}<span class="hidden-date">${safe(CT.hiddenLabel(modeAt(game)))}</span>${CT.cardBack(modeAt(game))}<strong>${safe(card.title)}</strong></div></div></section>` : '';
+  return `${hand}<section class="turn-duel-board"><div class="hand-title"><h3>${safe(CT.timelineTitle(modeAt(game)))}</h3></div>${CT.timelineEnds(modeAt(game))}${CT.timelineMap?.(modeAt(game), line) || ''}<div class="timeline-wrap" tabindex="0" role="region" aria-label="Mesa de cartas, desplaza para ver más"><div class="timeline">${slots.join('')}</div></div></section>`;
 }
 function cifraBoard(game, card) {
   return `<section class="turn-duel-answer starter-presentation cifra-presentation">${CT.StarterPresentation.plate(modeAt(game), card, false, {kicker: 'Duelo por turnos'})}${CT.StarterPresentation.answer(modeAt(game), 'turn-cifra-input')}<button class="btn btn-primary btn-block" data-turn-action="submit-cifra">Enviar cifra</button></section>`;
@@ -200,7 +200,7 @@ function render() {
       ${active && !card ? '<p role="alert">No se pudo cargar la carta. Actualiza Continuum en los dos móviles.</p>' : ''}
       ${finished ? `<p class="turn-duel-status">${safe(current.resultText || 'Gracias por jugar.')}</p>` : ''}
       ${!active && (finished || nextTargets.length) ? `<div class="turn-duel-actions">${finished && current.playersOrder.length === 2 ? '<button class="btn btn-primary" data-turn-action="rematch">Revancha</button>' : ''}${nextTargets.length ? `<button class="btn btn-secondary" data-turn-action="next" aria-label="Ver los duelos pendientes en Tus duelos">Ver los pendientes <small>(${nextTargets.length})</small></button>` : ''}${finished && !nextTargets.length ? '<button class="btn btn-secondary" data-turn-action="next">Volver a Tus duelos</button>' : ''}</div>` : ''}
-      ${!finished ? `<p class="hint">${recordatorio() ? 'Un recordatorio tras 48 horas. ' : ''}Caduca a los 7 días sin actividad.</p>` : ''}
+      ${!finished && !active ? `<p class="hint">${recordatorio() ? 'Un recordatorio tras 48 horas. ' : ''}Caduca a los 7 días sin actividad.</p>` : ''}
     </section></div>`;
   app.dataset.screen = 'turn-duel';
   app.innerHTML = html;

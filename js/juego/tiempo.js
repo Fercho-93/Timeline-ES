@@ -48,22 +48,30 @@
   // La barra de cuenta atrás, igual en todas partes: se pinta con lo que queda y `tick`
   // la pone en hora sin repintar la pantalla.
   function bar(restanteMs, totalMs) {
+    // Un plazo que aún no ha empezado (las cartas o la mano todavía llegan) se ve lleno.
+    restanteMs = Math.min(totalMs, restanteMs);
     const s = Math.ceil(Math.max(0, restanteMs) / 1000);
     return `<div class="reloj" data-tiempo-reloj><progress class="reloj-bar ${restanteMs <= 3000 ? "reloj-apura" : ""}" max="${totalMs}" value="${Math.max(0, restanteMs)}" aria-label="Tiempo restante para esta carta"></progress><span class="reloj-left" aria-live="off">${s} s</span></div>`;
   }
   // Un reloj que avisa al acabarse. `empezadoEn` es un instante (Date.now()): así sigue
   // corriendo aunque se repinte la pantalla o el móvil se vaya al fondo.
   let avisado = {};
+  // Pone en hora las barras ya pintadas. Las salas online y Wi-Fi, que llevan su propio reloj
+  // (el del servidor o el del anfitrión), la usan para verse igual que el resto.
+  function pinta(root, restanteMs, totalMs) {
+    const restante = Math.min(totalMs, restanteMs);
+    root.querySelectorAll("[data-tiempo-reloj]").forEach(caja => {
+      const barra = caja.querySelector(".reloj-bar"), marca = caja.querySelector(".reloj-left");
+      if (barra) { barra.max = totalMs; barra.value = Math.max(0, restante); barra.classList.toggle("reloj-apura", restante <= 3000); }
+      if (marca) marca.textContent = `${Math.ceil(Math.max(0, restante) / 1000)} s`;
+    });
+  }
   function clock({ empezadoEn, ms, onTimeout, root = document }) {
     let parado = false;
     const paso = () => {
       if (parado) return;
-      const restante = ms - (Date.now() - empezadoEn);
-      root.querySelectorAll("[data-tiempo-reloj]").forEach(caja => {
-        const barra = caja.querySelector(".reloj-bar"), marca = caja.querySelector(".reloj-left");
-        if (barra) { barra.value = Math.max(0, restante); barra.classList.toggle("reloj-apura", restante <= 3000); }
-        if (marca) marca.textContent = `${Math.ceil(Math.max(0, restante) / 1000)} s`;
-      });
+      const restante = Math.min(ms, ms - (Date.now() - empezadoEn));
+      pinta(root, restante, ms);
       // Los tres últimos segundos se oyen, uno a uno. La jugada se repinta y crea otro
       // reloj para la misma carta: el segundo ya avisado no vuelve a sonar.
       const quedan = Math.max(0, Math.ceil(restante / 1000));
@@ -82,7 +90,7 @@
   const texto = s => (Number(s) ? `${Number(s)} s por carta` : "sin tiempo");
   // «m:ss» para las cuentas atrás y el tiempo de espera de las mesas.
   const minutos = segundos => { const s = Math.max(0, Math.floor(segundos)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
-  CT.Tiempo = { OPCIONES, get, set, field, chosen, bar, clock, valido, texto, minutos };
+  CT.Tiempo = { OPCIONES, get, set, field, chosen, bar, pinta, clock, valido, texto, minutos };
 
   // Cartas iniciales por persona de las partidas en directo con amigos: se eligen en la pantalla
   // previa y la sala de espera (online o Wi-Fi) solo las enseña.

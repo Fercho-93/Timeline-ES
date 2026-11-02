@@ -858,16 +858,15 @@ function starterPanelMarkupContent(isHost) {
   // Reloj del turno
   function clearTurnTimer() { if (turnTimerHandle) { clearInterval(turnTimerHandle); turnTimerHandle = null; } }
 
-  function turnRemaining() {
-    const seconds = Number(roomState?.turnSeconds) || 0;
-    if (!seconds || roomState.status !== "playing" || roomState.phase !== "turn") return null;
-    if (role === "host" && Number.isFinite(roomState.turnStartedAt)) {
-      return Math.max(0, Math.ceil(seconds - (Date.now() - roomState.turnStartedAt) / 1000));
-    }
+  function turnRemainingMs() {
+    const total = (Number(roomState?.turnSeconds) || 0) * 1000;
+    if (!total || roomState.status !== "playing" || roomState.phase !== "turn") return null;
+    if (role === "host" && Number.isFinite(roomState.turnStartedAt)) return Math.max(0, total - (Date.now() - roomState.turnStartedAt));
     const key = `${roomState.round}:${roomState.turnsInRound}:${roomState.current}:${roomState.version}`;
     if (key !== turnSeenKey) { turnSeenKey = key; turnSeenAt = performance.now(); }
-    return Math.max(0, Math.ceil(seconds - (performance.now() - turnSeenAt) / 1000));
+    return Math.max(0, total - (performance.now() - turnSeenAt));
   }
+  function turnRemaining() { const ms = turnRemainingMs(); return ms === null ? null : Math.ceil(ms / 1000); }
 
   let lastClockSecond = null;
   function manageTurnTimer() {
@@ -877,9 +876,7 @@ function starterPanelMarkupContent(isHost) {
     const version = roomState.version;
     const tick = () => {
       const remaining = turnRemaining();
-      const value = document.getElementById("turn-timer-value");
-      if (value && remaining !== null) value.textContent = remaining;
-      document.getElementById("turn-timer")?.classList.toggle("turn-timer-low", remaining !== null && remaining <= 5);
+      if (remaining !== null) CT.Tiempo.pinta(appEl, turnRemainingMs(), roomState.turnSeconds * 1000);
       // Los tres últimos segundos de tu turno suenan y vibran.
       if (remaining !== null && remaining <= 3 && remaining !== lastClockSecond && esMio(roomState.playerOrder[roomState.current])) { lastClockSecond = remaining; CT.Effects?.clock?.(remaining); }
       if (remaining === 0 && role === "host" && roomState?.version === version) {
@@ -979,7 +976,7 @@ function starterPanelMarkupContent(isHost) {
           : `<button class="slot" data-local-action="place" data-index="${index}" ${myTurn && selectedCardId ? "" : "disabled"} aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>${index === 0 ? "−" : "+"}</span></button>`);
       if (index < timelineCards.length) slots.push(timelineCardMarkup(timelineCards[index]));
     }
-    const secondsLeft = turnRemaining();
+    const msLeft = turnRemainingMs();
     const powersEnabled = myTurn && !pulsing;
     const handSection = pulsing
       ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>${defensa ? `te reta ${escapeHtml(currentPlayer.name)}` : `contra ${escapeHtml(pulseTargetName)}`}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}">${categoryBadge(pulseCard)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${myPulse
@@ -990,9 +987,10 @@ function starterPanelMarkupContent(isHost) {
       : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${me.hand.length} en mano</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${pendingIndex === null && selectedCardId === id ? "selected" : ""}" data-local-action="select" data-id="${id}" aria-pressed="${pendingIndex === null && selectedCardId === id}" ${myTurn ? "" : "disabled"}>${categoryBadge(card)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p></section>`;
     paint(`<div class="shell">${header("room-menu", { menu: true })}
       <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, vuelta ${roomState.round}</h1>
-      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length} · ` : ""}Vuelta ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo restante para esta carta"><strong id="turn-timer-value">${secondsLeft}</strong><span>s</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
+      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length} · ` : ""}Vuelta ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div><div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
       <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores</div><div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i class="score-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'room:' + uid, id: esMio(uid) ? CT.Avatares.ownId() : player.avatarId })}</i><span class="score-copy"><b>${escapeHtml(player.name)}${uid === myPlayerId ? " · tú" : ""}${player.away ? " · desconectado" : ""}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(player.hand.length)}%"></i></span></span><em><strong>${player.hand.length}</strong><small>cartas</small></em></span>`; }).join("")}</div></section>
       ${pulsing ? `<div class="pulse-banner"><span aria-hidden="true">ϟ</span> Pulso · <b>${escapeHtml(currentPlayer.name)}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
+      ${msLeft !== null ? `<div id="turn-timer">${CT.Tiempo.bar(msLeft, roomState.turnSeconds * 1000)}</div>` : ""}
       ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
       ${handSection}
       <section class="board-timeline-section"><div class="hand-title"><h3>${timelineTitle()}</h3></div>${CT.timelineEnds(modeKey)}${CT.timelineMap(modeKey, timelineCards, { hidden: !!roomState.ghost?.pending.length })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>

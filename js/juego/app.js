@@ -4598,7 +4598,18 @@
     } else if (action === "draw-starter") beginStarterDraw();
     else if (action === "starter-guess-submit") starterGuessSubmit();
     else if (action === "start") startGame();
-    else if (action === "ready") { if (game.pulseGift && game.pulseGift.to === currentPlayer().id) { game.pulseGift = null; saveGame(); } if (game.pendingResult) { result = game.pendingResult; renderResult(); } else gameView(); }
+    else if (action === "ready") {
+      if (game.pulseGift && game.pulseGift.to === currentPlayer().id) { game.pulseGift = null; saveGame(); }
+      if (game.pendingResult) { result = game.pendingResult; renderResult(); }
+      else {
+        // Con tiempo por turno, el plazo empieza cuando la mano ha terminado de subir, no al pulsar.
+        if (Number(game.turnSeconds) > 0 && !game.pulseTurn && game.turnClock?.key !== localTurnKey()) {
+          game.turnClock = { key: localTurnKey(), at: Date.now() + (CT.UI.handArrival?.(actingPlayer().hand.length) || 0) };
+          saveGame();
+        }
+        gameView();
+      }
+    }
     else if (action === "ghost-use") useGhost();
     else if (action === "select-card") {
       selectedCardId = Number(target.dataset.id);

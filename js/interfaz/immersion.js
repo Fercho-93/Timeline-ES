@@ -169,10 +169,14 @@
         cards.forEach((card, i) => card.animate?.([
           {translate: `0 ${window.innerHeight * .6}px`, rotate: `${(i % 2 ? 1 : -1) * 9}deg`, opacity: 0},
           {translate: '0 0', rotate: '0deg', opacity: 1}
-        ], {duration: 620, delay: 120 + i * 70, easing: 'cubic-bezier(.3,1.35,.5,1)', fill: 'backwards'}));
+        ], {duration: HAND_IN, delay: HAND_DELAY + i * HAND_STEP, easing: 'cubic-bezier(.3,1.35,.5,1)', fill: 'backwards'}));
       });
     }
   }
+  // Cuánto tardan en subir las `n` cartas de la mano al empezar el turno tras pasar el móvil: el
+  // reloj del turno empieza después (app.js), como en el resto de partidas.
+  const HAND_IN = 620, HAND_DELAY = 120, HAND_STEP = 70;
+  const handArrival = n => reduced() || !n || typeof Element === 'undefined' || typeof Element.prototype.animate !== 'function' ? 0 : HAND_DELAY + (n - 1) * HAND_STEP + HAND_IN;
   function atlasFinal(container) {
     const panel = container.querySelector('.pass-screen .panel, .panel');
     if (!panel || panel.querySelector('.atlas-final-fan')) return;
@@ -984,5 +988,5 @@
     }
   }
 
-  CT.UI = {isPlaying: screen => playing.has(screen), header, nav, mount, captureBoard, compactResult, confirmExit, askDialog, confirmDialog, pulseGiftDialog, reveal, openSurface, closeSurface};
+  CT.UI = {isPlaying: screen => playing.has(screen), handArrival, header, nav, mount, captureBoard, compactResult, confirmExit, askDialog, confirmDialog, pulseGiftDialog, reveal, openSurface, closeSurface};
 })();

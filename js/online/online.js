@@ -731,8 +731,12 @@ function showTurnChangeSplash(nextUid, previousState = null) {
     </div>
   </div>`);
   const splash = appEl.querySelector("[data-turn-change-splash]");
-  window.setTimeout(() => splash?.remove(), 2000);
+  window.setTimeout(() => splash?.remove(), TURN_SPLASH_MS);
 }
+// El aviso de cambio de turno tapa la mesa `TURN_SPLASH_MS`: el plazo empieza al retirarse. Se
+// suma en todos los móviles por igual (también en el del anfitrión, que es quien salta el turno),
+// así que la cuenta atrás sigue siendo la misma para toda la sala.
+const TURN_SPLASH_MS = 2000;
 // Avisa cuando te llega una carta de poder: antes no tenías ninguno por usar y ahora sí.
 let teniaPoder = null;
 function avisaPoder() {
@@ -1135,17 +1139,18 @@ function clearTurnTimer() {
   if (turnTimerHandle) { clearInterval(turnTimerHandle); turnTimerHandle = null; }
 }
 
-function turnRemaining() {
-  const seconds = turnSeconds();
+function turnRemainingMs() {
+  const total = turnSeconds() * 1000;
   const serverStartedAt = roomState?.turnStartedAt?.toMillis?.();
-  const serverRemaining = CT.Session.remaining(serverStartedAt, seconds);
-  if (serverRemaining !== null) return serverRemaining;
+  const now = CT.Session.now();
+  if (total && now !== null && Number.isFinite(serverStartedAt)) return Math.max(0, Math.min(total, serverStartedAt + TURN_SPLASH_MS + total - now));
   if (fallbackTimerVersion !== roomState?.version) {
     fallbackTimerVersion = roomState?.version;
     fallbackTimerStartedAt = performance.now();
   }
-  return Math.max(0, seconds - Math.floor((performance.now() - fallbackTimerStartedAt) / 1000));
+  return Math.max(0, Math.min(total, fallbackTimerStartedAt + TURN_SPLASH_MS + total - performance.now()));
 }
+function turnRemaining() { return Math.ceil(turnRemainingMs() / 1000); }
 let lastClockSecond = null;
 function manageTurnTimer() {
   clearTurnTimer();
@@ -1153,9 +1158,7 @@ function manageTurnTimer() {
   if (!roomState || roomState.status !== "playing" || roomState.phase !== "turn" || !turnSeconds()) return;
   const tick = () => {
     const remaining = turnRemaining();
-    const value = document.getElementById("turn-timer-value");
-    if (value) value.textContent = remaining ?? "…";
-    document.getElementById("turn-timer")?.classList.toggle("turn-timer-low", remaining !== null && remaining <= 5);
+    CT.Tiempo.pinta(appEl, turnRemainingMs(), turnSeconds() * 1000);
     // Los tres últimos segundos de tu turno suenan y vibran, como en un solo móvil.
     if (remaining !== null && remaining <= 3 && remaining !== lastClockSecond && roomState.playerOrder[roomState.current] === user.uid) { lastClockSecond = remaining; CT.Effects.clock?.(remaining); }
     if (remaining === 0 && roomState.hostUid === user.uid && navigator.onLine) { clearTurnTimer(); skipTurn(roomState.version); }
@@ -1208,12 +1211,13 @@ function renderGame() {
   // El primer pintado ya arranca con la cuenta atrás en su punto real, no siempre en 20:
   // quien abre la sala a mitad de turno ve lo que de verdad queda, no un contador que
   // vuelve a empezar de cero en su pantalla.
-  const secondsLeft = roomState.phase === "turn" && turnSeconds() ? (turnRemaining() ?? turnSeconds()) : null;
+  const msLeft = roomState.phase === "turn" && turnSeconds() ? turnRemainingMs() : null;
   paint(`<div class="shell">${header()}
     <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(shownName(currentPlayer.name))}`}, vuelta ${roomState.round}</h1>
-    <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length}` : `Vuelta ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}`}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(shownName(currentPlayer.name))}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo restante para esta carta"><strong id="turn-timer-value">${secondsLeft}</strong><span>s</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
+    <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length}` : `Vuelta ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}`}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(shownName(currentPlayer.name))}`}</div></div><div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
     <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores</div><div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i class="score-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'uid:' + uid, id: uid === user.uid ? CT.Avatares.ownId() : player.avatarId })}</i><span class="score-copy"><b>${escapeHtml(shownName(player.name))}${uid === user.uid ? " · tú" : ""}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(player.hand.length)}%"></i></span></span><em><strong>${player.hand.length}</strong><small>cartas</small></em></span>`; }).join("")}</div></section>
     ${pulsing ? `<div class="pulse-banner"><span aria-hidden="true">ϟ</span> Pulso · <b>${escapeHtml(shownName(currentPlayer.name))}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
+    ${msLeft !== null ? `<div id="turn-timer">${CT.Tiempo.bar(msLeft, turnSeconds() * 1000)}</div>` : ""}
     ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
     ${pulsing
       ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>${defensa ? `te reta ${escapeHtml(shownName(currentPlayer.name))}` : `contra ${escapeHtml(pulseTargetName)}`}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}">${categoryBadge(pulseCard)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${myPulse
