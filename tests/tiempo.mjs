@@ -115,7 +115,7 @@ console.log('\nRetos rápidos: el plazo viaja en la partida y agotarlo falla la 
   const app = $(w, '#app'), paint = h => { app.innerHTML = h; };
   w.CONTINUUM.Quick.openSolo(paint);
   elige(w, 'quick-solo', 15);
-  click(w, '.quick-length-chip[data-length="1"]'); click(w, '[data-quick="start-free"]'); click(w, '[data-quick="ready"]');
+  click(w, '[data-quick="play-random"]'); click(w, '[data-quick="ready"]');
   ok('la partida enseña la cuenta atrás', !!$(w, '.reloj-bar'));
   w.adelanta(16000); await sleep(350);
   const guardada = JSON.parse(w.localStorage.getItem('continuum-quick-challenges-v1'));
@@ -172,12 +172,12 @@ console.log('\nRetos rápidos: el reloj no corre bajo la portada del siguiente r
 {
   const w = boot();
   const app = $(w, '#app'), paint = h => { app.innerHTML = h; };
+  // Una partida de tres mazos seguidos (las que se guardaron con la antigua «partida sorpresa»
+  // o las de varias personas en un móvil): se retoma y se juega el primer mazo entero.
+  const mazos = w.CONTINUUM.QuickCatalog.challenges.slice(0, 3).map(c => ({ id: c.id, order: c.cards.slice(0, 11).map(x => x.id) }));
+  w.localStorage.setItem('continuum-quick-challenges-v1', JSON.stringify({ version: w.CONTINUUM.QuickCatalog.version, config: { names: ['Tú'], rounds: mazos, kind: 'free', length: 3, seconds: 15, historyId: 'prueba-reloj' }, commands: [], startedAt: w.Date.now() }));
   w.CONTINUUM.Quick.openSolo(paint);
-  elige(w, 'quick-solo', 15);
-  click(w, '[data-quick="solo-mode"][data-mode="surprise"]');
-  click(w, '.quick-length-chip[data-length="3"]'); click(w, '[data-quick="start-free"]');
-  $(w, '[data-quick-splash]')?.click();
-  click(w, '[data-quick="ready"]');
+  click(w, '[data-quick="resume"]');
   for (let i = 0; i < 40 && !$(w, '[data-quick="next"]'); i++) {
     if ($(w, '[data-quick="ack"]')) click(w, '[data-quick="ack"]');
     else { w.adelanta(16000); await sleep(250); }

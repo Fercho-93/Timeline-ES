@@ -223,7 +223,7 @@ w.CONTINUUM.localNavigate('jugar');
 await tick();
 await click('[data-action="quick-challenges"]');
 assert.equal(screen(), 'quick-challenges');
-assert.ok(app().querySelector('[data-quick="start-free"]'));
+assert.ok(app().querySelector('[data-quick="play-random"]'));
 await swipe();
 assert.equal(screen(), 'hub-solo', 'deslizar en Retos rápidos vuelve a Jugar solo');
 if (!app().querySelector('[data-action="set-block"]')) await click('[data-inline-route]');

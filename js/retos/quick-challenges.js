@@ -160,16 +160,6 @@
     const name=profileName();
     return `<div class="field duel-identity-field"><label for="quick-profile-name">Tu nombre de perfil</label><div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares?.markup?.(name,{size:38,seed:CT.Avatares.ownSeed?.()})||''}</span><input id="quick-profile-name" type="text" readonly aria-readonly="true" value="${esc(name)}"></div><small class="field-help">Se usará en la partida. Puedes cambiarlo en Atlas.</small></div><input type="hidden" id="quick-net-name" value="${esc(name)}"><textarea id="quick-net-code" hidden></textarea>`;
   }
-  // Mazos del día: cada día salen QUICK_DAY_DECKS retos distintos, los mismos para todo el mundo, que
-  // van rotando por el catálogo entero. El catálogo se baraja una vez con una semilla fija y cada día
-  // toma el tramo siguiente, así que en una semana larga han salido todos y ninguno se repite antes.
-  const QUICK_DAY_DECKS=4;
-  const dayNumber=dayValue=>CT.RetoDiario.numero(dayValue);
-  function todayDecks(dayValue=day()) {
-    const order=CT.shuffleWith(CT.QuickCatalog.challenges,CT.seededRandom(CT.seedFrom('quick-rotation-v1')));
-    const count=Math.min(QUICK_DAY_DECKS,order.length), start=(dayNumber(dayValue)*count)%order.length;
-    return Array.from({length:count},(_,i)=>order[(start+i)%order.length]);
-  }
   // Lo descubierto de un reto: sus cartas acertadas alguna vez por quien juega (CT.Progreso).
   const quickSeen=()=>CT.Progreso?.quickSeenCards?.() || new Set();
   function deckProgress(c, seen=quickSeen()) {const done=c.cards.filter(card=>seen.has(card.id)).length;return {done,total:c.cards.length};}
@@ -177,70 +167,48 @@
     return `<span class="game-progress quick-deck-progress"><span class="game-progress-bar" aria-hidden="true"><i style="width:${Math.round(100*done/total)}%"></i></span><small>${done===total?`Completo · ${total} de ${total} cartas`:`Descubiertas ${done} de ${total}`}</small></span>`;
   }
   const deckArt=c=>c.cards.find(card=>card.image)?.image || 'assets/menu-quick.webp';
+  // Jugar solo en Retos rápidos: el álbum de mazos. Se ven todos con lo descubierto de cada uno y se
+  // juega el que se toque (10 cartas, primero las que aún faltan); «Al azar» elige uno sin completar.
+  // La meta es completar mazos, que son cortos. Lo del día ya lo tiene el Reto diario y varios temas
+  // seguidos, la Competición: por eso aquí ya no hay «mazos del día» ni «partida sorpresa».
+  // Primero los mazos empezados, después los nuevos y al final los completos (en el orden del catálogo).
+  const deckRank=(c,seen)=>{const {done,total}=deckProgress(c,seen);return done===total?2:done>0?0:1;};
+  const incompleteDecks=(seen=quickSeen())=>CT.QuickCatalog.challenges.filter(c=>deckRank(c,seen)<2);
   function freeSetup() {
     stopNetwork(); page='free-setup'; format='free'; state=null; record=null; selected=null; slot=null;
-    const total=CT.QuickCatalog.challenges.length;
-    const options=LONG_LENGTHS.filter(([n])=>n<total);
-    const seen=quickSeen(), cards=CT.QuickCatalog.challenges.reduce((n,c)=>n+c.cards.length,0);
-    const found=CT.QuickCatalog.challenges.reduce((n,c)=>n+deckProgress(c,seen).done,0);
+    const decks=CT.QuickCatalog.challenges, seen=quickSeen();
+    const cards=decks.reduce((n,c)=>n+c.cards.length,0), found=decks.reduce((n,c)=>n+deckProgress(c,seen).done,0);
+    const complete=decks.length-incompleteDecks(seen).length;
+    const ordered=[...decks].sort((a,b)=>deckRank(a,seen)-deckRank(b,seen));
     const deckTile=c=>`<button type="button" class="quick-day-deck" data-quick="play-deck" data-deck="${esc(c.id)}" aria-label="Jugar ${esc(c.title)}. ${esc(c.rule)}. ${deckProgress(c,seen).done} de ${c.cards.length} cartas descubiertas"><img src="${esc(deckArt(c))}" alt="" aria-hidden="true" decoding="async" loading="lazy"><span class="quick-day-deck-copy"><b>${esc(c.title)}</b><small>${esc(c.rule)} · ${c.cards.length} cartas</small>${progressBar(deckProgress(c,seen))}</span><span class="quick-day-deck-go" aria-hidden="true">→</span></button>`;
-    // Dos formas de jugar, elegidas arriba con dos tarjetas grandes: los mazos del día (sabes cuál
-    // juegas y cambian cada día) o una partida sorpresa (mazos al azar que no se ven hasta jugarlos).
-    // Debajo solo se ve lo de la elegida; el tiempo por carta vale para las dos.
-    const pendiente=load(), mode=soloMode();
-    const left=hoursLeft();
-    const modeCard=(key,title,text,tag,art)=>`<button type="button" class="quick-mode-card quick-mode-${key}${mode===key?' is-selected':''}" role="radio" aria-checked="${mode===key}" data-quick="solo-mode" data-mode="${key}"><span class="quick-mode-visual" aria-hidden="true"><img src="assets/${key==='day'?'menu-daily':'menu-quick'}.webp" alt="" decoding="async">${art}</span><span class="quick-mode-copy"><b>${title}</b><small>${text}</small><em>${tag}</em></span></button>`;
-    const sunArt='<svg class="quick-mode-art" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="10" y="14" width="44" height="40" rx="6" fill="var(--quick-card-paper, #fffaf0)" stroke="currentColor" stroke-width="2"/><path d="M10 25h44M21 9v10M43 9v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="32" cy="39" r="6" fill="currentColor" fill-opacity=".75"/><path d="M32 29v3M32 46v3M22 39h3M39 39h3M25 32l2 2M37 44l2 2M25 46l2-2M37 34l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
-    const diceArt='<svg class="quick-mode-art" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><g transform="rotate(-12 26 34)"><rect x="12" y="20" width="28" height="36" rx="4" fill="var(--quick-card-paper, #fffaf0)" stroke="currentColor" stroke-width="2"/><text x="26" y="45" text-anchor="middle" font-size="20" font-family="Georgia, serif" fill="currentColor">?</text></g><g transform="rotate(12 40 30)"><rect x="26" y="12" width="28" height="36" rx="4" fill="var(--quick-card-paper, #fffaf0)" stroke="currentColor" stroke-width="2"/><text x="40" y="37" text-anchor="middle" font-size="20" font-family="Georgia, serif" fill="currentColor">?</text></g></svg>';
+    const pendiente=load();
     shell(`<section class="setup-section solo-home quick-free-setup"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 class="solo-title" data-focus tabindex="-1">Jugar solo</h2>
         <p class="lead">${E.SOLO_CARDS} cartas en cada reto: un fallo no te echa.</p>
-        <p class="hint solo-dominadas">Tu colección: ${found} de ${cards} cartas descubiertas.</p>${button('collection','Ver tu colección','btn btn-ghost quick-collection-link')}</div>
+        <p class="hint solo-dominadas">Tu colección: ${found} de ${cards} cartas · ${complete} de ${decks.length} mazos completos.</p>${button('collection','Ver tu colección','btn btn-ghost quick-collection-link')}</div>
         ${pendiente ? button('resume','Continuar partida guardada <span>→</span>','btn btn-primary btn-block') : ''}
         <div class="panel solo-panel quick-day-panel">
-          <div class="solo-panel-head quick-mode-head"><span class="quick-setup-kicker">Elige cómo jugar</span><h3>¿Qué te apetece?</h3></div>
-          <div class="quick-mode-switch" role="radiogroup" aria-label="Forma de jugar">
-            ${modeCard('day','Mazos del día',`Eliges entre ${QUICK_DAY_DECKS} mazos que cambian cada día.`,`Cambian en ${left} h`,sunArt)}
-            ${modeCard('surprise','Partida sorpresa','Mazos al azar de todo el catálogo. No sabrás cuáles hasta jugarlos.',`${total} mazos posibles`,diceArt)}
-          </div>
+          <div class="solo-panel-head quick-mode-head"><span class="quick-setup-kicker">Elige un mazo</span><h3>${decks.length} mazos para completar</h3></div>
           ${CT.Tiempo.field('quick-solo')}
-          <div class="quick-mode-pane quick-day-pane" data-mode-pane="day"${mode==='day'?'':' hidden'}>
-            <div class="quick-day-head"><span class="quick-setup-kicker">Mazos de hoy</span><h4>Toca un mazo para empezar</h4><small>Mañana salen otros ${QUICK_DAY_DECKS}. Cada carta que aciertes queda en tu colección.</small></div>
-            <div class="quick-day-decks">${todayDecks().map(deckTile).join('')}</div>
-          </div>
-          <div class="quick-mode-pane quick-surprise" data-mode-pane="surprise"${mode==='surprise'?'':' hidden'}>
-            <div class="quick-preparation-head"><img class="quick-preparation-art" src="assets/hero-mixed-400.webp" alt="" aria-hidden="true" decoding="async"><div class="quick-preparation-copy"><span class="quick-setup-kicker">Partida sorpresa</span><h4>¿Cuánto quieres jugar?</h4><span class="quick-preparation-motto">El azar reparte. Tú decides.</span></div></div>
-            <p>Elige una duración. Los retos saldrán al azar, sin mostrarte cuáles son.</p>
-            ${lengthChips('quick-free-length',[...options,[total,'Todo el catálogo']],'Duración de la partida','',true)}
-            ${button('start-free',`${pendiente ? 'Empezar otra' : 'Empezar'} <span>→</span>`,`btn ${pendiente ? 'btn-secondary' : 'btn-primary'} btn-block`)}
-          </div><p id="quick-error" role="alert">${esc(error)}</p>
+          <p class="hint quick-album-note">Cada carta que aciertes queda en tu colección. Salen primero las que aún te faltan.</p>
+          ${button('play-random','Al azar <span>→</span>','btn btn-secondary btn-block quick-random')}
+          <div class="quick-day-decks">${ordered.map(deckTile).join('')}</div>
+          <p id="quick-error" role="alert">${esc(error)}</p>
         </div></section>`);
   }
-  // La forma de jugar elegida la última vez (mazos del día por defecto).
-  const MODE_KEY='continuum-quick-solo-mode';
-  const soloMode=()=>{try{return CT.Storage.getItem(MODE_KEY)==='surprise'?'surprise':'day';}catch{return 'day';}};
-  function setSoloMode(key) {
-    try{CT.Storage.setItem(MODE_KEY,key);}catch{/* sin almacenamiento: solo esta vez */}
-    for(const card of app().querySelectorAll('[data-quick="solo-mode"]')){const on=card.dataset.mode===key;card.classList.toggle('is-selected',on);card.setAttribute('aria-checked',String(on));}
-    for(const pane of app().querySelectorAll('[data-mode-pane]'))pane.hidden=pane.dataset.modePane!==key;
-    // El contenido queda bajo el tiempo por carta: se acerca para que se vea qué ha cambiado.
-    app().querySelector(`[data-mode-pane="${key}"]`)?.scrollIntoView?.({block:'nearest',behavior:globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches===false?'smooth':'auto'});
-  }
-  // Horas que faltan para que cambien los mazos del día (a medianoche), redondeando hacia arriba.
-  function hoursLeft(now=new Date()) {const next=new Date(now);next.setHours(24,0,0,0);return Math.max(1,Math.ceil((next-now)/3600000));}
   // Tu colección de Retos rápidos: todos los retos con lo descubierto de cada uno. Las cartas
   // acertadas enseñan su lámina y su dato; las que faltan, solo el título y un candado.
   // `open`: el reto que se despliega al entrar (el que se acaba de jugar).
   function collectionPage(open=null) {
     stopNetwork(); page='collection'; state=null; record=null; selected=null; slot=null;
-    const seen=quickSeen(), hoy=new Set(todayDecks().map(c=>c.id));
-    const decks=[...CT.QuickCatalog.challenges].sort((a,b)=>Number(hoy.has(b.id))-Number(hoy.has(a.id)));
+    const seen=quickSeen();
+    const decks=[...CT.QuickCatalog.challenges].sort((a,b)=>deckRank(a,seen)-deckRank(b,seen));
     const cards=decks.reduce((n,c)=>n+c.cards.length,0), found=decks.reduce((n,c)=>n+deckProgress(c,seen).done,0);
     const complete=decks.filter(c=>deckProgress(c,seen).done===c.cards.length).length;
     const card=(c,item)=>seen.has(item.id)
       ? `<li class="quick-album-card is-found">${item.image?`<img src="${esc(item.image)}" alt="" aria-hidden="true" loading="lazy" decoding="async">`:''}<b>${esc(item.title)}</b><small>${esc(item.label)}</small></li>`
       : `<li class="quick-album-card is-locked"><span class="quick-album-lock" aria-hidden="true">?</span><b>${esc(item.title)}</b><small>Por descubrir</small></li>`;
-    const deck=c=>{const pr=deckProgress(c,seen);return `<details class="quick-album-deck"${c.id===open?' open':''}><summary><img src="${esc(deckArt(c))}" alt="" aria-hidden="true" loading="lazy" decoding="async"><span><b>${esc(c.title)}</b>${hoy.has(c.id)?'<em class="quick-album-today">Hoy</em>':''}${progressBar(pr)}</span></summary>
-      <p class="hint">${esc(c.rule)}.</p>${hoy.has(c.id)?button('play-deck',pr.done===pr.total?'Volver a jugarlo':'Jugarlo ahora','btn btn-primary btn-block',`data-deck="${esc(c.id)}"`):'<p class="hint">Este mazo volverá a salir entre los mazos del día. También puede tocarte en una partida sorpresa.</p>'}
+    const deck=c=>{const pr=deckProgress(c,seen);return `<details class="quick-album-deck"${c.id===open?' open':''}><summary><img src="${esc(deckArt(c))}" alt="" aria-hidden="true" loading="lazy" decoding="async"><span><b>${esc(c.title)}</b>${progressBar(pr)}</span></summary>
+      <p class="hint">${esc(c.rule)}.</p>${button('play-deck',pr.done===pr.total?'Volver a jugarlo':'Jugarlo ahora','btn btn-primary btn-block',`data-deck="${esc(c.id)}"`)}
       <ul class="quick-album-cards">${[...c.cards].sort((a,b)=>Number(seen.has(b.id))-Number(seen.has(a.id))).map(item=>card(c,item)).join('')}</ul></details>`;};
     shell(`<section class="setup-section quick-album"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 data-focus tabindex="-1">Tu colección</h2>
       <p class="lead">${found} de ${cards} cartas descubiertas · ${complete} ${complete===1?'mazo completo':'mazos completos'}.</p>
@@ -1232,17 +1200,13 @@
       const count=Number(app().querySelector('#quick-free-length')?.value) || 3, seed=historyId();
       prepare({names:['Tú'],rounds:rounds(count,null,seed,E.MULTI_CARDS),kind:'duel',keep:true,seed,length:count,seconds:CT.Tiempo.chosen('amigos',15)}); return;
     }
-    if (action === 'solo-mode') {setSoloMode(target.dataset.mode==='surprise'?'surprise':'day'); CT.Effects?.tap?.(); CT.Effects?.transition?.('page'); return;}
     if (action === 'collection') {collectionPage(target.dataset.deck || null); return;}
-    // Un mazo del día: 10 cartas de ese reto (E.SOLO_CARDS), más la que abre la línea.
-    if (action === 'play-deck') {
-      const id=target.dataset.deck;
-      if(!todayDecks().some(c=>c.id===id)){freeSetup();return;}
+    // Un mazo del álbum (o uno sin completar al azar): 10 cartas de ese reto (E.SOLO_CARDS), más la que abre la línea.
+    if (action === 'play-deck' || action === 'play-random') {
+      const pool=incompleteDecks().length?incompleteDecks():CT.QuickCatalog.challenges;
+      const id=action==='play-random'?pool[Math.floor(Math.random()*pool.length)].id:target.dataset.deck;
+      if(!CT.QuickCatalog.challenges.some(c=>c.id===id)){freeSetup();return;}
       prepare({names:['Tú'],rounds:rounds(1,id,null,E.SOLO_CARDS+1,true),kind:'free',length:1,seconds:CT.Tiempo.chosen('quick-solo')}); return;
-    }
-    if (action === 'start-free') {
-      const count=Number(app().querySelector('#quick-free-length')?.value) || 3;
-      prepare({names:['Tú'],rounds:rounds(count,null,null,E.SOLO_CARDS+1,true),kind:'free',length:count,seconds:CT.Tiempo.chosen('quick-solo')}); return;
     }
     if (action === 'exit') {CT.UI.confirmExit(connection?.kind==='local' ? 'Al salir se cierra la conexión con la sala local.' : 'La partida se conserva para que puedas continuar después.', toEntry, undefined, undefined, (state || room) && connection?.kind!=='internet' ? {label:'Salir sin guardar', proceed:abandonQuick} : null); return;}
     if (action === 'abandon') {CT.UI.confirmExit('Se borrará esta partida y no podrás continuarla después.', abandonQuick, '¿Salir sin guardar?', 'Salir sin guardar'); return;}
@@ -1309,8 +1273,7 @@
     // El historial de Retos rápidos vive en el Atlas, junto al resto de estadísticas.
     stats:statsPanel,
     openSolo(renderPage){paint=renderPage;backTo=null;entry='free-setup';format='free';freeSetup();},
-    // Los mazos que se ofrecen un día en solitario y la colección de cartas descubiertas.
-    todayDecks,
+    // La colección de cartas descubiertas.
     openCollection(renderPage,deck=null){paint=renderPage;backTo=null;entry='free-setup';format='free';collectionPage(deck);},
     openLocal(renderPage){paint=renderPage;backTo=null;entry='setup';format='local';setup();},
     openDuel(renderPage){paint=renderPage;entry='duel-setup';format='duel';backTo=null;duelSetup();},

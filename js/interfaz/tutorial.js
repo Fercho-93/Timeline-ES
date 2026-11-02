@@ -44,7 +44,6 @@
     "Jugar con amigos": "mode-walk-multi.webp", "Jugar online": "menu-online.webp",
     "Unirme a una partida": "menu-private.webp", "Reto diario": "menu-daily.webp",
     "Maratón": "mode-walk-solo.webp", "Competición": "competition-engraving.webp",
-    "Mazos del día": "menu-daily.webp", "Partida sorpresa": "menu-quick.webp",
     "Mesas abiertas": "menu-online.webp", "Crear mesa": "menu-wifi.webp", "Partida rápida": "menu-quick.webp"
   };
   const menuArt = name => MENU_ART[name] ? `<img class="tv-menu-art" src="assets/${MENU_ART[name]}" alt="" decoding="async">` : "";
@@ -195,14 +194,14 @@
           [5400, c => c.focus(".tv-levels", 2)],
           [7000, c => { c.focus(".tv-levels", 3); c.say(`En Experto se ocultan las ${time ? "fechas" : "cifras"} de la línea. Te guías por las ilustraciones.`); }]
         ] },
-      blockIntro(1, "Retos rápidos", "Retos rápidos", "Jugar solo", "Mazos del día y partidas sorpresa",
+      blockIntro(1, "Retos rápidos", "Retos rápidos", "Jugar solo", "Un álbum de mazos para completar",
         ["Jugar solo", "Retos rápidos"], "En «Jugar solo» también tienes «Retos rápidos»."),
       { chapter: 1, title: "Retos rápidos", duration: 9800,
         html: `<div class="tv-board">${path(["Jugar solo", "Retos rápidos"])}${quickExample()}<div class="tv-tiles">
-          ${tile("☀", "Mazos del día", "4 mazos, nuevos cada día")}${tile("?", "Partida sorpresa", "1, 3, 5 o más, al azar")}</div></div>`,
+          ${tile("▦", "Elige un mazo", "Todos a la vista, con tu progreso")}${tile("?", "Al azar", "Uno que aún no tengas completo")}</div></div>`,
         steps: [
           [0, c => { c.say("Mazos cortos, cada uno con su propia regla de orden."); c.add(".tv-deck", "is-in"); }],
-          [3400, c => { c.say("Juega uno de los mazos del día o una partida sorpresa."); c.stagger(".tv-tile", 500); }],
+          [3400, c => { c.say("Elige un mazo y complétalo: cada acierto queda en tu colección."); c.stagger(".tv-tile", 500); }],
           [6800, c => c.say("Un fallo no te elimina: al final cuentan tus aciertos.")]
         ] },
 

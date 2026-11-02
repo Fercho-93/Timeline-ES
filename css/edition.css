@@ -4060,7 +4060,6 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
   opacity: 1; filter: drop-shadow(0 3px 3px #734f2938);
 }
 
-
 /* ===== Pantalla de «pasa el móvil» y demás tarjetas de turno de las partidas multijugador =====
    Dejan el recuadro blanco liso y toman el pergamino del resto del juego: papel cálido, filete de latón
    y un segundo marco interior, como las tarjetas del inicio. */
@@ -4644,7 +4643,6 @@ html #app .tiempo-segmented .segmented-option::after { content: none !important;
 #app .bienvenida .bienvenida-datos { margin-top: 10px; font-size: .74rem; line-height: 1.45; }
 #app .bienvenida .bienvenida-datos a { color: inherit; text-decoration: underline; }
 
-
 /* Vidas en solitario: corazones más visibles, y el que se pierde se rompe con un latido. */
 #app .solo-lives .vida { display: inline-block; color: #b03a2e; }
 #app .solo-lives .vida-perdida { color: var(--accent); opacity: .45; }
@@ -4839,21 +4837,7 @@ html #app.atlas-board[data-platform][data-device][data-screen] :is(.board-focus-
 
 /* Preparación ilustrada de retos rápidos. Los ajustes conservan sus controles. */
 #app .quick-free-setup .solo-panel { overflow: hidden; }
-#app .quick-free-setup .quick-preparation-head {
-  position: relative; isolation: isolate; min-height: 126px; display: flex;
-  align-items: center; margin: -20px -20px 20px; padding: 25px 22px 22px;
-  border-bottom: 1px solid var(--edition-line);
-  background: linear-gradient(125deg, #b8976012, transparent), var(--edition-surface);
-}
-#app .quick-preparation-art {
-  position: absolute; z-index: -1; inset: 0 0 0 auto; width: 48%; height: 100%;
-  object-fit: cover; object-position: 80% center; opacity: .82;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 65%);
-  mask-image: linear-gradient(90deg, transparent, #000 65%);
-}
-#app .quick-preparation-copy { width: 78%; position: relative; }
-#app .quick-free-setup .quick-preparation-head h3 { margin: 0; max-width: 260px; font: 600 clamp(1.45rem, calc(6 * var(--vw)), 2rem)/1.12 var(--font-display); text-wrap: balance; }
-#app .quick-preparation-motto { display: block; margin-top: 10px; color: var(--edition-muted); font: italic .78rem/1.3 var(--font-display); }
+
 #app .quick-free-setup .solo-panel > p:not(#quick-error) { font-size: .85rem; line-height: 1.5; }
 #app .quick-free-setup .quick-length { gap: 10px; }
 #app .quick-free-setup .quick-length-chip {
@@ -4897,8 +4881,7 @@ html #app.atlas-board[data-platform][data-device][data-screen] :is(.board-focus-
   #app .quick-free-setup .quick-length { gap: 7px; }
   #app .quick-free-setup .quick-length-chip { padding-inline: 4px; min-height: 150px; }
   #app .quick-free-setup .quick-duration-art { height: 60px; }
-  #app .quick-free-setup .quick-preparation-head { padding-inline: 18px; }
-  #app .quick-preparation-copy { width: 85%; }
+
   #app .quick-free-setup .quick-length-chip.quick-length-all { grid-auto-flow: row; grid-template-columns: 56px 1fr; text-align: left; }
   #app .quick-free-setup .quick-length-all .quick-duration-art { grid-row: 1 / span 3; }
   #app .quick-free-setup .quick-length-all small { max-width: none; margin: 0; }
@@ -4968,8 +4951,7 @@ html #app[data-screen] .setup-art-panel .quick-length-more { min-height: 44px; b
 #app .quick-deck-progress .game-progress-bar { display: block; height: 4px; border-radius: 2px; background: var(--edition-line); overflow: hidden; }
 #app .quick-deck-progress .game-progress-bar i { display: block; height: 100%; background: var(--edition-brass); }
 #app .quick-deck-progress small { display: block; margin-top: 4px; color: var(--edition-muted); font: .72rem/1.35 var(--ui-font); }
-#app .quick-mode-pane { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--edition-line); }
-#app .quick-free-setup .quick-surprise .quick-preparation-head h4 { margin: 0; font: 600 clamp(1.2rem, calc(5 * var(--vw)), 1.55rem)/1.15 var(--font-display); color: var(--edition-ink); }
+
 #app .quick-new-card { margin: 6px auto 10px; padding: 6px 12px; width: fit-content; border-radius: 999px; color: var(--edition-brass); border: 1px solid var(--edition-brass); font: 600 .82rem/1.3 var(--ui-font); }
 #app .quick-collection-summary { margin: 14px 0; padding: 12px 14px; border: 1px solid var(--edition-line); border-radius: 14px; background: var(--edition-surface); }
 #app .quick-collection-summary > p { margin: 0 0 8px; font-weight: 600; }
@@ -4983,7 +4965,7 @@ html #app[data-screen] .setup-art-panel .quick-length-more { min-height: 44px; b
 #app .quick-album-deck > summary::-webkit-details-marker { display: none; }
 #app .quick-album-deck > summary img { width: 52px; height: 52px; object-fit: cover; border-radius: 9px; border: 1px solid var(--edition-line); }
 #app .quick-album-deck > summary b { font: 600 .98rem/1.25 var(--font-display); color: var(--edition-ink); }
-#app .quick-album-today { margin-left: 8px; padding: 1px 8px; border-radius: 999px; font: 700 .66rem/1.6 var(--ui-font); font-style: normal; letter-spacing: .04em; text-transform: uppercase; color: var(--edition-surface); background: var(--edition-brass); vertical-align: 2px; }
+
 #app .quick-album-deck[open] > summary { border-bottom: 1px solid var(--edition-line); }
 #app .quick-album-deck > .hint, #app .quick-album-deck > .btn { margin: 10px 12px; width: calc(100% - 24px); }
 #app .quick-album-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin: 0; padding: 0 12px 12px; list-style: none; }
@@ -4993,25 +4975,9 @@ html #app[data-screen] .setup-art-panel .quick-length-more { min-height: 44px; b
 #app .quick-album-card b { font: 600 .74rem/1.25 var(--ui-font); color: var(--edition-ink); overflow-wrap: anywhere; }
 #app .quick-album-card small { color: var(--edition-muted); font: .68rem/1.3 var(--ui-font); }
 #app .quick-album-card.is-locked b { color: var(--edition-muted); }
-#app .quick-free-setup .quick-surprise .quick-preparation-head { margin: 0 0 14px; min-height: 104px; padding: 18px 16px; border: 1px solid var(--edition-line); border-radius: 14px; overflow: hidden; }
-#app .quick-free-setup .quick-surprise > p { font-size: .85rem; line-height: 1.5; }
 
 /* Retos rápidos en solitario: dos formas de jugar, elegidas con dos tarjetas grandes. */
 #app .quick-mode-head h3 { margin: 4px 0 12px; font: 600 clamp(1.35rem, calc(5.6 * var(--vw)), 1.8rem)/1.15 var(--font-display); color: var(--edition-ink); }
-#app .quick-mode-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
-#app .quick-mode-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; padding: 16px 10px 14px; text-align: center; color: var(--edition-ink); background: var(--edition-surface); border: 1px solid var(--edition-line); border-radius: 16px; box-shadow: inset 0 0 0 4px #b8976012, 0 3px 8px #63432314; cursor: pointer; transition: border-color var(--motion-fast, .16s), box-shadow var(--motion-fast, .16s), transform var(--motion-fast, .16s); }
-#app .quick-mode-card .quick-mode-art { width: 58px; height: 58px; color: var(--edition-muted); }
-#app .quick-mode-copy { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-#app .quick-mode-copy b { font: 600 1.05rem/1.2 var(--font-display); }
-#app .quick-mode-copy small { color: var(--edition-muted); font: .74rem/1.38 var(--ui-font); }
-#app .quick-mode-copy em { margin-top: 2px; padding: 2px 9px; border-radius: 999px; font: 600 .66rem/1.6 var(--ui-font); font-style: normal; letter-spacing: .03em; color: var(--edition-muted); border: 1px solid var(--edition-line); }
-#app .quick-mode-card.is-selected { border-color: var(--edition-brass); background: linear-gradient(160deg, #b8976026, #b897600a), var(--edition-surface); box-shadow: inset 0 0 0 2px var(--edition-brass), 0 6px 14px #63432326; }
-#app .quick-mode-card.is-selected .quick-mode-art { color: var(--edition-brass); }
-#app .quick-mode-card.is-selected .quick-mode-copy em { color: var(--edition-surface); background: var(--edition-brass); border-color: var(--edition-brass); }
-#app .quick-mode-card.is-selected::after { content: "✓"; position: absolute; right: 9px; top: 8px; font: 700 .78rem/1 var(--ui-font); color: var(--edition-brass); }
-#app .quick-mode-card:focus-visible { outline: 2px solid var(--edition-brass); outline-offset: 2px; }
-@media (hover: hover) { #app .quick-mode-card:not(.is-selected):hover { border-color: var(--edition-brass); } }
-@media (max-width: 340px) { #app .quick-mode-switch { grid-template-columns: 1fr; } }
 
 /* Último mazo: una ficha de colección con carátula y filete de latón. */
 #app .solo-shortcut-last {

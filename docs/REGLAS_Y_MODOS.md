@@ -351,7 +351,7 @@ ausencia de posiciones duplicadas, recolocación y conservación de las cartas n
 ## Retos rápidos
 
 **Retos rápidos** funciona igual que las grandes colecciones, con temas cortos: se juega solo
-(cuatro mazos del día que rotan, o una partida sorpresa por duración), en un solo móvil, por
+(eligiendo cualquier mazo del álbum, o uno al azar entre los que no tienes completos), en un solo móvil, por
 internet o por Wi-Fi local, en mesas públicas, o retando a un amigo en un duelo (por turnos o con
 las mismas cartas por enlace). No usa el marcador de Competición: mantiene su propia partida
 guardada. Usa las mismas cartas, tamaños, arrastre, confirmación, giro, zoom y ajustes del
@@ -359,10 +359,12 @@ tablero compartido.
 
 En solitario, cada reto se juega con 10 cartas que colocar (`QuickEngine.SOLO_CARDS`) más la que abre
 la línea, igual que una ronda de Grandes colecciones y el reto diario; salen primero las que aún no
-están en la colección, y un mazo más pequeño se juega entero. Cada día se ofrecen cuatro retos
-distintos, iguales para todo el mundo: el
-catálogo se baraja una vez con semilla fija y cada día toma el tramo siguiente, así que en ocho
-días salen todos sin repetir de un día a otro. Cada carta que quien juega coloca bien entra en su
+están en la colección, y un mazo más pequeño se juega entero. La pantalla de solitario es un
+álbum: todos los mazos a la vista (primero los empezados, luego los nuevos y al final los
+completos), cada uno con lo descubierto, y un botón «Al azar» que elige uno sin completar. La meta
+es completar mazos. Hasta noviembre de 2026 había «mazos del día» (cuatro que rotaban) y «partida
+sorpresa» (varios mazos ocultos seguidos); se quitaron porque repetían el Reto diario y la
+Competición. Una partida guardada de varios mazos se sigue pudiendo continuar. Cada carta que quien juega coloca bien entra en su
 **colección** de Retos rápidos (`quickMastered` en `hilo-perfil-v1`, que viaja con el progreso de
 la cuenta): la pantalla de solitario enseña lo descubierto de cada mazo y «Ver tu colección» lista
 las cartas conseguidas y las que faltan. Cuentan las de solitario, el reto diario, el duelo por

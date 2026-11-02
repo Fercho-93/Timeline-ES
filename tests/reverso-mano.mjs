@@ -127,7 +127,7 @@ assert.match(read('css/edition.css'), /\.hand\.hand-fan:not\(\.hand-placement-pe
   try {
     const CT = window.CONTINUUM;
     CT.Quick.openSolo((markup, playing) => CT.paint(document.querySelector('#app'), markup, playing ? 'quick-game' : 'quick-challenges'));
-    click(document, '[data-quick="start-free"]');
+    click(document, '[data-quick="play-random"]');
     click(document, '[data-quick="ready"]');
     checkBoard(document, document.querySelectorAll('.hand-card').length);
     assert.ok(document.querySelectorAll('.hand-card').length > 1, 'el reto mantiene todas las cartas comunes');

@@ -1,4 +1,4 @@
-// Retos rápidos en solitario: los mazos del día rotan por el catálogo, cada mazo se juega con 10 cartas y
+// Retos rápidos en solitario: un álbum con todos los mazos, cada mazo se juega con 10 cartas y
 // cada acierto propio deja la carta en la colección, que viaja con el progreso y suma en el ranking
 // de descubrimientos.
 import assert from 'node:assert/strict';
@@ -15,47 +15,20 @@ const CT = w.CONTINUUM, E = CT.QuickEngine, Q = CT.Quick;
 const cues = [];
 CT.Effects = {...CT.Effects, discovery: () => cues.push('discovery'), transition: kind => cues.push(kind), feedback: ok => cues.push(ok ? 'acierto' : 'fallo'), bank: () => cues.push('bank')};
 
-// Rotación: cuatro mazos distintos cada día, iguales para todos, que cambian de un día a otro y
-// recorren el catálogo entero en ocho días.
-// Los arrays vienen de la ventana de JSDOM: se comparan por contenido.
 const plain = value => JSON.parse(JSON.stringify(value));
-const ids = day => plain(Q.todayDecks(day).map(c => c.id));
-assert.equal(ids('2026-10-13').length, 4);
-assert.equal(new Set(ids('2026-10-13')).size, 4, 'sin repetir en el mismo día');
-assert.deepEqual(ids('2026-10-13'), ids('2026-10-13'), 'el mismo día salen los mismos');
-assert.notDeepEqual(ids('2026-10-13'), ids('2026-10-14'), 'al día siguiente salen otros');
-assert.equal(ids('2026-10-13').filter(id => ids('2026-10-14').includes(id)).length, 0, 'sin repetir de un día al siguiente');
-const semana = new Set(['2026-10-13','2026-10-14','2026-10-15','2026-10-16','2026-10-17','2026-10-18','2026-10-19','2026-10-20'].flatMap(ids));
-assert.equal(semana.size, CT.QuickCatalog.challenges.length, 'en ocho días han salido todos los retos');
 
-// La pantalla de solitario enseña los mazos de hoy con su progreso.
+// La pantalla de solitario es un álbum: todos los mazos, con su progreso, y «Al azar».
 w.sessionStorage.setItem('continuum-entry-route', 'quick');
 CT.ModeHubs.open('hub-solo');
 w.document.querySelector('[data-action="quick-challenges"]').click();
 const tiles = [...w.document.querySelectorAll('[data-quick="play-deck"]')];
-assert.equal(tiles.length, 4, 'cuatro mazos del día');
-assert.deepEqual(tiles.map(t => t.dataset.deck), ids(new Date().toLocaleDateString('sv-SE')));
+assert.equal(tiles.length, CT.QuickCatalog.challenges.length, 'todos los mazos a la vista');
+assert.deepEqual(tiles.map(t => t.dataset.deck), plain(CT.QuickCatalog.challenges.map(c => c.id)), 'sin nada descubierto, en el orden del catálogo');
 assert.match(tiles[0].textContent, /Descubiertas 0 de \d+/);
+assert.ok(w.document.querySelector('[data-quick="play-random"]'), 'y un botón para jugar uno al azar');
+assert.equal(w.document.querySelector('[data-quick="solo-mode"], [data-quick="start-free"]'), null, 'ya no hay mazos del día ni partida sorpresa');
 
-// Dos formas de jugar bien separadas: mazos del día (por defecto) o partida sorpresa. Solo se ve una.
-const modo = key => w.document.querySelector(`[data-quick="solo-mode"][data-mode="${key}"]`);
-const panel = key => w.document.querySelector(`[data-mode-pane="${key}"]`);
-assert.equal(modo('day').getAttribute('aria-checked'), 'true', 'empieza en los mazos del día');
-assert.equal(panel('day').hidden, false);
-assert.equal(panel('surprise').hidden, true, 'la partida sorpresa no se mezcla con los mazos del día');
-assert.match(modo('day').textContent, /Cambian en \d+ h/);
-modo('surprise').click();
-assert.equal(modo('surprise').getAttribute('aria-checked'), 'true');
-assert.equal(panel('surprise').hidden, false);
-assert.equal(panel('day').hidden, true);
-assert.ok(panel('surprise').querySelector('[data-quick="start-free"]') && panel('surprise').querySelector('.quick-length'));
-// Se recuerda la última forma elegida.
-w.document.querySelector('[data-quick="collection"]').click();
-w.document.querySelector('[data-quick="formats"]').click();
-assert.equal(panel('surprise').hidden, false, 'al volver sigue en la partida sorpresa');
-modo('day').click();
-
-// Un mazo del día se juega con 10 cartas que colocar, más la que abre la línea (o entero, si es más pequeño).
+// Un mazo se juega con 10 cartas que colocar, más la que abre la línea (o entero, si es más pequeño).
 const deckId = tiles[0].dataset.deck, deck = E.challenge(deckId), jugadas = Math.min(deck.cards.length, E.SOLO_CARDS + 1);
 assert.equal(E.SOLO_CARDS, 10);
 w.document.querySelector(`[data-quick="play-deck"][data-deck="${deckId}"]`).click();
@@ -110,10 +83,8 @@ const abierto = album.querySelector('.quick-album-deck[open]');
 assert.match(abierto.textContent, new RegExp(deck.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 assert.equal(abierto.querySelectorAll('.quick-album-card.is-found').length, jugadas - 2);
 assert.equal(abierto.querySelectorAll('.quick-album-card.is-locked').length, deck.cards.length - jugadas + 2);
-assert.ok(abierto.querySelector('.quick-album-today'), 'marca los mazos de hoy');
-// Un mazo que no es de hoy no se puede jugar desde la colección.
-const otro = album.querySelector('.quick-album-deck:not(:has(.quick-album-today))');
-assert.equal(otro.querySelector('[data-quick="play-deck"]'), null);
+assert.equal(album.querySelectorAll('.quick-album-deck [data-quick="play-deck"]').length, CT.QuickCatalog.challenges.length, 'cualquier mazo se puede jugar desde la colección');
+assert.equal(album.querySelector('.quick-album-deck').querySelector('b').textContent, deck.title, 'el mazo empezado va el primero');
 // Al volver a jugarlo salen primero las cartas que aún faltan en la colección.
 abierto.querySelector('[data-quick="play-deck"]').click();
 w.document.querySelector('[data-quick="ready"]').click();
@@ -121,14 +92,19 @@ const vistas = CT.Progreso.quickSeenCards(), otra = saved().config.rounds[0].ord
 const faltan = deck.cards.filter(c => !vistas.has(c.id)).length;
 assert.equal(otra.length, jugadas);
 assert.equal(otra.filter(id => !vistas.has(id)).length, Math.min(faltan, otra.length), 'las que faltan van delante');
-// La partida sorpresa también reparte 10 cartas por reto.
+// En el álbum, el mazo empezado sube arriba; «Al azar» elige uno sin completar, con 10 cartas.
 CT.ModeHubs.open('hub-solo');
 w.document.querySelector('[data-action="quick-challenges"]').click();
-w.document.querySelector('[data-quick="solo-mode"][data-mode="surprise"]').click();
-w.document.querySelector('.quick-length-chip[data-length="5"]').click();
-w.document.querySelector('[data-quick="start-free"]').click();
-w.document.querySelector('[data-quick="ready"]').click();
-const sorpresa = saved().config.rounds;
-assert.equal(sorpresa.length, 5);
-for (const r of sorpresa) assert.equal(r.order.length, Math.min(E.challenge(r.id).cards.length, E.SOLO_CARDS + 1), `${r.id}: 10 cartas y la de referencia`);
-console.log('Retos rápidos: mazos del día, 10 cartas por reto y colección de cartas descubiertas: OK');
+assert.equal(w.document.querySelector('[data-quick="play-deck"]').dataset.deck, deckId, 'el mazo empezado va el primero');
+const completos = new Set(CT.QuickCatalog.challenges.filter(c => c.cards.every(card => CT.Progreso.quickSeenCards().has(card.id))).map(c => c.id));
+for (let i = 0; i < 5; i++) {
+  w.document.querySelector('[data-quick="play-random"]').click();
+  const elegido = w.document.querySelector('.quick-ready h2')?.textContent;
+  assert.ok(elegido && !completos.has(CT.QuickCatalog.challenges.find(c => c.title === elegido)?.id), 'al azar, uno sin completar');
+  w.document.querySelector('[data-quick="ready"]').click();
+  assert.equal(saved().config.rounds.length, 1, 'un solo mazo');
+  assert.equal(saved().config.rounds[0].order.length, Math.min(E.challenge(saved().config.rounds[0].id).cards.length, E.SOLO_CARDS + 1), '10 cartas y la de referencia');
+  CT.ModeHubs.open('hub-solo');
+  w.document.querySelector('[data-action="quick-challenges"]').click();
+}
+console.log('Retos rápidos: álbum de mazos, 10 cartas por reto y colección de cartas descubiertas: OK');

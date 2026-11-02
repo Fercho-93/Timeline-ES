@@ -33,8 +33,7 @@ try {
           if(format==='quick') {
             await page.evaluate(()=>window.CONTINUUM.ModeHubs.open('hub-solo'));
             await page.locator('[data-solo-route="quick"]').click();
-            await page.locator('[data-quick="solo-mode"][data-mode="surprise"]').click();
-            await page.locator('[data-quick="start-free"]').click();
+            await page.locator('[data-quick="play-random"]').click();
             await page.evaluate(()=>document.querySelector('[data-quick-splash]')?.click());
             await page.locator('[data-quick="ready"]').click();
           } else if(format==='competition') {
