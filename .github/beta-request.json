@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 851,
+  "cache": 855,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Competición con amigos con el ritmo «Mismas cartas»: juegas 3 o 5 temas y mandas un enlace; quien lo abre juega los mismos temas y cartas cuando quiera, sin conexión, y ve el cara a cara. En «Crear partida»: la competición por turnos solo ofrece las cartas que caben, «Por turnos» avisa sin internet, ya no se promete un aviso al móvil que no llega, Retos rápidos recuerda el máximo de jugadores y volver desde la pantalla previa a un reto aceptado ya no falla"
+  "reason": "Versión de lanzamiento para probar antes de la App Store: modo público, temporada nueva, saltar turno y sacar de la partida en Retos rápidos, reto diario guardado aparte, reloj que no corre al pasar el móvil, pantalla previa del duelo por turnos, revancha en la sala online y nombres filtrados en mesas y salas"
 }
