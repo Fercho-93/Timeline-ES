@@ -231,9 +231,10 @@ Cómo da abasto con mucho volumen (pensado para 50.000 salas al día o más):
   trata 20 a la vez. No guarda por dónde va: un duelo caducado deja de estar abierto y uno ya
   avisado deja de necesitar nada, así que la ejecución siguiente empieza por lo pendiente. Para
   eso necesita un **índice compuesto** en `turnDuels`: `status` (ascendente) y `updatedAt`
-  (ascendente), ámbito de colección. Está en `firestore.indexes.json` y se publica con las reglas
-  (workflow «Publicar reglas de Firestore»); también se puede crear a mano en la consola de
-  Firebase → Firestore → Índices → Compuestos.
+  (ascendente), ámbito de colección. Está en `firestore.indexes.json` y lo publica el workflow
+  «Publicar reglas de Firestore» en un paso aparte que no bloquea las reglas, si la cuenta de
+  servicio tiene el papel «Administrador de índices de Cloud Datastore»; si no, se crea a mano en
+  la consola de Firebase → Firestore → Índices → Compuestos.
 
   Mientras no exista (o se esté construyendo), la tarea no falla: recorre todos los duelos
   abiertos por identificador, como antes, y lo avisa en los registros («falta el índice

@@ -54,7 +54,7 @@ cuando hacen falta.
 | `manifest.webmanifest`, `icon.svg` | Ficha e icono de la web cuando se instala en el móvil desde el navegador. |
 | `CNAME`, `.nojekyll`, `.well-known/` | Publican la web en GitHub Pages con el dominio `continuumjuego.es`, y demuestran a Apple que el dominio es del juego para que los enlaces abran la app (`.well-known/` lo genera `scripts/domain-associations.mjs`). |
 | `firestore.rules` | Las reglas de seguridad de la base de datos. **Subirlas a `main` las publica en producción.** |
-| `firestore.indexes.json` | Los índices compuestos que necesitan algunas consultas (el ranking ordenado por aciertos y tiempo). Se publican junto con las reglas. |
+| `firestore.indexes.json` | Los índices compuestos que necesitan algunas consultas (el ranking por aciertos y tiempo, el repaso de duelos). Los publica el mismo workflow que las reglas, en un paso aparte que no las bloquea (necesita el papel «Administrador de índices de Cloud Datastore»). |
 | `firebase.json`, `firebase-e2e.json` | Configuración de las herramientas de Firebase para publicar y para probar en local. |
 | `package.json`, `package-lock.json` | La lista de herramientas que necesita el proyecto y los atajos (`npm test`, `npm run build`…). |
 | `capacitor.config.json` | Configuración del envoltorio de app móvil. |
@@ -280,7 +280,7 @@ que en iPhone) y `res/` (iconos, pantallas de carga y textos).
 | --- | --- | --- |
 | `pruebas.yml` | En cada subida | Pasa `npm test` y las reglas, y comprueba que la app móvil se compila. |
 | `zoom-visual.yml` («Pruebas en navegador») | Al cambiar la interfaz | Pasa el grupo `navegador` de `tests/suites.mjs` en navegadores de verdad (pantallas pequeñas, zoom, duelos, navegación) y la partida online de extremo a extremo. |
-| `reglas-firestore.yml` | Al cambiar `firestore.rules` o `firestore.indexes.json` | Prueba las reglas y **las publica en producción**, con los índices. |
+| `reglas-firestore.yml` | Al cambiar `firestore.rules` o `firestore.indexes.json` | Prueba las reglas y **las publica en producción**; después intenta publicar los índices, sin bloquear las reglas si falla. |
 | `functions.yml` | Solo a mano | Prueba y publica las Cloud Functions. |
 | `borrar-cuenta.yml` | Solo a mano | Borra la cuenta de un jugador (moderación o petición por correo). |
 | `beta-firmada.yml` | Al cambiar `.github/beta-request.json` | Compila Android e iOS firmadas y sube la de iOS a TestFlight. Solo cuando lo pida el titular. |

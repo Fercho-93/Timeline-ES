@@ -58,9 +58,21 @@ jobs:
       - name: Publicar en el proyecto
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/cuenta.json
-        # Los índices compuestos (firestore.indexes.json) van con las reglas: el ranking los necesita. Publicar
-        # un índice no borra los que haya creados a mano en la consola (eso solo lo haría `--force`).
-        run: npx firebase deploy --only firestore:rules,firestore:indexes --project timeline-es --non-interactive
+        run: npx firebase deploy --only firestore:rules --project timeline-es --non-interactive
+      # Los índices compuestos (firestore.indexes.json: ranking por aciertos y tiempo, repaso de duelos) van aparte y
+      # no bloquean las reglas: si falla, el juego usa sus consultas de respaldo. Necesita que la cuenta de servicio
+      # tenga el papel «Administrador de índices de Cloud Datastore» (roles/datastore.indexAdmin); sin él, Firebase
+      # responde 403 y los índices se crean a mano en la consola (Firestore → Índices → Compuestos). Publicar un
+      # índice no borra los creados a mano (eso solo lo haría `--force`).
+      - name: Publicar los índices
+        continue-on-error: true
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/cuenta.json
+        run: |
+          if ! npx firebase deploy --only firestore:indexes --project timeline-es --non-interactive; then
+            echo "::warning::No se pudieron publicar los índices de firestore.indexes.json. Da a la cuenta de servicio el papel «Administrador de índices de Cloud Datastore» o créalos a mano en la consola. Las reglas sí están publicadas."
+            exit 1
+          fi
       - name: Borrar la credencial
         if: always()
         run: rm -f "$RUNNER_TEMP/cuenta.json"
