@@ -239,6 +239,17 @@ otros mazos.
   jugadores e historial y se preparan nuevas manos. Se puede reconectar con el mismo código.
   En la sala online lo admiten las reglas publicadas desde el cliente 42; en la sala Wi-Fi,
   `js/sin-conexion/local-room.js`.
+- **Con las mismas cartas** (el ritmo «Mismas cartas» de Competición con amigos): quien la crea
+  juega 3 o 5 temas al azar, de 1 a 6 cartas por tema, y manda un enlace; quien lo abre juega los
+  mismos temas y las mismas cartas, en el mismo orden, cuando quiera y sin conexión. Se juega con
+  las reglas del duelo por enlace (ver [Duelo por enlace](#duelo-por-enlace)): en Fácil, sin vidas,
+  sin que la carta fallada entre en la línea y con un reloj que no se para. Gana quien más acierte
+  en total; con los mismos aciertos, empate. El mismo enlace vale para todo el grupo, y cada uno se
+  compara con quien la creó (no hay clasificación del grupo, que necesitaría un servidor). Se guarda
+  en su propia clave, `continuum-competition-duel-v1`, así que no pisa la competición en solitario;
+  «Continuar la competición…» aparece en el mismo formulario. Terminarla cuenta para «Vuelta
+  completa» y ganar un reto aceptado, como duelo ganado. El código es la competición en solitario
+  (`comp`) con `comp.duelo`; el reparto de cada tema es `CT.Duelo.reparto(tema, semilla, cartas)`.
 
 ## Poderes: Fantasma y Pulso
 
@@ -505,6 +516,18 @@ la aplicación, el mazo puede haber cambiado y la misma semilla repartiría cart
 El duelo parecería ir bien y estaría comparando dos partidas que no son la misma, sin que
 nadie se enterara. Si la huella no cuadra se avisa y no se reparte. Un enlace cortado,
 manipulado o de una versión más nueva se rechaza con una explicación, nunca con un error.
+
+**La competición por enlace** usa la misma ruta (`#duelo=`) y los mismos ocho campos, con la
+lista de temas en el del mazo y una huella por tema:
+
+`versión | tema,tema,… | semilla | cartas por tema | aciertos | cuadrícula | huella,huella,… | nombre`
+
+Sus reglas son las versiones 10 a 13 de `REGLAS` (sin tiempo, 15, 20 y 30 s), marcadas con
+`comp: true`. Al conservar los ocho campos, una aplicación anterior no da el enlace por roto: no
+conoce la versión y pide actualizar. Al abrirlo se comprueba que los temas existen, no se repiten
+y no incluyen Gran mezcla, que se tienen todos los mazos (si falta uno, se dice cuál), la huella de
+cada uno y que la cuadrícula cuadre con los aciertos. Ni la invitación ni el resultado compartido
+nombran los temas, que se descubren en su cartel al jugar.
 
 Es un duelo entre amigos, no una competición arbitrada: el enlace es legible y la marca de
 quien reta la afirma su propio móvil. Se dice así en la Guía, con la misma franqueza con que

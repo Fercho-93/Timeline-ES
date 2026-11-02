@@ -74,6 +74,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `compartir-local.mjs` | test | La señal de la sala Wi-Fi viaja por «compartir» del sistema o por el portapapeles. |
 | `compatibilidad-version-anterior.mjs` | reglas | Las reglas nuevas aceptan las salas y escrituras de la versión anterior de la app. |
 | `competicion-turnos.mjs` | test | Competición de varios temas dentro de un duelo por turnos. |
+| `competicion-enlace.mjs` | test | Competición con las mismas cartas por enlace: formulario, formato del enlace, partida de las dos partes, guardado aparte y reloj. |
 | `competicion-wifi.mjs` | test | Competición por rondas en la sala Wi-Fi, con las mismas reglas que la sala online. |
 | `conexion-nativa.mjs` | test | Entrada en salas desde enlaces nativos y antiguos, y fallos de red o del servidor. |
 | `config-remota-reglas.mjs` | reglas | `appConfig/current`: lectura con sesión, ninguna escritura ni listado desde clientes. |

@@ -262,6 +262,10 @@ console.log("\nAceptar un duelo por enlace");
   rival.document.getElementById("duel-name").value = "Marta";
   click(rival, '[data-action="accept-duel"]');
   ok("aceptar lleva a la pantalla de preparación", existe(rival, '[data-action="duel-play"]'));
+  // Volver desde la preparación enseña otra vez el reto (antes se quedaba sin reto que pintar y fallaba).
+  click(rival, '[data-action="back-menu"]');
+  ok("volver desde la preparación enseña otra vez el reto", /Fernando te reta/.test(texto(rival)) && existe(rival, '[data-action="accept-duel"]'));
+  click(rival, '[data-action="accept-duel"]');
   await jugar(rival);
   ok("y al jugar reparte el duelo", existe(rival, '[data-action="solo-place"]'));
 

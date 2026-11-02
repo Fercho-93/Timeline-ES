@@ -102,6 +102,7 @@ export const SUITES = {
     "tests/push-apagado.mjs",
     "tests/config-remota.mjs",
     "tests/competicion-turnos.mjs",
+    "tests/competicion-enlace.mjs",
     "tests/competicion-wifi.mjs",
     "tests/multijugador-cercano.mjs",
     "tests/duelo-policy.cjs",

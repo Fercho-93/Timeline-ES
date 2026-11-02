@@ -400,10 +400,13 @@
   // La competición se cuenta aparte: cada ronda ya pasó por `finishGame` con su propio
   // mazo, y lo que premia el logro es haberlas jugado todas de seguido. En grupo, `clave`
   // identifica la competición compartida, que llega en varias instantáneas de la sala.
-  function finishCompetition({ clave = null } = {}) {
+  // `won` es la competición con las mismas cartas aceptada por enlace y ganada: como en el
+  // duelo, hay una marca concreta enfrente, así que cuenta como victoria y como duelo ganado.
+  function finishCompetition({ clave = null, won = false } = {}) {
     const profile = read();
     if (clave && alreadySeen(profile, `comp:${clave}`)) return [];
     profile.marks.comps += 1;
+    if (won) { profile.totals.wins += 1; profile.marks.duelWins += 1; }
     const nuevos = unlock(profile);
     save(profile);
     return nuevos;

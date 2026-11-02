@@ -381,7 +381,9 @@
   // Por turnos, una partida admite hasta 30 cartas (`MAX_CARDS` de js/online/duelo-turnos.js, el
   // tope de las reglas): como mucho cinco temas, y en cada uno las cartas por persona que quepan.
   const COMP_TURN_THEMES = 5, COMP_TURN_CARDS = 30;
-  function compPace() { return CT.Storage.getItem(COMP_PACE_KEY) === "turnos" ? "turnos" : "directo"; }
+  // Tres ritmos, como con un mazo: en directo (una sala), por turnos (entre dos, en el servidor)
+  // y con las mismas cartas (juegas tú y mandas un enlace; ver `startCompDuel`).
+  function compPace() { const guardado = CT.Storage.getItem(COMP_PACE_KEY); return guardado === "turnos" || guardado === "seguidos" ? guardado : "directo"; }
   // Cuántas cartas por persona y tema se pueden elegir: de 1 a 6 en directo; por turnos, las que
   // quepan en el tope (con 5 temas, 3; con 3, 5). El desplegable no ofrece más de las que se jugarán.
   function compCardsCap(ritmo, temas) {
@@ -414,7 +416,9 @@
     const topeCartas = compCardsCap(ritmo, temas), cartas = Math.min(competitionConfig.cards, topeCartas);
     // Lo que solo vale para un ritmo se marca para enseñarlo o esconderlo al cambiarlo. La nota de
     // las cartas va en su propio contenedor: el `display: block` de `.field-help` anularía `hidden`.
-    const soloDirecto = ritmo === "turnos" ? " hidden" : "", soloTurnos = ritmo === "turnos" ? "" : " hidden";
+    const soloDirecto = ritmo === "directo" ? "" : " hidden", soloTurnos = ritmo === "turnos" ? "" : " hidden";
+    // Una competición por enlace dejada a medias se ofrece seguir, sea cual sea el ritmo marcado.
+    const enCurso = loadCompetition(COMP_DUEL_KEY), contra = enCurso?.duelo?.rival?.nombre;
     const opcion = (name, clave, titulo, pie, icono, actual) => `<label class="segmented-option${clave === actual ? " is-on" : ""}">
       <input type="radio" name="${name}" value="${clave}"${clave === actual ? " checked" : ""}>
       <i class="duel-option-mark" aria-hidden="true">${glyph(GLYPHS[icono])}</i>
@@ -427,13 +431,14 @@
     paint(`<div class="shell">${header("back-menu")}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Competición</div><h2 class="solo-title" data-focus tabindex="-1">Competición con amigos</h2>
         <p class="lead" data-comp-lead>${compLead(ritmo)}</p></div>
+        ${enCurso ? `<button class="btn btn-secondary btn-block" data-action="resume-comp-duel">${contra ? `Continuar la competición contra ${escapeHtml(contra)}` : "Continuar tu competición con las mismas cartas"} <span>→</span></button>` : ""}
         <div class="panel solo-panel">
           <div class="solo-panel-head"><h3>Qué jugáis</h3></div>
           ${lengthField(temas, { all: todosVisible })}
           <div class="field"><label for="competition-cards">Cartas por persona en cada tema</label><select id="competition-cards">${[1, 2, 3, 4, 5, 6].map(n => `<option${n === cartas ? " selected" : ""}${n > topeCartas ? " hidden disabled" : ""}>${n}</option>`).join("")}</select>
             <div style="margin-bottom:14px" data-comp-turn-field${soloTurnos}><small class="field-help" data-comp-cards-help>${compCardsHelp(temas)}</small></div></div>
           <div class="solo-panel-head"><h3>Cómo jugáis</h3></div>
-          ${grupo("comp-pace", "comp-pace-label", "Ritmo", [["directo", "En directo", "Todos a la vez, en una sala", "directo"], ["turnos", "Por turnos", "Cada uno cuando pueda", "turnos"]], ritmo)}
+          ${grupo("comp-pace", "comp-pace-label", "Ritmo", [["directo", "En directo", "Todos a la vez, en una sala", "directo"], ["turnos", "Por turnos", "Cada uno cuando pueda", "turnos"], ["seguidos", "Mismas cartas", "Juegas tú y mandas el reto", "seguidos"]], ritmo)}
           ${grupo("live-net", "comp-net-label", "Conexión", [["internet", "Por internet", "Cada uno donde esté", "internet"], ["wifi", "Sin internet", "Cerca, en la misma Wi-Fi", "wifi"]], red, ` data-comp-net-field${soloDirecto}`)}
           ${sinRed ? `<p class="hint" data-offline-note data-comp-net-field${soloDirecto}>No hay internet: jugaréis por la Wi-Fi.</p>
           <p class="hint" data-offline-turnos data-comp-turn-field${soloTurnos}>${SIN_RED_COMP_TURNOS}</p>` : ""}
@@ -445,7 +450,7 @@
             <small class="field-help">Se usará automáticamente en la competición. Puedes cambiarlo en Atlas.</small>
           </div>
           <div class="duel-brief" data-comp-brief><p>${compBrief(ritmo)}</p></div>
-          <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="comp-friends-start">Empezar competición <span>→</span></button>
+          <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="comp-friends-start"><span data-comp-start>${compStartLabel(ritmo)}</span> <span>→</span></button>
         </div>
       </section>
     </div>`);
@@ -455,8 +460,11 @@
   function compLead(ritmo) {
     return ritmo === "turnos"
       ? "Cada uno en su móvil. Se juegan varios temas al azar de las Grandes colecciones, por turnos, y gana quien más acierte en total."
-      : "Cada uno en su móvil. Se juegan varios temas al azar de las Grandes colecciones, todos a la vez y con puntos, y gana quien más sume al final.";
+      : ritmo === "seguidos"
+        ? "Cada uno en su móvil y cuando quiera. Se juegan varios temas al azar de las Grandes colecciones, con las mismas cartas para todos, y gana quien más acierte en total."
+        : "Cada uno en su móvil. Se juegan varios temas al azar de las Grandes colecciones, todos a la vez y con puntos, y gana quien más sume al final.";
   }
+  const compStartLabel = ritmo => ritmo === "seguidos" ? "Jugar y retar" : "Empezar competición";
   // Un duelo o una competición por turnos se guarda en el servidor entre jugada y jugada: sin
   // internet no se puede crear. Se dice antes de pulsar y, si se pulsa igual, al pulsar.
   const SIN_RED_TURNOS = "Sin internet no se puede crear un duelo por turnos. Podéis jugar en directo, por la Wi-Fi, o con «Mismas cartas».";
@@ -466,11 +474,18 @@
   function compBrief(ritmo) {
     return ritmo === "turnos"
       ? `Entre dos, cada uno en su móvil y cuando pueda: temas al azar (hasta ${COMP_TURN_THEMES}), una carta cada vez y las mismas para cada uno. Creas la partida, haces tu primera jugada y le mandas el enlace a tu rival.`
-      : "Una sala para varias personas: varios temas al azar, uno detrás de otro. Ganar un tema suma un punto; las cartas que te queden restan su número menos uno. Quién empieza se decide en la sala de espera con un minijuego.";
+      : ritmo === "seguidos"
+        ? "Juegas tú ahora y mandas un enlace: quien lo abra juega los mismos temas y las mismas cartas cuando quiera, sin coincidir contigo, y al terminar ve el cara a cara. Vale para todo el grupo: cada uno se compara contigo. Sin vidas: se juegan todas las cartas."
+        : "Una sala para varias personas: varios temas al azar, uno detrás de otro. Ganar un tema suma un punto; las cartas que te queden restan su número menos uno. Quién empieza se decide en la sala de espera con un minijuego.";
   }
   function startCompFriends() {
     const opciones = competitionOptions(), ritmo = compPace();
     const red = app.querySelector('input[name="live-net"]:checked')?.value || liveNet();
+    // Con las mismas cartas no hace falta conexión: el enlace lleva todo.
+    if (ritmo === "seguidos") {
+      compDuelReady(null, { rounds: Math.min(opciones.rounds, COMP_TURN_THEMES), cards: Math.min(opciones.cards, CT.Duelo.Competicion.CARTAS), ms: CT.Tiempo.chosen("amigos", 15) * 1000 });
+      return;
+    }
     if (ritmo === "turnos") {
       if (navigator.onLine === false) { avisoSinRed(SIN_RED_COMP_TURNOS); return; }
       const competicion = { rounds: Math.min(opciones.rounds, COMP_TURN_THEMES), cards: opciones.cards };
@@ -2190,7 +2205,11 @@
 
   // Sin vidas: el duelo y el reto diario se juegan siempre hasta el final de sus cartas (un fallo no corta
   // el reto: el resultado es «7 de 10»). El resto de partidas en solitario sí tienen tres vidas.
-  function sinVidas() { return solo?.kind === "duel" || solo?.kind === "daily"; }
+  function sinVidas() { return solo?.kind === "duel" || solo?.kind === "daily" || enCompDuelo(); }
+  // La competición con las mismas cartas (por enlace) es la competición en solitario con las
+  // reglas del duelo: en Fácil, sin vidas, con el reparto de la semilla y sin que la carta
+  // fallada entre en la línea. Lo que la distingue vive en `comp.duelo`.
+  function enCompDuelo() { return solo?.kind === "comp" && !!comp?.duelo; }
 
   // Cuándo se acaba una partida en solitario. El duelo es el único formato sin vidas: las
   // dos partes juegan las mismas cartas de principio a fin, porque si a una se le acabaran
@@ -3096,7 +3115,7 @@
   // La carta fallada no se pierde: al continuar pasa a su lugar correcto y queda en la línea como
   // referencia, igual que en Retos rápidos. El duelo por enlace queda fuera: sus reglas van
   // numeradas dentro del enlace (ver `duelo.js`) y las dos marcas tienen que ser comparables.
-  const cartaFalladaEntraEnLinea = () => solo.kind !== "duel";
+  const cartaFalladaEntraEnLinea = () => solo.kind !== "duel" && !enCompDuelo();
   function soloNext() {
     if (!solo?.pendingResult) return;
     vidaRota = null;
@@ -3666,8 +3685,10 @@
 
   function duelPlay() {
     if (!duelPreparado) return duelHome();
-    const { modalidad, duel, pace } = duelPreparado;
+    const { modalidad, duel, pace, ajustes } = duelPreparado;
     duelPreparado = null;
+    pendingDuel = null;
+    if (modalidad === "comp") { startCompDuel(duel, ajustes); return; }
     if (pace === "turnos") {
       turnDuelReady.then(() => CT.TurnDuel?.open({ mode: selectedModeKey, kind: modalidad, back: backMenu }));
       return;
@@ -3679,8 +3700,63 @@
 
   // La pantalla a la que se llega desde un enlace de duelo. Dice quién reta, con qué
   // mazo y qué marca hay que batir —pero ninguna carta: la gracia es no saber qué sale—.
+  // Antes de una competición con las mismas cartas, como antes de un duelo: qué se juega, el plazo
+  // y, si llega de un enlace, la marca que hay que batir. No se nombra ningún tema: cada uno se
+  // descubre en su cartel. `ajustes` ({ rounds, cards, ms }) solo hacen falta al crearla.
+  function compDuelReady(duel = null, ajustes = null) {
+    const temas = duel ? duel.temas.length : ajustes.rounds, porTema = duel ? duel.porTema : ajustes.cards;
+    const plazo = Math.round((duel ? Number(duel.ms) || 0 : Number(ajustes.ms) || 0) / 1000);
+    duelPreparado = { modalidad: "comp", duel, ajustes };
+    screen = "comp-duelo-listo";
+    const rival = duel?.rival || null, quien = escapeHtml(rival?.nombre || "quien te reta");
+    const cartas = n => `${n} ${n === 1 ? "carta" : "cartas"}`;
+    const reglas = [
+      `${temas} ${temas === 1 ? "tema" : "temas"} al azar de las Grandes colecciones, ${cartas(porTema)} en cada uno${rival ? `: los mismos que ha jugado ${quien}, en el mismo orden` : ""}.`,
+      "Cada tema empieza con su cartel. Colocas cada carta en el hueco que le toque de la línea.",
+      "Gana quien más acierte en total. No se gastan vidas: se juegan todas."
+    ];
+    paint(`<div class="shell">${header("back-menu")}
+      <section class="pass-screen"><div class="panel duelo-listo">
+        <div class="eyebrow">Mismas cartas</div>
+        <h1 data-focus tabindex="-1" class="duelo-listo-titulo">Competición</h1>
+        <ul class="duelo-reglas">${reglas.map(linea => `<li>${linea}</li>`).join("")}</ul>
+        <p class="solo-intro-rule">${!plazo ? "Sin tiempo: colocas con calma." : `${plazo} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se da por fallada.`}</p>
+        ${rival ? `<div class="solo-stats" style="grid-template-columns:1fr"><span><b>${rival.hits} de ${duel.total}</b><small>la marca de ${quien}</small></span></div>` : ""}
+        <button class="btn btn-primary btn-block duelo-jugar" data-action="duel-play">Jugar <span>→</span></button>
+      </div></section>
+    </div>`);
+  }
+
+  // La invitación a una competición con las mismas cartas: quién reta, cuántos temas y cartas, el
+  // plazo y la marca. Ningún tema por su nombre, igual que en el mensaje que la trae.
+  function compDuelIntro() {
+    const { temas, porTema, total, rival, ms } = pendingDuel;
+    const quien = rival.nombre || "Alguien";
+    paint(`<div class="shell">${header("back-menu")}
+      <section class="pass-screen"><div class="panel">
+        <div class="big-icon">🏆</div>
+        <div class="eyebrow">Competición</div>
+        <h1 data-focus tabindex="-1" class="titular-marcador">${escapeHtml(quien)} te reta</h1>
+        <p class="lead centrado">${temas.length} ${temas.length === 1 ? "tema" : "temas"} al azar de las Grandes colecciones, ${porTema} ${porTema === 1 ? "carta" : "cartas"} en cada uno: los mismos temas y las mismas cartas que ha jugado ${escapeHtml(quien)}, en el mismo orden.</p>
+        ${ms > 0
+          ? `<p class="solo-intro-rule">${Math.round(ms / 1000)} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se da por fallada.</p>`
+          : `<p class="solo-intro-rule">Sin tiempo: se juega sin plazo, como lo jugó ${escapeHtml(quien)}.</p>`}
+        <div class="solo-stats" style="grid-template-columns:1fr"><span><b>${rival.hits} de ${total}</b><small>la marca que hay que batir</small></span></div>
+        <div class="field" style="margin-top:16px">
+          <label for="duel-name">Tu nombre de perfil</label>
+          <input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}">
+        </div>
+        <button class="btn btn-primary btn-block" style="margin-top:12px" data-action="accept-duel">Aceptar el reto <span>→</span></button>
+        <button class="btn btn-ghost btn-block" style="margin-top:8px" data-action="home">Ahora no</button>
+      </div></section>
+    </div>`);
+  }
+
   function duelIntro() {
     screen = "duelo-intro";
+    // Sin reto que enseñar (se volvió aquí después de jugarlo), no hay invitación que pintar.
+    if (!pendingDuel) { home(); return; }
+    if (pendingDuel.competicion) { compDuelIntro(); return; }
     const { mode, total, rival, cifras: esCifras } = pendingDuel;
     // Un enlace anterior al reloj se juega sin él: la marca de enfrente se hizo sin plazo
     // y ponérselo solo a quien lo acepta no compararía las mismas dos partidas.
@@ -3744,8 +3820,10 @@
   function acceptDuel() {
     if (!pendingDuel) return home();
     guardaNombreSiLoHay();
+    // El reto se conserva hasta pulsar «Jugar»: volver desde la explicación enseña otra vez la
+    // invitación, que sin él no tendría qué pintar.
     const duelo = pendingDuel;
-    pendingDuel = null;
+    if (duelo.competicion) { compDuelReady(duelo); return; }
     if (duelo.mode !== selectedModeKey) setMode(duelo.mode);
     duelReady(duelo.cifras ? "cifras" : "orden", duelo);
   }
@@ -3803,21 +3881,39 @@
     if (solo.kind === "duel") return solo.duelo?.rival ? `Duelo · contra ${escapeHtml(solo.duelo.rival.nombre || "quien te reta")}` : "Duelo · tu tirada";
     // El tema no va aquí: lo lleva su propio rótulo encima del marcador, que es lo que
     // recuerda a qué se está jugando cuando el cartel del principio ya se ha ido.
+    if (enCompDuelo()) return `Competición · tema ${comp.totalThemes - comp.queue.length} de ${comp.totalThemes} · ${comp.duelo.rival ? `contra ${escapeHtml(comp.duelo.rival.nombre || "quien te reta")}` : "tu tirada"}`;
     if (solo.kind === "comp") return `Competición · ${CT.Ghost.level(comp.difficulty).name} · tema ${(comp.totalThemes || TOTAL_TEMAS) - comp.queue.length} de ${comp.totalThemes || TOTAL_TEMAS}`;
     if (solo.kind === "marathon") return `Maratón · ${CT.Ghost.level(solo.difficulty).name}`;
     return `Ronda · ${CT.Ghost.level(solo.difficulty).name}`;
   }
 
   const COMP_KEY = "continuum-competition-v1";
+  // La competición con las mismas cartas se guarda aparte: empezarla, o aceptar un enlace, no
+  // puede pisar una competición en solitario a medias.
+  const COMP_DUEL_KEY = "continuum-competition-duel-v1";
   function saveCompetition() {
     if (!comp) return;
     comp.saveVersion = CT.Saves.VERSION;
     comp.previousModeKey = previousModeKey;
     comp.solo = solo?.kind === "comp" ? CT.Saves.prepare(solo, solo.mode) : null;
-    CT.Storage.setItem(COMP_KEY, JSON.stringify(comp));
+    CT.Storage.setItem(comp.duelo ? COMP_DUEL_KEY : COMP_KEY, JSON.stringify(comp));
   }
-  function loadCompetition() {
-    const raw = CT.Storage.getItem(COMP_KEY);
+  // Lo que tiene que traer una competición por enlace guardada, además de lo de cualquier
+  // competición: su semilla, sus temas en orden, un plazo de los que existen y, si se aceptó
+  // un reto, la marca de enfrente.
+  function compruebaCompDuelo(saved) {
+    const d = saved.duelo;
+    if (!d || typeof d.seed !== "string" || !/^[a-z0-9]{1,12}$/.test(d.seed) || !Array.isArray(d.temas) || d.temas.length !== saved.totalThemes || saved.difficulty !== "easy") throw Error("Competición por enlace inválida");
+    if (!CT.Tiempo.valido(Number(saved.ms) / 1000)) throw Error("Plazo inválido");
+    if (!Number.isInteger(saved.cardsPerRound) || saved.cardsPerRound > CT.Duelo.Competicion.CARTAS) throw Error("Cartas inválidas");
+    if (d.rival && (!Number.isInteger(d.rival.hits) || !Array.isArray(d.rival.sequence) || d.rival.sequence.length !== d.temas.length * saved.cardsPerRound)) throw Error("Marca inválida");
+    // Los temas jugados, el que está en juego y los que quedan, en el orden del enlace.
+    const jugados = [...saved.roundsSummary.map(round => round.mode), ...(saved.solo ? [saved.solo.mode] : []), ...saved.queue];
+    if (jugados.join(",") !== d.temas.join(",")) throw Error("Temas fuera de orden");
+    if (saved.roundsSummary.some(round => !Array.isArray(round.sequence) || round.sequence.length !== round.total)) throw Error("Cuadrícula inválida");
+  }
+  function loadCompetition(clave = COMP_KEY) {
+    const raw = CT.Storage.getItem(clave);
     if (!raw) return null;
     try {
       const saved = JSON.parse(raw);
@@ -3827,11 +3923,15 @@
       if (saved.solo) CT.Saves.validate(saved.solo, saved.solo.mode);
       const themes = [...saved.queue, ...saved.roundsSummary.map(round => round.mode), ...(saved.solo ? [saved.solo.mode] : [])];
       if (!themes.length || new Set(themes).size !== themes.length || (!saved.finished && !saved.solo && !saved.queue.length)) throw Error("Rondas inválidas");
-      return saved.finished ? null : saved;
-    } catch { CT.Storage.protect(COMP_KEY); return null; }
+      if (saved.finished) return null;
+      // Cada clave guarda su clase de competición, y no la otra.
+      if (clave === COMP_DUEL_KEY) compruebaCompDuelo(saved);
+      else if (saved.duelo) throw Error("Competición por enlace en la clave del solitario");
+      return saved;
+    } catch { CT.Storage.protect(clave); return null; }
   }
-  function resumeCompetition(confirmed = false) {
-    comp = loadCompetition();
+  function resumeCompetition(confirmed = false, clave = COMP_KEY) {
+    comp = loadCompetition(clave);
     if (!comp) { home(); return; }
     previousModeKey = comp.previousModeKey;
     solo = comp.solo; pendingIndex = null; result = null;
@@ -3842,7 +3942,30 @@
     if (solo.pendingResult) {
       result = { correct: solo.pendingResult.correct, card: cardsById.get(solo.pendingResult.cardId), solo: true };
       soloResult();
-    } else { estrenaPlazoTrasPausa(saveCompetition); soloView(); }
+    }
+    // Con las mismas cartas, el reloj no se para, como en el duelo: una carta que seguía abierta
+    // al salir se cierra en vez de estrenar plazo.
+    else if (comp.duelo && enDueloConReloj() && solo.cartaEmpezadaEn && Date.now() - solo.cartaEmpezadaEn > CT.Duelo.GRACIA_MS) cierraCartaDuelo("salida");
+    else { estrenaPlazoTrasPausa(saveCompetition); soloView(); }
+  }
+
+  // La competición con las mismas cartas. Quien la crea sortea los temas entre los mazos que tiene
+  // y estrena semilla; quien acepta un enlace juega los temas, la semilla, las cartas y el plazo
+  // que trae. Lo demás es la competición en solitario, con las reglas del duelo (`enCompDuelo`).
+  function startCompDuel(duel = null, ajustes = null) {
+    solo = null;
+    previousModeKey = selectedModeKey;
+    const C = CT.Duelo.Competicion;
+    const temas = duel ? [...duel.temas] : shuffle(compModes()).slice(0, Math.max(1, Math.min(Number(ajustes.rounds) || C.TEMAS, C.TEMAS)));
+    const porTema = duel ? duel.porTema : Math.max(1, Math.min(Number(ajustes.cards) || 1, C.CARTAS));
+    comp = {
+      decks: CT.Saves.clone(Object.fromEntries(temas.map(key => [key, CT.cards(key)]))),
+      difficulty: "easy", queue: [...temas], roundsSummary: [], totalHits: 0, totalFailed: [],
+      totalThemes: temas.length, cardsPerRound: porTema,
+      ms: duel ? Number(duel.ms) || 0 : Number(ajustes.ms) || 0,
+      duelo: { seed: duel ? duel.seed : CT.Duelo.crearSemilla(), temas, rival: duel ? duel.rival : null }
+    };
+    compRoundIntro();
   }
   function startCompetition() {
     if (loadCompetition()) { resumeCompetition(); return; }
@@ -3871,7 +3994,7 @@
       <div class="chapter-art" aria-hidden="true">${blockArt(CT.blockOf(introMode).art, true)}</div>
       <div class="chapter-number">Tema ${comp.roundsSummary.length + 1} de ${comp.totalThemes}</div>
       <h2 data-focus tabindex="-1"><span class="comp-splash-lead">${resuming ? "Vas a continuar" : "Vas a jugar a"}</span>${escapeHtml(CT.mode(introMode).name)}</h2>
-      <button class="btn btn-block comp-splash-start" data-action="${resuming ? "comp-confirm-resume" : "comp-next-round"}">${resuming ? "Continuar partida" : "Empezar"}</button>
+      <button class="btn btn-block comp-splash-start" data-action="${resuming ? "comp-confirm-resume" : "comp-next-round"}"${comp.duelo ? " data-comp-duelo" : ""}>${resuming ? "Continuar partida" : "Empezar"}</button>
     </div></section></div>`);
   }
 
@@ -3881,7 +4004,11 @@
     cardsById = new Map(comp.decks[modeKey].map(card => [card.id, card]));
     const extra = CT.Ghost.level(comp.difficulty).extra;
     const count = comp.cardsPerRound || ROUND_CARDS;
-    const barajado = shuffle(CT.uniqueValueIds(modeKey, comp.decks[modeKey].map(card => card.id))).slice(0, count + 1 + extra * (count - 1));
+    // Con las mismas cartas reparte la semilla, como en el duelo: cada tema mezcla su mazo con
+    // ella, y las dos partes reciben las mismas cartas en el mismo orden.
+    const barajado = comp.duelo
+      ? CT.Duelo.reparto(modeKey, comp.duelo.seed, count)
+      : shuffle(CT.uniqueValueIds(modeKey, comp.decks[modeKey].map(card => card.id))).slice(0, count + 1 + extra * (count - 1));
     const timeline = [barajado.shift()];
     solo = {
       savedDeck: comp.decks[modeKey], kind: "comp", difficulty: comp.difficulty, ghostTurns: comp.difficulty === "hard" ? CT.Ghost.soloSchedule(count) : [], mode: modeKey, timeline, deck: barajado,
@@ -3896,7 +4023,8 @@
   }
 
   function compRoundFinish() {
-    comp.roundsSummary.push({ mode: solo.mode, hits: solo.hits, total: solo.total });
+    // Con las mismas cartas, la cuadrícula del tema viaja en el enlace y sale en el cara a cara.
+    comp.roundsSummary.push({ mode: solo.mode, hits: solo.hits, total: solo.total, ...(comp.duelo ? { sequence: [...(solo.sequence || [])] } : {}) });
     comp.totalHits += solo.hits;
     comp.totalFailed.push(...(solo.failed || []).map(id => ({ id, mode: solo.mode })));
     // Cada ronda es una partida de su propio mazo, y así es como la cuenta el perfil. El
@@ -3908,6 +4036,7 @@
   }
 
   function compFinish() {
+    if (comp.duelo) return compDuelFinish();
     screen = "comp-end";
     comp.finished = true;
     saveCompetition();
@@ -3928,6 +4057,61 @@
     </div></section></div>`);
   }
 
+  // El final de una competición con las mismas cartas tiene las dos caras del duelo. Si la has
+  // creado tú, no hay todavía con quién compararse: toca mandar el enlace. Si has aceptado un
+  // reto, sí hay marcador: en total, que es lo que decide, y tema a tema.
+  // Los ajustes de la última, para «Devolver el reto» (otros temas, misma forma).
+  let compDuelAjustes = null;
+  function compDuelFinish() {
+    screen = "comp-end";
+    comp.finished = true;
+    saveCompetition();
+    selectedModeKey = previousModeKey;
+    cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
+    const d = comp.duelo, porTema = comp.cardsPerRound, temas = d.temas.length, rival = d.rival;
+    const total = comp.roundsSummary.reduce((sum, r) => sum + r.total, 0);
+    const mio = { hits: comp.totalHits, sequence: comp.roundsSummary.flatMap(r => r.sequence || []) };
+    compDuelAjustes = { rounds: temas, cards: porTema, ms: Number(comp.ms) || 0 };
+    const gano = !!rival && mio.hits > rival.hits, empate = !!rival && mio.hits === rival.hits;
+    // Terminarla cuenta para «Vuelta completa» una vez por enlace y papel; ganar un reto
+    // aceptado, además, como duelo ganado.
+    const logros = CT.Progreso.finishCompetition({ clave: `enlace:${d.seed}:${rival ? "acepta" : "crea"}`, won: gano });
+    if (logros.length) CT.Effects.achievement?.();
+    const fallosUnicos = new Set(comp.totalFailed.map(item => item.id)).size;
+    const quien = rival?.nombre || "quien te retaba";
+    const suyos = i => rival.sequence.slice(i * porTema, (i + 1) * porTema).filter(Boolean).length;
+    const filas = comp.roundsSummary.map((r, i) => `<li><b>${escapeHtml(CT.mode(r.mode).name)}</b><span>${rival ? `Tú ${r.hits} · ${escapeHtml(quien)} ${suyos(i)}` : `${r.hits} de ${r.total}`}</span></li>`).join("");
+    let cara;
+    if (!rival) {
+      const payload = CT.Duelo.Competicion.codificar({ temas: d.temas, seed: d.seed, porTema, sequence: mio.sequence, nombre: duelName(), decks: comp.decks, ms: comp.ms });
+      lastDuelShare = CT.Duelo.Competicion.invitacion({ nombre: duelName(), temas, hits: mio.hits, total, payload, ms: comp.ms });
+      cara = {
+        icono: "🎯", eyebrow: "Competición lista", titular: `${mio.hits} de ${total}`,
+        cuerpo: `<p class="lead centrado">Manda el enlace a quien quieras: jugará estos mismos ${temas} temas, con las mismas cartas y en el mismo orden, y al terminar verá el cara a cara. Vale para todo el grupo: cada uno se compara contigo.</p>`,
+        acciones: `<button class="btn btn-primary" data-action="share-duel">Mandar el reto <span>→</span></button>`
+      };
+    } else {
+      lastDuelShare = CT.Duelo.Competicion.marcador({ temas, porTema, rival, mio });
+      cara = {
+        icono: empate ? "🤝" : gano ? "🏆" : "🎯",
+        eyebrow: empate ? "Empate" : gano ? "Has ganado la competición" : "Competición perdida",
+        titular: `${mio.hits} <span style="opacity:.6">a</span> ${rival.hits}`,
+        cuerpo: `<p class="lead centrado">${empate ? `Habéis acertado lo mismo que ${escapeHtml(quien)}.` : gano ? `Has superado a ${escapeHtml(quien)}.` : `${escapeHtml(quien)} te ha ganado esta vez.`}</p>`,
+        acciones: `<button class="btn btn-primary" data-action="comp-duel-rematch">Devolver el reto <span>→</span></button><button class="btn btn-secondary" data-action="share-duel">Compartir el resultado</button>`
+      };
+    }
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel">
+      <div class="big-icon">${cara.icono}</div>
+      <div class="eyebrow">${cara.eyebrow}</div>
+      <h1 data-focus tabindex="-1" class="titular-marcador">${cara.titular}</h1>
+      ${cara.cuerpo}
+      <ul class="comp-summary">${filas}</ul>
+      ${rival ? duelGridMarkup(quien, rival.sequence, mio.sequence) : ""}
+      ${logrosMarkup(logros)}
+      <div class="actions actions-centro">${cara.acciones}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-comp">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-secondary" data-action="comp-friends-open">Preparar otra competición</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div>
+    </div></section></div>`);
+  }
+
 
   // ── Guía, salidas de la partida y logros ───────────────────────────────────────────
   // La guía explica la forma de jugar que se tiene delante. Con una partida en marcha la
@@ -3935,10 +4119,10 @@
   // menú del solitario y leer las reglas de una partida entre varios no ayuda a nadie.
   function rules() {
     const returnTo = screen;
-    const enSolitario = ["solo-home", "duel-home", "solo", "solo-end", "cifras", "cifras-end", "duelo-intro", "duelo-listo", "daily-intro", "comp-intro", "comp-end"].includes(screen);
+    const enSolitario = ["solo-home", "duel-home", "solo", "solo-end", "cifras", "cifras-end", "duelo-intro", "duelo-listo", "comp-duelo-listo", "daily-intro", "comp-intro", "comp-end"].includes(screen);
     const enGrupo = ["setup", "pass", "pulse-pass", "game", "winner", "final-local", "tournament-intro", "timeline-review"].includes(screen);
     const entreMoviles = ["duelos", "friends-join", "competition-friends"].includes(screen);
-    const context = enSolitario ? (comp ? "competition" : "solo") : enGrupo ? "local" : entreMoviles ? "online" : "general";
+    const context = enSolitario ? (comp || screen === "comp-duelo-listo" || (screen === "duelo-intro" && pendingDuel?.competicion) ? "competition" : "solo") : enGrupo ? "local" : entreMoviles ? "online" : "general";
     const modeKey = screen === 'solo' ? solo.mode : CT.UI.isPlaying(screen) ? (game?.mode || selectedModeKey) : selectedModeKey;
     overlay(`<div class="overlay" data-overlay="rules"><div class="modal rules"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-action="close-rules" aria-label="Cerrar guía">×</button></div><div class="guide-content">${CT.guideMarkup(modeKey, context, { pulse: !!game?.pulse, ghost: game ? !!game.ghost : true })}</div><button class="btn btn-primary btn-block" data-action="close-rules" data-return="${returnTo}">Volver</button></div></div>`, true);
   }
@@ -3948,10 +4132,14 @@
     if (screen === 'solo') vuelcaCartas(solo); else vuelcaCartas(game);
     // Salir por el menú es una pausa pedida: la carta o el turno estrenan plazo al volver.
     // El duelo por enlace no se pausa, porque su reloj no se para nunca (lo avisa requestPlayExit).
-    if (screen === 'solo' && solo && solo.kind !== 'duel' && !solo.pendingResult) solo.cartaEmpezadaEn = null;
+    // La competición con las mismas cartas tampoco: juega con las reglas del duelo.
+    if (screen === 'solo' && solo && solo.kind !== 'duel' && !enCompDuelo() && !solo.pendingResult) solo.cartaEmpezadaEn = null;
     if (screen !== 'solo' && game) delete game.turnClock;
     if ((screen === 'solo' && solo?.kind === 'comp') || screen === 'comp-intro') {
-      saveCompetition(); solo = null; comp = null; competitionMenu(); return;
+      const eraDuelo = !!comp?.duelo;
+      saveCompetition(); solo = null; comp = null;
+      if (eraDuelo) competitionFriends(); else competitionMenu();
+      return;
     }
     if (solo && screen === 'solo') saveSolo();
     else if (game) saveGame();
@@ -3968,10 +4156,11 @@
   // y se restaura la modalidad de antes de empezar. Las rondas ya terminadas siguen contando en
   // el perfil, porque se anotaron al acabar cada una.
   function discardCompetition() {
-    CT.Storage.removeItem(COMP_KEY);
+    const eraDuelo = !!comp?.duelo;
+    CT.Storage.removeItem(eraDuelo ? COMP_DUEL_KEY : COMP_KEY);
     if (comp && previousModeKey) { selectedModeKey = previousModeKey; cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card])); }
     solo = null; comp = null; result = null; pendingIndex = null; selectedCardId = null;
-    competitionMenu();
+    if (eraDuelo) competitionFriends(); else competitionMenu();
   }
   function discardMultiCompetition() {
     CT.Storage.removeItem(MULTI_COMP_KEY);
@@ -3992,9 +4181,9 @@
           : game
             ? { label: 'Salir sin guardar', proceed: () => { game = null; saveGame(); home(); } }
             : null;
-    const cartaDeDuelo = screen === 'solo' && solo?.kind === 'duel' && enDueloConReloj() && solo.cartaEmpezadaEn && !solo.pendingResult;
+    const cartaDeDuelo = screen === 'solo' && (solo?.kind === 'duel' || enCompDuelo()) && enDueloConReloj() && solo.cartaEmpezadaEn && !solo.pendingResult;
     CT.UI.confirmExit(cartaDeDuelo
-      ? 'Tu duelo quedará guardado, pero su reloj no se para: la carta que tienes delante contará como fallada.'
+      ? `${enCompDuelo() ? 'Tu competición quedará guardada' : 'Tu duelo quedará guardado'}, pero su reloj no se para: la carta que tienes delante contará como fallada.`
       : 'Tu partida quedará guardada para continuar después.', returnFromPlay, undefined, undefined, discard);
   }
   function uiBack() {
@@ -4160,9 +4349,11 @@
     if (event.target.name === "comp-pace") {
       CT.Storage.setItem(COMP_PACE_KEY, event.target.value);
       const ritmo = compPace();
-      app.querySelectorAll("[data-comp-net-field]").forEach(campo => { campo.hidden = ritmo === "turnos"; });
+      app.querySelectorAll("[data-comp-net-field]").forEach(campo => { campo.hidden = ritmo !== "directo"; });
       app.querySelectorAll("[data-comp-turn-field]").forEach(campo => { campo.hidden = ritmo !== "turnos"; });
-      // «Todos los temas» solo cabe en directo: por turnos hay un tope de temas.
+      const empezar = app.querySelector("[data-comp-start]");
+      if (empezar) empezar.textContent = compStartLabel(ritmo);
+      // «Todos los temas» solo cabe en directo: por turnos y con las mismas cartas hay un tope de temas.
       const todos = app.querySelector("[data-comp-all]"), select = document.getElementById("competition-length");
       const cabe = ritmo === "directo";
       if (todos) { todos.hidden = todos.disabled = !cabe; if (!cabe && select?.value === todos.value) select.value = String(COMP_TURN_THEMES); }
@@ -4492,11 +4683,18 @@
     else if (action === "review-timeline") timelineReviewScreen(game.timeline, game.mode, `<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button>`);
     else if (action === "review-solo") reviewScreen(soloFailedForReview, `<button class="btn btn-primary" data-action="solo">Elegir otra partida</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`);
     else if (action === "share-daily") compartir(lastShareText, "Resultado copiado");
-    else if (action === "review-comp") reviewScreen(comp.totalFailed, `<button class="btn btn-primary" data-action="start-competition">Jugar otra vez</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`);
+    else if (action === "review-comp") reviewScreen(comp.totalFailed, comp.duelo
+      ? `<button class="btn btn-primary" data-action="comp-friends-open">Preparar otra competición</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`
+      : `<button class="btn btn-primary" data-action="start-competition">Jugar otra vez</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`);
+    // La competición con las mismas cartas: seguir la que quedó a medias, devolver el reto
+    // (otros temas al azar con la misma forma) y volver a su formulario.
+    else if (action === "resume-comp-duel") resumeCompetition(false, COMP_DUEL_KEY);
+    else if (action === "comp-duel-rematch") compDuelReady(null, compDuelAjustes || { rounds: 3, cards: 3, ms: CT.Tiempo.chosen("amigos", 15) * 1000 });
+    else if (action === "comp-friends-open") competitionFriends();
     else if (action === "resume-competition") resumeCompetition();
     else if (action === "start-competition") startCompetition();
     else if (action === "comp-next-round") beginCompRound();
-    else if (action === "comp-confirm-resume") resumeCompetition(true);
+    else if (action === "comp-confirm-resume") resumeCompetition(true, target.hasAttribute("data-comp-duelo") ? COMP_DUEL_KEY : COMP_KEY);
     else if (action === "enc-view") openEnciclopedia(target.dataset.mode, { highlight: Number(target.dataset.id), returnTo: ["review", "timeline-review"].includes(screen) ? "review" : "perfil" });
     else if (action === "enc-card") openEnciclopediaCard(target.dataset.mode, target.dataset.id);
     else if (action === "enc-card-close") CT.closeDialog();

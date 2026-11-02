@@ -49,15 +49,32 @@
     "6": { cifras: false, ms: 30000 },
     "7": { cifras: true, ms: 0 },
     "8": { cifras: true, ms: 20000 },
-    "9": { cifras: true, ms: 30000 }
+    "9": { cifras: true, ms: 30000 },
+    // La competición con las mismas cartas: varios temas seguidos de Grandes colecciones, siempre
+    // de ordenar. Lleva sus propias versiones, una por plazo, porque se lee distinto (varios
+    // mazos, una huella por mazo y una cuadrícula que cubre todos los temas). La carga útil
+    // conserva los ocho campos, así que una aplicación anterior no la da por rota: no conoce la
+    // versión y pide actualizar.
+    "10": { cifras: false, ms: 0, comp: true },
+    "11": { cifras: false, ms: MS, comp: true },
+    "12": { cifras: false, ms: 20000, comp: true },
+    "13": { cifras: false, ms: 30000, comp: true }
   };
   // La versión que corresponde a una prueba y un plazo. Un plazo que no tiene versión se
   // juega con el de siempre, 15 segundos.
   function versionDe(cifras, ms = MS) {
     // La «2» (cifras a 10 s) es de antes y ya no se crea.
-    const clave = Object.keys(REGLAS).find(v => v !== "2" && REGLAS[v].cifras === cifras && REGLAS[v].ms === Number(ms));
+    const clave = Object.keys(REGLAS).find(v => v !== "2" && !REGLAS[v].comp && REGLAS[v].cifras === cifras && REGLAS[v].ms === Number(ms));
     return clave || (cifras ? "5" : "4");
   }
+  function versionCompeticion(ms = MS) {
+    return Object.keys(REGLAS).find(v => REGLAS[v].comp && REGLAS[v].ms === Number(ms)) || "11";
+  }
+  // Una competición por enlace: de uno a cinco temas (la aplicación ofrece 3 o 5) y de una a seis
+  // cartas por tema, como el resto de competiciones con amigos. Con cinco temas y seis cartas son
+  // 30, el mismo tope que la competición por turnos.
+  const COMP_TEMAS = 5;
+  const COMP_CARTAS = 6;
   // Sin reloj, la rapidez sigue desempatando las cifras: se mide contra un tope amplio
   // (diez minutos por carta) en vez de contra el plazo.
   const SIN_RELOJ_MS = 600000;
@@ -404,6 +421,23 @@
     return aBase64url(campos.join("|"));
   }
 
+  // La competición usa los mismos ocho campos. El mazo pasa a ser la lista de temas, las
+  // cartas son las de cada tema, la cuadrícula los cubre todos seguidos y la huella es una
+  // por mazo, en el mismo orden que los temas:
+  //
+  //   versión | tema,tema,… | semilla | cartas por tema | aciertos | 0101… | huella,huella,… | nombre
+  //
+  // Cada tema reparte con `reparto(tema, semilla, cartas)`, que ya mezcla el mazo con la
+  // semilla, así que una sola semilla da un reparto distinto en cada tema.
+  function codificarCompeticion({ temas, seed, porTema, sequence, nombre, decks = {}, ms = MS }) {
+    const campos = [
+      versionCompeticion(ms), temas.join(","), seed, porTema, sequence.filter(Boolean).length,
+      sequence.map(acierto => (acierto ? "1" : "0")).join(""),
+      temas.map(mode => huella(mode, decks[mode])).join(","), limpiaNombre(nombre)
+    ];
+    return aBase64url(campos.join("|"));
+  }
+
   // Se rechaza cualquier cosa rara sin lanzar una excepción: un enlace cortado al
   // reenviarlo, uno de una versión con otro mazo, o uno tocado a mano. Lo que no puede
   // pasar nunca es que la aplicación se rompa al abrir una dirección.
@@ -419,6 +453,8 @@
 
     const reglas = REGLAS[version];
     if (!reglas) return { ok: false, motivo: "version" };
+    // La competición lleva una lista de temas donde el duelo lleva un mazo: se lee aparte.
+    if (reglas.comp) return leeCompeticion({ textoTemas: mode, seed, textoTotal, textoMarca, cuerpo, textoHuellas: huellaRival, nombre, ms: reglas.ms });
     if (!CT.has(mode)) return { ok: false, motivo: "mazo" };
     // Un reto puede llegar de alguien que tiene un mazo que quien lo abre todavía no.
     // Se distingue de «este mazo no existe»: uno es un enlace roto y el otro una puerta
@@ -448,6 +484,40 @@
     return {
       ok: true,
       duelo: { mode, seed, total, cifras: false, ms, rival: { nombre: limpiaNombre(nombre), hits, sequence: secuencia } }
+    };
+  }
+
+  // Lo mismo que el duelo de ordenar, tema a tema: que existan, que no se repitan, que sean
+  // tuyos y que cada mazo sea el mismo que tenía quien reta. Si falta un mazo se dice cuál.
+  function leeCompeticion({ textoTemas, seed, textoTotal, textoMarca, cuerpo, textoHuellas, nombre, ms }) {
+    const roto = { ok: false, motivo: "roto" };
+    const temas = textoTemas.split(",");
+    if (!temas.length || temas.length > COMP_TEMAS || new Set(temas).size !== temas.length) return roto;
+    if (temas.some(mode => !CT.has(mode))) return { ok: false, motivo: "mazo" };
+    // Gran mezcla no es un tema de competición: combina los demás mazos (ver app.js).
+    if (temas.includes("mixed")) return roto;
+    const cerrado = temas.find(mode => !CT.Cartera.tiene(mode));
+    if (cerrado) return { ok: false, motivo: "mazo-cerrado", mode: cerrado };
+    if (!/^[a-z0-9]{1,12}$/.test(seed)) return roto;
+
+    const porTema = Number(textoTotal);
+    if (!Number.isInteger(porTema) || porTema < 1 || porTema > COMP_CARTAS) return roto;
+    // Cada tema necesita sus cartas más la que abre su línea.
+    if (temas.some(mode => porTema + 1 > CT.cards(mode).length)) return roto;
+
+    const huellas = textoHuellas.split(",");
+    if (huellas.length !== temas.length) return roto;
+    if (temas.some((mode, i) => huellas[i] !== huella(mode))) return { ok: false, motivo: "mazo-distinto" };
+
+    const total = temas.length * porTema;
+    const hits = Number(textoMarca);
+    if (!Number.isInteger(hits) || hits < 0 || hits > total) return roto;
+    if (!/^[01]+$/.test(cuerpo) || cuerpo.length !== total) return roto;
+    const secuencia = [...cuerpo].map(bit => bit === "1");
+    if (secuencia.filter(Boolean).length !== hits) return roto;
+    return {
+      ok: true,
+      duelo: { competicion: true, temas, seed, porTema, total, cifras: false, ms, rival: { nombre: limpiaNombre(nombre), hits, sequence: secuencia } }
     };
   }
 
@@ -507,6 +577,21 @@
     const rejilla = sec => sec.map(acierto => (acierto ? "🟩" : "⬜")).join("");
     const veredicto = mio.hits > rival.hits ? "Gano yo" : mio.hits < rival.hits ? `Gana ${rival.nombre || "quien retaba"}` : "Empate";
     return `Duelo en Continuum · ${modeName}\n${veredicto} — ${mio.hits} a ${rival.hits}\n${rival.nombre || "Quien retaba"} ${rejilla(rival.sequence)}\nYo ${rejilla(mio.sequence)}`;
+  }
+
+  // La competición no nombra sus temas, ni al retar ni al compartir el resultado: cada tema se
+  // descubre en su cartel, como en el resto de competiciones, y en un grupo puede haber quien
+  // todavía no la ha jugado.
+  function invitacionCompeticion({ nombre, temas, hits, total, payload, ms = MS }) {
+    const quien = nombre ? `${nombre} te reta` : "Te retan";
+    return `${quien} en Continuum · Competición de ${temas} temas\n📊 ${hits}/${total}, ${ritmoTexto(ms)} — a ver si lo superas\n${enlace(payload)}`;
+  }
+
+  // Las cuadrículas van partidas por temas, con un espacio entre uno y otro.
+  function marcadorCompeticion({ temas, porTema, rival, mio }) {
+    const rejilla = sec => Array.from({ length: temas }, (_, i) => sec.slice(i * porTema, (i + 1) * porTema).map(acierto => (acierto ? "🟩" : "⬜")).join("")).join(" ");
+    const veredicto = mio.hits > rival.hits ? "Gano yo" : mio.hits < rival.hits ? `Gana ${rival.nombre || "quien retaba"}` : "Empate";
+    return `Competición en Continuum · ${temas} temas\n${veredicto} — ${mio.hits} a ${rival.hits}\n${rival.nombre || "Quien retaba"} ${rejilla(rival.sequence)}\nYo ${rejilla(mio.sequence)}`;
   }
 
   function invitacionCifras({ modeName, nombre, aciertos, total, payload, ms = CIFRAS_MS }) {
@@ -573,6 +658,7 @@
     CARTAS, MAX_CARTAS, MAX_NOMBRE, SEGUNDOS, MS, GRACIA_MS,
     huella, crearSemilla, reparto, codificar, descodificar,
     enlace, invitacion, marcador, limpiaNombre, estadoTurnos,
+    Competicion: { TEMAS: COMP_TEMAS, CARTAS: COMP_CARTAS, codificar: codificarCompeticion, invitacion: invitacionCompeticion, marcador: marcadorCompeticion },
     Cifras: {
       CARTAS: CIFRAS_CARTAS, SEGUNDOS: CIFRAS_SEGUNDOS, MS: CIFRAS_MS, GRACIA_MS, SIN_RELOJ_MS, tope,
       PUNTOS_CARTA, PUNTOS_TINO, PUNTOS_PRISA, MAX_CIFRA,
