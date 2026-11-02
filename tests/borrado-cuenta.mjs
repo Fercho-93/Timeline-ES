@@ -8,10 +8,13 @@ const { purgeAccountData, deleteAccount, findUid, ACCOUNT_DOCS } = require('../f
 
 function fakeDb(initial) {
   const store = new Map(Object.entries(initial));
+  // Cuántos borrados hay en marcha a la vez (cada uno tarda una vuelta del bucle de eventos).
+  const load = { now: 0, peak: 0 };
+  const slow = async () => { load.peak = Math.max(load.peak, ++load.now); await new Promise(resolve => setImmediate(resolve)); load.now--; };
   const ref = path => ({
     path, id: path.split('/').at(-1),
     get: async () => ({ exists: store.has(path), data: () => store.get(path) }),
-    delete: async () => { store.delete(path); },
+    delete: async () => { await slow(); store.delete(path); },
     collection: name => collectionRef(`${path}/${name}`),
   });
   const collectionRef = path => ({
@@ -23,10 +26,10 @@ function fakeDb(initial) {
     },
   });
   return {
-    store,
+    store, load,
     doc: ref,
     collection: collectionRef,
-    recursiveDelete: async target => { for (const key of [...store.keys()]) if (key === target.path || key.startsWith(`${target.path}/`)) store.delete(key); },
+    recursiveDelete: async target => { await slow(); for (const key of [...store.keys()]) if (key === target.path || key.startsWith(`${target.path}/`)) store.delete(key); },
   };
 }
 const seed = uid => Object.fromEntries([
@@ -61,6 +64,15 @@ assert.ok(cut.store.has('playerProfiles/ana'), 'el perfil sigue para poder repet
 cut.recursiveDelete = realRecursive;
 await purgeAccountData(cut, 'ana');
 assert.equal([...cut.store.keys()].filter(key => key.includes('ana')).length, 0, 'repetir el borrado lo termina');
+
+// Las filas del ranking (cerca de un centenar de tablas) y los documentos de la cuenta se borran a la vez, no uno
+// detrás de otro: la limpieza de invitados caducados pasa por aquí miles de veces al día.
+const busy = { ...seed('ana') };
+for (let day = 1; day <= 90; day++) busy[`dailyScores/2026-${String(7 + Math.floor((day - 1) / 30)).padStart(2, '0')}-${String((day - 1) % 30 + 1).padStart(2, '0')}/players/ana`] = { score: day };
+const parallel = fakeDb(busy);
+await purgeAccountData(parallel, 'ana');
+assert.equal(parallel.store.size, 0, 'no queda ninguna fila');
+assert.ok(parallel.load.peak >= 90, `borrados a la vez: ${parallel.load.peak}`);
 
 // Sin perfil ni datos no falla, y un uid raro se rechaza.
 await purgeAccountData(fakeDb({}), 'nadie');

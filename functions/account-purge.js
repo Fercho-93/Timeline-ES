@@ -18,11 +18,15 @@ async function purgeAccountData(db, uid) {
     const name = db.doc(`playerNames/${aliasKey}`);
     if ((await name.get()).data()?.uid === uid) await name.delete();
   }
-  // Las filas del ranking de todos los días y semanas que aún se conservan.
-  for (const name of RANKING_COLLECTIONS) {
-    for (const period of await db.collection(name).listDocuments()) await period.collection('players').doc(uid).delete();
-  }
-  for (const collection of ACCOUNT_DOCS) await db.recursiveDelete(db.doc(`${collection}/${uid}`));
+  // Las filas del ranking de todos los días y semanas que aún se conservan (un centenar de tablas), y después los
+  // documentos de la cuenta. Cada paso borra a la vez, no uno detrás de otro: la limpieza de invitados caducados
+  // pasa por aquí miles de veces al día. El nombre sigue liberándose antes, y la cuenta de acceso no se borra hasta
+  // que todo esto termina bien (deleteAccount), así que si algo falla basta repetir el borrado.
+  await Promise.all(RANKING_COLLECTIONS.map(async name => {
+    const periods = await db.collection(name).listDocuments();
+    await Promise.all(periods.map(period => period.collection('players').doc(uid).delete()));
+  }));
+  await Promise.all(ACCOUNT_DOCS.map(collection => db.recursiveDelete(db.doc(`${collection}/${uid}`))));
 }
 
 // Borra los datos y, al final, el usuario de acceso. Si el usuario ya no existe, no es un error:

@@ -1,8 +1,8 @@
 // Tareas automáticas en la nube (Cloud Functions): avisos de duelos al móvil, mantenimiento de duelos
-// caducados, el borrado de cuenta (deleteMyAccount) y la limpieza diaria de datos caducados
-// (purgeExpiredData). Se publican a mano.
+// caducados, el borrado de cuenta (deleteMyAccount) y la limpieza de datos caducados (purgeExpiredData,
+// cada hora, y purgeRankingsAndGuests, cada día). Se publican a mano.
 const { initializeApp } = require('firebase-admin/app');
-const { getFirestore, FieldValue, FieldPath } = require('firebase-admin/firestore');
+const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { getMessaging } = require('firebase-admin/messaging');
 const { onDocumentUpdated, onDocumentCreated } = require('firebase-functions/v2/firestore');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
@@ -10,15 +10,19 @@ const { onCall, HttpsError } = require('firebase-functions/v2/https');
 const { setGlobalOptions } = require('firebase-functions/v2');
 const { DAY, millis, lifecycle, movementMessage } = require('./duel-policy');
 const { getAuth } = require('firebase-admin/auth');
-const { ACTIVITY, expiredRankingKey, staleAnonymous } = require('./retention');
+const { ACTIVITY } = require('./retention');
 const { deleteAccount } = require('./account-purge');
-const { purgeCollection } = require('./purge');
+const { RUN_BUDGET_MS, purgeCollection, purgeRanking, purgeStaleGuests } = require('./purge');
+const { maintainOpenDuels } = require('./duel-maintenance');
 
 // En Madrid, junto a la base de datos: los datos no salen de España para procesarse y los avisos
 // de Firestore no cruzan de región. El juego llama a `deleteMyAccount` aquí (js/nube/accounts.js, FUNCTIONS_REGIONS).
 // Las tareas programadas van en Bélgica (SCHEDULED_REGION): Cloud Scheduler no existe en Madrid.
 setGlobalOptions({ region: 'europe-southwest1' });
 const SCHEDULED_REGION = 'europe-west1';
+// Una sola instancia: una ejecución no se pisa con la siguiente. Cada una deja de empezar trabajo a los
+// RUN_BUDGET_MS (420 s), antes del corte de los 540 s, y lo que quede lo retoma la siguiente.
+const SCHEDULED = { region: SCHEDULED_REGION, timeZone: 'Europe/Madrid', timeoutSeconds: 540, maxInstances: 1 };
 initializeApp();
 
 const db = getFirestore();
@@ -96,48 +100,20 @@ async function maintainDuel(ref, now) {
     return { recipient: action.recipient, waiting: game.status === 'waiting' };
   });
 }
-exports.maintainTurnDuels = onSchedule({ region: SCHEDULED_REGION, schedule: 'every 60 minutes', timeZone: 'Europe/Madrid', timeoutSeconds: 540, maxInstances: 1 }, async () => {
-  let cursor;
+exports.maintainTurnDuels = onSchedule({ ...SCHEDULED, schedule: 'every 60 minutes' }, async () => {
   const now = Date.now();
-  do {
-    let query = db.collection('turnDuels').where('status', 'in', ['waiting', 'playing']).orderBy(FieldPath.documentId()).limit(200);
-    if (cursor) query = query.startAfter(cursor);
-    const page = await query.get();
-    for (const snapshot of page.docs) {
-      const reminder = await maintainDuel(snapshot.ref, now);
-      if (reminder) {
-        try { await send(reminder.recipient, snapshot.id, '¿Seguimos jugando?', reminder.waiting ? 'Tienes una invitación pendiente en Continuum.' : 'Tienes un turno pendiente en Continuum. Tu rival te espera.'); }
-        catch (error) { console.warn('Duel reminder failed', error.code); }
-      }
-    }
-    cursor = page.size === 200 ? page.docs.at(-1) : null;
-  } while (cursor);
+  const result = await maintainOpenDuels(db, now, async ref => {
+    const reminder = await maintainDuel(ref, now);
+    if (!reminder) return;
+    try { await send(reminder.recipient, ref.id, '¿Seguimos jugando?', reminder.waiting ? 'Tienes una invitación pendiente en Continuum.' : 'Tienes un turno pendiente en Continuum. Tu rival te espera.'); }
+    catch (error) { console.warn('Duel reminder failed', error.code); }
+  }, { deadline: now + RUN_BUDGET_MS });
+  if (!result.indexed) console.warn('Duel maintenance: falta el índice compuesto de turnDuels (status, updatedAt); se recorren todos los duelos abiertos. Ver docs/CONFIGURAR_MULTIJUGADOR.md.');
+  if (result.failed) console.warn('Duel maintenance failed', result.failed, result.lastError);
+  if (result.timedOut) console.warn('Duel maintenance: sin tiempo para todos; sigue en la próxima ejecución.');
+  console.log('Duel maintenance summary', JSON.stringify(result));
 });
 
-// Limpieza diaria según los plazos de retention.js (los mismos que cuenta la política de privacidad). Borra con
-// sus subcolecciones: una sala se lleva su presencia y su final. La lógica y el tope por ejecución, en purge.js.
-async function purgeRanking(collection, now) {
-  let removed = 0;
-  for (const ref of await db.collection(collection).listDocuments()) {
-    if (expiredRankingKey(ref.id, now)) { await db.recursiveDelete(ref); removed++; }
-  }
-  return removed;
-}
-// Invitados anónimos que llevan un año sin abrir el juego: nadie puede volver a entrar en ellos.
-async function purgeStaleGuests(now, limit = 500) {
-  let token, removed = 0;
-  do {
-    const page = await getAuth().listUsers(1000, token);
-    for (const user of page.users) {
-      if (removed >= limit) return removed;
-      if (!staleAnonymous(user, now)) continue;
-      await deleteAccount(db, getAuth(), user.uid);
-      removed++;
-    }
-    token = page.pageToken;
-  } while (token);
-  return removed;
-}
 // Borrado de la cuenta de quien llama, desde Ajustes. Borra todo lo que el servidor guarda de ella y su
 // acceso. Solo actúa sobre la cuenta autenticada: no recibe ningún identificador.
 exports.deleteMyAccount = onCall({ timeoutSeconds: 120, maxInstances: 10 }, async request => {
@@ -147,19 +123,35 @@ exports.deleteMyAccount = onCall({ timeoutSeconds: 120, maxInstances: 10 }, asyn
   catch (error) { console.warn('Account deletion failed', error.code || error.message); throw new HttpsError('internal', 'No se pudo borrar la cuenta.'); }
   return { deleted: true };
 });
-exports.purgeExpiredData = onSchedule({ region: SCHEDULED_REGION, schedule: 'every day 04:17', timeZone: 'Europe/Madrid', timeoutSeconds: 540, maxInstances: 1 }, async () => {
-  const now = Date.now(), summary = {}, capped = [];
-  for (const name of Object.keys(ACTIVITY)) {
-    try {
-      const result = await purgeCollection(db, name, now);
-      summary[name] = result.removed;
-      if (result.capped) capped.push(name);
-    } catch (error) { console.warn('Purge failed', name, error.code || error.message); }
-  }
+// Limpieza según los plazos de retention.js (los mismos que cuenta la política de privacidad). La lógica, los topes
+// por ejecución y el borrado con subcolecciones (una sala se lleva su presencia y su final), en purge.js.
+// Resumen en los registros: cuánto se ha borrado de cada cosa y, aparte, lo que ha fallado o se ha quedado a medias.
+function logPurge(label, names, results) {
+  const summary = {}, capped = [], unfinished = [];
+  results.forEach((outcome, i) => {
+    const name = names[i], result = outcome.value;
+    if (outcome.status === 'rejected') { console.warn('Purge failed', name, outcome.reason?.code || outcome.reason?.message); return; }
+    summary[name] = result.removed;
+    if (result.failed) console.warn('Purge failed', name, `${result.failed} sin borrar`, result.lastError);
+    if (result.capped) capped.push(name);
+    if (result.timedOut) unfinished.push(name);
+  });
   if (capped.length) console.warn('Purge capped: se ha llegado al tope por ejecución en', capped.join(', '));
-  for (const name of ['dailyScores', 'weeklyScores']) {
-    try { summary[name] = await purgeRanking(name, now); } catch (error) { console.warn('Purge failed', name, error.code || error.message); }
-  }
-  try { summary.guests = await purgeStaleGuests(now); } catch (error) { console.warn('Purge failed', 'guests', error.code || error.message); }
-  console.log('Purge summary', JSON.stringify(summary));
+  if (unfinished.length) console.warn('Purge unfinished: sin tiempo para todo en', unfinished.join(', '), '(sigue en la próxima ejecución)');
+  console.log(`${label} summary`, JSON.stringify(summary));
+}
+// Cada hora: las colecciones con fecha de última actividad, todas a la vez y cada una por su lado (si una falla o
+// tiene mucho que borrar, las demás no esperan).
+exports.purgeExpiredData = onSchedule({ ...SCHEDULED, schedule: 'every 60 minutes' }, async () => {
+  const now = Date.now(), deadline = now + RUN_BUDGET_MS, names = Object.keys(ACTIVITY);
+  logPurge('Purge', names, await Promise.allSettled(names.map(name => purgeCollection(db, name, now, { deadline }))));
+});
+// Cada día: las tablas del ranking de hace más de 90 días y los invitados que llevan un año sin abrir el juego.
+exports.purgeRankingsAndGuests = onSchedule({ ...SCHEDULED, schedule: 'every day 04:17' }, async () => {
+  const now = Date.now(), deadline = now + RUN_BUDGET_MS;
+  logPurge('Purge rankings and guests', ['dailyScores', 'weeklyScores', 'guests'], await Promise.allSettled([
+    purgeRanking(db, 'dailyScores', now, { deadline }),
+    purgeRanking(db, 'weeklyScores', now, { deadline }),
+    purgeStaleGuests(db, getAuth(), now, { deadline })
+  ]));
 });

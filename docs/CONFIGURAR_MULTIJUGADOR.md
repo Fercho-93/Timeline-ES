@@ -46,20 +46,21 @@ Como se publica en producción al momento, antes de subir un cambio de reglas:
 
 ### Cloud Functions
 
-Las Functions (`functions/index.js`) son seis:
+Las Functions (`functions/index.js`) son siete:
 
 | Función | Disparo | Qué hace |
 | --- | --- | --- |
 | `notifyTurnDuel` | Al actualizarse un `turnDuels/{id}` | Avisa a quien le toca |
 | `notifyQuickDuel` | Al actualizarse un `quickRooms/{code}` de un duelo de Retos rápidos | Avisa a quien le toca o del final |
 | `notifyDuelInvitation` | Al crearse un `turnDuels/{id}` con invitado | Avisa del reto, salvo bloqueo |
-| `maintainTurnDuels` | Cada 60 minutos (Europe/Madrid) | Recordatorio a las 48 h sin jugar y caducidad a los 7 días |
+| `maintainTurnDuels` | Cada 60 minutos (Europe/Madrid) | Recordatorio a las 48 h sin jugar y caducidad a los 7 días (`functions/duel-maintenance.js`; necesita un índice compuesto, ver «Conservación y limpieza de datos») |
 | `deleteMyAccount` | Al pulsar «Eliminar» en el Atlas (llamada del juego) | Borra todo lo que el servidor guarda de la cuenta de quien llama —datos, filas de ranking de todos los días y semanas, nombre— y su acceso (`functions/account-purge.js`) |
-| `purgeExpiredData` | Cada día a las 04:17 (Europe/Madrid) | Limpieza según `functions/retention.js` |
+| `purgeExpiredData` | Cada 60 minutos (Europe/Madrid) | Limpieza de salas, duelos, mesas, colas y registros según `functions/retention.js` |
+| `purgeRankingsAndGuests` | Cada día a las 04:17 (Europe/Madrid) | Limpieza de las tablas del ranking y de los invitados sin usar en un año |
 
 Corren en **`europe-southwest1`** (Madrid), junto a la base de datos, para que los datos no salgan de
 España al procesarse y los avisos de Firestore no crucen de región (`setGlobalOptions` en `functions/index.js`).
-Las dos programadas (`maintainTurnDuels` y `purgeExpiredData`) van en **`europe-west1`** (Bélgica, también en la
+Las tres programadas (`maintainTurnDuels`, `purgeExpiredData` y `purgeRankingsAndGuests`) van en **`europe-west1`** (Bélgica, también en la
 UE): Cloud Scheduler no está disponible en Madrid y publicarlas allí falla (`SCHEDULED_REGION`).
 Cada publicación crea las Functions en su región y retira las que queden en otras (por el `--force` del
 workflow). El juego llama a `deleteMyAccount` primero en Madrid y, si no responde, en Bélgica
@@ -180,9 +181,10 @@ Más detalles en [SEGURIDAD_Y_OPERACION.md](SEGURIDAD_Y_OPERACION.md).
 
 ## Conservación y limpieza de datos
 
-Los plazos viven en un único sitio, `functions/retention.js`, y los aplica cada día
-`purgeExpiredData` (04:17, hora de Madrid). Cuentan desde la última actividad de cada documento
-y se borran con sus subcolecciones (una sala se lleva su presencia, su minijuego y su final):
+Los plazos viven en un único sitio, `functions/retention.js`, y los aplican dos tareas programadas
+(`functions/purge.js`): `purgeExpiredData`, cada hora, y `purgeRankingsAndGuests`, cada día a las
+04:17 (hora de Madrid). Cuentan desde la última actividad de cada documento y se borran con sus
+subcolecciones (una sala se lleva su presencia, su minijuego y su final):
 
 | Datos | Plazo |
 | --- | --- |
@@ -199,6 +201,48 @@ y se borran con sus subcolecciones (una sala se lleva su presencia, su minijuego
 Estos plazos los cuenta también la política de privacidad: si cambian en `retention.js`, hay
 que cambiarlos en `privacidad.html` y `PRIVACIDAD.md`. `tests/retencion.mjs` comprueba que
 coinciden. No hace falta configurar políticas TTL en la consola.
+
+Cómo da abasto con mucho volumen (pensado para 50.000 salas al día o más):
+
+- **Cada hora, todas las colecciones a la vez.** `purgeExpiredData` lanza una limpieza por
+  colección en paralelo: si una falla o tiene mucho atraso, las demás no esperan. Cada una pide
+  páginas de 500 de lo más antiguo a lo más reciente (`orderBy` por su fecha) leyendo solo la
+  fecha (`select`), no el documento entero, y borra con su propio `BulkWriter` (empieza a 500
+  borrados por segundo y sube solo, como recomienda Firestore). Las salas, que tienen
+  subcolecciones, se borran con `recursiveDelete` sobre ese mismo `BulkWriter`, 25 a la vez.
+- **Tope por ejecución.** Ninguna ejecución borra más de 50.000 documentos de una colección, 10
+  tablas del ranking por colección ni 10.000 invitados (`MAX_*` en `purge.js`). Es un cortafuegos:
+  la limpieza se salta las reglas, y si un plazo o una fecha salieran mal, sin tope lo borraría
+  todo de una vez. Con 50.000 salas al día caducan unas 2.000 por hora: el tope deja margen para
+  picos y atrasos. Además, ningún plazo puede bajar de un día (`tests/limpieza-tope.mjs`).
+- **Se para a tiempo y sigue en la siguiente.** Las tres tareas se cortan a los 540 s; a los 420
+  dejan de empezar trabajo y terminan lo empezado. Lo que quede, por tiempo o por tope, sigue en
+  la ejecución siguiente: como siempre se empieza por lo más antiguo, nada se queda atrás para
+  siempre. Los registros dicen `Purge capped` (tope) o `Purge unfinished` (tiempo); si salen
+  todos los días, hay atraso y conviene revisarlo. Un borrado que falla se cuenta
+  (`Purge failed`) y se reintenta en la ejecución siguiente.
+- **Invitados.** Authentication no deja buscar por fecha, así que `purgeRankingsAndGuests`
+  repasa las cuentas por páginas de 1.000 y borra, 10 a la vez, los invitados anónimos de más de
+  un año. Guarda por dónde va en `purgeState/staleGuests` (solo lo toca el servidor; las reglas no
+  lo abren a nadie): si un día no llega al final, al siguiente sigue desde ahí, y al terminar el
+  repaso borra ese documento y el siguiente empieza desde el principio.
+- **Duelos por turnos.** `maintainTurnDuels` (cada hora) lee solo los duelos abiertos con dos
+  días o más sin jugar, del más antiguo al más reciente, con los campos justos para decidir, y
+  trata 20 a la vez. No guarda por dónde va: un duelo caducado deja de estar abierto y uno ya
+  avisado deja de necesitar nada, así que la ejecución siguiente empieza por lo pendiente. Para
+  eso necesita un **índice compuesto** en `turnDuels`: `status` (ascendente) y `updatedAt`
+  (ascendente), ámbito de colección. Se crea una vez en la consola de Firebase → Firestore →
+  Índices → Compuestos, o con:
+
+  ```
+  gcloud firestore indexes composite create --project=timeline-es --collection-group=turnDuels \
+    --query-scope=COLLECTION --field-config=field-path=status,order=ascending \
+    --field-config=field-path=updatedAt,order=ascending
+  ```
+
+  Mientras no exista (o se esté construyendo), la tarea no falla: recorre todos los duelos
+  abiertos por identificador, como antes, y lo avisa en los registros («falta el índice
+  compuesto»).
 
 Configurar alertas de presupuesto y observar lecturas, escrituras y autenticaciones antes de
 ampliar la beta. Una alerta avisa; no limita el gasto. Conservar un procedimiento de cierre

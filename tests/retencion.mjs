@@ -1,4 +1,4 @@
-// Plazos de conservación de functions/retention.js: los usa la limpieza diaria (purgeExpiredData)
+// Plazos de conservación de functions/retention.js: los usa la limpieza (purgeExpiredData y purgeRankingsAndGuests)
 // y los cuenta la política de privacidad. Si cambian, hay que cambiar también privacidad.html.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

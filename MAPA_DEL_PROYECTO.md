@@ -243,11 +243,12 @@ No se edita a mano.
 
 | Archivo | Qué hace |
 | --- | --- |
-| `index.js` | Las tareas: avisos de duelos, mantenimiento de duelos caducados, `deleteMyAccount` (borrado de cuenta) y `purgeExpiredData`, la limpieza diaria de las 04:17. |
+| `index.js` | Las tareas: avisos de duelos, mantenimiento de duelos caducados, `deleteMyAccount` (borrado de cuenta) y la limpieza de lo caducado: `purgeExpiredData`, cada hora, y `purgeRankingsAndGuests`, cada día a las 04:17. |
 | `account-purge.js` | Todo lo que se borra al eliminar una cuenta. Lo usan la función de borrado, la limpieza de invitados y el borrado manual. |
-| `purge.js` | La limpieza diaria de una colección, con un tope por ejecución para que un fallo no pueda vaciarla. |
+| `purge.js` | La limpieza de lo caducado: cada colección por páginas de solo fechas y en bloque, las tablas del ranking y los invitados sin usar (retomando donde se quedó). Con un tope por ejecución para que un fallo no pueda vaciar nada y parando antes del corte de la función. |
 | `retention.js` | Cuánto tiempo se guarda cada tipo de dato. Debe coincidir con la política de privacidad. |
 | `duel-policy.js` | Cuándo se manda un recordatorio de duelo y con qué texto. |
+| `duel-maintenance.js` | Qué duelos abiertos necesitan recordatorio o caducar: los repasa cada hora del más antiguo al más reciente, varios a la vez. |
 
 Se publican a mano desde GitHub (workflow «Publicar Cloud Functions»).
 

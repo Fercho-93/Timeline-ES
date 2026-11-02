@@ -65,7 +65,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `avatar-propio.mjs` | test | El avatar elegido en el Atlas es el que aparece en las partidas. |
 | `avatares-duelos.mjs` | test | Un mismo UID conserva su avatar entre partidas, tamaños y cambios de alias. |
 | `board-fit-browser.mjs` | navegador | La mesa cabe al 100 % en móviles de distintos tamaños en todos los formatos. |
-| `borrado-cuenta.mjs` | test | El borrado de cuenta del servidor (`functions/account-purge.js`) con una base en memoria: borra todo lo de la cuenta, incluidas las filas de ranking y subcolecciones, sin tocar otras cuentas. |
+| `borrado-cuenta.mjs` | test | El borrado de cuenta del servidor (`functions/account-purge.js`) con una base en memoria: borra todo lo de la cuenta, incluidas las filas de ranking y subcolecciones, sin tocar otras cuentas, y a la vez (no fila a fila). |
 | `build-movil.mjs` | test | `npm run build` deja un `dist/` completo y sincronizado con `capacitor.config.json`. |
 | `camera-permissions.mjs` | test | Las declaraciones de cámara de iOS y Android que necesita leer un QR. |
 | `card-text.mjs` | test | El texto de las cartas se ajusta sin partir palabras y recupera su tamaño. |
@@ -85,7 +85,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `despliegue.mjs` | test | `js/nube/deployment.js`: qué plataformas tienen App Check; pasar `audience` a «public» no cierra las salas del iPhone. |
 | `diagnostico.mjs` | test | Un error sin capturar enseña un aviso con versión, pantalla y mazo en vez de una pantalla en blanco. |
 | `duelo-layout.mjs` | navegador | Maquetación de los duelos por turnos en móvil y escritorio, sin desbordamiento. |
-| `duelo-policy.cjs` | test (y `functions.yml`) | Recordatorios a las 48 h, uno por turno, caducidad a los 7 días y textos de los avisos. |
+| `duelo-policy.cjs` | test (y `functions.yml`) | Recordatorios a las 48 h, uno por turno, caducidad a los 7 días y textos de los avisos; el repaso horario (`functions/duel-maintenance.js`) lee solo los campos necesarios, va del más antiguo al más reciente, para a tiempo, sigue en la ejecución siguiente y funciona sin el índice compuesto. |
 | `duelo-state.mjs` | test | Duelo por turnos sin pantalla de listo: envío pendiente, reintento e idempotencia. |
 | `duelo-turnos-reglas.mjs` | reglas | Reglas de los duelos por turnos: cuota, tiempo por carta, turnos, bloqueo y archivo. |
 | `duelo.mjs` | test | Duelo por enlace: mismas cartas en dos móviles, carga útil y enlaces manipulados o de otra versión. |
@@ -117,7 +117,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `invitaciones-app.mjs` | test | «Unirme» acepta el enlace entero, su parte final o el código suelto. |
 | `jugadores-recientes.mjs` | test | Un solo móvil recuerda los nombres de los jugadores recientes. |
 | `legal.mjs` | test | Condiciones de uso, aviso legal, soporte y página de borrado: enlaces y anclas, caché, app móvil, coherencia con la política y lista de huecos `[PENDIENTE: …]` por rellenar. |
-| `limpieza-tope.mjs` | test | La limpieza diaria del servidor tiene plazo mínimo de un día y tope de borrados por ejecución, y reanuda al día siguiente. |
+| `limpieza-tope.mjs` | test | La limpieza del servidor (`functions/purge.js`) tiene plazo mínimo de un día y tope de borrados por ejecución; lee solo fechas, borra en bloque (las salas con sus subcolecciones), para antes del corte y reanuda en la ejecución siguiente; ranking e invitados (con cursor) incluidos. |
 | `mano-carrusel-browser.mjs` | navegador | La mano en abanico gira como un carrusel con gestos táctiles reales y siempre deja una carta elegida en el centro. |
 | `mapa-proyecto.mjs` | test | `MAPA_DEL_PROYECTO.md` explica cada script de `js/` y cada hoja de `css/`, cada uno en la tabla de su carpeta, y no cita ninguno que ya no exista. |
 | `marca.mjs` | test | Nombre Continuum en la web, iOS, manifiesto, paquete, documentación y pantallas, sin la marca antigua. |
