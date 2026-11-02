@@ -41,6 +41,8 @@ El sistema visual común se ha construido mediante instrucciones de continuidad 
 - Idiomas: las 50 láminas, con la escena de cada una, en `docs/procedencia-idiomas.md`.
 - Retos rápidos: las 567 cartas de los 29 retos tienen lámina propia en `assets/quick-cards/` (WebP de 512 × 768, grabado sepia sobre pergamino). Para las generadas o sustituidas desde el 29 de septiembre de 2026 hay ficha individual con prompt, fecha, generador y huella en `docs/arte-*.json` (256 imágenes del 4 y 5 de octubre: las ampliaciones y las 43 sustituciones o añadidos de la revisión visual) y en `docs/ilustraciones-unicas-2026-09-29.json` (13). La revisión visual del 4 de octubre está en [docs/revisiones/revision-ilustraciones-retos-2026-10-04.md](docs/revisiones/revision-ilustraciones-retos-2026-10-04.md); los logos de redes sociales y los símbolos del póker son excepciones deliberadas a la regla de no dibujar texto ni marcas. La portada del modo está en `docs/retos-portada.md`.
 
+- Revisión visual de Retos rápidos del 2 de noviembre de 2026: revisadas las 567 cartas, con 51 sustituciones (50 generaciones nuevas y una reutilización). Se conservan sin cambios las otras 516. El [informe](docs/revisiones/revision-ilustraciones-retos-2026-11-02.md) y las [fichas con prompts, referencias y huellas](docs/arte-revision-retos-2026-11-02.json) documentan las correcciones.
+
 ## Límites de la documentación
 
 Salvo las fichas individuales citadas arriba, no se han recuperado los prompts completos, la fecha individual de generación, las imágenes de referencia ni el modelo utilizado para cada una de las demás imágenes de `assets/` (1.855 a 22 de octubre de 2026; `docs/inventario-arte.json` las lista una a una). Por ello, el inventario marca la procedencia como declarada por el titular y no como una ficha individual completa de generación.
@@ -48,3 +50,5 @@ Salvo las fichas individuales citadas arriba, no se han recuperado los prompts c
 Antes de una publicación comercial se deben conservar, junto con la documentación del proyecto, los términos aplicables al plan y servicio utilizados en cada generación. Esta documentación no afirma que OpenAI sea el titular de las imágenes ni sustituye una revisión jurídica; deja registrada la procedencia declarada y evita presentar los recursos como imágenes descargadas de terceros.
 
 Los textos, datos, fuentes y marcas representadas en las cartas tienen una revisión independiente. Que una ilustración haya sido generada con IA no convierte automáticamente en libres de derechos los nombres, logotipos o elementos identificables de terceros que pudiera representar.
+
+

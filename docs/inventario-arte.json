@@ -14984,16 +14984,31 @@
     },
     {
       "path": "assets/quick-cards/airports-5.webp",
-      "sha256": "3309d525ec2c58a05fbf796a046931b0541d24afd274a3c08e4c3dff1683bd96",
+      "sha256": "4d0efe202f9462087969edb48760f254b2ec569dd9c1b2e48eb57f3bdfde766f",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A factual aerial oblique view of Haneda airport on reclaimed flat land at Tokyo Bay, modern low terminal complexes, runways and taxiways with the BAY WATER clearly visible around the airfield, unbranded modern passenger jets and distant Tokyo skyline. Realistic engineered airport layout, no desert hills, palm oasis, fantasy radial terminal, text or flags.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -15012,16 +15027,31 @@
     },
     {
       "path": "assets/quick-cards/airports-7.webp",
-      "sha256": "7602c3afd0b53bce09a826e538a9b5103e9c4012435c9494d5271dddb15b6f6c",
+      "sha256": "14403da1a8edab2fe7c5034547bd63973248cf1328debed5b5b32e71ebb87c6d",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A faithful aerial oblique view of Atlanta Hartsfield-Jackson airport, a central linear axis linking several separate long straight PARALLEL concourse buildings like a ladder, jets parked along both sides of each concourse, parallel runways and flat green Georgia surroundings. No star-shaped or circular concourses, fantasy gardens, labels, text or airline branding.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -15052,16 +15082,31 @@
     },
     {
       "path": "assets/quick-cards/albums-sales-1.webp",
-      "sha256": "e1b3cfc6d3902179653b000f19bc79f9e5189905dac9f0047d55aba1e49d545a",
+      "sha256": "c2cbce8dbbd63d1b38536596d581901b7952a2b682c08db2e9098b138f06c330",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An elderly rural wood carrier seen strictly from behind walking along a rough stone wall, carrying a tied bundle of long hazel branches, quiet English countryside and grass. Original composition and different pose from any album cover, no face, band members, text, modern equipment or exact cover layout.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -15196,44 +15241,89 @@
     },
     {
       "path": "assets/quick-cards/albums-sales-2.webp",
-      "sha256": "a27b11fb919539160feb17ed0375a19cf2699a32342e95667d1e9ef03c2fed48",
+      "sha256": "eaa664622680b3e6fa09ee3d962633f0b1e1f5d493eea0f360d0a0ce11853762",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An empty 1950s American diner beside a parked classic convertible visible through the window, jukebox, chrome stools and a black leather jacket draped over one red vinyl booth, milkshake glasses on the table. Coherent scene, no people or actors, words or brand marks.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
       "path": "assets/quick-cards/albums-sales-3.webp",
-      "sha256": "6f0f3b7da8702334dc8c9e012d216475a2bb85bfc3224489759c66a3a818a7c4",
+      "sha256": "1bcf729df0b4eed0dc984da95f4ca2d6bf35cfdec67bc15bc8fc99a0afb6c905",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A quiet 1970s recording rehearsal room, a dark wood stool and two vintage microphones in foreground, an ordinary small hand drum and long loosely trailing fabric ribbons on the floor, acoustic guitar and bass resting on stands in background. Evoke Fleetwood Mac's Rumours through verified musical props without invented musicians or copying the cover composition; no text or people.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
       "path": "assets/quick-cards/albums-sales-4.webp",
-      "sha256": "d31a18ae72224f329e6aace011b10fcc10fd88630c3b450c3fc4af5b8e3aa55d",
+      "sha256": "2a07e9079559c9baf8a07d1d0fb9a11fdc28d88adc093719ca3a138fa6c21bcd",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An empty 1970s disco dance floor with illuminated square floor panels, mirrored disco ball overhead, a plain white tailored jacket draped over a chair near the edge of the floor and dark dance shoes below. No people, portraits, text or promotional layout.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -15266,30 +15356,60 @@
     },
     {
       "path": "assets/quick-cards/albums-sales-7.webp",
-      "sha256": "70da408a7d830cd91ee17cf6a3da44af8c763e8b615e92058caea382130342b5",
+      "sha256": "7d42cdff80ab0054ba9e9a3c92a915c8c70628c6f49678ad334b9dde9748aab7",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An empty rock stage after rehearsal, a black double-cutaway electric guitar on a stand in the foreground beside an unmarked tube amplifier, coiled instrument lead, drum kit farther back, restrained dramatic lighting. No people, schoolboy costume, labels, logos, written record titles or album-cover reproduction.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
       "path": "assets/quick-cards/albums-sales-8.webp",
-      "sha256": "2345388514f8765092b6cd85f85c6a1a32e397c7d77d8f36d041de2447dad617",
+      "sha256": "431f616489893fa41e4f65e720c464eaf88a9164c97ad05c185a4b1711ec79ef",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A quiet American Southwest recording room: vintage acoustic guitar and sunburst electric guitar on stands, a plain unlabelled vinyl record on a wood stool, a natural eagle feather resting next to it, broad desert hills visible through the window. No people, invented band, skull logo, words or copied album artwork.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -15447,16 +15567,31 @@
     },
     {
       "path": "assets/quick-cards/buildings-1.webp",
-      "sha256": "56b4ce2719684adbe99ecf0a5a5eec91f8961ae65fa507848a418bcee8d3866a",
+      "sha256": "c786f3b793e1938fe2e35bd39e5417ecbaadb73cbe06023612c3f8eb91ce752f",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. The actual Petronas Twin Towers in Kuala Lumpur, faithful paired slender silver-grey towers with repeated rounded projecting floor plates, stacked stepped setbacks, long pointed spires, and the double-deck skybridge at mid-height, viewed from KLCC park at ground level. Recognizable cylindrical ribbed construction and eight-pointed star based massing, NOT two rectangular slab towers. No text, signs, other copied image composition or people.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -15956,16 +16091,31 @@
     },
     {
       "path": "assets/quick-cards/cities-east-west-1.webp",
-      "sha256": "b3f66f227a2694ba7c8b68ad577cde8ed5a07b09a05363e956c95f193d373b7f",
+      "sha256": "9bc9584f17f536c0fa8cf74a8845b59d2e0cf241509c39cb16ccb02813078d31",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A geographically faithful view along Waikiki beach in Honolulu, broad shallow volcanic Diamond Head crater ridge in the distance, city hotels aligned along the shore, a few palms and calm Pacific water. The ridge is low broad crater rim, NOT a steep jagged tropical mountain; no sailing-era isolated village, map instruments, text or people.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -16167,16 +16317,31 @@
     },
     {
       "path": "assets/quick-cards/cities-east-west-6.webp",
-      "sha256": "9a5336ecbcbc437c78900f322fb028b87c6cdb27319f325ed458737f08df96cc",
+      "sha256": "8b09efab255a07a42aa45bc02d790bc218222a18ce87b034a9fdc59c432031ce",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A coherent Cairo Nile riverbank scene with traditional felucca sailboat on the Nile, modern Cairo urban buildings and the lattice Cairo Tower behind, warm atmospheric haze. No sphinx on the riverbank, pyramids floating among city blocks, text or people.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -16220,16 +16385,36 @@
     },
     {
       "path": "assets/quick-cards/cities-north-south-1.webp",
-      "sha256": "c5d0749bf4f7ab9e5c51954e21ca859938647ab149eb78e1a91c7b6cbfffc0e3",
+      "sha256": "81325ea52e8089d0ee094333be2406fe60a08c09cea62c31ea9aef0708b3579a",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. The last supplied image is a CONTENT reference only: use its relevant object/building/prop features, ignore all faces, typography, branding and promotional layout. Do not copy its composition. A realistic view of Reykjavik's low colorful corrugated-roof houses leading toward the distinctive stepped concrete Hallgrimskirkja church tower and broad flanking wings, Esja mountains far across the bay, cool clear Icelandic atmosphere. No Norwegian fjord town, fantasy alpine peaks, tall Gothic spire, text or aurora montage.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          },
+          {
+            "purpose": "subject-features-only",
+            "sourceUrl": "https://www.visiticeland.com/things-to-do/hallgrimskirkja/",
+            "sha256": "b6a26c2d20db73bb460d81f2d0dd987c9730c23cc11afd14545bc4d6300e8b16"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -16668,16 +16853,31 @@
     },
     {
       "path": "assets/quick-cards/companies-founded-1.webp",
-      "sha256": "e8a84617a08e5b9e662f835526d4b83df7b801f91a42de37c5fea72fa21a588b",
+      "sha256": "64023578ae342c870db44ab408db1b63aa3a10e78838ae2cb80befde4e00bd7c",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An 1886 Atlanta pharmacy soda-fountain interior, a pharmacist's unlettered glass syrup bottles, marble counter, old metal soda fountain taps and a small drinking glass of dark fizzy cola. No glassblowing furnace, brewery vats, modern soda bottles, logos, text or people. Accurate late-19th-century pharmaceutical soda-fountain context.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -16708,16 +16908,31 @@
     },
     {
       "path": "assets/quick-cards/companies-founded-12.webp",
-      "sha256": "a39b0a803e28d0b1de84773781084aa8e2f7edad4480319267393e22503aeec4",
+      "sha256": "e724135fe7c1f801bded59792024ede4338ef4af08cd017c15439a93f0649e32",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An early-2000s student dormitory desk with a period laptop showing an abstract simple blue-and-white university social-network profile page with photo placeholders and horizontal lines only, notebooks, ethernet cable and campus brick buildings visible through a window. No smartphones, modern app icons, faces, readable letters, brand names or logos.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -16813,16 +17028,36 @@
     },
     {
       "path": "assets/quick-cards/companies-founded-2.webp",
-      "sha256": "f866fdcf98a91f46b1df2f413ba51f3c17973eca70acefd507a8fc957bde560d",
+      "sha256": "c5117ebeba6f34a60db865982fd88e9a1b2647c597fd9d60c7186f7a811e7e71",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. The last supplied image is a CONTENT reference only: use its relevant object/building/prop features, ignore all faces, typography, branding and promotional layout. Do not copy its composition. An early-1910s office with a historically plausible electromechanical punched-card tabulator: cabinet of round counting dials and card feed, stacks of blank/unlettered punched cards and a mechanical time-recording clock nearby, heavy wood desks. No ordinary typewriter as main subject, modern computer, person, letters or numerals on dials.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          },
+          {
+            "purpose": "subject-features-only",
+            "sourceUrl": "https://www.ibm.com/history/ctr-and-ibm",
+            "sha256": "d6f0de86ff78ab1f81c6399fa6e7bf240d337eaa246fef22d23405699361387a"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -16894,16 +17129,31 @@
     },
     {
       "path": "assets/quick-cards/companies-founded-5.webp",
-      "sha256": "e30ac703dbbe7e5dd6af4808f6c71303dec66990a6de8c5ca6a8f6d6e0399171",
+      "sha256": "33d88b6a5f69f8f1d0dafa58a197b15f2a4618a2e91741dd2f5568e6b6f4d519",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A modest late-1930s Korean trading shop storeroom with bundles of dried fish, grain sacks, noodle bundles and wooden produce crates, paper ledgers CLOSED on a low wooden desk, simple Korean market-street architecture through the door. Evoke Samsung's founding trading business, not electronics manufacturing. No radios, valves, modern phones, people, readable labels or logos.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -16936,16 +17186,31 @@
     },
     {
       "path": "assets/quick-cards/companies-founded-8.webp",
-      "sha256": "b057e21d3667cb065d8ba138bee67fdb7946a4f1628cac84dac0b6a6a16699dc",
+      "sha256": "02abf0faa8c518083bebf6073c8b7ff724dd04599b8192368fc1d97339ba9e79",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A modest 1976 Californian garage electronics workbench, an early bare single-board personal computer with visible chips and solder joints, simple keyboard, small CRT monitor with blank dark screen, soldering iron, hand tools and handwritten sheets showing ONLY unlabeled circuit sketches. No lockers, delivery parcels, rainbow brand panels, logos, text or people.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -17278,16 +17543,31 @@
     },
     {
       "path": "assets/quick-cards/companies-revenue-4.webp",
-      "sha256": "1156afa84c7f73755b519047f668da4b92dcb5461fcb897c601698630db4ce79",
+      "sha256": "ff66eaa9502566cbceae4c7f888dfe36bfb6bdb1811da9ac7b54855e77a8f2b7",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A contemporary healthcare insurance and care-coordination office: desktop computer displaying an unlabeled abstract benefits-plan layout, a plain closed insurance folder, a stethoscope beside it and office chairs with a distant clinic corridor visible through glass. No pharmacy cross, medicine shop, fictional brand logo, dollar figures, text or people.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -17710,16 +17990,31 @@
     },
     {
       "path": "assets/quick-cards/drinks-21.webp",
-      "sha256": "bc0fa0212b286e8d0bf70c060b81919a912fdf363312b363a86de92f299f4b9e",
+      "sha256": "1b6f6e3e9d33131dfa161b3861abfdec39043c73fc142ece41e661afbf39806a",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A traditional clear glass anisette bottle, unlabelled, and a small stemmed glass of perfectly clear COLORLESS sweet anise spirit on a rustic distillery counter; green anise seeds and anise flowers nearby, copper still softly behind. Both liquid and bottle are transparent, no amber tint, honey, red wine, brand text or people.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -17933,16 +18228,31 @@
     },
     {
       "path": "assets/quick-cards/drinks-5.webp",
-      "sha256": "aadbc0ad4a2df531c91780adbe38e46f26bd53b11bc1c02823984e2fec98890d",
+      "sha256": "3290aa467c07e7bacb7e94be89755b13f6d3cdca97cadd9301be3dbf25ddf80f",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A small traditional sherry copita containing very pale straw-yellow dry fino wine, fine transparent reflections, an unmarked dark green wine bottle and old oak sherry casks in a Jerez bodega, modest bunch of pale Palomino grapes nearby. The wine is pale and light, NOT amber brandy, brown wine, whisky or red wine. No labels, brands, text or people.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -17975,16 +18285,31 @@
     },
     {
       "path": "assets/quick-cards/drinks-8.webp",
-      "sha256": "20f1d4ab2d79cb52f079af0345760e0525017cd42b76428969e7077f7fb8958c",
+      "sha256": "9d53a3d8f862d3ccfc7e5ca10561a68cbd85ad63fdf1092ccdefba543b8383e5",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A squat dark brown apothecary-style gin bottle with short neck and broad shoulders, completely unlettered, beside a simple glass containing clear gin and a cucumber slice; cucumber and a few rose petals on the table, quiet distillery background. Gin liquid is colorless, bottle glass is dark brown, no tall clear perfume bottle, brand labels, text or numbers.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -18183,16 +18508,31 @@
     },
     {
       "path": "assets/quick-cards/festivities-10.webp",
-      "sha256": "6e598debee290bd5754ea6e7f8c4f997198a1efd8fc94b147eb4f57714f46ced",
+      "sha256": "ae70e63bb436d9d8bad3fa34b17b4ec51ceb0c67205d0659a09050975dd3b039",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An original Independence Day scene in Philadelphia: recognizable Independence Hall with its red-brick Georgian facade and central white clock-tower steeple, small restrained fireworks in the evening sky, a simple unlettered colonial bell in the foreground as an evocative still-life anchor. No Westminster, Big Ben, European palace, copied photo composition, text or people.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -18535,16 +18875,31 @@
     },
     {
       "path": "assets/quick-cards/festivities-5.webp",
-      "sha256": "8dcc3f200e51e7efd1136d6ebdf0b1e462690c4d3d66e3a08eff8ed2310ad373",
+      "sha256": "aebe9b041f03310a04b7df57d2fbdabfaa14529de8303f2115509f29cdc7d114",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A Dublin St Patrick's Day street celebration evoked without characters: traditional Irish pub frontage with blank sign, simple green bunting and abundant three-leaf shamrocks decorating the entrance, an Irish fiddle and bodhran resting on a stool, people only tiny distant indistinct silhouettes if any. No Scottish kilts, tartan, bagpipes, national brand marks, text or logos.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -18563,16 +18918,36 @@
     },
     {
       "path": "assets/quick-cards/festivities-7.webp",
-      "sha256": "b86d09b6ca6e285a781a5ee4c13e8d2b07e9be5300a1679e26063436f2aad40b",
+      "sha256": "ba8ab04911aef589214967291a346fbb7f764db31aacf4366c5ec64eb77fa313",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. The last supplied image is a CONTENT reference only: use its relevant object/building/prop features, ignore all faces, typography, branding and promotional layout. Do not copy its composition. An original civic scene outside the European Commission Berlaymont building in Brussels, one prominent gently hanging European Union flag: blue rectangle containing EXACTLY TWELVE small golden five-pointed stars arranged in a single neat circle, no extra stars, on a pole beside a modest flower bed. Building's characteristic modern horizontal office form behind. Sepia scene with restrained muted blue/gold intrinsic flag accent, no national tricolors, text or people.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          },
+          {
+            "purpose": "subject-features-only",
+            "sourceUrl": "https://european-union.europa.eu/principles-countries-history/symbols/european-flag_en",
+            "sha256": "23de81148e98ebfaf75a7ac509dad54fabe12be0387e16f0a80d9be5cf573e3e"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -19885,28 +20260,63 @@
     },
     {
       "path": "assets/quick-cards/oscars-17.webp",
-      "sha256": "dab632b64320d514f027e58b9dcc43e458aad1e5e81a0a757ed526e6fcaa9c16",
+      "sha256": "20ee8e42196e2f8259816da71289c48378c4479d58649cde99623e70013209b7",
       "rightsEvidence": {
         "status": "documented-ai-generated",
-        "generator": "OpenAI image_gen",
-        "evidenceRef": "docs/arte-seis-retos-ampliacion-2026-10-05.json",
-        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a modern Korean hillside luxury house with a visitor approaching through the garden. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank.",
-        "generatedAt": "2026-10-05",
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "generator": "ChatGPT / OpenAI",
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. The last supplied image is a CONTENT reference only: use its relevant object/building/prop features, ignore all faces, typography, branding and promotional layout. Do not copy its composition. A contemporary wealthy Seoul family's angular modernist house viewed from its quiet green garden, flat roof, clean horizontal concrete and glass, long panoramic living-room window with minimalist furniture visible, a stairway descending out of sight along one side. No traditional Japanese tiled roofs, pagodas, mountains immediately behind the house, people or text.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          },
+          {
+            "purpose": "subject-features-only",
+            "sourceUrl": "https://www.architecturaldigest.com/story/bong-joon-ho-parasite-movie-set-design-interview",
+            "sha256": "78167ec3295cbacca29de024a7e1286fce1ed8d361ac6b7f53a02d790e8a2e12"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
       "path": "assets/quick-cards/oscars-18.webp",
-      "sha256": "4d20e44288a35ce07407cf0651545153efd41d54075a6c98f216b840e0cec335",
+      "sha256": "4a0c97418b7e25809ce3dca8d0fa555a77b8ddd928075355d941793428c02a77",
       "rightsEvidence": {
         "status": "documented-ai-generated",
-        "generator": "OpenAI image_gen",
-        "evidenceRef": "docs/arte-seis-retos-ampliacion-2026-10-05.json",
-        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a young jazz drummer and demanding conductor in a rehearsal room. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank.",
-        "generatedAt": "2026-10-05",
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "generator": "ChatGPT / OpenAI",
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An empty contemporary New York jazz-conservatory rehearsal room, a professional acoustic jazz drum kit as the strong foreground subject, drumsticks resting across the snare, cymbals and music stands holding blank sheets, modest black chairs and acoustic wall panels behind. No people, composer conductor, antique salon, text or printed notation.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -19993,16 +20403,31 @@
     },
     {
       "path": "assets/quick-cards/oscars-6.webp",
-      "sha256": "473891495088ba5687b1638760b087e5eb8367052e59402f823257f238bc0519",
+      "sha256": "67b7e61bb72a804d74868e2d0b83786b2e5f03f639dca6f36d57e45f35574ee7",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An empty simple park bench in a leafy historic Savannah city square, plain brown suitcase and a small closed unbranded chocolate box beside it, brick pavement, large live oak with Spanish moss, modest historic Southern buildings across the street. No rural station, fields, people, bus signs or text. Original viewpoint, not an exact film frame.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -20436,57 +20861,122 @@
     },
     {
       "path": "assets/quick-cards/series-seasons-1.webp",
-      "sha256": "2cd08d89e6d59acb2e0b1b05ef2bd9a799bc4ead999c21351adeb5d699860412",
+      "sha256": "78f0dacfb98b520e296a080e382ee2bee84e209757b9a91e2bf486be029520ed",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. The last supplied image is a CONTENT reference only: use its relevant object/building/prop features, ignore all faces, typography, branding and promotional layout. Do not copy its composition. An empty 1986 Soviet RBMK nuclear power-station control room, long pale control desks with dense analog switches, indicator lamps and round gauges; muted green walls, a few abandoned protective work gloves, cold overhead lighting, serious realistic industrial setting. No medieval machinery, no city montage, no writing on the instruments.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          },
+          {
+            "purpose": "subject-features-only",
+            "sourceUrl": "https://thespaces.com/inside-chernobyl-how-the-tv-shows-atmospheric-sets-were-created/",
+            "sha256": "4dfabdcbd3eeae78a3fc82155c2f972c4066640271093c9c0c92c813b6e3921d"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": "Precise cleanup only: erase every digit and numeral around the wall clock face, leaving plain unnumbered tick marks and the two hands. Erase all readable lettering and numerical labels on the control panels, retaining the controls, lamps and abstract gauge ticks. Preserve the room, equipment, perspective, engraved sepia texture and all other details. No text, watermark or border."
       }
     },
     {
       "path": "assets/quick-cards/series-seasons-10.webp",
-      "sha256": "e2a8a9c36316986d2c677c075abbbd65dc39c506f6ee60dfcc8b8f57a0eaf143",
+      "sha256": "be8494415e3f032bc0c2c66d1d9e293ed16970a5eb7cb40e517badaca060f775",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An empty cozy 1990s Manhattan coffeehouse, one unmistakably warm burnt-orange three-seat velvet sofa around a low wood coffee table with six ordinary coffee mugs, mismatched armchairs, tall street-facing picture windows and coffee bar behind. Original view of the setting, no cast, dog, signage or text.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
       "path": "assets/quick-cards/series-seasons-11.webp",
-      "sha256": "e908352799007b6ad6b896cffb45ebc327af88bcbefbc478d6e0c95c29dee467",
+      "sha256": "96a8c9ea867e103180d5998f8a15dfefc0159ff1b2366c2db641f6da07d6b9d1",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An empty suburban cartoon-inspired living-room SET rendered as believable finely etched physical furniture: simple brown-orange couch against muted dusty-pink walls, a small crooked framed sailboat picture above it, green rug, old boxy television in foreground, arched doorway. No people, faces, cartoon family, dog or readable text.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
       "path": "assets/quick-cards/series-seasons-12.webp",
-      "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360",
+      "sha256": "83fecc7d0365d76a87b662112b9cb0ad59eafbc6e18065b30a9d73bc1a64e28d",
       "rightsEvidence": {
         "status": "documented-ai-generated",
-        "generator": "OpenAI image_gen",
-        "evidenceRef": "docs/arte-seis-retos-ampliacion-2026-10-05.json",
-        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a hooded teenager with a bicycle at a dark cave entrance in a German forest. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank.",
-        "generatedAt": "2026-10-05",
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "generator": "ChatGPT / OpenAI",
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An empty old bicycle leaning on a mossy rock beside the dark entrance of a natural cave in a dense German conifer forest, a folded muted yellow raincoat draped over the bicycle frame, overcast atmospheric light, the distant modern concrete cooling towers of a nuclear power plant barely glimpsed beyond the trees. No person, castle, medieval skyline, time portal, writing, signs or symbols. Cave and bicycle are the focal subjects, original composition, no copied film frame.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -20530,15 +21020,30 @@
     },
     {
       "path": "assets/quick-cards/series-seasons-16.webp",
-      "sha256": "12221795ad839b59f51dfb93463304ef0d62efe548cc80a95b563ade8e1e9b53",
+      "sha256": "e3255b7cb57aab8cf0e96a06cffe5da81dc85f08a3ed2caf9907b4641969f0ee",
       "rightsEvidence": {
         "status": "documented-ai-generated",
-        "generator": "OpenAI image_gen",
-        "evidenceRef": "docs/arte-seis-retos-ampliacion-2026-10-05.json",
-        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a contemporary Baltimore police detective wearing a plain windbreaker in a modern industrial harbor, container stacks and modern harbor cranes, twenty-first-century clothing and architecture. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank.",
-        "generatedAt": "2026-10-05",
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "generator": "ChatGPT / OpenAI",
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A quiet contemporary Baltimore red-brick row-house street corner, modest front stoops and utility cables, with a compact unbranded police surveillance recorder and headphones on a plain foreground desk just inside an open window looking onto the street. A coherent investigation-room view, no people, docks-only scene, text or maps with labels.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -20556,55 +21061,125 @@
     },
     {
       "path": "assets/quick-cards/series-seasons-18.webp",
-      "sha256": "694fb6f21fc0f81ba01a10ff0fa30f31427cfb83a8d6d05eb7150618260ebd66",
+      "sha256": "8cbf601d847e66bfa3ffe89ebb1efcb588bc7f6104344a64668faf8aacf752b4",
       "rightsEvidence": {
         "status": "documented-ai-generated",
-        "generator": "OpenAI image_gen",
-        "evidenceRef": "docs/arte-seis-retos-ampliacion-2026-10-05.json",
-        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict an elderly media magnate and adult heirs around a Manhattan boardroom table. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank.",
-        "generatedAt": "2026-10-05",
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "generator": "ChatGPT / OpenAI",
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An empty modern luxury Manhattan corporate boardroom, long dark polished conference table, restrained leather swivel chairs, several closed unmarked folders and one plain phone, floor-to-ceiling glass overlooking the contemporary Manhattan skyline. Contemporary understated billionaire media-company setting, no Victorian wallpaper, globe ornament or portraits.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
       "path": "assets/quick-cards/series-seasons-19.webp",
-      "sha256": "c96aa224cbf08a3adaa86428e4ec3da6495a8e3bd98f857a31411cbe87161d48",
+      "sha256": "015565d35866cdda51aef5fb466c29c9298a15ba00b18ab6fdb8add56b049d92",
       "rightsEvidence": {
         "status": "documented-ai-generated",
-        "generator": "OpenAI image_gen",
-        "evidenceRef": "docs/arte-seis-retos-ampliacion-2026-10-05.json",
-        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Sheldon Cooper, Leonard Hofstadter, Raj Koothrappali and Howard Wolowitz in a modern university physics laboratory, contemporary casual T-shirt, hoodies and trousers, modern scientific instruments and a blank whiteboard, clearly twenty-first century, no Victorian clothes. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank.",
-        "generatedAt": "2026-10-05",
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "generator": "ChatGPT / OpenAI",
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An empty contemporary Pasadena physicists' apartment living room: worn tan sofa with a striped cushion, low coffee table with closed unlettered books and a mug, a freestanding whiteboard with a few unlabeled geometric science sketches and no formulas, a telescope by the window, crowded bookshelves. No people, laboratory benches, franchise toys or text.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
       "path": "assets/quick-cards/series-seasons-2.webp",
-      "sha256": "f14976f5ad37ff607fdcc88dcea95cfc71d93cfd9756cd643ea80408bc1adf69",
+      "sha256": "1bbee923233532943ea9c8a39c754681a31435c545c6feba6764b6344f9a8d33",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A weathered late-1980s beige motorhome parked in the dry New Mexico desert, rear door ajar with stainless chemistry equipment barely glimpsed inside; two folded yellow chemical protective coveralls on a plain case near the rear wheel, sandstone mesas and sparse scrub. No people, no masks with faces, no castles or alchemists.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          },
+          {
+            "purpose": "motorhome-body-correction",
+            "sourceUrl": "https://www.diariodesevilla.es/motor/Fleetwood-Bounder-1986-Breaking-Bad-autocaravana-video_0_1753325040.html",
+            "sha256": "dbfcd6edd45278c84e7b70913fe1371a9c8bf7050eba0ec761bf788099e41e38"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": "Correct the motorhome body in image1 using image2 as the actual vehicle-shape reference. Replace ONLY the motorhome with the accurately shaped cream/beige 1986 Fleetwood Bounder CLASS A motorhome: long high rectangular bus-like body, FLAT BROAD FRONT, wide windshield above a flat lower front panel, no separate van or pickup cab and no overcab sleeping pod. Muted orange-brown horizontal stripes, believable wheelbase and side window placement as in image2. Show the vehicle from a three-quarter FRONT AND SIDE view in the same desert position. All doors CLOSED, no invented large rear entry hatch. Keep the folded yellow protective coveralls on the plain equipment case beside it. Keep original desert landscape, composition, fine brown-ink crosshatching and aged sepia print. Use reference2 only for vehicle construction, do not copy the photograph composition, words, logo, numberplate or signage. Leave every plate and label blank. No people, faces, text, letters, numbers, logos, watermark or border."
       }
     },
     {
       "path": "assets/quick-cards/series-seasons-20.webp",
-      "sha256": "ba0bb2a7062e1ec3ed8035d13de8a040ce8b2ada45abad992e00a6e7a6594c62",
+      "sha256": "830a93df0234b7e158b8a64ac53ec3a71f4caa664c5812b25c48a6eec2c89090",
       "rightsEvidence": {
         "status": "documented-ai-generated",
-        "generator": "OpenAI image_gen",
-        "evidenceRef": "docs/arte-seis-retos-ampliacion-2026-10-05.json",
-        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict three connected contemporary American families with teenagers, young children and grandparents posing casually in a modern suburban living room, modern casual shirts and jeans, clearly twenty-first century, no Victorian clothes. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank.",
-        "generatedAt": "2026-10-05",
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "generator": "ChatGPT / OpenAI",
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. The last supplied image is a CONTENT reference only: use its relevant object/building/prop features, ignore all faces, typography, branding and promotional layout. Do not copy its composition. An original view of a sunny contemporary Los Angeles suburban family home, two-storey pale traditional house, porch, green lawn and modest landscaping, with an adult bicycle and small child's bicycle beside the driveway; no people or family portrait, no names, labels or numbered house signs.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          },
+          {
+            "purpose": "subject-features-only",
+            "sourceUrl": "https://www.seeing-stars.com/Locations/ModernFamily.shtml",
+            "sha256": "95150146562e5e94fb6a170a27ec28a7c2323159ec111458258e19af40c5b07f"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -20622,16 +21197,31 @@
     },
     {
       "path": "assets/quick-cards/series-seasons-3.webp",
-      "sha256": "65e67e2ada67e61aa178d1da3f545a15824c89620069995c30c59a742755bcca",
+      "sha256": "d511f4ae36e6bda2db0f23c5b54e0c0ab96a37b212fcd7f59303172ee44395e4",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An empty Old West saloon with an authentic mechanical player piano as the strong foreground subject, its lower panel open revealing the pneumatic mechanism and unlettered perforated paper roll; dusty warm timber, empty chairs, swing doors opening to an arid western park street. No people, spaceships or futuristic skyline.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -20650,72 +21240,157 @@
     },
     {
       "path": "assets/quick-cards/series-seasons-5.webp",
-      "sha256": "c2a66d967a9b1541aefd3ec2c9832c3c75a5af1eab223c2e53b8fe85a34abbcf",
+      "sha256": "e36b93e6bd8acb2220e562935ef8f0ade2caab8ceb7cb4aa11b1ef8cb352a2d1",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. The last supplied image is a CONTENT reference only: use its relevant object/building/prop features, ignore all faces, typography, branding and promotional layout. Do not copy its composition. A small Albuquerque strip-mall law office after hours, modest waiting chairs, plain legal briefcase and unlettered file folders on a desk, through the glass storefront a battered yellow compact sedan with one mismatched darker door in the car park and the desert city beyond; no people, signs, names, courtroom montage or portrait.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          },
+          {
+            "purpose": "subject-features-only",
+            "sourceUrl": "https://www.gq-magazine.co.uk/lifestyle/article/better-call-saul-cars",
+            "sha256": "a3b5ffee2508c7cb67db0e9b14e3ffe02d2dbe8fbde9f1aa5c9454445fd24445"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
       "path": "assets/quick-cards/series-seasons-6.webp",
-      "sha256": "bbf6a3f054b67422e0c09feae10a7e0d9a04b766a01de6cb825c83b7ab556942",
+      "sha256": "45b6c6452739e8e068e33a271aa8dff7a32149572b989e63f7656e0463b60568",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An empty 1960s Manhattan advertising executive office, mid-century desk, rotary telephone, unlettered advertising layout boards, a low modern sofa, drinks trolley, floor-to-ceiling city windows; an empty suit jacket on the chair, no people, readable copy or modern computers.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": "Precise cleanup only: erase every readable letter and digit on the rotary telephone dial and any tiny labels on objects or paper. Keep the physical finger holes, unnumbered dial ticks, phone shape, advertising graphic shapes, office, furniture, skyline and engraving unchanged. No text, numerals, logos, watermark or border."
       }
     },
     {
       "path": "assets/quick-cards/series-seasons-7.webp",
-      "sha256": "6d9127360edfb3eab71466c4f46026d967d77356bb43fb3eb9f2d81c05fa05a0",
+      "sha256": "8c084d78eee4581223188c9ab80d96b0880392276ece617309bbb7706674f7cb",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A quiet winter northern castle godswood, one distinctive ancient white-barked tree with sparse deep muted red leaves beside a dark still pool, snow-dusted roots, moss-covered grey castle walls behind. Tree is the focal subject, realistic natural branching, no human portraits, banners, dragons or unrelated fantasy buildings.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
       "path": "assets/quick-cards/series-seasons-8.webp",
-      "sha256": "7e80365ff3e11a367627fd41d6485155df27b3cd7d9ff5c661265b2bb6d3a6ad",
+      "sha256": "93d8c527d263bfe872925f06e4d7ae2249ca81aa43877066d4e0ecef21a81a20",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. The last supplied image is a CONTENT reference only: use its relevant object/building/prop features, ignore all faces, typography, branding and promotional layout. Do not copy its composition. An empty modest 1980s American living room at night, multicolored small Christmas bulbs strung irregularly across a pale wall above a worn sofa, one ordinary BMX bike near the open doorway, old tube television and wood furniture. The lights are subtle muted accents. NO alphabet, letters, portal ring, flying creatures or characters.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          },
+          {
+            "purpose": "subject-features-only",
+            "sourceUrl": "https://www.netflix.com/tudum/features/stranger-things-props-archive",
+            "sha256": "a9a58d279c4b35eb0daf44bf52bc04f55b55248f054012ee9a25d5858aed7fe9"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
       "path": "assets/quick-cards/series-seasons-9.webp",
-      "sha256": "86c6db7d24ae768fdbab4f1cb108755a24fe0cbacf589763346164807d3574ac",
+      "sha256": "b32b27a5f5934b0a95e33475ff3a32eb7b1947139e34e4649ef5af0493cc8f45",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An empty early-2000s American paper-company office: facing clusters of beige laminate desks, black office telephones, boxy flat computer monitors with blank screens, paper reams, stapler and plastic document trays; venetian blinds reveal the manager's glass office, dropped acoustic ceiling with fluorescent lights. Contemporary mundane Scranton office, no people or 1940s furnishings.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": "Precise cleanup only: remove the tiny printed words and numbers on ALL paper ream wrappers and cardboard boxes, and the small labels on monitors, telephones and office equipment. Preserve the plain colored bands on wrappers, all physical objects and every other detail of the room. Screens stay blank, telephone keys unlettered. Match original sepia etched texture. No text, numerals, logos, watermark or border."
       }
     },
     {
@@ -20897,15 +21572,30 @@
     },
     {
       "path": "assets/quick-cards/social-21.webp",
-      "sha256": "084863d1fc4fa42580db9949a69b743e4f88bad6a7d34bd73d4d12b0e7e66a1d",
+      "sha256": "47bb0ba370ba914871f934ee11b7a7bfe95877af6f15aa31b4ba8290533d352a",
       "rightsEvidence": {
         "status": "documented-ai-generated",
-        "generator": "OpenAI image_gen",
-        "evidenceRef": "docs/arte-revision-retos-2026-10-04.json",
-        "exactPrompt": "Use case: precise-object-edit. Edit the provided Continuum card illustration. Keep the casual kitchen setting. Replace the phone-only scene with an open modern laptop on the table displaying the official bereal.com homepage: bold authentic BeReal. wordmark in the header, large central mock smartphone showing a main kitchen photograph and small inset selfie (front/back cameras), clean white homepage and dark buttons. Show the whole website clearly, not a generic camera screen. Only exact brand text BeReal. is needed. Preserve the vertical 2:3 composition, antique fine brown ink engraving, cross-hatching and stippling, sepia parchment, softly vignetted edges, coherent physical perspective. Final target 512x768. A single scene, no decorative border, no card title, no date, no watermark. The user explicitly requests the real brand logo and recognizable main website; reproduce the named logo accurately and legibly. Use modest authentic brand color accents only on the screen. Simplify secondary text to nonverbal lines rather than gibberish. The brand mark/wordmark must be big enough to recognize at card size.",
-        "generatedAt": "2026-10-04",
-        "referenceImage": "assets/quick-cards/social-21.webp",
-        "commercialTermsRef": "terms-to-preserve"
+        "generator": "ChatGPT / OpenAI",
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A modern unbranded smartphone held upright on a desk, screen clearly depicts the BeReal dual-camera photo format: a large rear-camera view of an ordinary room with a small front-camera inset view showing an empty chair rather than a face. Minimal simple app interface with a few unlabeled geometric controls, no browser window, laptop interface, portrait collage, text, names or logos. Smartphone is main subject, warm home setting.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -21046,15 +21736,30 @@
     },
     {
       "path": "assets/quick-cards/spanish-tv-11.webp",
-      "sha256": "d370e40948afc6ea1fe30edebf0d3939765c7598d8c3f00fcbe3f0b7959967d1",
+      "sha256": "5a8d375a823a90da9f9ba854f9e8ebafccdd6c567ca0f5c0caaf7917019c3fc5",
       "rightsEvidence": {
         "status": "documented-ai-generated",
-        "generator": "OpenAI image_gen",
-        "evidenceRef": "docs/arte-programas-estrenos-2026-10-04.json",
-        "exactPrompt": "Finished image-only vertical card illustration for Timeline / Continuum. Canvas exactly 512 × 768 px, portrait 2:3, full bleed. Subject: The Spanish amateur cooking contest: a stainless steel contestant cooking station, a folded plain chef apron, sauce pan releasing steam and carefully plated meal, with two further cooking stations and three judge silhouettes far behind. The foreground cooking station dominates. One coherent scene with one dominant focal anchor, clear at a small mobile card size. Fine antique etched linework, cross-hatching and stippling, brown ink, muted sepia and ochre on warm aged parchment, cream highlights, subtle paper grain, softly darkened edges, layered depth. Believable architecture, props and anatomy. Artwork only: no readable text, letters, numerals, price labels, titles, dates, logos, watermark, border, frame, card layout, split panels or collage. Avoid saturated color, glossy 3D rendering and photorealistic camera style.",
-        "generatedAt": "2026-10-04",
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "generator": "ChatGPT / OpenAI",
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An empty contemporary competitive cooking studio: parallel stainless steel cooking stations with induction hobs and neatly placed saucepans, a professional pantry at the back, a separate judges' tasting counter, tall industrial studio lighting. Strong foreground workstation with cutting board and vegetables, no palace murals, gilding, people, logos or text.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -21163,30 +21868,60 @@
     },
     {
       "path": "assets/quick-cards/spanish-tv-2.webp",
-      "sha256": "b05bff9eab0d87bed3a2b4e06a062ccf01d256dcc3c29f182db1553c4709d93e",
+      "sha256": "ef90a85f83c1e7b0daa20f50d7d6b25d6e787a5d9f7a3a62cf4cbf764274d1da",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An empty modern Spanish daytime magazine television studio: broad bright curved seating with several separate contemporary chairs around an open discussion area, low tables, large abstract color wall panels with muted pink and teal accents, overhead lighting rig and TV cameras at the edge. No late-night host desk, theatrical city window, people or text.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
       "path": "assets/quick-cards/spanish-tv-3.webp",
-      "sha256": "753ecd4f93c148eb911a7d2d52c939029ad0e2d8eee14c4a2b2b2e86f42b31a5",
+      "sha256": "6c41bf2f60afb7312eb4d11ece7fde6c8d20c759df273c736ce35ccf3c4073e4",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An empty modern TV word-game studio: a LARGE HORIZONTAL prize wheel tilted slightly toward the viewer, divided into many muted colored wedges, three contestant standing positions behind its curved outer rim, a broad rectangular blank tiled puzzle board on the rear wall. Wheel is horizontal on a pedestal, never vertical like a fairground wheel. No text, letters, numbers or people.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -21245,16 +21980,31 @@
     },
     {
       "path": "assets/quick-cards/spanish-tv-8.webp",
-      "sha256": "2db657980c83ade0477a0beab28906fc23c255a9e163c31acbd67760e8ad4390",
+      "sha256": "017d59ccd5985a4f3c4f22a4f598f1a6f2d6371021ec936ef035a5d070294105",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. An empty contemporary Spanish knowledge-quiz studio with three individual contestant podiums side by side, a separate modest presenter desk, cool blue-grey background panels and simple abstract geometric display. Accurate understated television set, overhead studio lights. No giant book emblem, antique library, people or text.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -21806,16 +22556,31 @@
     },
     {
       "path": "assets/quick-cards/stadiums-8.webp",
-      "sha256": "d01dd517932d3b48cb4a096d1a54e55fecb31e974a1df30abff59518f1a7a413",
+      "sha256": "2c570437a414504a1c0e7157f388d7050974aa7f20770b0d5341696fb8a16e07",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. The actual modern San Siro stadium in Milan, faithful three-quarter exterior view: massive exposed concrete cylindrical access towers with spiral ramps, large red roof trusses projecting past the structure, rectangular supported roof around the pitch. Urban Milan surroundings. NOT a medieval castle, brick palace or Roman amphitheatre. No logos, signage, words or people.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -21834,30 +22599,54 @@
     },
     {
       "path": "assets/quick-cards/storage-1.webp",
-      "sha256": "36fe957778f09cfba5418f137ab0afe753d768c7cfa3086a79b47be539ab814e",
+      "sha256": "28215428c5ef652fcd909383565aa94d5dc4373f399ae0087fffd958eaa58faf",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. REUSE storage-2.webp",
         "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "referenceImage": [
+          {
+            "purpose": "reuse-resize-existing-project-art",
+            "path": "assets/quick-cards/storage-2.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "075ba14465811607273a14e606005301b745d67ab9eafd2480de31669145fc04"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "reuse-and-resize",
+        "correctionPrompt": null
       }
     },
     {
       "path": "assets/quick-cards/storage-2.webp",
-      "sha256": "075ba14465811607273a14e606005301b745d67ab9eafd2480de31669145fc04",
+      "sha256": "71748381693bac009f68380c4f9c2bf6e2b1b4b03d6fe90abe69d8f57b7bfb3c",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. One historically accurate circa-1975 2708 UV-erasable EPROM memory chip representing one kilobyte: rectangular ceramic dual-in-line package, EXACTLY twelve metal pins along each long side, a small clear round quartz window at the center of the top revealing the tiny silicon die inside. Chip shown as the main subject in a close three-quarter view on a modest electronics workbench with one small supporting circuit board. No additional chips as the focal subject, toggles, switches, brand names, lettering, chip model numbers, labels or numerals. Accurate solid ceramic construction, no invented transparent circuits or neon glow.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
@@ -21972,16 +22761,31 @@
     },
     {
       "path": "assets/quick-cards/timezones-june-10.webp",
-      "sha256": "9048bc106f804d2bb73cc8f21db3e26970d4c0cc9ff8905f2952daea574154b5",
+      "sha256": "62f912de56d6a4616a2f72677949beb30b78e60ba641e8dad29e45e55e8e3dff",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
+        "evidenceRef": "docs/arte-revision-retos-2026-11-02.json",
+        "exactPrompt": "Create ONE original illustration for a Timeline/Continuum quick-challenge card, portrait2:3 intended final512x768. Match the supplied STYLE references ONLY for medium: fine brown-ink copperplate engraving, dense delicate crosshatching, stippling, restrained warm sepia umber and ochre on aged matte parchment, subtle fine grain, sparse muted natural-color accents only where they identify the subject. Every surface visibly hand-drawn, not photographic, not glossy CGI, not flat vector. One coherent scene with a clear focal subject and layered depth; full bleed with useful breathing room. NO decorative frame, aged-photo border, torn-paper edge, card layout, collage or montage. Absolutely NO text, lettering, numerals, labels, signatures, watermarks or standalone logos. Do not invent people to stand in for a cast, performer or public figure. When the prompt calls for an empty setting, do not add any people. The scene is a new evocative illustration of verified subject-specific motifs, NOT a claim to reproduce a real film frame or official poster. A geographically faithful view of Bangkok's Wat Arun temple across the Chao Phraya river: tall ornate central Khmer-style porcelain prang surrounded by four smaller prangs, long-tail boat on the river, low tropical cityscape and palms. No Japanese pagoda, Mount Fuji, Tokyo tower, text or people.",
+        "generatedAt": "2026-11-02",
+        "referenceImage": [
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/foods-kcal-15.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "a59d2542064895670a3d0ccc80217e413309ede7a21f45d42736d9c3697d1a46"
+          },
+          {
+            "purpose": "style-only",
+            "path": "assets/quick-cards/series-seasons-12.webp",
+            "baseCommit": "c36126029d3d4f2aef4ae88854ed0e42225832a9",
+            "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360"
+          }
+        ],
+        "commercialTermsRef": "terms-to-preserve",
+        "method": "generated-illustration",
+        "correctionPrompt": null
       }
     },
     {
