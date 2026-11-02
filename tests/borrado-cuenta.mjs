@@ -36,7 +36,7 @@ const seed = uid => Object.fromEntries([
   [`playerProfiles/${uid}`, { aliasKey: `alias-${uid}` }], [`playerProfiles/${uid}/pushTokens/t1`, { token: 'x' }],
   [`playerNames/alias-${uid}`, { uid }], [`playerProgress/${uid}`, {}], [`socialRanking/${uid}`, {}], [`dailyRanking/${uid}`, {}],
   [`discoveryScores/${uid}`, {}], [`duelPreferences/${uid}`, {}], [`duelPreferences/${uid}/blocked/rival`, {}], [`creationQuota/${uid}`, {}],
-  [`roomCreation/${uid}`, {}], [`duelReminderBudgets/${uid}`, {}],
+  [`roomCreation/${uid}`, {}], [`reportQuota/${uid}`, {}], [`duelReminderBudgets/${uid}`, {}],
   [`dailyScores/2026-10-10/players/${uid}`, { score: 1 }], [`dailyScores/2026-10-11/players/${uid}`, { score: 2 }], [`weeklyScores/2026-10-05/players/${uid}`, { score: 3 }],
 ]);
 

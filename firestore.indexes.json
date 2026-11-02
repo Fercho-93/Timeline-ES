@@ -4,8 +4,28 @@
       "collectionGroup": "players",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "hits", "order": "DESCENDING" },
-        { "fieldPath": "ms", "order": "ASCENDING" }
+        {
+          "fieldPath": "hits",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "ms",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "turnDuels",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "updatedAt",
+          "order": "ASCENDING"
+        }
       ]
     }
   ],

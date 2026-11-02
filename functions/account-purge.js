@@ -5,7 +5,7 @@
 // Documentos sueltos de la cuenta; `recursiveDelete` se lleva también sus subcolecciones
 // (avisos del móvil, bloqueados, archivados).
 const ACCOUNT_DOCS = ['playerProfiles', 'playerProgress', 'socialRanking', 'dailyRanking', 'discoveryScores',
-  'duelPreferences', 'creationQuota', 'roomCreation', 'duelReminderBudgets'];
+  'duelPreferences', 'creationQuota', 'roomCreation', 'reportQuota', 'duelReminderBudgets'];
 // Colecciones con un documento por día o semana y, dentro, una fila por jugador.
 const RANKING_COLLECTIONS = ['dailyScores', 'weeklyScores'];
 

@@ -2,7 +2,7 @@
 
 Todas las colecciones del proyecto `timeline-es`, según `firestore.rules`, el código del cliente y
 `functions/`. «Con sesión» significa cualquier jugador autenticado (invitado anónimo o cuenta de
-Apple). Las colecciones sin regla (`duelNotificationEvents`, `duelReminderBudgets`) solo las toca
+Apple). Las colecciones sin regla (`duelNotificationEvents`, `duelReminderBudgets`, `purgeState`) solo las toca
 el servidor. Los plazos de conservación salen de `functions/retention.js` y los aplica cada día
 `purgeExpiredData` (ver
 [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#conservación-y-limpieza-de-datos)).
@@ -45,6 +45,7 @@ Lo que borra la eliminación de una cuenta está en
 | `duelPreferences/{uid}/archived/{id}` | Duelos archivados | Su dueño | Su dueño, solo partidas terminadas | Con la cuenta |
 | `duelNotificationEvents/{id}` | Eventos de aviso ya procesados (sin tokens) | Servidor | Functions | 30 días |
 | `duelReminderBudgets/{uid}` | Último recordatorio enviado a cada persona | Servidor | Functions | 30 días; con la cuenta |
+| `purgeState/staleGuests` | Por dónde va el repaso diario de invitados sin uso (el último identificador revisado) | Servidor | Functions | Se borra al terminar cada repaso |
 
 ## Control y capacidades
 

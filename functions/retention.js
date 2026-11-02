@@ -10,6 +10,7 @@ const RETENTION = Object.freeze({
   quickPublicQueues: DAY,
   creationQuota: 7 * DAY,     // registros de la cuota de altas
   roomCreation: 7 * DAY,
+  reportQuota: 7 * DAY,       // registro de la cuota de denuncias (una cada 15 s)
   duelNotificationEvents: 30 * DAY,
   duelReminderBudgets: 30 * DAY,
   reports: 90 * DAY,          // denuncias de nombres (botón «Denunciar»)
@@ -20,7 +21,7 @@ const RETENTION = Object.freeze({
 const ACTIVITY = Object.freeze({
   rooms: 'updatedAt', quickRooms: 'updatedAt', turnDuels: 'updatedAt', publicTables: 'updatedAt',
   publicQueues: 'updatedAt', quickPublicQueues: 'updatedAt', creationQuota: 'lastCreatedAt',
-  roomCreation: 'lastCreatedAt', duelNotificationEvents: 'claimedAt', duelReminderBudgets: 'lastSentAt', reports: 'createdAt'
+  roomCreation: 'lastCreatedAt', reportQuota: 'lastAt', duelNotificationEvents: 'claimedAt', duelReminderBudgets: 'lastSentAt', reports: 'createdAt'
 });
 // Ningún plazo puede bajar de un día: un valor mal escrito (0, un número negativo, un texto) dejaría el límite en
 // «ahora» y la limpieza diaria borraría datos recientes. Mejor que falle antes de borrar nada.
