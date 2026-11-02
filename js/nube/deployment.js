@@ -3,7 +3,7 @@
 (function () {
   // Configuración pública, nunca contraseñas ni claves privadas.
   const config = {
-    audience: 'private-beta',
+    audience: 'public',
     feedbackEmail: 'feedbackcontinuum@gmail.com',
     // Avisos push del móvil. Apagados hasta integrar FCM y APNs: sin google-services.json (Android) ni
     // aps-environment (iPhone), pedir permiso y registrar el dispositivo falla o cierra la app.

@@ -150,19 +150,16 @@ diseño (y el prototipo retirado que sigue en el historial de git) está en
 - [ ] Validar comprensión, repetición y disposición a pagar con testers.
 - [ ] Decidir la monetización después de la beta; si se venden mazos, compras oficiales,
       restauración, reembolsos y validación en servidor.
-- [ ] **Empezar de cero al salir a la App Store** (decidido por el titular): borrar todas las
-      cuentas y datos de la beta para que nadie arrastre progreso, ranking ni alias de prueba.
-      Pasos, el mismo día de la publicación y antes de abrirla:
-      1. Avisar a los testers con antelación de que su progreso se borrará.
-      2. Firebase Authentication: borrar todos los usuarios (invitados y vinculados con Apple).
-      3. Firestore: borrar todas las colecciones (perfiles, progreso, ranking, salas, duelos,
-         mesas, cuotas y registros de avisos).
-      4. En el código, cambiar `SEASON` de `js/jugador/account-storage.js` (`'launch-1'` → `'launch-2'`)
-         para que las copias guardadas en los móviles de la beta no se suban a las cuentas nuevas,
-         y subir la caché.
-      5. Quitar de `privacidad.html` y `PRIVACIDAD.md` la frase sobre el correo de Apple de
+- [ ] **Empezar de cero al salir a la App Store** (decidido por el titular; ya solo prueba él la beta). Preparado:
+      `SEASON` = `launch-2` en `js/jugador/account-storage.js` (las reglas aceptan las dos temporadas) y
+      `audience: 'public'` en `js/nube/deployment.js`. Orden el día de publicar:
+      1. Subir la beta con esos cambios, instalarla y probar sin App Check obligatorio.
+      2. Aplicar App Check en Cloud Firestore (Firebase → App Check) y repetir la prueba; si falla, «Anular».
+      3. Actions → «Borrar todos los datos (lanzamiento)»: primero con «simulacro» activado (cuenta lo que hay);
+         después, desmarcado y con BORRAR TODO. Borra todas las cuentas y todos los datos, menos `appConfig`.
+      4. Quitar de `privacidad.html`, `PRIVACIDAD.md` y `docs/TIENDAS.md` la frase sobre el correo de Apple de
          quienes vincularon antes del 10 de octubre de 2026: con el borrado deja de existir.
-      Conviene preparar un script o workflow de un solo uso para los pasos 2 y 3 cuando llegue el momento.
+      5. Enviar la compilación a la App Store.
 
 ## 9. Multijugador sin internet
 

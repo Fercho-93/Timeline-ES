@@ -13,7 +13,7 @@ const scripts = [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"
 const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
 const w = dom.window;
 const pulsa = d => { const b = d.querySelector('[data-action="jugar"]'); if (b) b.dataset.homeTransition = "done"; };
-w.eval(`(function(){ const base = window.localStorage; window.__scoped = k => 'continuum-account:launch-1:uid-x:' + k; })();`);
+w.eval(`(function(){ const base = window.localStorage; window.__scoped = k => 'continuum-account:launch-2:uid-x:' + k; })();`);
 scripts.forEach(file => w.eval(read(file)));
 const CT = w.CONTINUUM;
 // Como con una cuenta abierta: todo lo del juego se guarda bajo el prefijo del invitado.

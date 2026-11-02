@@ -46,6 +46,10 @@ export async function servirJuego({ inicio = gameHtml(read("index.html")) } = {}
 // la pantalla se repinta y cambia el `src` mientras decodifica: se reintenta con el nuevo, y si la
 // imagen ya está cargada se da por buena. Es una función en texto para pasarla a `evaluate`.
 export const DECODIFICAR = `async img => {
+  // WebKit no siempre empieza a cargar una imagen que lleva loading="lazy" dentro de un recuadro recién pintado: se
+  // fuerza la carga y se espera hasta 5 s a que esté lista antes de decodificar (antes la prueba medía en vacío).
+  img.loading = "eager";
+  for (let espera = 0; espera < 50 && !(img.complete && img.naturalWidth > 0); espera++) await new Promise(resolver => setTimeout(resolver, 100));
   for (let intento = 0; intento < 5; intento++) {
     try { await img.decode(); return; } catch (error) {
       if (img.complete && img.naturalWidth > 0 && error?.name !== "EncodingError") return;

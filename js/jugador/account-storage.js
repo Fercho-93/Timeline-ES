@@ -2,7 +2,7 @@
 (function () {
   const CT = window.CONTINUUM;
   const base = CT.Storage;
-  const SEASON = 'launch-1';
+  const SEASON = 'launch-2';
   let uid = null;
   const listeners = new Set();
   // Del dispositivo, no de la cuenta: los ajustes y la edad declarada (edad.js).

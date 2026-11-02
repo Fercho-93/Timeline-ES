@@ -526,7 +526,7 @@ service cloud.firestore {
         && request.resource.data.alias is string
         && request.resource.data.alias.size() >= 2 && request.resource.data.alias.size() <= 24
         && validAvatar(request.resource.data.avatar)
-        && request.resource.data.season == 'launch-1'
+        && request.resource.data.season in ['launch-1','launch-2']
         && request.resource.data.privacyVersion == 1
         && request.resource.data.createdAt == request.time;
       allow update: if owner(uid) && validName(uid)
@@ -570,7 +570,7 @@ service cloud.firestore {
           && d.records is string && d.records.size() <= 350000
           && d.hits is int && d.hits >= 0 && d.hits <= 100000000
           && d.games is int && d.games >= 0 && d.games <= 10000000
-          && d.season == 'launch-1' && d.revision is int && d.updatedAt == request.time
+          && d.season in ['launch-1','launch-2'] && d.revision is int && d.updatedAt == request.time
           && exists(/databases/$(database)/documents/playerProfiles/$(uid));
       }
       allow get: if owner(uid);
@@ -588,7 +588,7 @@ service cloud.firestore {
         let p = getAfter(/databases/$(database)/documents/playerProfiles/$(uid)).data;
         let s = getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data;
         return d.keys().hasOnly(['alias','avatar','hits','games','season','updatedAt'])
-          && d.alias == p.alias && d.avatar == p.avatar && d.season == 'launch-1'
+          && d.alias == p.alias && d.avatar == p.avatar && d.season in ['launch-1','launch-2']
           && d.hits == s.hits && d.games == s.games && d.updatedAt == request.time;
       }
       allow get: if registered();
@@ -674,7 +674,7 @@ service cloud.firestore {
         let p = getAfter(/databases/$(database)/documents/playerProfiles/$(uid)).data;
         let s = getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data;
         return d.keys().hasOnly(['alias','avatar','hits','games','season','updatedAt'])
-          && d.alias == p.alias && d.avatar == p.avatar && d.season == 'launch-1'
+          && d.alias == p.alias && d.avatar == p.avatar && d.season in ['launch-1','launch-2']
           && d.hits == s.hits && d.games == s.games && d.updatedAt == request.time;
       }
       allow get: if registered();

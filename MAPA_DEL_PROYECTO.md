@@ -235,6 +235,7 @@ No se edita a mano.
 | `icons.mjs` | Genera los iconos y pantallas de carga de iPhone y Android en todos los tamaños. |
 | `vendor-firebase.mjs` | Copia el SDK de Firebase a `vendor/firebase/`. |
 | `borrar-cuenta.mjs` | Borra la cuenta de un jugador entera; lo lanza el workflow «Borrar cuenta de un jugador». |
+| `borrar-todo.mjs` | Borra todas las cuentas y todos los datos de Firestore (menos `appConfig`) para empezar de cero el día del lanzamiento; lo lanza el workflow «Borrar todos los datos (lanzamiento)», con simulacro previo. |
 | `domain-associations.mjs` | Genera los archivos que permiten abrir los enlaces del juego directamente en la app. |
 | `render-intro.mjs` | Graba el vídeo promocional de la intro. |
 | `carga.mjs` | Prueba de carga del online con bots (`npm run carga`): ráfagas de búsquedas, gente mirando el tablón y jugadores que desaparecen a mitad de partida, contra el emulador o un proyecto de pruebas. Mide cuánto se tarda en sentarse, los errores, las mesas de una persona, las lecturas del tablón y las salas paradas. |
@@ -283,6 +284,7 @@ que en iPhone) y `res/` (iconos, pantallas de carga y textos).
 | `reglas-firestore.yml` | Al cambiar `firestore.rules` o `firestore.indexes.json` | Prueba las reglas y **las publica en producción**; después intenta publicar los índices, sin bloquear las reglas si falla. |
 | `functions.yml` | Solo a mano | Prueba y publica las Cloud Functions. |
 | `borrar-cuenta.yml` | Solo a mano | Borra la cuenta de un jugador (moderación o petición por correo). |
+| `borrar-todo.yml` | Solo a mano | Borra todas las cuentas y datos para el lanzamiento: primero simulacro (cuenta lo que hay); para borrar de verdad, desmarcar «simulacro» y escribir BORRAR TODO. |
 | `beta-firmada.yml` | Al cambiar `.github/beta-request.json` | Compila Android e iOS firmadas y sube la de iOS a TestFlight. Solo cuando lo pida el titular. |
 
 ## Convenciones

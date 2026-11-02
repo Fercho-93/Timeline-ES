@@ -232,18 +232,18 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
 {
  // Lo jugado sin conexión (espacio «locked») pasa a una cuenta nueva sin progreso en la nube.
  const {w,dom,data}=setup(user('n'),{});
- w.localStorage.setItem('continuum-account:launch-1:locked:hilo-perfil-v1','{"totals":{"dailyHits":4,"dailyGames":1}}');
- w.localStorage.setItem('continuum-account:launch-1:locked:hilo-retos-v1','{"retoDiario":{"days":{}}}');
+ w.localStorage.setItem('continuum-account:launch-2:locked:hilo-perfil-v1','{"totals":{"dailyHits":4,"dailyGames":1}}');
+ w.localStorage.setItem('continuum-account:launch-2:locked:hilo-retos-v1','{"retoDiario":{"days":{}}}');
  await w.testAccounts.startAccounts(()=>{});
  assert.equal(JSON.parse(data.get('playerProgress/n').progress).totals.dailyHits,4,'el progreso sin conexión es ahora el de la cuenta');
  assert.equal(data.get('playerProgress/n').hits,4,'y cuenta para el ranking');
- assert.equal(w.localStorage.getItem('continuum-account:launch-1:locked:hilo-perfil-v1'),null);
+ assert.equal(w.localStorage.getItem('continuum-account:launch-2:locked:hilo-perfil-v1'),null);
  dom.window.close();
 }
 {
  // Una cuenta que ya tiene progreso en la nube no lo pierde por lo que haya quedado sin conexión.
  const {w,dom,data}=setup(user('m'),{'playerProfiles/m':{...profile,aliasKey:'fer'},'playerProgress/m':{progress:'{"totals":{"dailyHits":9,"dailyGames":2}}',records:'{}',hits:9,games:2,revision:1,season:'launch-1'}});
- w.localStorage.setItem('continuum-account:launch-1:locked:hilo-perfil-v1','{"totals":{"dailyHits":1,"dailyGames":1}}');
+ w.localStorage.setItem('continuum-account:launch-2:locked:hilo-perfil-v1','{"totals":{"dailyHits":1,"dailyGames":1}}');
  await w.testAccounts.startAccounts(()=>{});
  assert.equal(JSON.parse(data.get('playerProgress/m').progress).totals.dailyHits,9);
  dom.window.close();

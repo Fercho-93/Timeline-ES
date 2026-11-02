@@ -57,7 +57,7 @@ try {
         const box=img.getBoundingClientRect(),frame=img.parentElement,outer=frame.getBoundingClientRect(),style=getComputedStyle(img),edge=getComputedStyle(frame);
         const left=outer.left+parseFloat(edge.borderLeftWidth),top=outer.top+parseFloat(edge.borderTopWidth);
         const right=outer.right-parseFloat(edge.borderRightWidth),bottom=outer.bottom-parseFloat(edge.borderBottomWidth);
-        return {loaded:img.naturalWidth>0,fit:style.objectFit,filled:Math.abs(box.left-left)<1&&Math.abs(box.right-right)<1&&Math.abs(box.top-top)<1&&Math.abs(box.bottom-bottom)<1};
+        return {src:img.currentSrc.split('/').slice(-2).join('/'),loaded:img.naturalWidth>0,fit:style.objectFit,filled:Math.abs(box.left-left)<1&&Math.abs(box.right-right)<1&&Math.abs(box.top-top)<1&&Math.abs(box.bottom-bottom)<1};
        });
        assert.ok(fit.loaded&&fit.filled&&fit.fit==='cover',`${width}px ${theme} ${mode} ${context}: el grabado llena el recuadro sin bandas ni deformación (${JSON.stringify(fit)})`);
        assert.ok(await openingPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${context}: sin desbordamiento horizontal`);

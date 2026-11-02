@@ -571,7 +571,8 @@ async function enter() {
     await prepareApple();
     const r=refs(u.uid);
     profile=await ensureProfile(u.uid);
-    if (profile.season !== season) throw Object.assign(Error('Este perfil pertenece a otra temporada. Contacta con soporte.'),{code:'account/wrong-season'});
+    // Los perfiles de la beta (launch-1) se aceptan hasta el borrado total del lanzamiento: así se puede probar la versión nueva con la cuenta de siempre.
+    if (profile.season !== season && profile.season !== 'launch-1') throw Object.assign(Error('Este perfil pertenece a otra temporada. Contacta con soporte.'),{code:'account/wrong-season'});
     const snap=await getDocFromServer(r.progress), remote=snap.exists()?snap.data():null;
     const meta=metadata();revision=meta.revision || 0;
     const handoff=takeHandoff();
