@@ -115,7 +115,7 @@ console.log('\nRetos rápidos: el plazo viaja en la partida y agotarlo falla la 
   const app = $(w, '#app'), paint = h => { app.innerHTML = h; };
   w.CONTINUUM.Quick.openSolo(paint);
   elige(w, 'quick-solo', 15);
-  click(w, '[data-quick="play-random"]'); click(w, '[data-quick="ready"]');
+  click(w, '[data-quick="play-deck"]'); click(w, '[data-quick="ready"]');
   ok('la partida enseña la cuenta atrás', !!$(w, '.reloj-bar'));
   w.adelanta(16000); await sleep(350);
   const guardada = JSON.parse(w.localStorage.getItem('continuum-quick-challenges-v1'));

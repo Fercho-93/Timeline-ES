@@ -4951,6 +4951,16 @@ html #app[data-screen] .setup-art-panel .quick-length-more { min-height: 44px; b
 #app .quick-album .lead { margin-bottom: 4px; }
 #app .quick-album > .btn { margin: 6px 0 14px; }
 #app .quick-album-decks { display: grid; gap: 10px; margin-top: 12px; }
+/* La partida a medias en Retos rápidos: una tarjeta propia con su mazo y lo jugado, separada de
+   lo de arriba y del panel de mazos, en vez de un botón grande pegado al panel. */
+#app .quick-resume { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; align-items: center; gap: 12px; margin: 22px 0 26px; padding: 12px 12px 12px 14px; border: 1px solid var(--edition-line); border-left: 3px solid var(--edition-rust); border-radius: 14px; background: var(--edition-surface); box-shadow: 0 4px 12px #45331b12; }
+#app .quick-resume:not(:has(img)) { grid-template-columns: minmax(0, 1fr) auto; }
+#app .quick-resume img { width: 56px; height: 56px; object-fit: cover; border-radius: 10px; border: 1px solid var(--edition-line); }
+#app .quick-resume-copy { display: grid; gap: 3px; min-width: 0; }
+#app .quick-resume-copy b { overflow: hidden; color: var(--edition-ink); font: 600 1rem/1.2 var(--font-display); text-overflow: ellipsis; white-space: nowrap; }
+#app .quick-resume-copy small { color: var(--edition-muted); font: .74rem/1.3 var(--ui-font); }
+#app .quick-resume .quick-resume-go { width: auto; min-height: 40px; margin: 0; padding: 0 14px; font-size: .85rem; white-space: nowrap; }
+#app .quick-album-today { margin-left: 8px; padding: 1px 8px; border-radius: 999px; font: 700 .66rem/1.6 var(--ui-font); font-style: normal; letter-spacing: .04em; text-transform: uppercase; color: var(--edition-surface); background: var(--edition-brass); vertical-align: 2px; }
 /* Los mazos de Retos rápidos en tres grupos (empezados, nuevos y completos), en solitario y en la colección. */
 #app .quick-deck-group + .quick-deck-group { margin-top: 18px; }
 #app .quick-deck-group-title { display: flex; align-items: baseline; gap: 8px; margin: 0 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--edition-line); color: var(--edition-rust); font: 700 .72rem/1.3 var(--font-display); letter-spacing: .12em; text-transform: uppercase; }

@@ -194,14 +194,14 @@
           [5400, c => c.focus(".tv-levels", 2)],
           [7000, c => { c.focus(".tv-levels", 3); c.say(`En Experto se ocultan las ${time ? "fechas" : "cifras"} de la línea. Te guías por las ilustraciones.`); }]
         ] },
-      blockIntro(1, "Retos rápidos", "Retos rápidos", "Jugar solo", "Un álbum de mazos para completar",
+      blockIntro(1, "Retos rápidos", "Retos rápidos", "Jugar solo", "Cuatro mazos al azar cada día",
         ["Jugar solo", "Retos rápidos"], "En «Jugar solo» también tienes «Retos rápidos»."),
       { chapter: 1, title: "Retos rápidos", duration: 9800,
         html: `<div class="tv-board">${path(["Jugar solo", "Retos rápidos"])}${quickExample()}<div class="tv-tiles">
-          ${tile("▦", "Elige un mazo", "Empezados, nuevos y completos")}${tile("?", "Al azar", "Uno que aún no tengas completo")}</div></div>`,
+          ${tile("☀", "Mazos de hoy", "4 al azar, nuevos cada día")}${tile("▦", "Tu colección", "Empezados, nuevos y completos")}</div></div>`,
         steps: [
           [0, c => { c.say("Mazos cortos, cada uno con su propia regla de orden."); c.add(".tv-deck", "is-in"); }],
-          [3400, c => { c.say("Elige un mazo y complétalo: cada acierto queda en tu colección."); c.stagger(".tv-tile", 500); }],
+          [3400, c => { c.say("Cada día salen cuatro mazos al azar. Cada acierto queda en tu colección."); c.stagger(".tv-tile", 500); }],
           [6800, c => c.say("Un fallo no te elimina: al final cuentan tus aciertos.")]
         ] },
 

@@ -87,7 +87,7 @@
   }
   function guide() {
     const layer=document.createElement('div'); layer.className='overlay';
-    layer.innerHTML=`<div class="modal rules quick-guide-modal"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-quick="close-menu" aria-label="Cerrar guía">×</button></div><div class="guide-content"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2>Guía</h2><section><h3>Un reto, una línea</h3><p>Comienza con una carta de referencia y coloca cada carta nueva en el hueco que le corresponde. El dato se revela al confirmar.</p></section><section><h3>Si juegas solo (o en un duelo por enlace)</h3><p>Cada carta bien colocada suma un acierto. Un fallo cuenta como fallo, pero sigues hasta terminar el reto: no te echa.</p></section><section><h3>Tus mazos</h3><p>En «Jugar solo» están todos, en tres grupos: Empezados, Nuevos y Completos. Toca uno para jugarlo, o «Al azar» para que el juego elija uno que aún no tengas completo. Cada carta que aciertas queda en tu colección.</p></section><section><h3>Si juegas con amigos</h3><p>En un solo móvil, en una sala o por turnos, quien prepara la partida elige qué pasa al fallar. «Arriesgar o plantarse»: cada acierto es provisional y puedes plantarte para asegurarlo; si fallas, pierdes los provisionales de ese reto y quedas fuera hasta el siguiente. «Seguir hasta el final»: un fallo no suma, pero se juega todo el reto y gana quien acierte más. Quien crea una sala puede echar a alguien mientras esperan, con la «×» de su plaza.</p></section><section><h3>Mesa pública</h3><p>La partida rápida son tres retos sorpresa con desconocidos, arriesgando o plantándote. Quien crea una mesa elige cuántos retos se juegan y qué pasa al fallar.</p></section><section><h3>Mazos sorpresa</h3><p>Los mazos se sortean automáticamente. Solo conocerás la temática cuando empiece el reto; los siguientes permanecen ocultos.</p></section><section><h3>Turnos justos</h3><p>El primer turno rota en cada reto. En partidas por internet o por enlace, siempre juega una persona cada vez.</p></section></div><button class="btn btn-primary btn-block" data-quick="close-menu">Volver</button></div>`;
+    layer.innerHTML=`<div class="modal rules quick-guide-modal"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-quick="close-menu" aria-label="Cerrar guía">×</button></div><div class="guide-content"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2>Guía</h2><section><h3>Un reto, una línea</h3><p>Comienza con una carta de referencia y coloca cada carta nueva en el hueco que le corresponde. El dato se revela al confirmar.</p></section><section><h3>Si juegas solo (o en un duelo por enlace)</h3><p>Cada carta bien colocada suma un acierto. Un fallo cuenta como fallo, pero sigues hasta terminar el reto: no te echa.</p></section><section><h3>Los mazos de hoy</h3><p>En «Jugar solo» salen cada día cuatro mazos al azar, los mismos para todo el mundo, y al día siguiente salen otros. Toca uno para jugarlo. Cada carta que aciertas queda en tu colección, donde ves todos los mazos en tres grupos: Empezados, Nuevos y Completos.</p></section><section><h3>Si juegas con amigos</h3><p>En un solo móvil, en una sala o por turnos, quien prepara la partida elige qué pasa al fallar. «Arriesgar o plantarse»: cada acierto es provisional y puedes plantarte para asegurarlo; si fallas, pierdes los provisionales de ese reto y quedas fuera hasta el siguiente. «Seguir hasta el final»: un fallo no suma, pero se juega todo el reto y gana quien acierte más. Quien crea una sala puede echar a alguien mientras esperan, con la «×» de su plaza.</p></section><section><h3>Mesa pública</h3><p>La partida rápida son tres retos sorpresa con desconocidos, arriesgando o plantándote. Quien crea una mesa elige cuántos retos se juegan y qué pasa al fallar.</p></section><section><h3>Mazos sorpresa</h3><p>Los mazos se sortean automáticamente. Solo conocerás la temática cuando empiece el reto; los siguientes permanecen ocultos.</p></section><section><h3>Turnos justos</h3><p>El primer turno rota en cada reto. En partidas por internet o por enlace, siempre juega una persona cada vez.</p></section></div><button class="btn btn-primary btn-block" data-quick="close-menu">Volver</button></div>`;
     app().append(layer); CT.openDialog(layer,true);
   }
   function myTurn() {return !room || room.actor === myId;}
@@ -167,11 +167,24 @@
     return `<span class="game-progress quick-deck-progress"><span class="game-progress-bar" aria-hidden="true"><i style="width:${Math.round(100*done/total)}%"></i></span><small>${done===total?`Completo · ${total} de ${total} cartas`:`Descubiertas ${done} de ${total}`}</small></span>`;
   }
   const deckArt=c=>c.cards.find(card=>card.image)?.image || 'assets/menu-quick.webp';
-  // Jugar solo en Retos rápidos: el álbum de mazos. Se ven todos con lo descubierto de cada uno y se
-  // juega el que se toque (10 cartas, primero las que aún faltan); «Al azar» elige uno sin completar.
-  // La meta es completar mazos, que son cortos. Lo del día ya lo tiene el Reto diario y varios temas
-  // seguidos, la Competición: por eso aquí ya no hay «mazos del día» ni «partida sorpresa».
-  // Los mazos van en tres grupos, cada uno en el orden del catálogo: empezados (lo que estás
+  // Jugar solo en Retos rápidos: cada día salen QUICK_DAY_DECKS mazos al azar, los mismos para todo el
+  // mundo. El catálogo se baraja una vez con semilla fija y cada día toma el tramo siguiente, así que
+  // en una semana larga salen todos y ninguno se repite de un día al siguiente.
+  const QUICK_DAY_DECKS=4;
+  function todayDecks(dayValue=day()) {
+    const order=CT.shuffleWith(CT.QuickCatalog.challenges,CT.seededRandom(CT.seedFrom('quick-rotation-v1')));
+    const count=Math.min(QUICK_DAY_DECKS,order.length), start=(CT.RetoDiario.numero(dayValue)*count)%order.length;
+    return Array.from({length:count},(_,i)=>order[(start+i)%order.length]);
+  }
+  // Horas que faltan para que cambien (a medianoche), redondeando hacia arriba.
+  function hoursLeft(now=new Date()) {const next=new Date(now);next.setHours(24,0,0,0);return Math.max(1,Math.ceil((next-now)/3600000));}
+  // La partida a medias, para enseñarla con su mazo y lo que lleva en vez de un botón suelto.
+  function resumeCard(saved) {
+    let c=null, done=0, total=0;
+    try {const s=E.restore(saved);const r=saved.config.rounds[s.index];c=E.challenge(r.id);total=r.order.length-1;done=Math.max(0,total-s.remaining.length);} catch {/* partida ilegible: solo el botón */}
+    return `<section class="quick-resume" aria-labelledby="quick-resume-title">${c?`<img src="${esc(deckArt(c))}" alt="" aria-hidden="true" decoding="async">`:''}<div class="quick-resume-copy"><span class="quick-setup-kicker">Partida a medias</span><b id="quick-resume-title">${c?esc(c.title):'Partida guardada'}</b>${c?`<small>${done} de ${total} cartas jugadas</small>`:''}</div>${button('resume','Continuar <span>→</span>','btn btn-primary quick-resume-go')}</section>`;
+  }
+  // Los mazos de la colección van en tres grupos, cada uno en el orden del catálogo: empezados (lo que estás
   // completando, arriba), nuevos y completos. Igual en «Jugar solo» y en «Tu colección».
   const deckRank=(c,seen)=>{const {done,total}=deckProgress(c,seen);return done===total?2:done>0?0:1;};
   const incompleteDecks=(seen=quickSeen())=>CT.QuickCatalog.challenges.filter(c=>deckRank(c,seen)<2);
@@ -190,17 +203,16 @@
     const cards=decks.reduce((n,c)=>n+c.cards.length,0), found=decks.reduce((n,c)=>n+deckProgress(c,seen).done,0);
     const complete=decks.length-incompleteDecks(seen).length;
     const deckTile=c=>`<button type="button" class="quick-day-deck" data-quick="play-deck" data-deck="${esc(c.id)}" aria-label="Jugar ${esc(c.title)}. ${esc(c.rule)}. ${deckProgress(c,seen).done} de ${c.cards.length} cartas descubiertas"><img src="${esc(deckArt(c))}" alt="" aria-hidden="true" decoding="async" loading="lazy"><span class="quick-day-deck-copy"><b>${esc(c.title)}</b><small>${esc(c.rule)} · ${c.cards.length} cartas</small>${progressBar(deckProgress(c,seen))}</span><span class="quick-day-deck-go" aria-hidden="true">→</span></button>`;
-    const pendiente=load();
+    const pendiente=load(), hoy=todayDecks();
     shell(`<section class="setup-section solo-home quick-free-setup"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 class="solo-title" data-focus tabindex="-1">Jugar solo</h2>
         <p class="lead">${E.SOLO_CARDS} cartas en cada reto: un fallo no te echa.</p>
         <p class="hint solo-dominadas">Tu colección: ${found} de ${cards} cartas · ${complete} de ${decks.length} mazos completos.</p>${button('collection','Ver tu colección','btn btn-ghost quick-collection-link')}</div>
-        ${pendiente ? button('resume','Continuar partida guardada <span>→</span>','btn btn-primary btn-block') : ''}
+        ${pendiente ? resumeCard(pendiente) : ''}
         <div class="panel solo-panel quick-day-panel">
-          <div class="solo-panel-head quick-mode-head"><span class="quick-setup-kicker">Elige un mazo</span><h3>${decks.length} mazos para completar</h3></div>
+          <div class="solo-panel-head quick-mode-head"><span class="quick-setup-kicker">Mazos de hoy</span><h3>Elige uno de los ${hoy.length}</h3></div>
           ${CT.Tiempo.field('quick-solo')}
-          <p class="hint quick-album-note">Cada carta que aciertes queda en tu colección. Salen primero las que aún te faltan.</p>
-          ${button('play-random','Al azar <span>→</span>','btn btn-secondary btn-block quick-random')}
-          ${deckGroups(seen,'quick-day-decks',deckTile)}
+          <p class="hint quick-album-note">Cambian cada día (dentro de ${hoursLeft()} h). Cada carta que aciertes queda en tu colección; salen primero las que aún te faltan.</p>
+          <div class="quick-day-decks">${hoy.map(deckTile).join('')}</div>
           <p id="quick-error" role="alert">${esc(error)}</p>
         </div></section>`);
   }
@@ -209,15 +221,15 @@
   // `open`: el reto que se despliega al entrar (el que se acaba de jugar).
   function collectionPage(open=null) {
     stopNetwork(); page='collection'; state=null; record=null; selected=null; slot=null;
-    const seen=quickSeen();
+    const seen=quickSeen(), hoy=new Set(todayDecks().map(c=>c.id));
     const decks=CT.QuickCatalog.challenges;
     const cards=decks.reduce((n,c)=>n+c.cards.length,0), found=decks.reduce((n,c)=>n+deckProgress(c,seen).done,0);
     const complete=decks.filter(c=>deckProgress(c,seen).done===c.cards.length).length;
     const card=(c,item)=>seen.has(item.id)
       ? `<li class="quick-album-card is-found">${item.image?`<img src="${esc(item.image)}" alt="" aria-hidden="true" loading="lazy" decoding="async">`:''}<b>${esc(item.title)}</b><small>${esc(item.label)}</small></li>`
       : `<li class="quick-album-card is-locked"><span class="quick-album-lock" aria-hidden="true">?</span><b>${esc(item.title)}</b><small>Por descubrir</small></li>`;
-    const deck=c=>{const pr=deckProgress(c,seen);return `<details class="quick-album-deck"${c.id===open?' open':''}><summary><img src="${esc(deckArt(c))}" alt="" aria-hidden="true" loading="lazy" decoding="async"><span><b>${esc(c.title)}</b>${progressBar(pr)}</span></summary>
-      <p class="hint">${esc(c.rule)}.</p>${button('play-deck',pr.done===pr.total?'Volver a jugarlo':'Jugarlo ahora','btn btn-primary btn-block',`data-deck="${esc(c.id)}"`)}
+    const deck=c=>{const pr=deckProgress(c,seen);return `<details class="quick-album-deck"${c.id===open?' open':''}><summary><img src="${esc(deckArt(c))}" alt="" aria-hidden="true" loading="lazy" decoding="async"><span><b>${esc(c.title)}</b>${hoy.has(c.id)?'<em class="quick-album-today">Hoy</em>':''}${progressBar(pr)}</span></summary>
+      <p class="hint">${esc(c.rule)}.</p>${hoy.has(c.id)?button('play-deck',pr.done===pr.total?'Volver a jugarlo':'Jugarlo ahora','btn btn-primary btn-block',`data-deck="${esc(c.id)}"`):'<p class="hint">Se juega el día que salga entre los mazos de hoy.</p>'}
       <ul class="quick-album-cards">${[...c.cards].sort((a,b)=>Number(seen.has(b.id))-Number(seen.has(a.id))).map(item=>card(c,item)).join('')}</ul></details>`;};
     shell(`<section class="setup-section quick-album"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 data-focus tabindex="-1">Tu colección</h2>
       <p class="lead">${found} de ${cards} cartas descubiertas · ${complete} ${complete===1?'mazo completo':'mazos completos'}.</p>
@@ -1210,11 +1222,10 @@
       prepare({names:['Tú'],rounds:rounds(count,null,seed,E.MULTI_CARDS),kind:'duel',keep:true,seed,length:count,seconds:CT.Tiempo.chosen('amigos',15)}); return;
     }
     if (action === 'collection') {collectionPage(target.dataset.deck || null); return;}
-    // Un mazo del álbum (o uno sin completar al azar): 10 cartas de ese reto (E.SOLO_CARDS), más la que abre la línea.
-    if (action === 'play-deck' || action === 'play-random') {
-      const pool=incompleteDecks().length?incompleteDecks():CT.QuickCatalog.challenges;
-      const id=action==='play-random'?pool[Math.floor(Math.random()*pool.length)].id:target.dataset.deck;
-      if(!CT.QuickCatalog.challenges.some(c=>c.id===id)){freeSetup();return;}
+    // Un mazo de hoy: 10 cartas de ese reto (E.SOLO_CARDS), más la que abre la línea.
+    if (action === 'play-deck') {
+      const id=target.dataset.deck;
+      if(!todayDecks().some(c=>c.id===id)){freeSetup();return;}
       prepare({names:['Tú'],rounds:rounds(1,id,null,E.SOLO_CARDS+1,true),kind:'free',length:1,seconds:CT.Tiempo.chosen('quick-solo')}); return;
     }
     if (action === 'exit') {CT.UI.confirmExit(connection?.kind==='local' ? 'Al salir se cierra la conexión con la sala local.' : 'La partida se conserva para que puedas continuar después.', toEntry, undefined, undefined, (state || room) && connection?.kind!=='internet' ? {label:'Salir sin guardar', proceed:abandonQuick} : null); return;}
@@ -1282,7 +1293,8 @@
     // El historial de Retos rápidos vive en el Atlas, junto al resto de estadísticas.
     stats:statsPanel,
     openSolo(renderPage){paint=renderPage;backTo=null;entry='free-setup';format='free';freeSetup();},
-    // La colección de cartas descubiertas.
+    // Los mazos que se ofrecen hoy en solitario y la colección de cartas descubiertas.
+    todayDecks,
     openCollection(renderPage,deck=null){paint=renderPage;backTo=null;entry='free-setup';format='free';collectionPage(deck);},
     openLocal(renderPage){paint=renderPage;backTo=null;entry='setup';format='local';setup();},
     openDuel(renderPage){paint=renderPage;entry='duel-setup';format='duel';backTo=null;duelSetup();},

@@ -27,7 +27,7 @@ assert.ok(src('.atlas-identidad-avatar img').includes(elegido), 'el Atlas muestr
 await click('[data-action="home-top"]');
 await click('[data-action="solo-hub"]');
 await click('[data-solo-route="quick"]');
-await click('[data-quick="play-random"]');
+await click('[data-quick="play-deck"]');
 await click('[data-quick="ready"]');
 assert.ok(src('.quick-score-avatar img').includes(elegido), `Retos rápidos en solitario muestra el avatar elegido (${src('.quick-score-avatar img')})`);
 

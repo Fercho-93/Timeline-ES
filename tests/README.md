@@ -149,7 +149,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `quick-challenges-browser.mjs` | navegador | Retos rápidos en un solo móvil, en Chromium. |
 | `quick-challenges.mjs` | test | Catálogo de Retos rápidos: curiosidades, fuentes trazables y motor. |
 | `retos-un-movil.mjs` | test | Retos rápidos en un solo móvil: el reto diario a medias se guarda aparte (empezar otra partida no lo borra), el reloj no corre mientras se pasa el móvil y «Guardar y salir» lo congela. |
-| `quick-coleccion.mjs` | test | Retos rápidos en solitario: álbum con todos los mazos agrupados en empezados, nuevos y completos (también en la colección) y «Al azar» entre los no completos; cada acierto propio entra en la colección y suma en el ranking de descubrimientos. |
+| `quick-coleccion.mjs` | test | Retos rápidos en solitario: cuatro mazos al azar cada día (rotación por el catálogo), tarjeta de partida a medias y colección agrupada en empezados, nuevos y completos; cada acierto propio entra en la colección y suma en el ranking de descubrimientos. |
 | `quick-duelo.mjs` | test | Duelo de Retos rápidos por enlace con los mismos mazos. |
 | `quick-formats-browser.mjs` | navegador | Formatos de Retos rápidos con varios móviles, cada uno con su nombre. |
 | `quick-online-rules.mjs` | reglas | Salas de Retos rápidos: cuota, comandos firmados, turnos y salida. |

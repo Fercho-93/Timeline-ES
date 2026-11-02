@@ -313,7 +313,7 @@ w.document.querySelector('[data-action="quick-challenges"]').click();
   assert.ok(seccion, 'Retos rápidos en solitario usa la maqueta de solitario');
   assert.ok(seccion.querySelector('.solo-intro .solo-title') && seccion.querySelector('.solo-intro .eyebrow'), 'con la misma portada');
   const panel = seccion.querySelector('.panel.solo-panel');
-  assert.ok(panel && panel.querySelector('.solo-panel-head h3') && panel.querySelector('.tiempo-field') && panel.querySelector('[data-quick="play-random"]') && panel.querySelectorAll('[data-quick="play-deck"]').length === w.CONTINUUM.QuickCatalog.challenges.length, 'y un único panel con el tiempo, «Al azar» y todos los mazos');
+  assert.ok(panel && panel.querySelector('.solo-panel-head h3') && panel.querySelector('.tiempo-field') && panel.querySelectorAll('[data-quick="play-deck"]').length === 4, 'y un único panel con el tiempo y los cuatro mazos de hoy');
   assert.equal(seccion.querySelectorAll('.solo-panel').length, 1, 'un solo panel: no se pliega en desplegables');
 }
 openQuick();

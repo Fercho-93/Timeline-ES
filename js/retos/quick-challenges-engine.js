@@ -101,7 +101,7 @@
   }
   // Partidas con más de una persona (sala, mesa pública, un solo móvil, duelo): siempre 10 cartas al azar del mazo.
   const MULTI_CARDS = 10;
-  // Jugando solo (el álbum de mazos y el reto diario): 10 cartas que colocar en cada reto, como una ronda de
+  // Jugando solo (los mazos de hoy y el reto diario): 10 cartas que colocar en cada reto, como una ronda de
   // Grandes colecciones, más la que abre la línea. Un mazo más pequeño se juega entero.
   const SOLO_CARDS = 10;
   CT.QuickEngine = {create, step, restore, challenge, keepPlaying, timeoutPlacement, MULTI_CARDS, SOLO_CARDS};

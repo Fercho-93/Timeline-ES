@@ -36,7 +36,7 @@ console.log('\nEl reto diario a medias no se pierde');
   ok('el reto diario se guarda en su hueco propio', JSON.parse(w.localStorage.getItem(DAILY)).commands.length === 1 && w.localStorage.getItem(KEY) === null);
   // Otra partida (aquí, una libre en solitario) usa el hueco de siempre y no toca el del reto diario.
   CT.Quick.openSolo(paint(w));
-  click(w, '[data-quick="play-random"]'); click(w, '[data-quick="ready"]');
+  click(w, '[data-quick="play-deck"]'); click(w, '[data-quick="ready"]');
   ok('la otra partida se guarda aparte', JSON.parse(w.localStorage.getItem(KEY))?.config?.kind === 'free');
   ok('y el reto diario sigue a medias', CT.Quick.dailyPending(today) && JSON.parse(w.localStorage.getItem(DAILY)).commands.length === 1);
   w.close();
