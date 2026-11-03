@@ -661,10 +661,18 @@
 
   // ---------------------------------------------------------------------------
   // Vestíbulo (compartido entre anfitrión e invitados)
+  // Hasta diez plazas, repartidas por igual alrededor de la mesa.
   const SEAT_POSITIONS = [
-    { left: "50%", top: "10%" }, { left: "80%", top: "24%" }, { left: "90%", top: "50%" },
-    { left: "80%", top: "76%" }, { left: "50%", top: "90%" }, { left: "20%", top: "76%" },
-    { left: "10%", top: "50%" }, { left: "20%", top: "24%" }
+    { left: "50.0%", top: "8.0%" },
+    { left: "73.5%", top: "16.0%" },
+    { left: "88.0%", top: "37.0%" },
+    { left: "88.0%", top: "63.0%" },
+    { left: "73.5%", top: "84.0%" },
+    { left: "50.0%", top: "92.0%" },
+    { left: "26.5%", top: "84.0%" },
+    { left: "12.0%", top: "63.0%" },
+    { left: "12.0%", top: "37.0%" },
+    { left: "26.5%", top: "16.0%" }
   ];
 
   // Las cartas iniciales y los poderes con los que el anfitrión abre la sala salen de lo que eligió
@@ -686,7 +694,7 @@ function starterPanelMarkupContent(isHost) {
     if (roomState.playerOrder.length < 2) return "";
     if (!draw) {
       return isHost
-        ? `<div class="field starter-field"><span class="field-label">Quién empieza</span>${CT.StarterPresentation.drawButton('data-local-action="starter-draw"', CT.starterNoun(modeKey))}<p class="hint">Cada persona escribe la cifra de la misma carta: empieza quien más se acerque y el resto juega por orden de cercanía.</p></div>`
+        ? `<div class="field starter-field">${CT.StarterPresentation.startButton('data-local-action="starter-draw"')}</div>`
         : `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>Va a repartir una carta para decidir el orden de juego.</p>`;
     }
     const card = getCard(draw.cardId);

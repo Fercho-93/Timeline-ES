@@ -66,6 +66,9 @@ try {
   const answer=await guest.locator('#quick-signal').inputValue();
   await host.locator('#quick-answer').fill(answer);await host.locator('[data-quick="accept-answer"]').click();
   try{await host.getByText('Bea',{exact:false}).first().waitFor();}catch(e){for(const [label,pg] of [['host',host],['guest',guest]]){console.log(label,await pg.locator('#app').innerText(),await pg.evaluate(()=>pcs.map(x=>({state:x.connectionState,ice:x.iceConnectionState}))));await pg.screenshot({path:'test-results/quick-challenges/'+label+'-error.png',fullPage:true});}throw e;}
+  // «Empezar» saca primero la carta de quién empieza: responden las dos y se vuelve a pulsar para repartir.
+  await host.locator('[data-quick="start-room"]:enabled').click();
+  for(const pg of [host,guest]){await pg.locator('#quick-room-starter-input').waitFor();await pg.fill('#quick-room-starter-input','1900');await pg.locator('[data-quick="room-starter-guess"]').click();}
   await host.locator('[data-quick="start-room"]:enabled').click();
   await dismissSplash(guest);await dismissSplash(host);
   // Mientras juega Ana, Bea ve la partida pero no puede plantarse: el botón solo sale en su turno.

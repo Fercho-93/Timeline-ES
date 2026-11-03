@@ -39,7 +39,7 @@
     return room.capacity === 2 && room.members.length === 1 && room.config?.kind === 'duel' && room.config.names.length === 2 && room.config.names[0] === room.names[0];
   }
   function validate(room) {
-    if (!room || room.version !== 1 || !Array.isArray(room.members) || room.members.length < 1 || !Number.isInteger(room.capacity) || room.capacity < 2 || room.capacity > 8 || room.members.length > room.capacity || new Set(room.members).size !== room.members.length || room.members[0] !== room.host || !Array.isArray(room.names) || room.names.length !== room.members.length || room.names.some(n => typeof n !== 'string' || !n.trim() || n.length > 24) || !Number.isInteger(room.revision) || room.revision < 0) throw Error('Sala no válida.');
+    if (!room || room.version !== 1 || !Array.isArray(room.members) || room.members.length < 1 || !Number.isInteger(room.capacity) || room.capacity < 2 || room.capacity > 10 || room.members.length > room.capacity || new Set(room.members).size !== room.members.length || room.members[0] !== room.host || !Array.isArray(room.names) || room.names.length !== room.members.length || room.names.some(n => typeof n !== 'string' || !n.trim() || n.length > 24) || !Number.isInteger(room.revision) || room.revision < 0) throw Error('Sala no válida.');
     if (room.resigned !== undefined && (!room.config || room.config.kind !== 'duel' || !room.members.includes(room.resigned))) throw Error('Sala no válida.');
     if (room.declined !== undefined && (!room.config || room.declined !== room.invitedUid || room.members.includes(room.declined))) throw Error('Sala no válida.');
     if (room.config) {

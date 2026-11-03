@@ -351,6 +351,13 @@ try {
     await wait(()=>seen.host?.members.length===2);
     again.close();a.close();b.close();
   }
+  // Una sala de amigos admite hasta diez personas.
+  {
+    await env.clearFirestore();
+    const a=await adapter('host',host,true).connect({name:'Ana',capacity:10,create:true,onChange:()=>{},onError:e=>{throw e;}});
+    assert.equal((await getDoc(doc(host,'quickRooms',a.code))).data().capacity,10,'se crea una sala de diez');
+    a.close();
+  }
   console.log('Retos online: reglas de acceso, turnos, historial, sala real, sincronización y reconexión: OK');
   // The production transaction retries a saved command after a lost response, exactly once.
   {

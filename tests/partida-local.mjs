@@ -94,9 +94,9 @@ w = boot();
 click(irAJugar(w), '[data-block="historia"]');
 click(w, '[data-mode="history"]');
 (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('local');
-// Como en Retos rápidos, la lámina es el botón que abre el minijuego.
-ok("al principio hay un botón para adivinar la cifra", !!w.document.querySelector('button.starter-draw-cta[data-action="draw-starter"]'));
-click(w, '[data-action="draw-starter"]');
+// Quién empieza no es un ajuste de la preparación: el minijuego sale al pulsar «Empezar».
+ok("la preparación no lleva el minijuego como ajuste", !w.document.querySelector('[data-action="draw-starter"], .starter-field'));
+click(w, '[data-action="start"]');
 ok("pide pasar el móvil al primer jugador, que lleva tu nombre", /Pasa el móvil a Prueba/.test(w.document.body.textContent));
 ok("el sorteo enseña la ilustración de la carta", !!w.document.querySelector('.starter-card-art img.animal-card-art'));
 ok("la ayuda está asociada a la respuesta", w.document.getElementById(w.document.getElementById("starter-guess-input").getAttribute("aria-describedby"))?.textContent.length > 0);
@@ -113,9 +113,8 @@ click(w, '[data-action="starter-guess-submit"]');
 ok("el resultado enseña la cifra de cada jugador", w.document.querySelectorAll(".starter-draw-list li").length === 2);
 ok("hay una persona ganadora marcada", !!w.document.querySelector(".starter-draw-winner"));
 ok("el resultado mantiene visible la ilustración de la carta", !!w.document.querySelector('.starter-card-art img.animal-card-art'));
-click(w, '[data-action="close-menu"]');
-ok("el campo pasa a ofrecer repetir el minijuego", /Repetir el minijuego/.test(w.document.body.innerHTML));
-click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
+ok("el resultado ofrece empezar la partida", !!w.document.querySelector('[data-action="starter-start"]'));
+click(w, '[data-action="starter-start"]');
 const partidaSorteada = JSON.parse(w.localStorage.getItem("hilo-game-history-v1"));
 ok("la partida arranca con quien ganó el sorteo", partidaSorteada.current === partidaSorteada.starter);
 const enJuego = new Set([...partidaSorteada.deck, ...partidaSorteada.discard, ...partidaSorteada.timeline, ...partidaSorteada.players.flatMap(p => p.hand)]);

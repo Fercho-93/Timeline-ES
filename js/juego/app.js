@@ -353,9 +353,12 @@
   // quién antes de llegar aquí, así que cada audiencia tiene su pantalla de ajustes: en solitario esta,
   // en un solo móvil la de preparar la partida y, cada uno en su móvil, la de «Competición con amigos».
   // Las tres comparten maqueta (eyebrow, título, panel de ajustes y un botón para empezar).
-  function lengthField(rounds, { all = true } = {}) {
+  // En solitario hay más medidas entre la corta y «Todos los temas»; con amigos, las de siempre.
+  const COMP_SOLO_THEMES = [2, 3, 4, 5, 6, 8, 10, 12];
+  function lengthField(rounds, { all = true, more = false } = {}) {
     const todos = CT.Tournament.modes().length;
-    return `<div class="field"><label for="competition-length">Temas a jugar</label><select id="competition-length">${[[3, "3 temas"], [5, "5 temas"], [todos, "Todos los temas"]].map(([n, label]) => `<option value="${n}"${n === todos ? " data-comp-all" : ""}${n === todos && !all ? " hidden disabled" : ""}${n === rounds ? " selected" : ""}>${label}</option>`).join("")}</select></div>`;
+    const medidas = (more ? COMP_SOLO_THEMES : [3, 5]).filter(n => n < todos).map(n => [n, `${n} temas`]);
+    return `<div class="field"><label for="competition-length">Temas a jugar</label><select id="competition-length">${[...medidas, [todos, "Todos los temas"]].map(([n, label]) => `<option value="${n}"${n === todos ? " data-comp-all" : ""}${n === todos && !all ? " hidden disabled" : ""}${n === rounds ? " selected" : ""}>${label}</option>`).join("")}</select></div>`;
   }
   function competitionMenu() {
     const audience = sessionStorage.getItem('continuum-competition-audience') || 'solo';
@@ -368,7 +371,7 @@
         ${loadCompetition() ? '<button class="btn btn-secondary btn-block" data-action="resume-competition">Continuar competición en solitario <span>→</span></button>' : ''}
         <div class="panel solo-panel">
           <div class="solo-panel-head"><h3>Qué juegas</h3></div>
-          ${lengthField(competitionConfig.rounds)}
+          ${lengthField(competitionConfig.rounds, { more: true })}
           ${CT.Ghost.difficultyCards("competition-difficulty", competitionDifficulty).replace('class="field difficulty-field', 'class="field difficulty-field competition-difficulty')}
           <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-competition">Empezar competición <span aria-hidden="true">→</span></button>
         </div>
@@ -974,7 +977,7 @@
     screen = "setup";
     starterDraw = null;
     paint(`<div class="shell">${header("back-menu")}
-      <section class="setup-section local-setup"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2 data-focus tabindex="-1">Un solo móvil</h2><p class="lead">Añadid hasta 9 jugadores y decidid quién empieza adivinando la cifra de una carta.</p>
+      <section class="setup-section local-setup"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2 data-focus tabindex="-1">Un solo móvil</h2><p class="lead">Añadid hasta 10 jugadores. Al empezar, un minijuego decide quién abre la partida.</p>
         ${game && !game.winners && !pendingTournament && sessionStorage.getItem('continuum-entry-route') === 'local' ? '<button class="btn btn-secondary btn-block" data-action="continue">Continuar partida guardada <span>→</span></button>' : ''}
         <div class="panel">
           <div class="setup-block">
@@ -986,7 +989,6 @@
           <div class="setup-block">
             <div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Cómo empezar</span></div>
             <div class="setup-grid">
-              <div class="field starter-field">${starterFieldMarkup()}</div>
               <div class="field local-hand-size"><span class="local-hand-art" aria-hidden="true">${CT.StarterPresentation.cardsIcon()}</span><label for="hand-size">Cartas iniciales por persona<small>En la mano de cada jugador</small></label><select id="hand-size">${[1, 2, 3, 4, 5, 6].map(n => `<option${n === (lastLocalSetup?.handSize || 4) ? " selected" : ""}>${n}</option>`).join("")}</select></div>
             </div>
           </div>
@@ -1084,7 +1086,8 @@
     const winner = order[0];
     starterDraw.winner = winner;
     starterDraw.order = order;
-    document.querySelector(".starter-field").innerHTML = starterFieldMarkup();
+    const campoQuienEmpieza = document.querySelector(".starter-field");
+    if (campoQuienEmpieza) campoQuienEmpieza.innerHTML = starterFieldMarkup();
     CT.Effects.starterResult?.();
     announce(`${starterDraw.names[winner]} se ha acercado más y empieza la partida. Orden de juego: ${order.map(i => starterDraw.names[i]).join(", ")}.`);
     renderStarterDialog(`${CT.StarterPresentation.winner(starterDraw.names[winner])}
@@ -1117,7 +1120,7 @@
 
   function appendPlayer(name = "") {
     const rows = document.querySelectorAll("#players .player-row");
-    if (rows.length >= 9) return showToast("El máximo es de 9 jugadores");
+    if (rows.length >= 10) return showToast("El máximo es de 10 jugadores");
     const value = name || `Jugador ${rows.length + 1}`;
     document.getElementById("players").insertAdjacentHTML("beforeend", `<div class="player-row"><input aria-label="Nombre del jugador ${rows.length + 1}" value="${escapeHtml(value)}" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div>`);
     syncStarterOptions();

@@ -29,7 +29,7 @@
   // antes de aceptarlo (como `QuickRoom.validate` en los Retos rápidos), así un anfitrión
   // malicioso no puede colar marcado en lugar de un número o de un identificador.
   function validRoom(room) {
-    if (!room || typeof room !== "object" || !Array.isArray(room.playerOrder) || room.playerOrder.length < 1 || room.playerOrder.length > 9
+    if (!room || typeof room !== "object" || !Array.isArray(room.playerOrder) || room.playerOrder.length < 1 || room.playerOrder.length > 10
       || !room.playerOrder.every(validId) || !room.players || typeof room.players !== "object") return false;
     for (const key of ["capacity", "round", "turnsInRound", "current", "version", "handSize"]) if (key in room && !isInt(room[key])) return false;
     if ("turnSeconds" in room && !isInt(room.turnSeconds)) return false;

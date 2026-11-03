@@ -22,7 +22,7 @@
   const CT = window.CONTINUUM;
 
   const MIN_PLAYERS = 2;
-  const MAX_PLAYERS = 9;
+  const MAX_PLAYERS = 10;
   const PULSE_MIN_HAND = 2;
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
 

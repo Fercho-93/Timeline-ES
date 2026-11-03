@@ -122,8 +122,8 @@
         <ul class="public-board-list" data-public-board aria-live="polite"><li class="public-board-empty">Buscando mesas…</li></ul></section>`,
       `<h2 class="mode-section-title public-quick-label">Partida rápida</h2><p class="hint public-quick-hint">Sin elegir mesa: te sentamos en la primera libre.</p>`,
       capacityField(),
-      modeDoor('online-collections', modeArt['online-collections'], 'Grandes colecciones', 'Elige hasta tres temas o ninguno, y te sentamos en la primera mesa libre.', false, 'data-online-kind="collections"'),
-      modeDoor('quick-public', modeArt['quick-public'], 'Retos rápidos', 'Tres retos sorpresa: arriesga o plántate para asegurar tus aciertos.', false, 'data-online-kind="quick"')
+      modeDoor('online-collections', modeArt['online-collections'], 'Grandes colecciones', 'Mazos por temas. Marca hasta tres o ninguno y te sentamos en una mesa libre.', false, 'data-online-kind="collections"'),
+      modeDoor('quick-public', modeArt['quick-public'], 'Retos rápidos', 'Tres mazos cortos y sorpresa. Arriesga o plántate.', false, 'data-online-kind="quick"')
     ].join(''), modeArt['online-hub']);
     watchBoard();
   }
@@ -277,7 +277,7 @@
   const inlineOpen = {};
   // La competición va al final de la lista de colecciones, con su misma carátula (app.js).
   const compAudience = route => route === 'collections' ? 'solo' : route;
-  function inlineCollections(route, texto = 'Elige un tema o combina los ocho mazos cronológicos, o juega una competición.') {
+  function inlineCollections(route, texto = 'Mazos por temas: historia, cine, ciencia, naturaleza y geografía. Tú eliges cuál.') {
     const open = !!inlineOpen[app.dataset.pendingHub || ''];
     return `<div class="mode-inline-collections">${modeDoor('jugar', 'menu-collections.webp', 'Grandes colecciones', texto, false, `data-inline-route="${route}" data-solo-route="collections" aria-expanded="${open}" aria-controls="mode-inline-drawer"`, 'Elegir mazo')}<div id="mode-inline-drawer" class="mode-inline-drawer" data-route="${route}"${open ? '' : ' hidden'}>${open ? window.CONTINUUM.collectionsGallery(true, compAudience(route)) : window.CONTINUUM.competitionPanel(compAudience(route))}</div></div>`;
   }
@@ -292,7 +292,7 @@
   let createRoomOpen = false;
   function createRoomGroup(route) {
     return `<div class="mode-create-room"><button type="button" class="mode-entry mode-create-toggle" data-action="create-room-toggle" aria-expanded="${createRoomOpen}" aria-controls="mode-create-list"><span class="mode-entry-art" aria-hidden="true"><img src="assets/menu-wifi.webp" alt="" loading="lazy" decoding="async"></span><span class="mode-entry-copy"><b>Crear partida</b><small>Elige qué jugar y después el ritmo: en directo, por turnos o con las mismas cartas.</small><span class="mode-entry-cta" aria-hidden="true">${createRoomOpen ? 'Ocultar' : 'Elegir qué jugar'} <span>${createRoomOpen ? '↑' : '↓'}</span></span></span></button>
-      <div id="mode-create-list" class="mode-create-list"${createRoomOpen ? '' : ' hidden'}>${inlineCollections(route)}${modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: los mismos retos para todos.', false, `data-friend-quick="${route}"`, 'Preparar partida')}</div></div>`;
+      <div id="mode-create-list" class="mode-create-list"${createRoomOpen ? '' : ' hidden'}>${inlineCollections(route)}${modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos cortos y sorpresa de cualquier dato. Arriesgad o plantaos.', false, `data-friend-quick="${route}"`, 'Preparar partida')}</div></div>`;
   }
   function openFriendHub(route) {
     if (!FRIEND_HUBS[route]) route = 'online';
@@ -302,8 +302,8 @@
       // Quien se une no elige mazo ni ritmo: la invitación ya lo lleva.
       route === 'online' ? modeDoor('friends-join', 'menu-private.webp', 'Unirme a una partida', 'Escanea el QR o pega el enlace o el código. Por internet o por Wi-Fi.', true, '', 'Unirme') : '',
       route === 'online' ? createRoomGroup(route) : [
-        inlineCollections(route, 'Elegid un tema o combinad los ocho mazos cronológicos, o jugad una competición.'),
-        modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: los mismos retos para todos.', false, `data-friend-quick="${route}"`, 'Preparar partida')
+        inlineCollections(route, 'Mazos por temas: historia, cine, ciencia, naturaleza y geografía. Elegís cuál.'),
+        modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos cortos y sorpresa de cualquier dato. Arriesgad o plantaos.', false, `data-friend-quick="${route}"`, 'Preparar partida')
       ].join(''),
       route === 'online' ? modeDoor('duels-list', 'mode-walk-duel.webp', 'Tus duelos', 'Los duelos por turnos en curso y a quién le toca.', false, '', 'Ver') : ''
     ].join(''), art);
@@ -327,7 +327,7 @@
     hub('hub-solo', 'Jugar solo', 'A tu ritmo', [
       soloShortcuts(),
       inlineCollections('collections'),
-      modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: ordena y suma aciertos.', false, 'data-solo-route="quick"', 'Preparar partida')
+      modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos cortos y sorpresa de cualquier dato. Arriesga o plántate.', false, 'data-solo-route="quick"', 'Preparar partida')
     ].join(''), modeArt['solo-hub']);
   }
 

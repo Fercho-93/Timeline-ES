@@ -38,6 +38,11 @@
   function drawButton(attribute, noun = "la cifra") {
     return `<button type="button" class="btn btn-block starter-draw-cta" ${attribute}><span class="starter-draw-icon" aria-hidden="true">${cardsIcon()}</span><span class="starter-draw-copy"><span class="starter-draw-kicker">El primer turno se gana</span><b>Adivinar ${escapeHtml(noun)}</b><small>Todos respondéis a la misma carta y empieza quien más se acerque</small></span><span class="starter-draw-arrow" aria-hidden="true">→</span></button>`;
   }
+  // En las salas de espera, quien la lleva no ve un paso aparte para el minijuego: pulsa «Empezar» y sale la carta
+  // de quién empieza; con el orden decidido, vuelve a pulsar para repartir.
+  function startButton(attribute, disabled = false) {
+    return `<button type="button" class="btn btn-primary btn-block starter-start-cta" ${attribute}${disabled ? " disabled" : ""}>Empezar <span aria-hidden="true">→</span></button><p class="hint">Al empezar, un minijuego decide quién abre la partida: todos respondéis a la misma carta.</p>`;
+  }
   function repeatButton(attribute) {
     return `<button type="button" class="btn btn-ghost btn-block" ${attribute}><span aria-hidden="true">↻</span> Repetir el minijuego</button>`;
   }
@@ -58,5 +63,5 @@
   document.addEventListener('focusin', event => {
     if (event.target.matches?.('.starter-answer input')) event.target.scrollIntoView?.({block: 'center', behavior: 'smooth'});
   });
-  CT.StarterPresentation = {cardsIcon, plate, heading, winner, order, answer, drawButton, repeatButton, syncAnswer};
+  CT.StarterPresentation = {cardsIcon, plate, heading, winner, order, answer, drawButton, startButton, repeatButton, syncAnswer};
 })();

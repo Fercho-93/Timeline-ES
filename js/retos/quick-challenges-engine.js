@@ -40,7 +40,7 @@
   // Tope de rondas de un duelo de colección (de un mismo mazo).
   const MAX_ROUNDS = 5;
   function create(config) {
-    if (!config || !Array.isArray(config.names) || config.names.length < 1 || config.names.length > 8 ||
+    if (!config || !Array.isArray(config.names) || config.names.length < 1 || config.names.length > 10 ||
         config.names.some(n => typeof n !== 'string' || !n.trim() || n.length > 24) ||
         !Array.isArray(config.rounds) || config.rounds.length < 1 || config.rounds.length > Math.max(catalog.challenges.length, MAX_ROUNDS)) throw Error('INVALID_CONFIG');
     if (config.keep !== undefined && typeof config.keep !== 'boolean') throw Error('INVALID_CONFIG');

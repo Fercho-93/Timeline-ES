@@ -137,13 +137,13 @@ w.CONTINUUM.Storage.setItem('continuum-quick-duel-pace-v1', 'directo');
 Object.defineProperty(w.navigator, 'onLine', {configurable: true, get: () => true});
 CT.Quick.openDuel(html => { app.innerHTML = html; });
 assert.equal(app.querySelector('[data-offline-turnos]'), null, 'con internet no hay aviso');
-// El máximo de la sala se recuerda, el mismo que en las colecciones, y en Retos rápidos no pasa de 8.
+// El máximo de la sala se recuerda, el mismo que en las colecciones: de 2 a 10 en los dos.
 w.CONTINUUM.Storage.setItem('continuum-live-max-v1', '6');
 CT.Quick.openDuel(html => { app.innerHTML = html; });
 assert.equal(app.querySelector('#quick-net-players').value, '6');
-w.CONTINUUM.Storage.setItem('continuum-live-max-v1', '9');
+w.CONTINUUM.Storage.setItem('continuum-live-max-v1', '10');
 CT.Quick.openDuel(html => { app.innerHTML = html; });
-assert.equal(app.querySelector('#quick-net-players').value, '8', 'nueve en las colecciones son ocho en Retos rápidos');
+assert.equal(app.querySelector('#quick-net-players').value, '10', 'en Retos rápidos también caben diez');
 {
   const maximo = app.querySelector('#quick-net-players'); maximo.value = '3';
   maximo.dispatchEvent(new w.Event('change', {bubbles: true}));
