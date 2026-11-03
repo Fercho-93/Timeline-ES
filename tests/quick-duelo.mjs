@@ -216,4 +216,26 @@ const encoded = CT.LocalTransport.encodeText(JSON.stringify(payload));
 CT.Quick.open(html => { app.innerHTML = html; }, {quickDuel:encoded});
 assert.equal(app.querySelectorAll('.hand-card').length, rounds[0].order.length - 1, 'la invitación arranca el primer mazo del rival');
 assert.equal(w.location.origin, 'https://continuum.test');
+// Grandes colecciones por turnos: el mazo elegido se juega con estas reglas, en rondas de 9 cartas más la de salida.
+{
+  const R = CT.QuickRoom, c = E.challenge('col:history');
+  assert.equal(c.title, CT.mode('history').name, 'el mazo de colección se ve con su nombre');
+  assert.ok(c.cards.every(card => typeof card.id === 'string' && Number.isFinite(card.value) && card.label), 'cada carta trae su valor y su etiqueta');
+  const rondas = E.collectionRounds('history', 3);
+  assert.equal(rondas.length, 3); assert.ok(rondas.every(r => r.id === 'col:history' && r.order.length === E.MULTI_CARDS));
+  assert.equal(new Set(rondas.flatMap(r => r.order)).size, 3 * E.MULTI_CARDS, 'cada ronda trae cartas distintas');
+  assert.equal(E.collectionRounds('history', 99).length, 5, 'como mucho cinco rondas');
+  let r = R.create('me', 'Tester', 2); r = R.reduce(r, 'me', {type: 'start', rounds: rondas, kind: 'duel', keep: false});
+  r = R.reduce(r, 'me', {type: 'place', cardId: R.state(r).remaining[0], index: 0}); r = R.reduce(r, 'me', {type: 'ack'});
+  const joined = R.reduce(r, 'amigo', {type: 'join', name: 'Luis'});
+  assert.equal(R.validate(joined).config.rounds[0].id, 'col:history', 'la sala se valida con el mazo de colección');
+  CT.QuickNetwork.mine = async () => [{code: 'HHHHHHHHH2', room: joined, uid: 'me'}];
+  const [row] = await CT.Quick.duels();
+  assert.equal(row.collection, 'history', 'la fila del duelo recuerda el mazo para la revancha');
+  assert.equal(row.deck, CT.mode('history').name);
+  assert.match(row.detalle, /^Ronda 1 de 3 · carta \d de 9$/);
+  // Las versiones anteriores no saben jugar estos mazos: la sala lleva otra huella, que esta versión acepta.
+  assert.notEqual(CT.QuickNetwork.collectionFingerprint(), CT.QuickNetwork.fingerprint());
+  assert.ok(CT.QuickNetwork.compatible(CT.QuickNetwork.collectionFingerprint()) && CT.QuickNetwork.compatible(CT.QuickNetwork.fingerprint()));
+}
 w.close();

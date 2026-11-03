@@ -2701,6 +2701,28 @@
   const LIVE_NET_KEY = "hilo-sala-red-v1";
   function liveNet() { return CT.Storage.getItem(LIVE_NET_KEY) === "wifi" ? "wifi" : "internet"; }
   function duelBlockKey(ritmo, prueba) { return ritmo === "directo" ? "directo" : `${ritmo}-${prueba}`; }
+  // «Por turnos · Ordenar» se juega con las reglas de Retos rápidos (sus duelos por turnos), con rondas de
+  // cartas de este mazo: cuántas rondas y qué pasa al fallar los elige quien crea el duelo.
+  const TURN_ROUNDS_KEY = "continuum-turnos-rondas-v1", TURN_KEEP_KEY = "continuum-turnos-fallo-v1";
+  const turnRounds = () => [1, 3, 5].includes(Number(CT.Storage.getItem(TURN_ROUNDS_KEY))) ? Number(CT.Storage.getItem(TURN_ROUNDS_KEY)) : 3;
+  const turnKeep = () => CT.Storage.getItem(TURN_KEEP_KEY) === "seguir";
+  function turnRulesFields() {
+    const opcion = (name, clave, titulo, pie, on) => `<label class="segmented-option${on ? " is-on" : ""}"><input type="radio" name="${name}" value="${clave}"${on ? " checked" : ""}><span><b>${titulo}</b><small>${pie}</small></span></label>`;
+    const cartas = CT.QuickEngine.MULTI_CARDS - 1;
+    return `<div class="field duel-kind-field"><span class="field-label" id="turn-rounds-label">Rondas</span>
+        <div class="segmented" role="radiogroup" aria-labelledby="turn-rounds-label">${[[1, "Corta"], [3, "Media"], [5, "Larga"]].map(([n, pie]) => opcion("turn-rounds", n, `${n} ${n === 1 ? "ronda" : "rondas"}`, `${pie} · ${cartas} cartas cada una`, n === turnRounds())).join("")}</div></div>
+      <div class="field duel-kind-field"><span class="field-label" id="turn-keep-label">Si alguien falla</span>
+        <div class="segmented" role="radiogroup" aria-labelledby="turn-keep-label">${opcion("turn-keep", "fuera", "Arriesgar o plantarse", "Un fallo pierde los aciertos provisionales de la ronda; plantarse los asegura", !turnKeep())}${opcion("turn-keep", "seguir", "Seguir hasta el final", "Un fallo no suma, pero se juega toda la ronda y gana quien acierte más", turnKeep())}</div></div>`;
+  }
+  // Crea el duelo por turnos del mazo elegido: lo abre Retos rápidos, que lleva la sala, la partida y «Tus duelos».
+  function startCollectionTurnDuel() {
+    const rondas = Number(app.querySelector('input[name="turn-rounds"]:checked')?.value) || turnRounds();
+    const keep = (app.querySelector('input[name="turn-keep"]:checked')?.value || (turnKeep() ? "seguir" : "fuera")) === "seguir";
+    CT.Quick.openCollectionDuel((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); },
+      { deck: selectedModeKey, name: duelName(), length: rondas, keep, back: duelHome })
+      // Si no se llega a crear, se vuelve a esta misma pantalla con el aviso (no a la de Retos rápidos).
+      .catch(error => { if (screen === 'quick-challenges' || screen === 'duel-home') { CT.Quick.leave(); duelHome(); } showToast(error?.message || "No se pudo crear el duelo. Comprueba tu conexión."); });
+  }
 
   function duelPanel() {
     // Un duelo aceptado y dejado a medias no se puede volver a empezar desde el enlace si
@@ -2775,8 +2797,8 @@
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Con tiempo, el reloj no se para: si sales de la aplicación, la carta se cierra.</span></p></div>
         ${enCifras ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-cifras">Continuar ${contra(enCifras) ? `el duelo contra ${escapeHtml(contra(enCifras))}` : "tu duelo de cifras"} <span>→</span></button>` : ""}
         <button class="btn ${enCifras ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-cifras">${enCifras ? "Empezar otro duelo" : "Jugar y retar"} <span>→</span></button>`) : ""}
-      ${bloque("turnos-orden", `<div class="duel-brief"><p>Entre dos, cada uno desde su móvil y cuando pueda: os turnáis carta a carta. Juegas tú la primera y después le mandas el enlace a tu rival. En la revancha empieza tu rival.</p>
-        <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Respondes cuando te toque. Con tiempo, el reloj empieza al abrir tu carta.</span></p></div>
+      ${bloque("turnos-orden", `${turnRulesFields()}<div class="duel-brief"><p>Entre dos, cada uno desde su móvil y cuando pueda, como en los duelos de Retos rápidos: os turnáis carta a carta en la misma línea con cartas de este mazo. Cada acierto suma uno provisional y plantarte lo asegura. Juegas tú la primera y después le mandas el enlace a tu rival, que entra directo en la partida y ve tu última jugada. En la revancha empieza tu rival.</p>
+        <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>La partida se guarda entre turnos y la tienes en «Tus duelos».</span></p></div>
         ${sinRedTurnos}
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`)}
       ${regla ? bloque("turnos-cifras", `<div class="duel-brief"><p>Entre dos, cada uno desde su móvil y cuando pueda: os turnáis carta a carta, escribiendo la cifra de cada una. Juegas tú la primera y después le mandas el enlace a tu rival. En la revancha empieza tu rival.</p>
@@ -4392,6 +4414,11 @@
     }
     // Competición con amigos: con más temas caben menos cartas por persona si se juega por turnos.
     if (event.target.id === "competition-length" && screen === "competition-friends") { compSyncCards(); return; }
+    if (event.target.name === "turn-rounds" || event.target.name === "turn-keep") {
+      CT.Storage.setItem(event.target.name === "turn-rounds" ? TURN_ROUNDS_KEY : TURN_KEEP_KEY, event.target.value);
+      event.target.closest(".segmented")?.querySelectorAll(".segmented-option").forEach(opcion => opcion.classList.toggle("is-on", opcion.querySelector("input").checked));
+      return;
+    }
     if (event.target.name === "duel-kind" || event.target.name === "duel-pace" || event.target.name === "live-net") {
       const value = event.target.value;
       if (event.target.name === "duel-kind") CT.Storage.setItem(DUEL_KIND_KEY, value);
@@ -4647,7 +4674,12 @@
     else if (action === "comp-friends-start") startCompFriends();
     else if (action === "friends-join-nearby") { sessionStorage.setItem("continuum-entry-route", "wifi"); CT.LocalMultiplayer.open({ join: true, nearby: true, onBack: friendsJoin }); }
     else if (action === "start-live-room") { if ((app.querySelector('input[name="live-net"]:checked')?.value || liveNet()) === "wifi") launchLocalMultiplayer(); else launchOnline("", null, { createOnly: true }); }
-    else if (action === "start-turn-duel") { if (navigator.onLine === false) { avisoSinRed(SIN_RED_TURNOS); return; } guardaNombreSiLoHay(); duelReady(duelKind(), null, "turnos"); }
+    else if (action === "start-turn-duel") {
+      if (navigator.onLine === false) { avisoSinRed(SIN_RED_TURNOS); return; }
+      guardaNombreSiLoHay();
+      // Ordenar las cartas por turnos va con las reglas de Retos rápidos; escribir la cifra sigue con su duelo de siempre.
+      if (duelKind() === "orden") startCollectionTurnDuel(); else duelReady(duelKind(), null, "turnos");
+    }
     else if (action === "open-quick-duel") { CT.Quick.openRoom((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); }, target.dataset.quickCode, duelsView).catch(() => showToast('No se pudo abrir el duelo. Comprueba tu conexión.')); }
     else if (action === "rematch-quick-duel" || action === "challenge-quick-rival") {
       target.disabled = true;

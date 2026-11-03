@@ -291,7 +291,7 @@ export async function actOnce(code,action,expected){
 }
 // `invite`: reto dirigido a quien ya jugó contigo en la sala `invite.source` (las reglas lo comprueban). Sin esa sala
 // (por ejemplo, una revancha de una partida por Wi-Fi) el duelo se crea sin rival fijo y se comparte por enlace.
-export async function connect({code, name, create=false, capacity=4, invite=null, onChange, onError}) {
+export async function connect({code, name, create=false, capacity=4, invite=null, catalog=null, onChange, onError}) {
   await auth.authStateReady();
   const uid=auth.currentUser?.uid;
   if(!uid) throw Error('Espera a que se prepare tu perfil e inténtalo de nuevo.');
@@ -304,7 +304,7 @@ export async function connect({code, name, create=false, capacity=4, invite=null
     const snap=await tx.get(ref);
     if(create) {
       if(snap.exists())throw Error('Ese código ya existe. Vuelve a crear la sala.');
-      tx.set(ref,{...R.create(uid,name,capacity),...(invite?.uid&&/^[A-Z2-9]{10}$/.test(String(invite.source||''))?{invitedUid:String(invite.uid).slice(0,128),invitedName:String(invite.name||'').slice(0,24),sourceRoom:String(invite.source)}:{}),catalog:CT.QuickNetwork.fingerprint(),updatedAt:serverTimestamp()});
+      tx.set(ref,{...R.create(uid,name,capacity),...(invite?.uid&&/^[A-Z2-9]{10}$/.test(String(invite.source||''))?{invitedUid:String(invite.uid).slice(0,128),invitedName:String(invite.name||'').slice(0,24),sourceRoom:String(invite.source)}:{}),catalog:catalog??CT.QuickNetwork.fingerprint(),updatedAt:serverTimestamp()});
       tx.set(doc(db,'creationQuota',uid),{lastCreatedAt:serverTimestamp(),kind:'quickRoom',target:code});
     } else {
       if(!snap.exists())throw Error('No se encuentra esta sala.');

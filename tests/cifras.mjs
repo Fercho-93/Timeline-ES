@@ -275,7 +275,13 @@ console.log("\nCrear un duelo de cifras y jugarlo");
     const porTurnos = w.document.querySelector('input[name="duel-pace"][value="turnos"]');
     porTurnos.checked = true;
     porTurnos.dispatchEvent(new w.Event("change", { bubbles: true }));
-    click(w, '[data-duel-block="turnos-orden"] [data-action="start-turn-duel"]');
+    // «Ordenar» por turnos va con las reglas de Retos rápidos (pide sala en internet); escribir la cifra sigue con su duelo.
+    ok("por turnos, ordenar elige rondas y qué pasa al fallar", existe(w, '[data-duel-block="turnos-orden"] input[name="turn-rounds"]') && existe(w, '[data-duel-block="turnos-orden"] input[name="turn-keep"]'));
+    const aCifrasTurnos = w.document.querySelector('input[name="duel-kind"][value="cifras"]');
+    aCifrasTurnos.checked = true;
+    aCifrasTurnos.dispatchEvent(new w.Event("change", { bubbles: true }));
+    click(w, '[data-duel-block="turnos-cifras"] [data-action="start-turn-duel"]');
+    w.localStorage.removeItem("hilo-duelo-prueba-v1");
     ok("por turnos no se promete un aviso que no llega", existe(w, '[data-action="duel-play"]') && /lo verás en «Tus duelos»/.test(texto(w)) && !/recibirás un aviso/.test(texto(w)));
     w.localStorage.setItem("hilo-duelo-ritmo-v1", "directo");
   }

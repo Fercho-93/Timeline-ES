@@ -4,12 +4,45 @@
   'use strict';
   const CT = window.CONTINUUM;
   const catalog = CT.QuickCatalog;
-  const challenge = id => catalog.challenges.find(c => c.id === id);
+  // Un mazo de Grandes colecciones se juega con estas mismas reglas como un reto más, con el id «col:<mazo>»
+  // (el duelo por turnos de las colecciones). Las cartas son las del mazo: el dato que ordena es su valor de
+  // la línea y la etiqueta, el texto que se enseña en la carta. Se prepara una vez por mazo.
+  const COLLECTION = 'col:';
+  const collections = new Map();
+  function collection(id) {
+    const key = id.slice(COLLECTION.length);
+    if (!CT.has?.(key)) return undefined;
+    if (!collections.has(id)) {
+      const m = CT.mode(key), axis = CT.axis(key), [left, right] = axis.ends || ['Antes', 'Después'];
+      collections.set(id, {
+        id, collection: key, title: m.name, rule: `De ${left.toLowerCase()} a ${right.toLowerCase()}`, timelineTitle: axis.timelineTitle,
+        context: m.blurb || m.tagline || '', direction: 1, cover: null, asOf: null,
+        cards: CT.cards(key).map(card => ({
+          id: String(card.id), raw: card.id, title: card.title, value: CT.sortValue(key, card), label: CT.formatValue(key, card),
+          image: CT.animalArt(key, card).match(/src="([^"]+)"/)?.[1] || null, detail: card.detail || '', curiosity: card.detail || '', source: card.source || ''
+        }))
+      });
+    }
+    return collections.get(id);
+  }
+  const isCollection = id => typeof id === 'string' && id.startsWith(COLLECTION);
+  const challenge = id => isCollection(id) ? collection(id) : catalog.challenges.find(c => c.id === id);
+  // Las rondas de un duelo de colección: tantas como se pidan (y quepan), de MULTI_CARDS cartas distintas cada una
+  // y sin dos del mismo valor, para que siempre haya un único sitio correcto.
+  function collectionRounds(key, count) {
+    const c = challenge(COLLECTION + key);
+    if (!c) throw Error('INVALID_DECK');
+    const ids = CT.shuffle(CT.uniqueValueIds(key, CT.cards(key).map(card => card.id))).map(String);
+    const n = Math.max(1, Math.min(Number(count) || 1, MAX_ROUNDS, Math.floor(ids.length / MULTI_CARDS)));
+    return Array.from({length: n}, (_, i) => ({id: c.id, order: ids.slice(i * MULTI_CARDS, (i + 1) * MULTI_CARDS)}));
+  }
   const clone = value => JSON.parse(JSON.stringify(value));
+  // Tope de rondas de un duelo de colección (de un mismo mazo).
+  const MAX_ROUNDS = 5;
   function create(config) {
     if (!config || !Array.isArray(config.names) || config.names.length < 1 || config.names.length > 8 ||
         config.names.some(n => typeof n !== 'string' || !n.trim() || n.length > 24) ||
-        !Array.isArray(config.rounds) || config.rounds.length < 1 || config.rounds.length > catalog.challenges.length) throw Error('INVALID_CONFIG');
+        !Array.isArray(config.rounds) || config.rounds.length < 1 || config.rounds.length > Math.max(catalog.challenges.length, MAX_ROUNDS)) throw Error('INVALID_CONFIG');
     if (config.keep !== undefined && typeof config.keep !== 'boolean') throw Error('INVALID_CONFIG');
     // `first`: quién abre el primer reto (0 = el primero de la lista, 1 = el segundo); la revancha de un duelo lo alterna.
     if (config.first !== undefined && !(Number.isInteger(config.first) && config.first >= 0 && config.first < config.names.length)) throw Error('INVALID_CONFIG');
@@ -104,5 +137,5 @@
   // Jugando solo (los mazos de hoy y el reto diario): 10 cartas que colocar en cada reto, como una ronda de
   // Grandes colecciones, más la que abre la línea. Un mazo más pequeño se juega entero.
   const SOLO_CARDS = 10;
-  CT.QuickEngine = {create, step, restore, challenge, keepPlaying, timeoutPlacement, MULTI_CARDS, SOLO_CARDS};
+  CT.QuickEngine = {create, step, restore, challenge, keepPlaying, timeoutPlacement, MULTI_CARDS, SOLO_CARDS, isCollection, collectionRounds, COLLECTION};
 })();

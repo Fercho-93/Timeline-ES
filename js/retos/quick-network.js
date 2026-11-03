@@ -42,10 +42,13 @@
   // La huella solo cuenta lo que hace falta para reanudar una partida (cartas, valores y sentido de cada
   // reto): los cambios de presentación (textos, imágenes) no la alteran.
   function fingerprint(){return CT.seedFrom(JSON.stringify({version:CT.QuickCatalog.version,challenges:CT.QuickCatalog.challenges.map(c=>({id:c.id,direction:c.direction,cards:c.cards.map(x=>({id:x.id,value:x.value}))}))}));}
-  function compatible(value){return value===fingerprint();}
+  // Los duelos de Grandes colecciones juegan con este motor mazos que las versiones anteriores no conocen: llevan
+  // otra huella para que una de esas versiones pida actualizar en vez de abrir una partida que no sabe jugar.
+  function collectionFingerprint(){return (fingerprint()^0x2c01ec7)>>>0;}
+  function compatible(value){return value===fingerprint()||value===collectionFingerprint();}
   async function internet(options) {return (await import('./quick-online.js')).connect(options);}
   async function mine() {return (await import('./quick-online.js')).mine();}
   async function actOnce(code, action, expected) {return (await import('./quick-online.js')).actOnce(code, action, expected);}
   async function cancelRoom(code) {return (await import('./quick-online.js')).cancelRoom(code);}
-  CT.QuickNetwork={localHost,localGuest,internet,mine,cancelRoom,actOnce,fingerprint,compatible};
+  CT.QuickNetwork={localHost,localGuest,internet,mine,cancelRoom,actOnce,fingerprint,collectionFingerprint,compatible};
 })();
