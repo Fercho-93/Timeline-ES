@@ -318,6 +318,11 @@ w.document.querySelector('[data-action="quick-challenges"]').click();
 }
 openQuick();
 assert.match(w.document.querySelector('#app').textContent, /un solo móvil/);
+// En un solo móvil, como en cualquier partida de Retos rápidos con amigos, caben de 2 a 4.
+for (let i = 0; i < 4; i++) click('[data-quick="add-player"]');
+assert.equal(w.document.querySelectorAll('[data-quick-name]').length, 4, 'no se pasa de cuatro participantes');
+assert.ok(w.document.querySelector('[data-quick="add-player"]').disabled, 'con cuatro ya no se añade nadie');
+for (let i = 0; i < 2; i++) click('[data-quick="remove-player"]');
 assert.ok(!w.document.querySelector('.quick-starter-field, [data-quick="draw-starter"]'), 'quién empieza no es un ajuste de la preparación: sale al empezar');
 click('[data-quick="start"]');
 // Un solo móvil: antes de repartir se juega el minijuego de quién empieza (con una carta de Grandes colecciones).

@@ -137,13 +137,14 @@ w.CONTINUUM.Storage.setItem('continuum-quick-duel-pace-v1', 'directo');
 Object.defineProperty(w.navigator, 'onLine', {configurable: true, get: () => true});
 CT.Quick.openDuel(html => { app.innerHTML = html; });
 assert.equal(app.querySelector('[data-offline-turnos]'), null, 'con internet no hay aviso');
-// El máximo de la sala se recuerda, el mismo que en las colecciones: de 2 a 10 en los dos.
-w.CONTINUUM.Storage.setItem('continuum-live-max-v1', '6');
+// El máximo de la sala se recuerda, el mismo que en las colecciones, pero Retos rápidos con amigos es de 2 a 4.
+w.CONTINUUM.Storage.setItem('continuum-live-max-v1', '3');
 CT.Quick.openDuel(html => { app.innerHTML = html; });
-assert.equal(app.querySelector('#quick-net-players').value, '6');
+assert.equal(app.querySelector('#quick-net-players').value, '3');
 w.CONTINUUM.Storage.setItem('continuum-live-max-v1', '10');
 CT.Quick.openDuel(html => { app.innerHTML = html; });
-assert.equal(app.querySelector('#quick-net-players').value, '10', 'en Retos rápidos también caben diez');
+assert.equal(app.querySelector('#quick-net-players').value, '4', 'diez en las colecciones son cuatro en Retos rápidos');
+assert.deepEqual([...app.querySelectorAll('#quick-net-players option')].map(o => o.value), ['2', '3', '4'], 'en Retos rápidos con amigos solo se elige de 2 a 4');
 {
   const maximo = app.querySelector('#quick-net-players'); maximo.value = '3';
   maximo.dispatchEvent(new w.Event('change', {bubbles: true}));

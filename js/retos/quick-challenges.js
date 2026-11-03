@@ -318,6 +318,8 @@
   // cartas: «Partida completa» (juegas tú y mandas un enlace; tu amigo juega cuando pueda) y «Por turnos»
   // (una sala de dos: cada uno juega desde su móvil y la partida se guarda entre turnos).
   // En el duelo por turnos, quien crea la sala elige qué pasa al fallar: seguir hasta el final o quedarse sin más turnos.
+  // Retos rápidos con amigos, en cualquier modalidad (un solo móvil, sala por internet o por Wi-Fi, mesa pública): de 2 a 4.
+  const MAX_FRIENDS=4;
   const DUEL_KEEP='continuum-quick-duel-keep-v1';
   const duelKeep=()=>CT.Storage.getItem(DUEL_KEEP)==='seguir';
   const DUEL_PACE='continuum-quick-duel-pace-v1';
@@ -342,8 +344,8 @@
     const pace=duelPace();
     // Sin internet, en directo solo cabe la Wi-Fi: se marca sola, sin cambiar lo guardado.
     const offline=navigator.onLine===false, net=offline?'wifi':liveNet();
-    // El máximo de la sala se recuerda con el de las colecciones (`CT.ManoInicial`), con el mismo tope de 10.
-    const maxRoom=Math.min(Math.max(Number(CT.ManoInicial?.maximo?.())||4,2),10);
+    // El máximo de la sala se recuerda con el de las colecciones (`CT.ManoInicial`), pero Retos rápidos con amigos es de 2 a 4.
+    const maxRoom=Math.min(Math.max(Number(CT.ManoInicial?.maximo?.())||4,2),MAX_FRIENDS);
     const option=([key,title,foot])=>`<label class="segmented-option${key===pace?' is-on':''}"><input type="radio" name="quick-duel-pace" value="${key}"${key===pace?' checked':''}><i class="duel-option-mark" aria-hidden="true">${soloGlyph(PACE_GLYPH[key])}</i><span><b>${title}</b><small>${foot}</small></span></label>`;
     const block=(key,body)=>`<div data-quick-duel-block="${key}"${key===pace?'':' hidden'}>${body}</div>`;
     // Conexión y máximo solo cuentan en directo: van antes de la duración, el tiempo y el nombre.
@@ -358,13 +360,13 @@
           <div class="field duel-kind-field"><span class="field-label" id="quick-net-label">Conexión</span>
             <div class="segmented" role="radiogroup" aria-labelledby="quick-net-label">${[['internet','Por internet','Cada uno donde esté'],['wifi','Sin internet','Cerca, en la misma Wi-Fi']].map(([key,title,foot])=>`<label class="segmented-option${key===net?' is-on':''}"><input type="radio" name="quick-live-net" value="${key}"${key===net?' checked':''}><i class="duel-option-mark" aria-hidden="true">${soloGlyph(PACE_GLYPH[key])}</i><span><b>${title}</b><small>${foot}</small></span></label>`).join('')}</div></div>
           ${offline?'<p class="hint" data-offline-note>No hay internet: jugaréis por la Wi-Fi.</p>':''}
-          <div class="field"><label for="quick-net-players">Máximo de jugadores</label><select id="quick-net-players" data-maximo-sala>${[2,3,4,5,6,7,8,9,10].map(n=>`<option value="${n}"${n===maxRoom?' selected':''}>${n} jugadores</option>`).join('')}</select></div>
+          <div class="field"><label for="quick-net-players">Máximo de jugadores</label><select id="quick-net-players" data-maximo-sala>${[2,3,4].map(n=>`<option value="${n}"${n===maxRoom?' selected':''}>${n} jugadores</option>`).join('')}</select></div>
         `)}
         ${lengthChips('quick-free-length',SHORT_LENGTHS,'Retos')}
         ${keepField(` data-quick-keep-field${pace==='seguidos'?' hidden':''}`)}
         ${CT.Tiempo.field('amigos',{porDefecto:15})}
         ${identityField()}
-        ${block('directo',`<div class="duel-brief"><p>Jugáis todos a la vez, cada uno desde su móvil, de 2 a 10 jugadores. En la sala de espera, un minijuego decide quién empieza. Por internet invitas con el código, el enlace o el QR; sin internet, con un QR.</p></div>${button('live-room','Crear sala <span>→</span>','btn btn-primary btn-block')}`)}
+        ${block('directo',`<div class="duel-brief"><p>Jugáis todos a la vez, cada uno desde su móvil, de 2 a 4 jugadores. En la sala de espera, un minijuego decide quién empieza. Por internet invitas con el código, el enlace o el QR; sin internet, con un QR.</p></div>${button('live-room','Crear sala <span>→</span>','btn btn-primary btn-block')}`)}
         ${block('seguidos',`<div class="duel-brief"><p>Juegas tú ahora y mandas un enlace: quien lo abra juega los mismos retos cuando quiera y compara su marca con la tuya. Un fallo no suma, pero se juega todo el reto. Gana quien más acierte.</p></div>
           ${button('start-duel','Jugar y retar <span>→</span>','btn btn-primary btn-block')}`)}
         ${block('turnos',`<div class="duel-brief"><p>Entre dos, cada uno desde su móvil y cuando pueda: os turnáis carta a carta. Juegas tú la primera y después le mandas el enlace a tu rival, que entra directo en la partida y ve tu última jugada. En la revancha empieza tu rival. La partida se guarda entre turnos.</p></div>
@@ -388,7 +390,7 @@
           <div class="field"><label for="quick-net-name-join">Tu nombre</label><input id="quick-net-name-join" maxlength="18" value="${ownName}"></div>
           ${button('scan-code','Escanear código QR','btn btn-secondary btn-block')}${button('join-room','Unirme <span>→</span>','btn btn-primary btn-block')}</section>`}
         ${only==='join'?'':`<section class="panel online-form">${only?'':'<span class="form-number">02</span>'}<h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código, el enlace o el QR.</p>
-          <div class="field"><label for="quick-net-name">Tu nombre</label><input id="quick-net-name" maxlength="18" value="${ownName}"></div>${capacity===2?'':`<div class="field"><label for="quick-net-players">Participantes</label><select id="quick-net-players">${[2,3,4,5,6,7,8,9,10].map(n=>`<option value="${n}"${n===capacity?' selected':''}>${n} jugadores</option>`).join('')}</select></div>`}<div class="field"><label for="quick-net-length">Duración de la partida</label><select id="quick-net-length"><option value="1">1 reto · partida rápida</option><option value="3" selected>3 retos · partida estándar</option><option value="5">5 retos · partida larga</option></select></div>
+          <div class="field"><label for="quick-net-name">Tu nombre</label><input id="quick-net-name" maxlength="18" value="${ownName}"></div>${capacity===2?'':`<div class="field"><label for="quick-net-players">Participantes</label><select id="quick-net-players">${[2,3,4].map(n=>`<option value="${n}"${n===capacity?' selected':''}>${n} jugadores</option>`).join('')}</select></div>`}<div class="field"><label for="quick-net-length">Duración de la partida</label><select id="quick-net-length"><option value="1">1 reto · partida rápida</option><option value="3" selected>3 retos · partida estándar</option><option value="5">5 retos · partida larga</option></select></div>
           ${button('create-room',only?'Crear sala <span>→</span>':'Crear sala',only?'btn btn-primary btn-block':'btn btn-secondary btn-block')}</section>`}
       </div>
       ${net && readJSON(NET) ? button('reconnect','Volver a mi sala','btn btn-secondary btn-block') : ''}
@@ -844,7 +846,7 @@
     stopNetwork();page="setup";const solo=format!=="local";
     state = null; record = null; selected = null; slot = null;
     const saved = load();
-    shell(`<section class="setup-section quick-local-setup"><h2 data-focus tabindex="-1">Retos rápidos</h2><p class="lead">${solo ? "Juega a tu ritmo: cada carta bien colocada suma un acierto y un fallo no te echa del reto." : "De 2 a 10 jugadores o equipos en un solo móvil."}</p><div class="panel">
+    shell(`<section class="setup-section quick-local-setup"><h2 data-focus tabindex="-1">Retos rápidos</h2><p class="lead">${solo ? "Juega a tu ritmo: cada carta bien colocada suma un acierto y un fallo no te echa del reto." : "De 2 a 4 jugadores o equipos en un solo móvil."}</p><div class="panel">
       <div class="setup-block"><div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Jugadores</span></div>
       <div id="quick-names">${nameFields(solo ? 1 : 2, solo ? ["Tú"] : [CT.Identidad?.propio?.() || "Jugador 1"])}</div>
       ${solo ? '' : button('add-player', '<span aria-hidden="true">+</span> Añadir participante', 'btn btn-ghost')}</div>
@@ -1236,10 +1238,10 @@
     if(formatActions.includes(action)){target.disabled=true;Promise.resolve(formatAction(action)).catch(errorNotice).finally(()=>{if(target.isConnected)target.disabled=false;});return;}
     if (action === 'add-player' || action === 'remove-player') {
       const names = [...app().querySelectorAll('[data-quick-name]')].map(el => el.value);
-      if (action === 'add-player' && names.length < 10) names.push(`Jugador ${names.length + 1}`);
+      if (action === 'add-player' && names.length < MAX_FRIENDS) names.push(`Jugador ${names.length + 1}`);
       else if (action === 'remove-player' && names.length > 2) names.splice(Number(target.dataset.index), 1);
       app().querySelector('#quick-names').innerHTML = nameFields(names.length, names);
-      app().querySelector('[data-quick="add-player"]').disabled = names.length >= 10;
+      app().querySelector('[data-quick="add-player"]').disabled = names.length >= MAX_FRIENDS;
       refreshStarterField();
       app().querySelector(`#quick-name-${names.length - 1}`)?.focus(); return;
     }
