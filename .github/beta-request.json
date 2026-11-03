@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 864,
+  "cache": 865,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Grandes colecciones por turnos con la dinámica de Retos rápidos (rondas, aciertos provisionales, plantarse y qué pasa al fallar), menú de la sala reordenado con «Expulsar» y «Zoom de las cartas» sin partirse en móviles estrechos"
+  "reason": "Grandes colecciones por turnos con la dinámica de Retos rápidos en una sola ronda, rival pendiente como «Rival por invitar» y menú de la partida con jugadores, «Denunciar o bloquear», «Expulsar» y «Rendirme»; menú de la sala reordenado"
 }
