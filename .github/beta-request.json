@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 862,
+  "cache": 864,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Retos rápidos en solitario con cuatro mazos al azar cada día y tarjeta propia para continuar la partida guardada, además de lo de la 861: reloj que empieza cuando las cartas ya han caído, sin subtítulos «¿Dónde encaja?», golpe de acierto en todas las modalidades y cartas y cabecera iguales en todas las partidas"
+  "reason": "Grandes colecciones por turnos con la dinámica de Retos rápidos (rondas, aciertos provisionales, plantarse y qué pasa al fallar), menú de la sala reordenado con «Expulsar» y «Zoom de las cartas» sin partirse en móviles estrechos"
 }
