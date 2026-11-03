@@ -882,9 +882,9 @@
     const keep = E.keepPlaying(state), n = state.players.length;
     return `<div class="quick-scores" data-n="${n}" style="--cols:${Math.min(n, 4)}" role="group" aria-label="Marcador">${state.players.map((p, i) => {
       const gone = p.status === 'gone', out = gone || (!keep && p.status === 'failed'), banked = !keep && p.status === 'banked';
-      const label = `${p.name}: ${gone ? `${p.score} asegurados. Ha salido de la partida` : keep ? `${p.points + p.score} ${p.points + p.score === 1 ? 'acierto' : 'aciertos'}. Sigue jugando` : `${p.score} asegurados, ${p.points} en juego. ${out ? 'Fuera de este reto' : banked ? 'Se ha plantado' : 'Sigue jugando'}`}`;
+      const label = `${playerName(p, i)}: ${gone ? `${p.score} asegurados. Ha salido de la partida` : keep ? `${p.points + p.score} ${p.points + p.score === 1 ? 'acierto' : 'aciertos'}. Sigue jugando` : `${p.score} asegurados, ${p.points} en juego. ${out ? 'Fuera de este reto' : banked ? 'Se ha plantado' : 'Sigue jugando'}`}`;
       const figures = keep ? `<strong>${p.score + p.points}</strong>` : `<strong>${p.score}</strong>${p.points && !out && !banked ? `<small class="quick-score-open">+${p.points}</small>` : ''}${banked ? '<small class="quick-score-state" aria-hidden="true">✓</small>' : out ? '<small class="quick-score-state" aria-hidden="true">✕</small>' : ''}`;
-      return `<span class="quick-score${i === state.current ? ' is-active' : ''}${out ? ' is-out' : ''}${banked ? ' is-banked' : ''}"${i === state.current ? ' aria-current="true"' : ''} role="group" aria-label="${esc(label)}"><i class="quick-score-avatar">${playerAvatar(p, i)}</i><span class="quick-score-copy"><b>${esc(p.name)}</b><em>${figures}</em></span></span>`;
+      return `<span class="quick-score${i === state.current ? ' is-active' : ''}${out ? ' is-out' : ''}${banked ? ' is-banked' : ''}"${i === state.current ? ' aria-current="true"' : ''} role="group" aria-label="${esc(label)}"><i class="quick-score-avatar">${playerAvatar(p, i)}</i><span class="quick-score-copy"><b>${esc(playerName(p, i))}</b><em>${figures}</em></span></span>`;
     }).join('')}</div>`;
   }
   // En solitario la única persona eres tú (se llama «Tú», no por tu nombre); en una sala,
@@ -1067,7 +1067,7 @@
     // Plantarse: botón a todo el ancho bajo la barra, para verlo a la primera. Siempre dice con cuántos puntos
     // te plantas (los aciertos provisionales de este reto); con ninguno va más discreto, con el mismo alto.
     const pass = keep ? '' : `<button class="quick-bank${p.points ? ' has-points' : ''}" data-quick="bank">${p.points ? '<span class="quick-bank-mark" aria-hidden="true">✓</span>' : ''}Plantarme con ${p.points} ${p.points === 1 ? 'acierto' : 'aciertos'}</button>`;
-    const heading = `${room && outboxHere() ? '<p class="hint" role="status">Sin conexión: tu jugada está guardada en este móvil y se enviará sola al volver.</p>' : ''}${room ? `<p class="hint">${room.members.length < state.players.length ? 'Juega tu turno: después le mandas el duelo a tu amigo' : myTurn() ? "Tu turno" : `Turno de ${esc(p.name)}`}${record?.config?.kind === 'duel' ? '' : ` · ${connection?.kind==='local' ? 'Misma Wi-Fi' : 'Sala por internet'}`}</p>` : ''}<h1 class="solo-lectores" data-focus tabindex="-1">${esc(c.title)}${!room && state.players.length === 1 ? '' : ` · Turno de ${esc(p.name)}`}</h1><div class="quick-bar${state.players.length > 2 ? ' quick-bar-many' : ''}"><span class="quick-left"><b>${state.remaining.length}</b> por colocar</span>${scores()}</div>${state.phase === 'turn' && myTurn() ? pass : ''}`;
+    const heading = `${room && outboxHere() ? '<p class="hint" role="status">Sin conexión: tu jugada está guardada en este móvil y se enviará sola al volver.</p>' : ''}${room ? `<p class="hint">${room.members.length < state.players.length ? 'Duelo por turnos: juega tu primera carta y después invita a tu rival con el enlace' : myTurn() ? "Tu turno" : `Turno de ${esc(p.name)}`}${record?.config?.kind === 'duel' ? '' : ` · ${connection?.kind==='local' ? 'Misma Wi-Fi' : 'Sala por internet'}`}</p>` : ''}<h1 class="solo-lectores" data-focus tabindex="-1">${esc(c.title)}${!room && state.players.length === 1 ? '' : ` · Turno de ${esc(p.name)}`}</h1><div class="quick-bar${state.players.length > 2 ? ' quick-bar-many' : ''}"><span class="quick-left"><b>${state.remaining.length}</b> por colocar</span>${scores()}</div>${state.phase === 'turn' && myTurn() ? pass : ''}`;
     if (room?.resigned) {
       const yo = room.resigned === myId, rival = esc(state.players.find((_, i) => room.members[i] !== myId)?.name || 'Tu rival');
       shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Duelo con un amigo · ${duelSection(state.config)}</div><h2 data-focus tabindex="-1">${yo ? 'Te has rendido' : `${rival} se ha rendido`}</h2></div></section>
@@ -1154,17 +1154,40 @@
   }
   // Quien lleva una sala privada puede, en plena partida, saltar el turno de quien no juega y sacar a alguien de la
   // partida (se quedó sin batería, se fue). En una mesa pública lo hace el juego solo con quien deja de responder.
-  function hostControls() {
-    if (!room || room.host !== myId || room.matchmaking === 'public' || room.config?.kind === 'duel' || !['turn', 'result', 'round-end'].includes(room.phase)) return '';
+  // Un rival de duelo por turnos que aún no ha abierto el enlace: no tiene nombre todavía.
+  const pendingAt=i=>!!room&&room.config?.kind==='duel'&&i>=room.members.length;
+  const playerName=(p,i)=>pendingAt(i)?'Rival por invitar':p.name;
+  // Los jugadores en el menú de la partida, como en el de las salas: avatar, nombre con «Denunciar o bloquear» debajo y,
+  // a quien lleva una sala privada, «Expulsar» (sale de la partida y conserva lo asegurado) y saltar el turno de quien no juega.
+  // En una mesa pública lo hace el juego solo; en un duelo de dos, en vez de expulsar está «Rendirme».
+  function playersSection() {
+    if (!room || !state) return '';
+    const playing = ['turn', 'result', 'round-end'].includes(room.phase);
+    const manage = room.host === myId && room.matchmaking !== 'public' && room.config?.kind !== 'duel' && playing;
     const at = room.members.indexOf(room.actor), actor = state.players[at];
-    const skip = room.actor !== myId && room.phase !== 'round-end' && actor ? button('skip-turn', `Saltar el turno de ${esc(actor.name)}`, 'btn btn-secondary btn-block') : '';
-    const drops = room.members.map((uid, i) => uid === myId || !state.players[i] || state.players[i].gone ? '' : `<button class="btn btn-ghost btn-block" data-quick="drop" data-player="${i}">Sacar a ${esc(state.players[i].name)} de la partida</button>`).join('');
-    return skip || drops ? `<div class="manage-players"><div class="section-label">Jugadores</div>${skip}${drops}</div>` : '';
+    const skip = manage && room.actor !== myId && room.phase !== 'round-end' && actor ? button('skip-turn', `Saltar el turno de ${esc(actor.name)}`, 'btn btn-secondary btn-block') : '';
+    const context = room.matchmaking === 'public' ? 'mesa' : room.config?.kind === 'duel' ? 'duelo' : 'sala';
+    const rows = state.players.map((p, i) => {
+      const uid = room.members[i];
+      if (uid === myId || p.gone) return '';
+      const pending = pendingAt(i);
+      const report = !pending && connection?.kind === 'internet' && uid ? CT.Moderacion?.botonDenuncia(uid, p.name, context) || '' : '';
+      const action = pending ? (connection?.code ? button('share-room', 'Invitar', 'kick-btn') : '')
+        : manage ? `<button class="kick-btn" data-quick="drop" data-player="${i}" aria-label="Expulsar a ${esc(p.name)}">Expulsar</button>` : '';
+      return `<div class="manage-player"><span class="seat-avatar">${playerAvatar(p, i)}</span><span class="manage-player-copy"><strong>${esc(playerName(p, i))}</strong>${pending ? '<small>Aún no ha abierto el enlace</small>' : report}</span>${action}</div>`;
+    }).join('');
+    return skip || rows ? `<div class="manage-players"><div class="section-label">Jugadores</div>${skip}${rows}</div>` : '';
   }
   function menu() {
     const c = E.challenge(state.config.rounds[state.index].id);
+    const internet = room && connection?.kind === 'internet';
     const layer = document.createElement('div'); layer.className = 'overlay';
-    layer.innerHTML = `<div class="modal"><div class="eyebrow">Retos rápidos</div><h2>Opciones de la partida</h2><p>${esc(c.rule)}. ${esc(c.context)}${c.asOf ? ` Datos a ${esc(c.asOf)}.` : ''}</p><p>${E.keepPlaying(state) ? 'Cada carta bien colocada suma un acierto. Un fallo cuenta como fallo, pero sigues jugando hasta terminar el reto.' : 'Acertar suma un acierto provisional. Plantarse lo asegura; fallar pierde los aciertos de este reto y te retira. Los aciertos anteriores se conservan.'}</p>${hostControls()}<div class="actions exit-actions">${button('close-menu', 'Seguir jugando', 'btn btn-primary btn-block')}${button('guide', 'Guía', 'btn btn-secondary btn-block')}<button class="btn btn-secondary btn-block" data-settings-action="open">Ajustes</button>${button('formats', room && connection?.kind==='internet' ? (state.config.kind==='duel' ? 'Salir del duelo' : 'Salir de la sala') : 'Guardar y salir', 'btn btn-secondary btn-block')}${room && room.capacity === 2 && room.members.length === 2 && state.config.kind === 'duel' && !room.resigned && room.phase !== 'finished' ? button('resign', 'Rendirme', 'btn btn-ghost btn-block exit-discard') : ''}${room && connection?.kind==='internet' ? '' : button('abandon', 'Salir sin guardar', 'btn btn-ghost btn-block exit-discard')}</div></div>`;
+    layer.innerHTML = `<div class="modal room-menu"><div class="eyebrow">${deckOf(state.config) ? 'Grandes colecciones' : 'Retos rápidos'}</div><h2>Opciones de la partida</h2>
+      <p class="hint">${esc(c.rule)}.${c.asOf ? ` Datos a ${esc(c.asOf)}.` : ''} ${E.keepPlaying(state) ? `Cada carta bien colocada suma un acierto; un fallo no suma, pero sigues hasta terminar ${R_('el reto', 'la ronda')}.` : `Cada acierto es provisional: plantarte lo asegura y fallar pierde los de ${R_('este reto', 'esta ronda')} y te retira.`}</p>
+      <div class="actions actions-columna">${button('close-menu', 'Seguir jugando', 'btn btn-primary')}<div class="actions-par">${button('guide', 'Guía', 'btn btn-secondary')}<button class="btn btn-secondary" data-settings-action="open">Ajustes</button></div>
+        ${button('formats', internet ? (state.config.kind === 'duel' ? 'Salir del duelo' : 'Salir de la sala') : 'Guardar y salir', 'btn btn-secondary')}</div>
+      ${playersSection()}
+      <div class="actions actions-columna">${room && room.capacity === 2 && room.members.length === 2 && state.config.kind === 'duel' && !room.resigned && room.phase !== 'finished' ? button('resign', 'Rendirme', 'btn btn-ghost exit-discard') : ''}${internet ? '' : button('abandon', 'Salir sin guardar', 'btn btn-ghost exit-discard')}</div></div>`;
     app().append(layer); CT.openDialog(layer, true);
   }
   document.addEventListener('change', event => {
@@ -1200,7 +1223,7 @@
     if (action === 'drop') {
       const at = Number(target.dataset.player), name = state?.players?.[at]?.name || 'esta persona';
       CT.closeDialog();
-      CT.UI.confirmDialog('Dejará de jugar en esta partida: conserva los aciertos que ya tenía asegurados y su turno se salta en adelante.', () => {CT.closeDialog?.(); void networkAction({type: 'drop', player: at});}, {title: `¿Sacar a ${name} de la partida?`, confirmLabel: 'Sacar de la partida', cancelLabel: 'Cancelar'});
+      CT.UI.confirmDialog('Dejará de jugar en esta partida: conserva los aciertos que ya tenía asegurados y su turno se salta en adelante.', () => {CT.closeDialog?.(); void networkAction({type: 'drop', player: at});}, {title: `¿Expulsar a ${name} de la partida?`, confirmLabel: 'Expulsar', cancelLabel: 'Cancelar'});
       return;
     }
     if (action === 'kick') {

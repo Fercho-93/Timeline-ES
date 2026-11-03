@@ -276,7 +276,7 @@ console.log("\nCrear un duelo de cifras y jugarlo");
     porTurnos.checked = true;
     porTurnos.dispatchEvent(new w.Event("change", { bubbles: true }));
     // «Ordenar» por turnos va con las reglas de Retos rápidos (pide sala en internet); escribir la cifra sigue con su duelo.
-    ok("por turnos, ordenar elige rondas y qué pasa al fallar", existe(w, '[data-duel-block="turnos-orden"] input[name="turn-rounds"]') && existe(w, '[data-duel-block="turnos-orden"] input[name="turn-keep"]'));
+    ok("por turnos, ordenar elige qué pasa al fallar y no las rondas", !existe(w, 'input[name="turn-rounds"]') && existe(w, '[data-duel-block="turnos-orden"] input[name="turn-keep"]'));
     const aCifrasTurnos = w.document.querySelector('input[name="duel-kind"][value="cifras"]');
     aCifrasTurnos.checked = true;
     aCifrasTurnos.dispatchEvent(new w.Event("change", { bubbles: true }));
