@@ -938,11 +938,23 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .solo-lives { margin: -6px 0 14px; font-size: 1.25rem; letter-spacing: .18em; color: var(--accent); }
 .hand-solo { grid-template-columns: minmax(0, 260px); }
 .hand-solo .hand-card { cursor: grab; }
-.kick-btn { min-height: 44px; padding: 7px 14px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--accent); font: inherit; font-size: .68rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
+.kick-btn { min-height: 44px; padding: 7px 14px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--accent); font: inherit; font-size: .68rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; cursor: pointer; }
 .kick-btn:active { background: rgba(143,47,42,.1); }
+/* Lista de jugadores en el menú de la sala: avatar, nombre (con «Denunciar o bloquear» o el
+   estado debajo) y, a la derecha, «Expulsar». Tres columnas, y cada fila en una sola línea. */
 .manage-players { margin-top: 18px; text-align: left; }
-.manage-player { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 10px; padding: 7px 0; }
-.manage-player > span { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--accent-solid); font-size: .625rem; font-weight: 700; }
+.manage-players > .btn-block { margin-bottom: 8px; }
+.manage-player { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 7px 0; }
+.manage-player + .manage-player { border-top: 1px solid var(--line); }
+.manage-player-copy { display: grid; justify-items: start; min-width: 0; }
+.manage-player-copy > strong { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.manage-player-copy > small { color: var(--muted); font-size: .75rem; }
+/* Dos botones cortos que van juntos (Guía y Ajustes, enlace y QR) comparten fila. */
+.actions-par { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.actions-par > .btn { margin: 0; padding-inline: 10px; }
+.room-menu > .hint { text-wrap: balance; }
+@media (max-width: 340px) { .actions-par { grid-template-columns: 1fr; } }
+.manage-player > .seat-avatar { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--accent-solid); font-size: .625rem; font-weight: 700; }
 .lobby-settings { align-self: start; }
 .lobby-settings .field + .field { margin-top: 12px; }
 .lobby-settings .btn-primary { margin-top: 18px; }

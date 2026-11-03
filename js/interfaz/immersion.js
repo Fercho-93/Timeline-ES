@@ -909,7 +909,8 @@
         const level = e.target.closest('[data-zoom-level]');
         if (level) setTimeout(() => block.querySelectorAll('[data-zoom-level]').forEach(b => b.setAttribute('aria-pressed', String(b === level))), 0);
       });
-      const title = modal.querySelector('h2');
+      // Bajo el título y, si lo hay, bajo el aviso que lo acompaña («La partida continúa…»).
+      const title = modal.querySelector('h2 + .hint') || modal.querySelector('h2');
       if (title) title.after(block); else modal.prepend(block);
     }, 0);
   });

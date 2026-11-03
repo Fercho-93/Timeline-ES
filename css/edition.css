@@ -3832,6 +3832,10 @@ html #app .home-nav.atlas-nav button[aria-current="page"] {
 .menu-view-zoom button[aria-pressed="true"] { background: var(--terracota); color: #fff6e8; }
 .menu-view-row > span { text-align: left; }
 .menu-view-zoom { flex: none; }
+/* En pantallas estrechas el texto no cabe junto a los tres botones: en vez de partirse
+   letra a letra, los botones bajan a su propia línea. */
+.menu-view-row { flex-wrap: wrap; }
+.menu-view-row > span { flex: 1 1 5.5em; min-width: 5.5em; }
 #app .modal .menu-view-zoom button { width: auto !important; min-width: 0; white-space: nowrap; padding: 0 11px; }
 
 /* Gran mezcla: la carta de la mano se ve igual que en Grandes colecciones. La temática ya no es

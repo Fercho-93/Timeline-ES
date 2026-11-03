@@ -1742,23 +1742,27 @@ function roomMenu() {
   const inFinal = roomState?.phase === 'final';
   const currentUid = playing ? roomState.playerOrder[roomState.current] : null;
   const currentName = currentUid ? roomState.players[currentUid].name : "";
-  const others = (roomState?.playerOrder || []).filter(uid => uid !== roomState.hostUid);
-  appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-room-overlay><div class="modal">
+  const contexto = roomState?.matchmaking === 'public' ? 'mesa' : 'sala';
+  // Quien lleva la sala puede expulsar a los demás (no en la final); el resto solo ve la lista.
+  const puedeExpulsar = isHost && !inFinal;
+  const otros = (roomState?.playerOrder || []).filter(uid => uid !== user.uid && (!puedeExpulsar || uid !== roomState.hostUid));
+  const fila = uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><span class="manage-player-copy"><strong>${escapeHtml(shownName(roomState.players[uid].name))}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, contexto) || ''}</span>${puedeExpulsar ? `<button class="kick-btn" data-online-action="kick" data-uid="${uid}" aria-label="Expulsar a ${escapeHtml(shownName(roomState.players[uid].name))}">Expulsar</button>` : ''}</div>`;
+  const saltar = isHost && playing && !inFinal ? `<button class="btn btn-secondary btn-block" data-online-action="skip">Saltar el turno de ${escapeHtml(currentName)}</button>` : "";
+  // Orden: seguir (lo más probable), ayuda, invitar, salir de la pantalla; luego la gestión de
+  // jugadores y, separada al final, la salida que cierra o abandona la sala.
+  appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-room-overlay><div class="modal room-menu">
     <div class="eyebrow">Sala ${roomCode}</div><h2>${playing ? "Opciones de la partida" : "Opciones de la sala"}</h2>${playing ? '<p class="hint">La partida continúa mientras consultas este menú.</p>' : ""}
     <div class="actions actions-columna">
-      <button class="btn btn-secondary" data-online-action="guide">Guía</button>${CT.settingsButton()}
-      <button class="btn btn-secondary" data-online-action="back">Volver a la pantalla anterior</button>
-      <button class="btn btn-secondary" data-online-action="share">Compartir enlace</button>
-      <button class="btn btn-secondary" data-online-action="qr">Mostrar QR</button>
+      <button class="btn btn-primary" data-online-action="close-room-menu">${playing ? "Seguir jugando" : "Seguir en la sala"}</button>
+      <div class="actions-par"><button class="btn btn-secondary" data-online-action="guide">Guía</button>${CT.settingsButton()}</div>
+      <div class="actions-par"><button class="btn btn-secondary" data-online-action="share">Compartir enlace</button><button class="btn btn-secondary" data-online-action="qr">Mostrar QR</button></div>
       ${canClaimHost() ? '<button class="btn btn-secondary" data-online-action="claim-host">Tomar relevo del anfitrión</button>' : ""}
-      ${isHost && playing && !inFinal ? `<button class="btn btn-ghost" data-online-action="skip">Saltar el turno de ${escapeHtml(currentName)}</button>` : ""}
+      <button class="btn btn-secondary" data-online-action="back">Volver a la pantalla anterior</button>
     </div>
-    ${isHost && others.length && !inFinal ? `<div class="manage-players"><div class="section-label">Jugadores</div>${others.map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(shownName(roomState.players[uid].name))}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, roomState.matchmaking === 'public' ? 'mesa' : 'sala') || ''}<button class="kick-btn" data-online-action="kick" data-uid="${uid}">Expulsar</button></div>`).join("")}</div>` : ""}
-    ${!(isHost && others.length && !inFinal) && roomState?.playerOrder?.some(uid => uid !== user.uid) ? `<div class="manage-players"><div class="section-label">Jugadores</div>${roomState.playerOrder.filter(uid => uid !== user.uid).map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'uid:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(shownName(roomState.players[uid].name))}</strong>${CT.Moderacion?.botonDenuncia(uid, roomState.players[uid].name, roomState.matchmaking === 'public' ? 'mesa' : 'sala') || ''}</div>`).join("")}</div>` : ""}
+    ${saltar || otros.length ? `<div class="manage-players"><div class="section-label">Jugadores</div>${saltar}${otros.map(fila).join("")}</div>` : ""}
     ${inFinal ? '<p>La final espera a todos los finalistas. Si alguien se desconecta, puede volver a entrar y responder.</p>' : ''}
     <div class="actions actions-columna">
-      ${isHost && playing ? '<button class="btn btn-ghost" data-online-action="close-room">Terminar partida y cerrar sala</button>' : isHost ? '<button class="btn btn-ghost" data-online-action="close-room">Cerrar la sala</button>' : inFinal ? '<button class="btn btn-ghost" data-online-action="home">Ir al inicio</button>' : `<button class="btn btn-ghost" data-online-action="leave-room">${playing ? "Salir de la partida" : "Salir de la sala"}</button>`}
-      <button class="btn btn-primary" data-online-action="close-room-menu">Seguir jugando</button>
+      ${isHost && playing ? '<button class="btn btn-ghost exit-discard" data-online-action="close-room">Terminar partida y cerrar sala</button>' : isHost ? '<button class="btn btn-ghost exit-discard" data-online-action="close-room">Cerrar la sala</button>' : inFinal ? '<button class="btn btn-ghost" data-online-action="home">Ir al inicio</button>' : `<button class="btn btn-ghost exit-discard" data-online-action="leave-room">${playing ? "Salir de la partida" : "Salir de la sala"}</button>`}
     </div>
   </div></div>`);
   abreCapa(appEl.querySelector("[data-room-overlay]"), true);
