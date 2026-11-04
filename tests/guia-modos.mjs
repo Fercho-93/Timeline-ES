@@ -46,6 +46,11 @@ for (const [action, kind, screen, branches] of CASES) {
   assert.equal(layer.getAttribute('role'), 'dialog');
   assert.equal(layer.getAttribute('aria-modal'), 'true');
   assert.deepEqual([...layer.querySelectorAll('.mode-guide-node b')].map(b => b.textContent), branches, `${action}: las ramas del árbol`);
+  // Cómo se juega (con la línea dibujada) y los dos juegos cara a cara, cada uno con su lógica.
+  assert.ok(layer.querySelector('.mode-guide-how svg.mode-guide-line'), `${action}: la línea dibujada`);
+  assert.ok(layer.querySelector('.mode-guide-how p').textContent.length > 20, `${action}: la frase de cómo se juega`);
+  assert.deepEqual([...layer.querySelectorAll('.mode-guide-game b')].map(b => b.textContent), ['Grandes colecciones', 'Retos rápidos']);
+  layer.querySelectorAll('.mode-guide-game p').forEach(p => assert.ok(p.textContent.length > 20, `${action}: cada juego dice cómo funciona`));
   assert.equal(doc.activeElement, layer.querySelector('[data-mode-guide-go]'), 'el foco va a la lámina');
   // Un toque en cualquier parte la retira y devuelve el foco al título de la pantalla.
   layer.click();
@@ -87,6 +92,13 @@ await enter('friends-hub'); guide().click();
 await enter('local-hub');
 assert.equal(app.dataset.screen, 'hub-friends-local');
 assert.equal(guide(), null, 'dentro de Jugar con amigos no vuelve a salir');
+
+// Con amigos, la lámina cuenta la lógica en grupo: la mano y el robo en Grandes colecciones;
+// arriesgar o plantarse en Retos rápidos. Solo, las vidas y la dificultad.
+const text = kind => { const g = w.CONTINUUM.ModeHubs.guides[kind]; return [g.how, ...g.games, ...g.branches.flat(2)].join(' '); };
+assert.match(text('friends'), /mano/); assert.match(text('friends'), /robas/); assert.match(text('friends'), /plantarse/);
+assert.match(text('online'), /plántate/); assert.match(text('online'), /2 a 4/);
+assert.match(text('solo'), /vidas/); assert.match(text('solo'), /Dificultad/);
 
 console.log('guia-modos: ok');
 w.close();
