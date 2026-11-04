@@ -2708,13 +2708,13 @@
   // cartas de este mazo: quien crea el duelo elige qué pasa al fallar. Elegir varias rondas es cosa de Retos rápidos.
   const TURN_KEEP_KEY = "continuum-turnos-fallo-v1";
   const turnKeep = () => CT.Storage.getItem(TURN_KEEP_KEY) === "seguir";
-  // Cuántos juegan por turnos (al ordenar) y con las mismas cartas: de 2 a 4. En directo manda el máximo de la sala (2–10).
+  // Cuántos juegan por turnos (al ordenar) y con las mismas cartas: de 2 a 10, como en directo (ahí manda el máximo de la sala).
   const DUEL_GROUP_KEY = "continuum-amigos-grupo-v1";
-  const duelGroup = () => { const n = Number(CT.Storage.getItem(DUEL_GROUP_KEY)); return [2, 3, 4].includes(n) ? n : 2; };
+  const duelGroup = () => { const n = Number(CT.Storage.getItem(DUEL_GROUP_KEY)); return n >= 2 && n <= 10 && Number.isInteger(n) ? n : 2; };
   const groupShown = (ritmo, prueba) => ritmo === "seguidos" || (ritmo === "turnos" && prueba === "orden");
   function duelGroupField(ritmo, prueba) {
     const n = duelGroup();
-    return `<div class="field" data-duel-group${groupShown(ritmo, prueba) ? "" : " hidden"}><label for="duel-group">Jugadores</label><select id="duel-group">${[2, 3, 4].map(k => `<option value="${k}"${k === n ? " selected" : ""}>${k} jugadores</option>`).join("")}</select></div>`;
+    return `<div class="field" data-duel-group${groupShown(ritmo, prueba) ? "" : " hidden"}><label for="duel-group">Jugadores</label><select id="duel-group">${[2, 3, 4, 5, 6, 7, 8, 9, 10].map(k => `<option value="${k}"${k === n ? " selected" : ""}>${k} jugadores</option>`).join("")}</select></div>`;
   }
   function turnRulesFields(visible = true) {
     const opcion = (name, clave, titulo, pie, on) => `<label class="segmented-option${on ? " is-on" : ""}"><input type="radio" name="${name}" value="${clave}"${on ? " checked" : ""}><span><b>${titulo}</b><small>${pie}</small></span></label>`;

@@ -277,7 +277,7 @@ console.log("\nCrear un duelo de cifras y jugarlo");
     porTurnos.dispatchEvent(new w.Event("change", { bubbles: true }));
     // «Ordenar» por turnos va con las reglas de Retos rápidos (pide sala en internet); escribir la cifra sigue con su duelo.
     ok("por turnos, ordenar elige qué pasa al fallar y no las rondas", !existe(w, 'input[name="turn-rounds"]') && existe(w, '[data-duel-keep]:not([hidden]) input[name="turn-keep"]'));
-    ok("y cuántos juegan, de 2 a 4", existe(w, '[data-duel-group]:not([hidden]) #duel-group') && [...w.document.querySelectorAll('#duel-group option')].map(o => o.value).join() === "2,3,4");
+    ok("y cuántos juegan, de 2 a 10", existe(w, '[data-duel-group]:not([hidden]) #duel-group') && [...w.document.querySelectorAll('#duel-group option')].map(o => o.value).join() === "2,3,4,5,6,7,8,9,10");
     // Orden común con Retos rápidos: jugadores, qué pasa al fallar, reloj, nombre y botón; sin textos de explicación.
     const pos = sel => [...w.document.querySelectorAll('*')].indexOf(w.document.querySelector(sel));
     const orden = ['#duel-group', '[data-duel-keep]', '.tiempo-field, [data-tiempo]', '#duel-name', '[data-duel-block="turnos-orden"] [data-action="start-turn-duel"]'].map(pos);

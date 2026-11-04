@@ -34,7 +34,7 @@
     }
   }
   // Duelo por turnos recién empezado por quien lo crea: la partida ya tiene dos jugadores, pero el segundo aún no ha entrado.
-  const FRIEND = 'Tu amigo', DUEL_MAX = 4;
+  const FRIEND = 'Tu amigo', DUEL_MAX = 10;
   // El nombre provisional de cada plaza libre de un duelo (en el de dos, «Tu amigo», como siempre).
   const seatName = (capacity, i) => capacity === 2 ? FRIEND : `Jugador ${i + 1}`;
   function waitingFriend(room) {

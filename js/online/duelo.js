@@ -404,11 +404,11 @@
     return aBase64url(campos.join("|"));
   }
 
-  // «Mismas cartas» en grupo (3 o 4 personas): dos campos más al final, el tamaño del grupo y lo que sacaron
+  // «Mismas cartas» en grupo (de 3 a 10 personas): dos campos más al final, el tamaño del grupo y lo que sacaron
   // quienes jugaron antes que quien manda el enlace («nombre~marca;…»). Cada uno se lo pasa al siguiente, y el
   // último ve la clasificación entera. La marca de quien manda el enlace es la de siempre, comprobada carta a carta;
   // las anteriores viajan tal cual. Los enlaces de dos siguen teniendo ocho campos.
-  const MAX_GRUPO = 4;
+  const MAX_GRUPO = 10;
   function colaGrupo(grupo, previos) {
     if (!(Number(grupo) > 2)) return [];
     const limpio = nombre => limpiaNombre(nombre).replace(/[~;]/g, " ").trim() || "Jugador";

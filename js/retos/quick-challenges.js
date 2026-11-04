@@ -97,7 +97,7 @@
   let previewCode=null, serverRoom=null, duelRoom=false, duelStarting=false, duelFirst=0, backTo=null, pendingInvite=null;
   // Duelo por turnos de Grandes colecciones: el mazo elegido (su clave). Se juega con estas mismas reglas, con rondas
   // de ese mazo en vez de retos sorpresa (QuickEngine: «col:<mazo>»).
-  let duelDeck=null;
+  let duelDeck=null, duelPlayers=null;
   const deckOf=config=>{const id=config?.rounds?.[0]?.id;return E.isCollection(id)?E.challenge(id)?.collection||null:null;};
   // En un duelo de colección no se juegan retos sino rondas del mismo mazo: el texto se adapta.
   const R_=(reto,ronda)=>deckOf(state?.config)?ronda:reto;
@@ -328,8 +328,11 @@
   // En el duelo por turnos, quien crea la sala elige qué pasa al fallar: seguir hasta el final o quedarse sin más turnos.
   // Retos rápidos con amigos, en cualquier modalidad (un solo móvil, sala por internet o por Wi-Fi, mesa pública): de 2 a 4.
   const MAX_FRIENDS=4;
+  // Un duelo de Grandes colecciones (mismo motor) admite de 2 a 10; uno de Retos rápidos, de 2 a 4.
+  const DUEL_CAP=10;
+  const seatsMax=()=>duelDeck?DUEL_CAP:MAX_FRIENDS;
   // Cuántos juegan por turnos o con las mismas cartas (de 2 a 4; por defecto, 2). Se recuerda con lo mismo que en las colecciones.
-  const DUEL_GROUP='continuum-amigos-grupo-v1';
+  const DUEL_GROUP='continuum-quick-grupo-v1';
   const duelGroup=()=>{const n=Number(CT.Storage.getItem(DUEL_GROUP));return [2,3,4].includes(n)?n:2;};
   const DUEL_KEEP='continuum-quick-duel-keep-v1';
   const duelKeep=()=>CT.Storage.getItem(DUEL_KEEP)==='seguir';
@@ -351,7 +354,7 @@
   // El duelo por turnos se guarda en el servidor entre jugadas: sin internet no se puede crear.
   const OFFLINE_TURNS='Sin internet no se puede crear un duelo por turnos. Podéis jugar en directo, por la Wi-Fi, o con «Mismas cartas».';
   function duelSetup() {
-    stopNetwork(); duelFirst=0; duelDeck=null; page='duel-setup'; format='duel'; netKind='internet'; roomCapacity=2; state=null; record=null; selected=null; slot=null;
+    stopNetwork(); duelFirst=0; duelDeck=null; duelPlayers=null; page='duel-setup'; format='duel'; netKind='internet'; roomCapacity=2; state=null; record=null; selected=null; slot=null;
     const pace=duelPace();
     // Sin internet, en directo solo cabe la Wi-Fi: se marca sola, sin cambiar lo guardado.
     const offline=navigator.onLine===false, net=offline?'wifi':liveNet();
@@ -425,7 +428,7 @@
     const freshOwnPlace=room && previous && room.members.includes(id) && next.commands.length===previous.commands.length+1
       && previous.actor===id && next.commands.at(-1)?.type==='place';
     serverRoom=next;
-    if(!backTo&&next.capacity<=MAX_FRIENDS&&next.config?.kind==='duel'&&!next.matchmaking)backTo=()=>window.dispatchEvent(new CustomEvent('continuum:duels-list'));
+    if(!backTo&&next.capacity<=DUEL_CAP&&next.config?.kind==='duel'&&!next.matchmaking)backTo=()=>window.dispatchEvent(new CustomEvent('continuum:duels-list'));
     room=CT.QuickRoom.validate(withOutbox(next,id,code));myId=id;busy=false;page='network-lobby';
     if(readOutbox()&&!flushing&&navigator.onLine!==false)void flushOutbox();
     if(code)CT.Storage.setItem(NET,JSON.stringify({code,name:room.names[room.members.indexOf(id)],duel:duelRoom,len:roomLength,...(duelDeck?{deck:duelDeck}:{})}));
@@ -538,7 +541,7 @@
     if(room.phase==='round-end')return mioTurno?{...base,grupo:'tu-turno',pendiente:true,estado:'Te toca',detalle:deckOf(cfg)?'Pasa a la siguiente ronda':'Pasa al siguiente mazo'}:{...base,grupo:'su-turno',pendiente:false,estado:`Turno de ${turnoDe}`,detalle:deckOf(cfg)?'Pasa a la siguiente ronda':'Pasa al siguiente mazo'};
     return mioTurno?{...base,grupo:'tu-turno',pendiente:true,estado:'Te toca',detalle:where}:{...base,grupo:'su-turno',pendiente:false,estado:`Turno de ${turnoDe}`,detalle:where};
   }
-  const isDuel=room=>room.capacity<=MAX_FRIENDS&&room.config?.kind==='duel'&&!room.matchmaking;
+  const isDuel=room=>room.capacity<=DUEL_CAP&&room.config?.kind==='duel'&&!room.matchmaking;
   // Los duelos de tu cuenta con su estado actual. Sin conexión se enseña lo último que se supo.
   async function duels() {
     try{
@@ -552,7 +555,8 @@
   // si se sabe contra quién es, el reto le llega a su lista de duelos, como en las colecciones.
   async function createDuelRoom({renderPage,name,length,keep,iStart,invite,back,deck=null,players=2}) {
     paint=renderPage;entry='duel-setup';duelSetup();backTo=back||null;duelFirst=iStart?0:1;duelDeck=CT.has(deck)?deck:null;
-    const seats=app().querySelector('#quick-duel-group');if(seats)seats.value=String(Math.min(Math.max(Number(players)||2,2),MAX_FRIENDS));
+    // El número de jugadores va por aquí y no por el desplegable (que solo llega a 4): en colecciones pueden ser hasta 10.
+    duelPlayers=Math.min(Math.max(Number(players)||2,2),seatsMax());
     CT.Storage.setItem(DUEL_PACE,'turnos');CT.Storage.setItem(DUEL_KEEP,keep?'seguir':'fuera');
     pendingInvite=invite||null;
     app().querySelector('#quick-net-name').value=name||CT.Identidad?.propio?.()||'';
@@ -636,7 +640,7 @@
     clearInterval(publicClock);publicClock=null;
     const draft=app().querySelector('#quick-room-starter-input')?.value||'';
     state=null;const host=myId===room.host, cap=room.capacity, count=room.members.length;
-    if((duelRoom && cap<=MAX_FRIENDS) || (cap===2 && !host && room.invitedUid)) {duelWaiting(code,host);return;}
+    if((duelRoom && cap<=DUEL_CAP) || (cap===2 && !host && room.invitedUid)) {duelWaiting(code,host);return;}
     const slots=SEAT_SLOTS[cap]||SEAT_SLOTS[8], table=Array(cap===10?10:9).fill('<div class="table-seat is-unused" aria-hidden="true"></div>');
     slots.forEach((slot,i)=>{
       const mine=room.members[i]===myId, name=mine?room.names[i]:room.names[i]&&(CT.Moderacion?.visible?.(room.names[i])??room.names[i]);
@@ -667,7 +671,7 @@
     if(create&&duelRoom){netKind='internet';if(navigator.onLine===false)throw Error('Sin internet no se puede crear un duelo por turnos.');}
     const nameInput=app().querySelector(create?'#quick-net-name':'#quick-net-name-join') || app().querySelector('#quick-net-name'), name=nameInput.value.trim();if(!name)throw Error('Escribe tu nombre.');{const rechazado=CT.Moderacion?.problema(name);if(rechazado)throw Error(rechazado);}
     // Un duelo por turnos es de 2 a 4, como cualquier partida de Retos rápidos con amigos.
-    if (create) roomCapacity = duelRoom ? Math.min(Math.max(Number(app().querySelector('#quick-duel-group')?.value)||2,2),MAX_FRIENDS) : Number(app().querySelector('#quick-net-players')?.value) || roomCapacity;
+    if (create) roomCapacity = duelRoom ? (duelPlayers ?? Math.min(Math.max(Number(app().querySelector('#quick-duel-group')?.value)||2,2),MAX_FRIENDS)) : Number(app().querySelector('#quick-net-players')?.value) || roomCapacity;
     // La duración que se eligió al crear la sala; en la sala ya no hay desplegable, y sin esto siempre eran 3 retos.
     if (create) roomLength = Number(app().querySelector('#quick-net-length')?.value || app().querySelector('#quick-free-length')?.value) || 3;
     let code=app().querySelector('#quick-net-code').value.trim();

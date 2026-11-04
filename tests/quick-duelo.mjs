@@ -254,7 +254,10 @@ assert.equal(w.location.origin, 'https://continuum.test');
   [row] = await CT.Quick.duels();
   assert.equal(row.grupo, 'su-turno'); assert.equal(row.estado, 'Turno de Sara'); assert.match(row.marcador, /^Tú \d · Luis \d · Sara \d aciertos$/);
   assert.equal(row.players, 3, 'la revancha se crea con las mismas plazas');
-  assert.throws(() => R.reduce(R.create('me', 'Tester', 5), 'me', {type: 'start', rounds: rondas, kind: 'duel'}), /dos personas/, 'un duelo por turnos es de 4 como mucho');
+  // El motor admite hasta 10 plazas (Grandes colecciones); que Retos rápidos se quede en 4 lo decide la pantalla.
+  let diez = R.create('me', 'Tester', 10); diez = R.reduce(diez, 'me', {type: 'start', rounds: rondas, kind: 'duel', keep: true});
+  assert.equal(R.state(diez).players.length, 10, 'un duelo de diez reserva diez plazas');
+  assert.throws(() => R.reduce(R.create('me', 'Tester', 11), 'me', {type: 'start', rounds: rondas, kind: 'duel'}), /Sala no válida|dos personas/, 'más de diez no cabe');
 }
 // Grandes colecciones por turnos: el mazo elegido se juega con estas reglas, en rondas de 9 cartas más la de salida.
 {

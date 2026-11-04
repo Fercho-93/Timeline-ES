@@ -67,7 +67,7 @@ service cloud.firestore {
       // siguiente plaza libre y la partida sigue donde está. Su nombre sustituye al provisional de esa plaza.
       function joiningStarted(a,b) {
         let k = a.members.size();
-        return a.phase in ['turn','result','round-end'] && a.capacity <= 4 && k < a.capacity && a.get('matchmaking','private') != 'public'
+        return a.phase in ['turn','result','round-end'] && a.capacity <= 10 && k < a.capacity && a.get('matchmaking','private') != 'public'
           && a.config != null && a.config.get('kind','') == 'duel' && !(request.auth.uid in a.members)
           && a.get('invitedUid', request.auth.uid) == request.auth.uid
           && b.diff(a).affectedKeys().hasOnly(['members','names','config','actor','revision','updatedAt'])
@@ -185,7 +185,7 @@ service cloud.firestore {
       }
       function starting(a,b) {
         return request.auth.uid == a.host && a.phase == 'lobby'
-          && (a.members.size() >= 2 || (a.capacity <= 4 && a.get('matchmaking','private') != 'public' && b.config.get('kind','') == 'duel'))
+          && (a.members.size() >= 2 || (a.capacity <= 10 && a.get('matchmaking','private') != 'public' && b.config.get('kind','') == 'duel'))
           // Mesa pública: empieza al completarse o, con al menos dos personas, cuando lleva
           // un rato sin que entre nadie (la pantalla cuenta 30 s; aquí se exigen 25).
           && (a.get('matchmaking','private') != 'public' || a.members.size() == a.capacity
@@ -198,10 +198,19 @@ service cloud.firestore {
           && (!('keep' in b.config.keys()) || b.config.keep is bool)
           && (!('first' in b.config.keys()) || ((a.members.size() == 1 && b.config.first is int && b.config.first >= 0 && b.config.first < a.capacity)
               || (a.members.size() >= 2 && b.config.first is int && b.config.first >= 0 && b.config.first < a.members.size())))
-          // Duelo por turnos empezado a solas: una plaza por jugador, con su nombre provisional hasta que entre.
+          // Duelo por turnos empezado a solas: una plaza por jugador, con su nombre provisional hasta que entre
+          // («Tu amigo» en el de dos; «Jugador N» en los de grupo, que se comparan tal cual: es mucho más barato
+          // que revisar diez nombres como los de verdad).
           && (b.config.names == a.names || (a.members.size() == 1 && b.config.names.size() == a.capacity && b.config.names[0] == a.names[0]
-              && publicName(b.config.names[1], 24) && (a.capacity < 3 || publicName(b.config.names[2], 24))
-              && (a.capacity < 4 || publicName(b.config.names[3], 24))))
+              && (a.capacity == 2 ? publicName(b.config.names[1], 24)
+                : b.config.names[1] == 'Jugador 2' && b.config.names[2] == 'Jugador 3'
+                  && (a.capacity < 4 || b.config.names[3] == 'Jugador 4')
+                  && (a.capacity < 5 || b.config.names[4] == 'Jugador 5')
+                  && (a.capacity < 6 || b.config.names[5] == 'Jugador 6')
+                  && (a.capacity < 7 || b.config.names[6] == 'Jugador 7')
+                  && (a.capacity < 8 || b.config.names[7] == 'Jugador 8')
+                  && (a.capacity < 9 || b.config.names[8] == 'Jugador 9')
+                  && (a.capacity < 10 || b.config.names[9] == 'Jugador 10'))))
           && b.config.rounds is list && b.config.rounds.size() in [1,3,5]
           && (!('kind' in b.config.keys()) || b.config.kind in ['duel','network','public'])
           && (!('historyId' in b.config.keys()) || b.config.historyId == null || (b.config.historyId is string && b.config.historyId.size() <= 64))
@@ -229,7 +238,7 @@ service cloud.firestore {
       allow get: if registered() && (!exists(/databases/$(database)/documents/quickRooms/$(code)) || resource.data.phase=='lobby' || request.auth.uid in resource.data.members
         // Un duelo por turnos con el sitio del amigo libre se lee con el enlace para poder entrar.
         || (resource.data.capacity==2 && resource.data.members.size()==1 && resource.data.get('matchmaking','private')!='public')
-        || (resource.data.capacity in [3,4] && resource.data.members.size() < resource.data.capacity && resource.data.get('matchmaking','private')!='public'
+        || (resource.data.capacity >= 3 && resource.data.capacity <= 10 && resource.data.members.size() < resource.data.capacity && resource.data.get('matchmaking','private')!='public'
           && resource.data.config != null && resource.data.config.get('kind','') == 'duel'));
       // Tus salas (consulta con members array-contains tu uid): la lista unificada de duelos.
       allow list: if registered() && (request.auth.uid in resource.data.members || resource.data.get('invitedUid','') == request.auth.uid);
@@ -249,7 +258,7 @@ service cloud.firestore {
           // cerca del límite de expresiones) no pagan su coste.
           || kicking(resource.data,request.resource.data) || forcing(resource.data,request.resource.data) || dropping(resource.data,request.resource.data));
       allow delete: if registered() && request.auth.uid==resource.data.host
-        && (!(resource.data.capacity<=4 && resource.data.config!=null && resource.data.config.get('kind','')=='duel')
+        && (!(resource.data.capacity<=10 && resource.data.config!=null && resource.data.config.get('kind','')=='duel')
           || (resource.data.members.size()==1 && resource.data.phase!='finished'));
     }
 

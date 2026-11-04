@@ -152,8 +152,10 @@ console.log("\nLa carga útil da la vuelta entera");
   ok("un reto de dos no lleva grupo", leido.duelo.grupo === undefined);
   const deMas = D.descodificar(D.codificar({ mode: "history", seed: "x1", total: 1, hits: 1, sequence: [true], nombre: "A", grupo: 3, previos: [["B", 1], ["C", 1], ["D", 1]] }));
   ok("no viajan más resultados de los que caben en el grupo", deMas.ok === true && deMas.duelo.previos.length === 1);
-  const roto = w.CONTINUUM.LocalTransport.encodeText(w.CONTINUUM.LocalTransport.decodeText(payload) + "|9|x~1");
-  ok("un grupo fuera de 3 o 4 se rechaza", D.descodificar(roto).ok === false);
+  const roto = w.CONTINUUM.LocalTransport.encodeText(w.CONTINUUM.LocalTransport.decodeText(payload) + "|11|x~1");
+  ok("un grupo fuera de 3 a 10 se rechaza", D.descodificar(roto).ok === false);
+  const dePrueba = D.descodificar(D.codificar({ mode: "history", seed: "x1", total: 1, hits: 1, sequence: [true], nombre: "A", grupo: 10, previos: Array.from({ length: 8 }, (_, i) => ["J" + i, i]) }));
+  ok("en colecciones caben grupos de hasta 10", dePrueba.ok === true && dePrueba.duelo.grupo === 10 && dePrueba.duelo.previos.length === 8);
 
   ok("el enlace apunta a la propia aplicación sin enviar el duelo en la consulta HTTP", D.enlace(payload).startsWith("https://continuumjuego.es/invitation.html") && D.enlace(payload).includes("#duelo="));
 }

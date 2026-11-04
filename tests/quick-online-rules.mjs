@@ -370,6 +370,18 @@ try {
     assert.equal(t.actor,'outsider');
     t=R.reduce(t,'outsider',{type:'place',cardId:'poker-4',index:0});await assertSucceeds(write(out,t));
   }
+  // Duelo por turnos de diez (Grandes colecciones): las diez plazas se reservan al empezar y se ocupan en orden.
+  {
+    await env.clearFirestore();
+    const rondas=[{id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}];
+    let t=R.create('host','Ana',10);await assertSucceeds(write(host,t));
+    t=R.reduce(t,'host',{type:'start',rounds:rondas,kind:'duel',keep:true,first:0});await assertSucceeds(write(host,t));
+    assert.equal(t.config.names.length,10);
+    t=R.reduce(t,'host',{type:'place',cardId:'poker-2',index:1});await assertSucceeds(write(host,t));
+    t=R.reduce(t,'host',{type:'ack'});await assertSucceeds(write(host,t));
+    const bea=R.reduce(t,'guest',{type:'join',name:'Bea'});await assertSucceeds(write(guest,bea));
+    await assertFails(write(guest,{...bea,config:{...bea.config,names:[...bea.config.names.slice(0,9),'x|y?']}}));
+  }
   // Una sala de amigos admite hasta diez personas.
   {
     await env.clearFirestore();
