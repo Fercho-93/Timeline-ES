@@ -85,6 +85,11 @@
       const nextMode = room.tournament.queue[room.tournament.index + 1];
       action.deckFingerprint = nextMode && CT.deckFingerprint ? CT.deckFingerprint(nextMode) : null;
     }
+    // Revancha con otro mazo: debe existir, y se lleva su huella.
+    if (message.type === "rematch") {
+      if (typeof data.mode === "string" && CT.has?.(data.mode)) action.deckFingerprint = CT.deckFingerprint ? CT.deckFingerprint(data.mode) : null;
+      else delete action.mode;
+    }
     if (message.type === "starter-draw" && data.cardId == null) {
       const ids = CT.cards(modeKey).map(card => card.id);
       action.cardId = ids[Math.floor(random() * ids.length)];

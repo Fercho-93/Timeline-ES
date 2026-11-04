@@ -634,7 +634,7 @@
         <button class="btn btn-primary btn-block" type="submit">Empezar a jugar <span aria-hidden="true">→</span></button>
       </form>
       <p class="hint" id="bienvenida-pista">Toca el avatar para elegirlo. Podrás cambiarlo después.</p>
-      <p class="hint bienvenida-datos" id="bienvenida-datos">Mejor un apodo que tu nombre real. Tu progreso se guarda en un servidor junto a tu apodo, sin pedirte correo ni nombre real. El ranking es opcional: te preguntaremos al terminar tu primer reto diario. <a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a> · <a href="terminos.html" target="_blank" rel="noopener">Condiciones</a></p>
+      <p class="hint bienvenida-datos" id="bienvenida-datos">Tu progreso se guarda en un servidor junto a tu apodo, sin pedirte correo ni nombre real. El ranking es opcional: te preguntaremos al terminar tu primer reto diario. <a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a> · <a href="terminos.html" target="_blank" rel="noopener">Condiciones</a></p>
     </section></div>`);
   }
 
@@ -4592,8 +4592,12 @@
     else if (action === "rematch-local") {
       pendingTournament = null;
       if (game?.players?.length) lastLocalSetup = { ...(lastLocalSetup || {}), names: game.players.map(p => p.name) };
-      if (game?.mode && game.mode !== selectedModeKey && !setMode(game.mode)) return;
-      setup(); beginStarterDraw();
+      // El mismo mazo u otro, antes de volver a la preparación.
+      void CT.UI.chooseRematchDeck({ current: game?.mode || selectedModeKey }).then(mode => {
+        if (!mode) return;
+        if (mode !== selectedModeKey && !setMode(mode)) return;
+        setup(); beginStarterDraw();
+      });
     }
     else if (action === "competition-next") nextTournamentRound();
     else if (action === "competition-resume") resumeMultiCompetition();

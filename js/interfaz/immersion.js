@@ -67,6 +67,34 @@
     layer.querySelectorAll('[data-ask-action]').forEach(button => button.addEventListener('click', () => { CT.closeDialog(); actions[Number(button.dataset.askAction)].proceed(); }));
     app.append(layer); CT.openDialog(layer, true);
   }
+  // Revancha en Grandes colecciones: antes de empezar, el mismo mazo u otro. Devuelve el mazo elegido (o null si se cancela).
+  // Retos rápidos no pasa por aquí: sus mazos salen al azar y no se eligen.
+  function chooseRematchDeck({ current } = {}) {
+    return new Promise(resolve => {
+      const app = document.getElementById('app'), esc = CT.escapeHtml;
+      const known = CT.has?.(current) ? current : CT.DEFAULT_MODE;
+      if (!app || app.querySelector('[data-rematch-deck]')) { resolve(null); return; }
+      const layer = document.createElement('div'); layer.className = 'overlay'; layer.dataset.rematchDeck = '';
+      let answered = false;
+      const done = value => { if (answered) return; answered = true; CT.closeDialog(); resolve(value); };
+      const first = () => `<div class="eyebrow">Revancha</div><h2>¿Con qué mazo jugáis?</h2>
+        <div class="actions actions-columna"><button class="btn btn-primary" data-rematch-pick="${esc(known)}">Mismo mazo · ${esc(CT.mode(known).name)}</button>
+        <button class="btn btn-secondary" data-rematch-other>Otro mazo</button><button class="btn btn-ghost" data-rematch-cancel>Cancelar</button></div>`;
+      const decks = () => `<div class="eyebrow">Revancha</div><h2>Elige otro mazo</h2>
+        ${Object.values(CT.BLOCKS).map(block => `<div class="section-label">${esc(block.name)}</div><div class="actions actions-columna">${block.games.filter(key => key !== known && (CT.Cartera?.tiene?.(key) ?? true))
+          .map(key => `<button class="btn btn-secondary" data-rematch-pick="${esc(key)}">${esc(CT.mode(key).name)}</button>`).join('')}</div>`).join('')}
+        <div class="actions actions-columna"><button class="btn btn-ghost" data-rematch-back>Volver</button></div>`;
+      const paint = html => {
+        layer.innerHTML = `<div class="modal room-menu" role="dialog" aria-modal="true">${html}</div>`;
+        layer.querySelectorAll('[data-rematch-pick]').forEach(b => b.addEventListener('click', () => done(b.dataset.rematchPick)));
+        layer.querySelector('[data-rematch-other]')?.addEventListener('click', () => { paint(decks()); layer.querySelector('.modal')?.scrollTo?.(0, 0); });
+        layer.querySelector('[data-rematch-back]')?.addEventListener('click', () => paint(first()));
+        layer.querySelector('[data-rematch-cancel]')?.addEventListener('click', () => done(null));
+      };
+      paint(first());
+      app.append(layer); CT.openDialog(layer, true);
+    });
+  }
   // Pulso, segundo paso: quien reta elige de su mano la carta que pasaría al rival si acierta él y falla
   // el rival. Se elige antes de colocar y ya no se cambia. `cards` es [{ id, title }].
   function pulseGiftDialog({ cards = [], targetName = 'tu rival', onPick } = {}) {
@@ -1020,5 +1048,5 @@
     const pick = [...new Set([art[0], art[Math.floor(art.length / 2)], art.at(-1)].filter(Boolean))];
     return gameSplash({ lead, title: CT.mode(modeKey).name, art: pick, key, onClose });
   }
-  CT.UI = {isPlaying: screen => playing.has(screen), handArrival, gameSplash, deckSplash, header, nav, mount, captureBoard, compactResult, confirmExit, askDialog, confirmDialog, pulseGiftDialog, reveal, openSurface, closeSurface};
+  CT.UI = {isPlaying: screen => playing.has(screen), handArrival, gameSplash, deckSplash, chooseRematchDeck, header, nav, mount, captureBoard, compactResult, confirmExit, askDialog, confirmDialog, pulseGiftDialog, reveal, openSurface, closeSurface};
 })();

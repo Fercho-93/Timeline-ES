@@ -171,6 +171,12 @@ const rematch = (who, over = {}) => updateDoc(doc(ctx(who), "rooms", REV), {
 await seed(`rooms/${REV}`, ended());
 await check("quien lleva la sala pide revancha: la misma mesa vuelve a la sala de espera", "allow", rematch(HOST));
 await seed(`rooms/${REV}`, ended());
+await check("la revancha puede cambiar de mazo, con su huella", "allow", rematch(HOST, { mode: "science", deckFingerprint: "54.abc123" }));
+await seed(`rooms/${REV}`, ended());
+await check("pero no cambiar de mazo sin huella", "deny", rematch(HOST, { mode: "science" }));
+await seed(`rooms/${REV}`, ended());
+await check("ni con un mazo que no es un nombre", "deny", rematch(HOST, { mode: 7, deckFingerprint: "54.abc123" }));
+await seed(`rooms/${REV}`, ended());
 await check("otra persona de la sala no puede pedirla", "deny", rematch(P2));
 await seed(`rooms/${REV}`, ended());
 await check("la revancha no puede cambiar el nombre de nadie", "deny", rematch(HOST, { players: { [HOST]: { name: "Ana", hand: [], joinedAt: 1 }, [P2]: { name: "Otra", hand: [], joinedAt: 2 } } }));

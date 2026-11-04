@@ -289,6 +289,8 @@ ok("la invitada puede salir de la pantalla final (antes el botón no hacía nada
 
 console.log("\nRevancha con los mismos jugadores");
 click(anfitrion, '[data-local-action="rematch"]');
+ok("la revancha pregunta si se juega con el mismo mazo u otro", !!anfitrion.document.querySelector('[data-rematch-deck] [data-rematch-other]'));
+click(anfitrion, '[data-rematch-deck] [data-rematch-pick]');
 await until(() => pantalla(invitada) === "local-lobby");
 ok("los dos vuelven al vestíbulo, con las mismas personas", pantalla(anfitrion) === "local-lobby" && pantalla(invitada) === "local-lobby" && /Ana/.test(html(anfitrion)));
 ok("y hay que volver a jugar el minijuego", !anfitrion.document.querySelector('[data-local-action="start"]'));

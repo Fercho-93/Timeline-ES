@@ -1226,7 +1226,7 @@ function starterPanelMarkupContent(isHost) {
     else if (action === "guide") { CT.closeDialog(); showGuide(); }
     else if (action === "close-guide") CT.closeDialog();
     else if (action === "skip") { CT.closeDialog(); doSkipTurn(); }
-    else if (action === "rematch") attempt("rematch");
+    else if (action === "rematch") void CT.UI.chooseRematchDeck({ current: modeKey }).then(mode => { if (mode) attempt("rematch", { mode }); });
     else if (action === "competition-next") attempt("competition-next");
     else if (action === "starter-draw") attempt("starter-draw");
     else if (action === "starter-guess") doStarterGuess();

@@ -1055,7 +1055,7 @@ async function nextTournamentRound() {
 
 // Revancha en una sala privada: la misma mesa vuelve a la sala de espera, lista para otro minijuego y otro reparto,
 // como en un solo móvil y por Wi-Fi. La pide quien lleva la sala; la final sigue la numeración de rondas.
-async function rematchRoom() {
+async function rematchRoom(mode = null) {
   if (busy || !roomState || roomState.hostUid !== user.uid || roomState.status !== "ended" || roomState.tournament || roomState.matchmaking === "public") return;
   busy = true;
   try {
@@ -1066,6 +1066,8 @@ async function rematchRoom() {
       const next = { ...data, status: "lobby", phase: "lobby", players, deck: [], discard: [], timeline: [], current: 0, starter: data.hostUid,
         turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null, version: data.version + 1, updatedAt: serverTimestamp() };
       if ("pulseTurn" in data) next.pulseTurn = null;
+      // Otro mazo para la revancha: la sala vuelve a la espera con ese mazo (y su huella, como al pasar de tema en una competición).
+      if (mode && mode !== data.mode && CT.has(mode)) { next.mode = mode; next.deckFingerprint = CT.deckFingerprint(mode); }
       next.finalRoundOffset = data.final?.round || data.finalRoundOffset || 0;
       for (const key of ["ghost", "pulsePower", "final", "tieQueue", "turnStartedAt"]) delete next[key];
       tx.set(roomRef, next);
@@ -2084,7 +2086,7 @@ document.addEventListener("click", event => {
   else if (action === "starter-draw") void drawStarterCard();
   else if (action === "starter-guess-submit") void submitStarterGuess();
   else if (action === "competition-next") nextTournamentRound();
-  else if (action === "rematch") void rematchRoom();
+  else if (action === "rematch") void CT.UI.chooseRematchDeck({ current: modeKey() }).then(mode => { if (mode) void rematchRoom(mode); });
   else if (action === "competition-round-start") renderGame();
   else if (action === "select") {
     selectedCardId = Number(target.dataset.id);

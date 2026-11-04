@@ -446,7 +446,10 @@
       selected=null;slot=null;render();
     }
     else {
-      lobby(code || connection?.code);
+      // Quien crea un duelo lo empieza sola, al momento: no se pinta la sala de espera (parpadearía).
+      const hostDuel=duelRoom && myId===room.host && room.capacity<=DUEL_CAP;
+      if(!hostDuel)lobby(code || connection?.code);
+      else setTimeout(()=>{if(room&&!room.config&&page==='network-lobby')lobby(code || connection?.code);},5000);
       if(duelRoom && myId===room.host && !duelStarting){duelStarting=true;void networkAction({type:'start',rounds:duelRounds(roomLength||3),kind:'duel',historyId:historyId(),...(duelDeck?{hand:duelHand}:{keep:duelKeep()}),seconds:CT.Tiempo.get('amigos',15),first:duelFirst}).then(()=>{duelStarting=false;});}
     }
   }
@@ -521,7 +524,7 @@
   function duelRow(room,uid) {
     const at={seconds:typeof room.updatedAt==='number'?room.updatedAt:room.updatedAt?.seconds||Math.floor(Date.now()/1000)};
     const cfg=room.config,me=room.members.indexOf(uid),host=room.members[0]===uid;
-    const details={length:cfg.rounds.length,keep:cfg.keep!==false,firstName:cfg.names[cfg.first||0],collection:deckOf(cfg),players:room.capacity,host,canCancel:host&&room.members.length===1&&room.phase!=='finished',canResign:room.capacity===2&&room.members.length===2&&room.phase!=='finished'};
+    const details={length:cfg.rounds.length,keep:cfg.keep!==false,firstName:cfg.names[cfg.first||0],collection:deckOf(cfg),hand:cfg.hand,players:room.capacity,host,canCancel:host&&room.members.length===1&&room.phase!=='finished',canResign:room.capacity===2&&room.members.length===2&&room.phase!=='finished'};
     // Un reto que te han mandado y aún no has aceptado (o que has rechazado).
     const shown=n=>CT.Moderacion?.visible?.(n)??n;
     if(me<0&&room.declined)return {rival:shown(room.names[0]),rivalUid:room.host,rivalIn:false,me:'',deck:E.challenge(cfg.rounds[0].id).title,marcador:'',updatedAt:at,grupo:'historial',pendiente:false,estado:'Rechazaste el reto',detalle:'Cerrado',done:true,...details};
@@ -577,7 +580,9 @@
     // Solo se reta por su nombre a quien llegó a jugar en esa sala (las reglas lo exigen con `sourceRoom`); si no
     // entró nunca, el duelo nuevo se comparte por enlace, como uno sin rival.
     const invite=row.rivalIn===false?null:{uid:row.rivalUid,name:row.rival,source:code};
-    await createDuelRoom({renderPage,name:row.me,length:row.length,keep:row.keep,iStart:row.me!==row.firstName,invite,back,deck:row.collection,players:row.players||2});
+    let deck=row.collection||null;
+    if(deck){deck=await CT.UI.chooseRematchDeck({current:deck});if(!deck)return;}
+    await createDuelRoom({renderPage,name:row.me,length:row.length,keep:row.keep,iStart:row.me!==row.firstName,invite,back,deck,players:row.players||2,hand:row.hand});
   }
   async function declineInvite(code) {await CT.QuickNetwork.actOnce(code,{type:'decline'});}
   // Un reto que te han mandado se ve antes de entrar: se acepta (entras y juegas tu turno) o se rechaza (el duelo se cierra).
@@ -681,6 +686,12 @@
     // La duración que se eligió al crear la sala; en la sala ya no hay desplegable, y sin esto siempre eran 3 retos.
     if (create) roomLength = Number(app().querySelector('#quick-net-length')?.value || app().querySelector('#quick-free-length')?.value) || 3;
     let code=app().querySelector('#quick-net-code').value.trim();
+    // Crear un duelo por turnos: la pantalla de «Preparando…» se queda hasta que sale la mesa (antes parpadeaba un instante
+    // entre el formulario y la partida). Si falla, se vuelve al formulario.
+    const preparing=create&&duelRoom;
+    if(preparing)preparingScreen();
+    try{ await connectNetwork(); }catch(e){ if(preparing)duelSetup(); throw e; }
+    async function connectNetwork() {
     const epoch=networkEpoch, change=(...args)=>{if(epoch===networkEpoch)roomChanged(...args);}, fail=e=>{if(epoch===networkEpoch)errorNotice(e);};
     if(netKind==='internet') {
       code=roomCodeFromText(code);
@@ -693,6 +704,12 @@
       const answer=await connection.answer();if(epoch!==networkEpoch)return;
       shell(`<section class="setup-section"><h2 data-focus tabindex="-1">Devuelve esta respuesta</h2><div class="panel"><p>Compártela con quien creó la sala para completar la conexión.</p><div class="field"><textarea id="quick-signal" readonly rows="4">${esc(answer)}</textarea></div>${button('share-signal','Compartir respuesta','btn btn-primary btn-block')}${button('qr-signal','Mostrar QR de la respuesta','btn btn-secondary btn-block')}<p>La sala aparecerá al conectar. Si no conecta, comprobad que estáis en la misma red Wi-Fi.</p><p id="quick-error" role="alert"></p></div></section>`);
     }
+    }
+  }
+  // «Preparando el duelo…»: lo único que se ve entre pulsar «Crear» y que aparezca la mesa.
+  function preparingScreen() {
+    shell(`<section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> ${duelDeck?'Grandes colecciones':'Retos rápidos'}</div><h2 data-focus tabindex="-1">Preparando el duelo…</h2>
+      <section class="panel lobby-settings" role="status"><div class="waiting-orbit"><span></span></div></section></section>`);
   }
   async function networkAction(action) {
     if(busy)return;busy=true;
@@ -796,7 +813,10 @@
     if(action==='rematch-room'){
       const cfg=state.config, me=state.players[room.members.indexOf(myId)].name, other=room.members.find(m=>m!==myId);
       const grupo=room.capacity>2;
-      await createDuelRoom({renderPage:paint,name:me,length:cfg.rounds.length,hand:cfg.hand,keep:cfg.keep!==false,iStart:grupo||me!==cfg.names[cfg.first||0],deck:deckOf(cfg),players:room.capacity,invite:!grupo&&other?{uid:other,name:room.names[room.members.indexOf(other)],source:connection?.code}:null,back:backTo});
+      // En Grandes colecciones la revancha deja elegir el mismo mazo u otro; Retos rápidos reparte los suyos al azar.
+      let deck=deckOf(cfg);
+      if(deck){deck=await CT.UI.chooseRematchDeck({current:deck});if(!deck)return true;}
+      await createDuelRoom({renderPage:paint,name:me,length:cfg.rounds.length,hand:cfg.hand,keep:cfg.keep!==false,iStart:grupo||me!==cfg.names[cfg.first||0],deck,players:room.capacity,invite:!grupo&&other?{uid:other,name:room.names[room.members.indexOf(other)],source:connection?.code}:null,back:backTo});
       return true;
     }
     if(action==='accept-invite'){const code=previewCode;await openRoom(paint,code,backTo);return true;}
@@ -804,9 +824,10 @@
     if(action==='back-invite'){previewCode=null;toEntry();return true;}
     if(action==='share-room'){
       const url=roomUrl(connection.code),esperando=!!(room&&state&&page==='game'&&room.members.length<state.players.length);
-      await CT.LocalShare.shareSignal(url.href);
-      // Con el enlace ya mandado, el duelo sigue su curso esperando a tu amigo: se vuelve a la lista de duelos.
-      if(esperando)toEntry();
+      const result=await CT.LocalShare.shareSignal(url.href);
+      // Con el enlace ya mandado, el duelo sigue su curso esperando a tu amigo: se vuelve a la lista de duelos. Si se cierra
+      // la hoja de compartir sin mandarlo, se sigue donde estabas (el duelo no se cierra).
+      if(esperando&&result!=='cancelled')toEntry();
       return true;
     }
     if(action==='qr-room'){const url=roomUrl(connection.code);showQrOrExplain({eyebrow:'Sala de Retos rápidos',title:'Escanea para entrar',text:url.href,code:connection.code,hint:'Abre la cámara del otro móvil y apunta al código.'});return true;}

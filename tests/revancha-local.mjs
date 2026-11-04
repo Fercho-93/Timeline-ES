@@ -65,6 +65,9 @@ console.log('  ok   la preparación recuerda nombres, cartas y poderes');
 // directamente. La mesa se sienta por orden de cercanía: quien más se acerca, primero.
 app().insertAdjacentHTML('beforeend', '<button data-action="rematch-local">Revancha</button>');
 await click('[data-action="rematch-local"]');
+// Antes de volver a la preparación se elige el mismo mazo u otro.
+assert.ok(w.document.querySelector('[data-rematch-deck] [data-rematch-pick]') && w.document.querySelector('[data-rematch-other]'), 'la revancha ofrece el mismo mazo u otro');
+await click('[data-rematch-pick]');
 assert.ok(w.document.getElementById('starter-guess-input'), 'la revancha abre el minijuego');
 const nombresMesa = [...w.document.querySelectorAll('#players input')].map(input => input.value);
 const respuestas = [1, 999999, 2];
@@ -86,3 +89,25 @@ assert.equal(screen(), 'pass');
 assert.ok(app().textContent.includes(esperado[0]), 'empieza quien más se acercó');
 console.log('  ok   la revancha baraja desde el resultado y empieza quien más se acercó');
 console.log('\n0 fallos');
+
+// El diálogo de la revancha: el mismo mazo u otro (cualquiera de los que se tienen), o cancelar.
+{
+  const UI = w.CONTINUUM.UI, tap = el => el.dispatchEvent(new w.MouseEvent('click', {bubbles: true}));
+  let elegido = 'sin respuesta';
+  UI.chooseRematchDeck({current: 'history'}).then(v => { elegido = v; });
+  const mismo = w.document.querySelector('[data-rematch-deck] [data-rematch-pick]');
+  assert.equal(mismo.dataset.rematchPick, 'history', 'el primer botón es el mismo mazo');
+  assert.match(mismo.textContent, /Mismo mazo · Historia de España/);
+  tap(w.document.querySelector('[data-rematch-other]'));
+  const otros = [...w.document.querySelectorAll('[data-rematch-deck] [data-rematch-pick]')].map(b => b.dataset.rematchPick);
+  assert.ok(otros.length >= 10 && !otros.includes('history'), 'en «Otro mazo» salen los demás mazos, sin repetir el actual');
+  tap(w.document.querySelector('[data-rematch-pick="movies"]'));
+  await new Promise(resolve => setTimeout(resolve, 10));
+  assert.equal(elegido, 'movies', 'devuelve el mazo elegido');
+  assert.equal(w.document.querySelector('[data-rematch-deck]'), null, 'y se cierra');
+  UI.chooseRematchDeck({current: 'history'}).then(v => { elegido = v; });
+  tap(w.document.querySelector('[data-rematch-cancel]'));
+  await new Promise(resolve => setTimeout(resolve, 10));
+  assert.equal(elegido, null, 'cancelar no elige nada');
+  console.log('  ok   la revancha ofrece el mismo mazo, otro mazo o cancelar');
+}

@@ -349,13 +349,15 @@
 
   // Revancha: la misma mesa vuelve al vestíbulo, lista para otro minijuego y otro reparto.
   // Solo el anfitrión, y solo con la partida terminada; quien seguía desconectado se va.
-  function rematch(state, { requesterId, now }) {
+  function rematch(state, { requesterId, now, mode = null, deckFingerprint = null }) {
     if (state.hostId !== requesterId || state.status !== "ended" || state.tournament) throw new Error("NOT_ALLOWED");
     const playerOrder = state.playerOrder.filter(id => !state.players[id].away);
     const players = {};
     playerOrder.forEach(id => { const { away, pulseUsed, shieldRound, ...rest } = state.players[id]; players[id] = { ...rest, hand: [] }; });
     return {
       ...state, status: "lobby", phase: "lobby", players, playerOrder,
+      // Otro mazo para la revancha, con su huella (la pone la sesión, que sabe calcularla).
+      ...(typeof mode === "string" && mode && mode !== state.mode ? { mode, deckFingerprint } : {}),
       deck: [], discard: [], timeline: [], current: 0, turnsInRound: 0, round: 1,
       winner: null, winners: null, reveal: null, turnStartedAt: null,
       starterDraw: null, ghost: null, pulsePower: null, pulseTurn: null, final: null, finalAnswers: null,
