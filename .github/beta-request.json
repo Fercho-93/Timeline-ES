@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 873,
+  "cache": 874,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Jugar con amigos simplificado (en directo o por turnos, solo ordenar cartas), Grandes colecciones de 2 a 10 y Retos rápidos de 2 a 4, duelo por turnos de colecciones con mano propia y reposición del mazo al fallar, portada «Vas a jugar a» en todas las partidas y menús de partida iguales"
+  "reason": "Revancha de Grandes colecciones con el mismo mazo u otro, crear duelo por turnos sin parpadeo, cerrar la hoja de compartir ya no cierra la partida y bienvenida sin la frase del apodo"
 }
