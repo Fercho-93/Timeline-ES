@@ -94,7 +94,8 @@ cuando hacen falta.
 
 | Archivo | Qué es |
 | --- | --- |
-| `home-modes-v1.js` | Las entradas ilustradas de la pantalla de Inicio y las pantallas de elección («Jugar solo», «Jugar con amigos»…), con la lámina del árbol de opciones que sale al entrar en cada una. |
+| `home-modes-v1.js` | Las entradas ilustradas de la pantalla de Inicio y las pantallas de elección («Jugar solo», «Jugar con amigos»…). |
+| `guia-modos.js` | La lámina que sale al entrar en Jugar solo, con amigos u online: escenas animadas de cómo se juega allí y el árbol de modalidades. |
 | `starter-presentation.js` | La lámina del minijuego de quién empieza, la misma en Grandes colecciones, Retos rápidos y salas de amigos. |
 | `tutorial.js` | La guía en vídeo: escenas que se reproducen solas con subtítulos y un dedo que hace las jugadas. Se abre desde la Guía y desde «Ver el manual». |
 | `settings.js` | La pantalla de Ajustes. |
@@ -171,6 +172,7 @@ cambian (`edition.css` y `tablet.css`, en cada cambio).
 | `accounts.css` | Pantallas de cuenta, bienvenida y ranking. |
 | `quick-challenges.css` | Retos rápidos. |
 | `home-modes-v1.css` | Las entradas ilustradas de Inicio (va con `js/interfaz/home-modes-v1.js`). |
+| `guia-modos.css` | La lámina de cada forma de jugar y sus animaciones (va con `js/interfaz/guia-modos.js`). |
 | `atlas-voyage.css`, `guide-journal.css` | El Atlas personal y la Guía. |
 | `tutorial.css` | La guía en vídeo. |
 | `navigation-nautical.css` | La barra de navegación inferior que se ve hoy. |

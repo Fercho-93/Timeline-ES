@@ -3,7 +3,7 @@
 // online con su lista de mesas públicas y Crear mesa. Inicio lo pinta app.js; este archivo
 // lo reordena cada vez que se pinta (un MutationObserver al final) y pinta sus pantallas
 // con `CT.showScreen`, para que entren en el rastro de «Volver». Al entrar desde Inicio en una de
-// las tres formas de jugar, una lámina enseña de un vistazo el árbol de lo que hay dentro.
+// las tres formas de jugar, abre encima la lámina que la explica (js/interfaz/guia-modos.js).
 (function () {
   'use strict';
 
@@ -339,121 +339,6 @@
     ].join(''), modeArt['friends-hub']);
   }
 
-  // Al entrar desde Inicio en una de las tres formas de jugar sale una lámina, como la portada
-  // del mazo, que resume en frases cortas lo que hay dentro: cómo se juega, en qué se diferencian
-  // Grandes colecciones y Retos rápidos en esa forma de jugar, y el árbol de modalidades con lo
-  // que se elige en cada una. Un toque la retira; «No volver a mostrar» la apaga para esa forma de
-  // jugar. Lo que dice sale de la Guía (CT.guideMarkup en js/juego/modes.js): si cambia una
-  // regla allí, cambia también aquí.
-  //   how       la frase de cómo se juega, junto al dibujo de la línea
-  //   games     [Grandes colecciones, Retos rápidos]: la lógica de cada juego aquí
-  //   branches  [ilustración, nombre, nota, hojas [[nombre, nota]], «Tú eliges» [opciones], aclaración]
-  const GUIDES = {
-    solo: {
-      screen: 'hub-solo', name: 'Jugar solo', title: 'A tu ritmo', art: modeArt['solo-hub'],
-      how: 'Pon cada carta en su hueco de la línea: de antes a después o de menor a mayor. Si fallas, te enseña dónde iba.',
-      games: ['Mazos grandes por temas: historia, cine, ciencia… Tú eliges cuál.', 'Mazos cortos y sorpresa, cada uno con su regla: de oeste a este, por Óscar…'],
-      branches: [
-        ['menu-collections.webp', 'Grandes colecciones', 'Con 3 vidas', [['Ronda', '10 cartas. Cada vida que guardas, una estrella.'], ['Maratón', 'El mazo entero.'], ['Competición', 'Varios temas al azar, seguidos.']], ['Mazo', 'Dificultad'], 'Más difícil: la línea se estrecha, hay reloj y datos ocultos.'],
-        ['menu-quick.webp', 'Retos rápidos', 'Sin vidas', [['Mazos de hoy', '4 nuevos cada día, los mismos para todos.'], ['10 cartas', 'Fallar no te saca; lo que aciertas, a tu colección.']], []]
-      ]
-    },
-    friends: {
-      screen: 'hub-friends', name: 'Jugar con amigos', title: 'Juntos, como prefiráis', art: modeArt['friends-hub'],
-      how: 'Por turnos, cada uno pone una carta en su hueco de la línea. La línea es la misma para todos.',
-      games: ['Cada uno tiene su mano. Si fallas, la carta se descarta y robas otra. Gana quien se quede sin cartas.', 'Mismo mazo sorpresa para todos. Al fallar: arriesgar o plantarse, o seguir hasta el final. Gana quien más acierte.'],
-      branches: [
-        ['menu-local.webp', 'Un solo móvil', 'De 2 a 10 · os pasáis el móvil', [], ['Cartas por persona', 'Poderes', 'Tiempo por carta'], 'Poderes: el Fantasma oculta los datos una vuelta; el Pulso reta a un rival a colocar a ciegas.'],
-        ['menu-private.webp', 'Cada uno en su móvil', 'Por internet o en la misma Wi-Fi', [['En directo', 'Todos a la vez, en una sala.'], ['Por turnos', 'Un duelo: cada uno juega cuando puede.'], ['Unirme', 'Con el QR, el enlace o el código que te pasen.']], []]
-      ]
-    },
-    online: {
-      screen: 'hub-online', name: 'Jugar online', title: 'Una mesa con más gente', art: modeArt['online-hub'],
-      how: 'Mesas de 2 a 4 personas. Empieza al llenarse, o tras 30\u00a0s sin que entre nadie más.',
-      games: ['Cada uno tiene su mano. Si fallas, robas otra. Gana quien se quede sin cartas.', 'Mazos sorpresa para todos. Cada acierto es provisional: plántate para asegurarlo o arriesga.'],
-      branches: [
-        ['menu-wifi.webp', 'Crear mesa', 'Los demás la verán en la lista', [], ['Juego y mazo', 'Plazas', 'Tiempo por carta']],
-        ['menu-online.webp', 'Mesas abiertas', 'Siéntate en una con sitio', [], []],
-        ['menu-quick.webp', 'Partida rápida', 'Te sentamos en la primera libre', [['Grandes colecciones', 'Marca hasta 3 temas, o ninguno.'], ['Retos rápidos', '3 mazos sorpresa.']], []]
-      ]
-    }
-  };
-  // La línea dibujada: tres cartas ya descubiertas y una nueva que baja a su hueco.
-  const GUIDE_LINE = `<svg class="mode-guide-line" viewBox="0 0 200 92" aria-hidden="true" focusable="false">
-    <path d="M6 70h188" class="mode-guide-line-rule"/>
-    <g class="mode-guide-line-card"><rect x="14" y="46" width="34" height="44" rx="4"/><text x="31" y="73">1492</text></g>
-    <g class="mode-guide-line-card"><rect x="58" y="46" width="34" height="44" rx="4"/><text x="75" y="73">1789</text></g>
-    <rect x="104" y="46" width="34" height="44" rx="4" class="mode-guide-line-gap"/><text x="121" y="73" class="mode-guide-line-plus">+</text>
-    <g class="mode-guide-line-card"><rect x="150" y="46" width="34" height="44" rx="4"/><text x="167" y="73">1969</text></g>
-    <g class="mode-guide-line-new"><rect x="104" y="2" width="34" height="38" rx="4"/><text x="121" y="26">?</text></g>
-  </svg>`;
-  const GUIDE_KEY = 'continuum-guia-modos-v1';
-  function guidesHidden() {
-    try { const saved = JSON.parse(localStorage.getItem(GUIDE_KEY) || '{}'); return saved && typeof saved === 'object' ? saved : {}; } catch { return {}; }
-  }
-  function hideGuide(kind) {
-    try { localStorage.setItem(GUIDE_KEY, JSON.stringify({ ...guidesHidden(), [kind]: true })); } catch { /* sin guardado, vuelve a salir la próxima vez */ }
-  }
-  let guideLayer = null;
-  function closeGuide({ focus = true } = {}) {
-    const layer = guideLayer;
-    if (!layer || layer.dataset.closed) return;
-    layer.dataset.closed = '1';
-    guideLayer = null;
-    layer.classList.add('is-leaving');
-    setTimeout(() => layer.remove(), 260);
-    if (focus) app.querySelector('[data-focus]')?.focus?.({ preventScroll: true });
-  }
-  function showGuide(kind) {
-    const guide = GUIDES[kind];
-    if (!guide || guidesHidden()[kind]) return;
-    guideLayer?.remove(); guideLayer = null;
-    const leaves = list => list.length ? `<ul class="mode-guide-leaves">${list.map(([name, note]) => `<li><b>${escapeHtml(name)}</b> <span>${escapeHtml(note)}</span></li>`).join('')}</ul>` : '';
-    const chips = (list, hint) => (list.length ? `<p class="mode-guide-choose"><em>Tú eliges</em>${list.map(item => `<span>${escapeHtml(item)}</span>`).join('')}</p>` : '') + (hint ? `<p class="mode-guide-hint">${escapeHtml(hint)}</p>` : '');
-    const [collections, quick] = guide.games;
-    const layer = document.createElement('div');
-    layer.className = 'quick-splash mode-guide';
-    layer.dataset.modeGuide = kind;
-    layer.setAttribute('role', 'dialog');
-    layer.setAttribute('aria-modal', 'true');
-    layer.setAttribute('aria-labelledby', 'mode-guide-title');
-    layer.innerHTML = `<div class="mode-guide-inner">
-      <header class="mode-guide-head"><img class="mode-guide-hero" src="assets/${guide.art}" alt="" aria-hidden="true" decoding="async"><span><span class="eyebrow">${escapeHtml(guide.name)}</span><h2 id="mode-guide-title">${escapeHtml(guide.title)}</h2></span></header>
-      <section class="mode-guide-how" aria-label="Cómo se juega">${GUIDE_LINE}<p>${escapeHtml(guide.how)}</p></section>
-      <section class="mode-guide-games" aria-label="Los dos juegos">
-        <div class="mode-guide-game"><img src="assets/menu-collections.webp" alt="" aria-hidden="true" decoding="async"><b>Grandes colecciones</b><p>${escapeHtml(collections)}</p></div>
-        <div class="mode-guide-game"><img src="assets/menu-quick.webp" alt="" aria-hidden="true" decoding="async"><b>Retos rápidos</b><p>${escapeHtml(quick)}</p></div>
-      </section>
-      <h3 class="mode-guide-section">Qué puedes jugar</h3>
-      <ol class="mode-guide-tree">${guide.branches.map(([art, name, note, list, choose, hint]) => `<li class="mode-guide-branch">
-        <span class="mode-guide-node"><img src="assets/${art}" alt="" aria-hidden="true" decoding="async"><span><b>${escapeHtml(name)}</b><small>${escapeHtml(note)}</small></span></span>${leaves(list)}${chips(choose, hint)}</li>`).join('')}</ol>
-      <footer class="mode-guide-foot">
-        <button type="button" class="mode-guide-go" data-mode-guide-go>Toca para continuar</button>
-        <button type="button" class="mode-guide-hide" data-mode-guide-hide>No volver a mostrar</button>
-      </footer>
-    </div>`;
-    layer.addEventListener('click', event => {
-      if (event.target.closest('[data-mode-guide-hide]')) hideGuide(kind);
-      closeGuide();
-    });
-    layer.addEventListener('keydown', event => {
-      if (event.key === 'Escape') { event.preventDefault(); closeGuide(); }
-      // El foco no sale de la lámina mientras está abierta: solo tiene sus dos botones.
-      if (event.key === 'Tab') {
-        const buttons = [...layer.querySelectorAll('button')];
-        const at = buttons.indexOf(document.activeElement);
-        event.preventDefault();
-        buttons[(at + (event.shiftKey ? buttons.length - 1 : 1)) % buttons.length]?.focus();
-      }
-    });
-    layer.dataset.screen = guide.screen;
-    guideLayer = layer;
-    // Fuera de #app, como la portada del mazo: así no la borra el repintado de la pantalla.
-    document.body.append(layer);
-    try { layer.querySelector('[data-mode-guide-go]').focus({ preventScroll: true }); } catch { /* sin foco también se toca */ }
-    window.CONTINUUM?.Effects?.transition?.('open');
-  }
-
   app.addEventListener('click', event => {
     const playToggle = event.target.closest('[data-action="toggle-modes"]');
     if (playToggle && app.dataset.screen === 'home') {
@@ -590,7 +475,7 @@
     else if (action === 'friend-hub') openFriendHub(target.dataset.friendHub);
     else openFriendsHub();
     const guide = { 'solo-hub': 'solo', 'friends-hub': 'friends', 'online-hub': 'online' }[action];
-    if (guide) showGuide(guide);
+    if (guide) window.CONTINUUM.GuiaModos?.show(guide);
   }, true);
 
   app.addEventListener('change', event => {
@@ -606,7 +491,7 @@
 
   const hubs = {'hub-online': openOnlineHub, 'hub-online-create': openPublicCreate, 'hub-online-collections': openOnlineCollections, 'hub-solo': openSoloHub, 'hub-friends-local': openLocalHub, 'hub-friends-online': () => openFriendHub('online'), 'hub-friends': openFriendsHub};
   // `refreshHome` solo lo usan las pruebas: reordena Inicio sin esperar al observador.
-  if (window.CONTINUUM) window.CONTINUUM.ModeHubs = { open(screen) { (hubs[screen] || openSoloHub)(); }, refreshHome() { restructureHome(); }, guides: GUIDES };
+  if (window.CONTINUUM) window.CONTINUUM.ModeHubs = { open(screen) { (hubs[screen] || openSoloHub)(); }, refreshHome() { restructureHome(); } };
 
   // El resumen del inicio habla el mismo idioma que el ranking: aciertos de hoy, de esta semana y la racha.
   function rankingSummary() {
@@ -637,7 +522,7 @@
 
   // Si la ventana ya se ha cerrado (pruebas), no queda documento sobre el que trabajar.
   // La lámina de las formas de jugar se va con su pantalla (por ejemplo, con el «atrás» del sistema).
-  const observer = new MutationObserver(()=>{if(typeof document==='undefined'||!document||!app.ownerDocument?.defaultView)return;if(guideLayer&&app.dataset.screen!==guideLayer.dataset.screen)closeGuide({focus:false});restructureHome();addRankingSummary();});
+  const observer = new MutationObserver(()=>{if(typeof document==='undefined'||!document||!app.ownerDocument?.defaultView)return;window.CONTINUUM?.GuiaModos?.follow(app.dataset.screen);restructureHome();addRankingSummary();});
   observer.observe(app, { childList: true, subtree: true });
   restructureHome();
   addRankingSummary();

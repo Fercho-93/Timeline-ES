@@ -46,11 +46,16 @@ for (const [action, kind, screen, branches] of CASES) {
   assert.equal(layer.getAttribute('role'), 'dialog');
   assert.equal(layer.getAttribute('aria-modal'), 'true');
   assert.deepEqual([...layer.querySelectorAll('.mode-guide-node b')].map(b => b.textContent), branches, `${action}: las ramas del árbol`);
-  // Cómo se juega (con la línea dibujada) y los dos juegos cara a cara, cada uno con su lógica.
-  assert.ok(layer.querySelector('.mode-guide-how svg.mode-guide-line'), `${action}: la línea dibujada`);
-  assert.ok(layer.querySelector('.mode-guide-how p').textContent.length > 20, `${action}: la frase de cómo se juega`);
-  assert.deepEqual([...layer.querySelectorAll('.mode-guide-game b')].map(b => b.textContent), ['Grandes colecciones', 'Retos rápidos']);
-  layer.querySelectorAll('.mode-guide-game p').forEach(p => assert.ok(p.textContent.length > 20, `${action}: cada juego dice cómo funciona`));
+  // Cómo se juega y los dos juegos cara a cara: escenas animadas con un rótulo corto, y la regla
+  // entera en su aria-label para quien no ve el dibujo.
+  const scenes = [...layer.querySelectorAll('svg.g-scene')];
+  assert.equal(scenes.length, 3, `${action}: tres escenas`);
+  scenes.forEach(svg => {
+    assert.equal(svg.getAttribute('role'), 'img');
+    assert.ok(svg.getAttribute('aria-label').length > 40, `${action}: cada escena cuenta su regla`);
+    assert.ok(svg.closest('figure').querySelector('figcaption').textContent.split(' ').length <= 7, `${action}: rótulos de pocas palabras`);
+  });
+  assert.deepEqual([...layer.querySelectorAll('.mode-guide-game > b')].map(b => b.textContent), ['Grandes colecciones', 'Retos rápidos']);
   assert.equal(doc.activeElement, layer.querySelector('[data-mode-guide-go]'), 'el foco va a la lámina');
   // Un toque en cualquier parte la retira y devuelve el foco al título de la pantalla.
   layer.click();
@@ -93,12 +98,17 @@ await enter('local-hub');
 assert.equal(app.dataset.screen, 'hub-friends-local');
 assert.equal(guide(), null, 'dentro de Jugar con amigos no vuelve a salir');
 
-// Con amigos, la lámina cuenta la lógica en grupo: la mano y el robo en Grandes colecciones;
-// arriesgar o plantarse en Retos rápidos. Solo, las vidas y la dificultad.
-const text = kind => { const g = w.CONTINUUM.ModeHubs.guides[kind]; return [g.how, ...g.games, ...g.branches.flat(2)].join(' '); };
-assert.match(text('friends'), /mano/); assert.match(text('friends'), /robas/); assert.match(text('friends'), /plantarse/);
-assert.match(text('online'), /plántate/); assert.match(text('online'), /2 a 4/);
-assert.match(text('solo'), /vidas/); assert.match(text('solo'), /Dificultad/);
+// Con amigos y online, las escenas son las del juego en grupo (cada uno su mano; un mismo mazo
+// para todos) y lo dicen; jugando solo, las vidas y el mazo sorpresa.
+const G = w.CONTINUUM.GuiaModos.guides;
+const sceneKeys = kind => [G[kind].how[0], ...G[kind].games.map(g => g[0])];
+assert.deepEqual(sceneKeys('solo'), ['line', 'lives', 'surprise']);
+assert.deepEqual(sceneKeys('friends'), ['line', 'hands', 'shared']);
+assert.deepEqual(sceneKeys('online'), ['table', 'hands', 'shared']);
+const rules = kind => [G[kind].how[2], ...G[kind].games.map(g => g[2])].join(' ');
+assert.match(rules('friends'), /mano/); assert.match(rules('friends'), /robas/); assert.match(rules('friends'), /plantarte/);
+assert.match(rules('online'), /plántate/); assert.match(rules('online'), /2 a 4/);
+assert.match(rules('solo'), /tres vidas/);
 
 console.log('guia-modos: ok');
 w.close();
