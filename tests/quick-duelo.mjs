@@ -46,6 +46,18 @@ assert.equal(rival.score, score, 'quien abre el enlace ve el resultado que sacó
 assert.deepEqual(rival.rounds, rounds);
 assert.ok(score > 0);
 
+// «Mismas cartas» en grupo (3 o 4): el enlace lleva el tamaño del grupo y lo que sacaron quienes jugaron antes.
+{
+  const enGrupo = D.payload({...record, config: {...record.config, group: 3, rivals: [['Luis', 4]]}});
+  assert.equal(enGrupo.g, 3); assert.equal(JSON.stringify(enGrupo.r), '[["Luis",4]]');
+  const leido = D.read(CT.LocalTransport.encodeText(JSON.stringify(enGrupo)));
+  assert.equal(leido.group, 3); assert.equal(JSON.stringify(leido.prior), '[["Luis",4]]');
+  assert.equal(leido.score, score, 'el resultado de quien te lo pasa lo vuelve a calcular el motor');
+  const sinGrupo = D.read(link);
+  assert.equal(sinGrupo.group, 2, 'los enlaces de dos (y los de antes) siguen siendo de dos');
+  const raro = D.read(CT.LocalTransport.encodeText(JSON.stringify({...enGrupo, g: 9, r: [['<b>x</b>', -3], 'basura']})));
+  assert.equal(raro.group, 2, 'un tamaño fuera de 2 a 4 no vale');
+}
 // Un enlace que no vale se rechaza con un motivo legible.
 const enlace = cambios => CT.LocalTransport.encodeText(JSON.stringify({...payload, ...cambios}));
 assert.throws(() => D.read('no-es-un-enlace'), /no es un duelo/);
@@ -80,7 +92,10 @@ assert.equal(app.querySelector('input[name="quick-duel-pace"]:checked').value, '
 assert.equal(app.querySelector('[data-quick-duel-block="directo"]').hidden, false);
 assert.equal(app.querySelector('[data-quick-duel-block="seguidos"]').hidden, true);
 assert.equal(app.querySelector('[data-quick-duel-block="turnos"]').hidden, true);
-assert.ok(app.querySelector('[data-quick-duel-pre] #quick-net-players'), 'en directo la sala se prepara en la misma pantalla');
+assert.ok(app.querySelector('[data-quick-duel-pre] #quick-net-players'), 'en directo se elige el máximo de la sala');
+assert.equal(app.querySelector('[data-quick-group]').hidden, true, 'y no el número de jugadores de los otros ritmos');
+assert.equal(app.querySelector('#quick-duel-group').value, '2', 'por turnos y con las mismas cartas, de entrada, dos');
+assert.ok(!app.querySelector('.duel-brief'), 'sin textos de explicación debajo de los ajustes');
 assert.equal(app.querySelector('[data-quick-keep-field]').hidden, false, 'en directo también se elige qué pasa al fallar');
 assert.ok(app.querySelector('#quick-profile-name[readonly]'), 'el nombre es el del perfil');
 assert.deepEqual([...app.querySelectorAll('input[name="quick-live-net"]')].map(i => i.value), ['internet', 'wifi']);
@@ -88,7 +103,7 @@ assert.ok(app.querySelector('[data-quick-duel-block="directo"] [data-quick="live
 // Orden de «Cómo jugáis», igual en todas las modalidades: ritmo, conexión, máximo, contenido, tiempo, nombre y botón.
 {
   const pos = sel => { const el = app.querySelector(sel); assert.ok(el, `falta ${sel}`); return [...app.querySelectorAll('*')].indexOf(el); };
-  const orden = ['input[name="quick-duel-pace"]', 'input[name="quick-live-net"]', '#quick-net-players', '.quick-length-chip', '[data-quick-keep-field]', '[data-tiempo], .tiempo-field, [name="tiempo-amigos"]', '#quick-profile-name', '[data-quick="live-room"]'];
+  const orden = ['input[name="quick-duel-pace"]', 'input[name="quick-live-net"]', '#quick-net-players', '#quick-duel-group', '.quick-length-chip', '[data-quick-keep-field]', '[data-tiempo], .tiempo-field, [name="tiempo-amigos"]', '#quick-profile-name', '[data-quick="live-room"]'];
   const encontrados = orden.filter(sel => app.querySelector(sel));
   assert.ok(encontrados.length >= 7, 'están los campos del formulario');
   const posiciones = encontrados.map(pos);
@@ -217,6 +232,30 @@ const encoded = CT.LocalTransport.encodeText(JSON.stringify(payload));
 CT.Quick.open(html => { app.innerHTML = html; }, {quickDuel:encoded});
 assert.equal(app.querySelectorAll('.hand-card').length, rounds[0].order.length - 1, 'la invitación arranca el primer mazo del rival');
 assert.equal(w.location.origin, 'https://continuum.test');
+// Duelo por turnos de grupo (de 2 a 4): quien lo crea juega primero y cada amigo ocupa, al abrir el enlace, la siguiente plaza.
+{
+  const R = CT.QuickRoom, rondas = E.collectionRounds('history', 1);
+  let r = R.create('me', 'Tester', 3); r = R.reduce(r, 'me', {type: 'start', rounds: rondas, kind: 'duel', keep: true});
+  assert.equal(JSON.stringify(R.state(r).players.map(p => p.name)), '["Tester","Jugador 2","Jugador 3"]', 'cada plaza libre lleva un nombre provisional');
+  r = R.reduce(r, 'me', {type: 'place', cardId: R.state(r).remaining[0], index: 0}); r = R.reduce(r, 'me', {type: 'ack'});
+  assert.equal(R.state(r).current, 1, 'después le toca a la segunda plaza, aún vacía');
+  assert.throws(() => R.reduce(r, 'me', {type: 'place', cardId: R.state(r).remaining[0], index: 0}), /turno/, 'quien creó el duelo no juega por los demás');
+  CT.QuickNetwork.mine = async () => [{code: 'JJJJJJJJJ2', room: r, uid: 'me'}];
+  let [row] = await CT.Quick.duels();
+  assert.equal(row.grupo, 'enviada'); assert.equal(row.estado, 'Esperando a que entre Jugador 2'); assert.equal(row.rivalUid, null, 'un duelo de grupo no cuenta para el cara a cara');
+  r = R.reduce(r, 'luis', {type: 'join', name: 'Luis'});
+  assert.equal(JSON.stringify(r.config.names), '["Tester","Luis","Jugador 3"]', 'quien entra ocupa la siguiente plaza');
+  assert.equal(r.actor, 'luis', 'y juega su turno');
+  r = R.reduce(r, 'luis', {type: 'place', cardId: R.state(r).remaining[0], index: 0}); r = R.reduce(r, 'luis', {type: 'ack'});
+  r = R.reduce(r, 'sara', {type: 'join', name: 'Sara'});
+  assert.equal(JSON.stringify(r.config.names), JSON.stringify(r.names), 'con la mesa completa, los nombres son los de verdad');
+  assert.throws(() => R.reduce(r, 'otro', {type: 'join', name: 'Otro'}), /completa/, 'no cabe una cuarta persona en un duelo de tres');
+  CT.QuickNetwork.mine = async () => [{code: 'JJJJJJJJJ2', room: r, uid: 'me'}];
+  [row] = await CT.Quick.duels();
+  assert.equal(row.grupo, 'su-turno'); assert.equal(row.estado, 'Turno de Sara'); assert.match(row.marcador, /^Tú \d · Luis \d · Sara \d aciertos$/);
+  assert.equal(row.players, 3, 'la revancha se crea con las mismas plazas');
+  assert.throws(() => R.reduce(R.create('me', 'Tester', 5), 'me', {type: 'start', rounds: rondas, kind: 'duel'}), /dos personas/, 'un duelo por turnos es de 4 como mucho');
+}
 // Grandes colecciones por turnos: el mazo elegido se juega con estas reglas, en rondas de 9 cartas más la de salida.
 {
   const R = CT.QuickRoom, c = E.challenge('col:history');

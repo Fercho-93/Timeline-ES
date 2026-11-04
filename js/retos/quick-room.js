@@ -34,9 +34,14 @@
     }
   }
   // Duelo por turnos recién empezado por quien lo crea: la partida ya tiene dos jugadores, pero el segundo aún no ha entrado.
-  const FRIEND = 'Tu amigo';
+  const FRIEND = 'Tu amigo', DUEL_MAX = 4;
+  // El nombre provisional de cada plaza libre de un duelo (en el de dos, «Tu amigo», como siempre).
+  const seatName = (capacity, i) => capacity === 2 ? FRIEND : `Jugador ${i + 1}`;
   function waitingFriend(room) {
-    return room.capacity === 2 && room.members.length === 1 && room.config?.kind === 'duel' && room.config.names.length === 2 && room.config.names[0] === room.names[0];
+    // De 2 a 4: quien lo crea juega sin esperar y cada amigo ocupa, al abrir el enlace, la siguiente plaza libre.
+    const c = room.config;
+    return c?.kind === 'duel' && room.capacity <= DUEL_MAX && room.members.length < room.capacity && Array.isArray(c.names)
+      && c.names.length === room.capacity && room.names.every((n, i) => c.names[i] === n);
   }
   function validate(room) {
     if (!room || room.version !== 1 || !Array.isArray(room.members) || room.members.length < 1 || !Number.isInteger(room.capacity) || room.capacity < 2 || room.capacity > 10 || room.members.length > room.capacity || new Set(room.members).size !== room.members.length || room.members[0] !== room.host || !Array.isArray(room.names) || room.names.length !== room.members.length || room.names.some(n => typeof n !== 'string' || !n.trim() || n.length > 24) || !Number.isInteger(room.revision) || room.revision < 0) throw Error('Sala no válida.');
@@ -68,7 +73,7 @@
       const name = typeof action.name === 'string' ? action.name.trim() : '';
       if (!name || name.length > 24 || r.names.some(n=>n.toLocaleLowerCase('es') === name.toLocaleLowerCase('es'))) throw Error('Escribe un nombre diferente.');
       r.members.push(id); r.names.push(name);
-      if (lateFriend) {r.config.names = r.names.slice(); metadata(r);}
+      if (lateFriend) {r.config.names = [...r.names, ...r.config.names.slice(r.names.length)]; metadata(r);}
     } else if (action.type === 'leave') {
       // Dejar una mesa pública antes de empezar: se libera la plaza y, si se iba quien la
       // llevaba, la lleva quien queda primero.
@@ -123,9 +128,9 @@
       metadata(r);
     } else if (action.type === 'start') {
       // Un duelo por turnos lo empieza quien lo crea, sin esperar al amigo: su sitio queda reservado hasta que abra el enlace.
-      const alone = r.capacity === 2 && r.members.length === 1 && action.kind === 'duel' && r.matchmaking !== 'public';
+      const alone = r.capacity <= DUEL_MAX && r.members.length === 1 && action.kind === 'duel' && r.matchmaking !== 'public';
       if (id !== r.host || r.phase !== 'lobby' || (r.members.length < 2 && !alone)) throw Error('Solo quien crea la sala puede empezar, con al menos dos personas.');
-      r.config = {names:alone ? [...r.names, FRIEND] : r.names, rounds:action.rounds, kind: action.kind || (r.capacity === 2 ? 'duel' : 'network'), historyId: action.historyId || null, ...(typeof action.keep === 'boolean' ? {keep: action.keep} : {}), ...([15, 20, 30].includes(action.seconds) ? {seconds: action.seconds} : {}), ...(alone ? (action.first === 0 || action.first === 1 ? {first: action.first} : {}) : (Number.isInteger(action.first) && action.first >= 0 && action.first < r.members.length ? {first: action.first} : {}))}; E.create(r.config); metadata(r);
+      r.config = {names:alone ? [...r.names, ...Array.from({length: r.capacity - 1}, (_, i) => seatName(r.capacity, i + 1))] : r.names, rounds:action.rounds, kind: action.kind || (r.capacity === 2 ? 'duel' : 'network'), historyId: action.historyId || null, ...(typeof action.keep === 'boolean' ? {keep: action.keep} : {}), ...([15, 20, 30].includes(action.seconds) ? {seconds: action.seconds} : {}), ...(alone ? (Number.isInteger(action.first) && action.first >= 0 && action.first < r.capacity ? {first: action.first} : {}) : (Number.isInteger(action.first) && action.first >= 0 && action.first < r.members.length ? {first: action.first} : {}))}; E.create(r.config); metadata(r);
     } else {
       if (!r.config || r.phase === 'finished' || id !== r.actor) throw Error('Espera tu turno.');
       const now = state(r);
@@ -150,5 +155,5 @@
     return {modeKey, cardId: CT.shuffle(CT.cards(modeKey))[0].id};
   }
   const starterComplete = room => !!room.starter && room.members.every(who => Number.isFinite(room.starter.guesses[who]));
-  CT.QuickRoom = {create, reduce, record, state, validate, sign, sameCommand, starterOrder, starterComplete, starterPick};
+  CT.QuickRoom = {DUEL_MAX, create, reduce, record, state, validate, sign, sameCommand, starterOrder, starterComplete, starterPick};
 })();

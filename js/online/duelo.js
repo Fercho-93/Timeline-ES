@@ -395,20 +395,42 @@
   // aplicación que no la conozca pide actualizar en vez de comparar dos partidas que se
   // jugaron con plazos distintos. Es la misma idea que la huella del mazo, aplicada a las
   // reglas en vez de a las cartas.
-  function codificar({ mode, seed, total, hits, sequence, nombre, deck, ms = MS }) {
+  function codificar({ mode, seed, total, hits, sequence, nombre, deck, ms = MS, grupo = 2, previos = [] }) {
     const campos = [
       versionDe(false, ms), mode, seed, total, hits,
       sequence.map(acierto => (acierto ? "1" : "0")).join(""),
-      huella(mode, deck), limpiaNombre(nombre)
+      huella(mode, deck), limpiaNombre(nombre), ...colaGrupo(grupo, previos)
     ];
     return aBase64url(campos.join("|"));
+  }
+
+  // «Mismas cartas» en grupo (3 o 4 personas): dos campos más al final, el tamaño del grupo y lo que sacaron
+  // quienes jugaron antes que quien manda el enlace («nombre~marca;…»). Cada uno se lo pasa al siguiente, y el
+  // último ve la clasificación entera. La marca de quien manda el enlace es la de siempre, comprobada carta a carta;
+  // las anteriores viajan tal cual. Los enlaces de dos siguen teniendo ocho campos.
+  const MAX_GRUPO = 4;
+  function colaGrupo(grupo, previos) {
+    if (!(Number(grupo) > 2)) return [];
+    const limpio = nombre => limpiaNombre(nombre).replace(/[~;]/g, " ").trim() || "Jugador";
+    return [String(Math.min(Number(grupo), MAX_GRUPO)), (previos || []).slice(0, Number(grupo) - 2)
+      .map(([nombre, marca]) => `${limpio(nombre)}~${Math.max(0, Math.min(99, Math.round(Number(marca) || 0)))}`).join(";")];
+  }
+  function leeGrupo(textoGrupo, textoPrevios) {
+    const grupo = Number(textoGrupo);
+    if (!Number.isInteger(grupo) || grupo < 3 || grupo > MAX_GRUPO) return null;
+    const previos = String(textoPrevios || "").split(";").filter(Boolean).map(item => {
+      const [nombre, marca] = item.split("~");
+      return [limpiaNombre(nombre) || "Jugador", Number(marca)];
+    });
+    if (previos.length > grupo - 2 || previos.some(([, marca]) => !Number.isInteger(marca) || marca < 0 || marca > 99)) return null;
+    return { grupo, previos };
   }
 
   // El duelo de cifras usa los mismos ocho campos y cambia los dos del medio: en vez de
   // aciertos y cuadrícula lleva los puntos y una jugada por carta.
   //
   //   versión | mazo | semilla | cartas | puntos | respuesta:ms:salida,… | huella | nombre
-  function codificarCifras({ mode, seed, total, jugadas, nombre, deck, ms = CIFRAS_MS }) {
+  function codificarCifras({ mode, seed, total, jugadas, nombre, deck, ms = CIFRAS_MS, grupo = 2, previos = [] }) {
     const datos = jugadas.map(jugada => [
       textoCifra(mode, jugada.respuesta),
       Math.min(Math.max(Math.round(Number(jugada.ms) || 0), 0), tope(ms)),
@@ -416,7 +438,7 @@
     ].join(":")).join(",");
     const campos = [
       versionDe(true, ms), mode, seed, total, puntosPartida(mode, seed, total, jugadas, ms),
-      datos, huella(mode, deck), limpiaNombre(nombre)
+      datos, huella(mode, deck), limpiaNombre(nombre), ...colaGrupo(grupo, previos)
     ];
     return aBase64url(campos.join("|"));
   }
@@ -448,11 +470,19 @@
     } catch { return { ok: false, motivo: "roto" }; }
 
     const campos = plano.split("|");
-    if (campos.length !== 8) return { ok: false, motivo: "roto" };
+    if (campos.length !== 8 && campos.length !== 10) return { ok: false, motivo: "roto" };
     const [version, mode, seed, textoTotal, textoMarca, cuerpo, huellaRival, nombre] = campos;
+    const enGrupo = campos.length === 10 ? leeGrupo(campos[8], campos[9]) : null;
+    if (campos.length === 10 && !enGrupo) return { ok: false, motivo: "roto" };
 
     const reglas = REGLAS[version];
     if (!reglas) return { ok: false, motivo: "version" };
+    if (enGrupo && reglas.comp) return { ok: false, motivo: "roto" };
+    if (enGrupo) {
+      const leido = descodificar(aBase64url(campos.slice(0, 8).join("|")));
+      if (leido.ok) Object.assign(leido.duelo, enGrupo);
+      return leido;
+    }
     // La competición lleva una lista de temas donde el duelo lleva un mazo: se lee aparte.
     if (reglas.comp) return leeCompeticion({ textoTemas: mode, seed, textoTotal, textoMarca, cuerpo, textoHuellas: huellaRival, nombre, ms: reglas.ms });
     if (!CT.has(mode)) return { ok: false, motivo: "mazo" };

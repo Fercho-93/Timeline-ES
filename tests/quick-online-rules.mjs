@@ -351,6 +351,25 @@ try {
     await wait(()=>seen.host?.members.length===2);
     again.close();a.close();b.close();
   }
+  // Duelo por turnos de tres: quien lo crea juega solo y cada amigo entra por el enlace y ocupa la siguiente plaza.
+  {
+    await env.clearFirestore();
+    const rondas=[{id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}];
+    let t=R.create('host','Ana',3);await assertSucceeds(write(host,t));
+    t=R.reduce(t,'host',{type:'start',rounds:rondas,kind:'duel',keep:true,first:0});await assertSucceeds(write(host,t));
+    t=R.reduce(t,'host',{type:'place',cardId:'poker-2',index:1});await assertSucceeds(write(host,t));
+    t=R.reduce(t,'host',{type:'ack'});await assertSucceeds(write(host,t));
+    await assertSucceeds(getDoc(ref(guest)));
+    const bea=R.reduce(t,'guest',{type:'join',name:'Bea'});
+    await assertFails(write(guest,{...bea,config:{...bea.config,names:['Ana','Bea','Impostor']}}));
+    await assertFails(write(guest,{...bea,config:{...bea.config,names:['Impostor','Bea','Jugador 3']}}));
+    await assertSucceeds(write(guest,bea));t=bea;
+    t=R.reduce(t,'guest',{type:'place',cardId:'poker-3',index:0});await assertSucceeds(write(guest,t));
+    t=R.reduce(t,'guest',{type:'ack'});await assertSucceeds(write(guest,t));
+    const cid=R.reduce(t,'outsider',{type:'join',name:'Cid'});await assertSucceeds(write(out,cid));t=cid;
+    assert.equal(t.actor,'outsider');
+    t=R.reduce(t,'outsider',{type:'place',cardId:'poker-4',index:0});await assertSucceeds(write(out,t));
+  }
   // Una sala de amigos admite hasta diez personas.
   {
     await env.clearFirestore();

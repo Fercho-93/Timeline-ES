@@ -144,7 +144,40 @@ console.log("\nLa carga útil da la vuelta entera");
   const vacio = D.descodificar(D.codificar({ mode: "history", seed: "x1", total: 1, hits: 0, sequence: [false], nombre: "" }));
   ok("sin nombre también vale", vacio.ok === true && vacio.duelo.rival.nombre === "");
 
+  // «Mismas cartas» en grupo: el tamaño y lo que sacaron quienes jugaron antes viajan en dos campos más.
+  const enGrupo = D.descodificar(D.codificar({ mode: "history", seed: "ab12cd34", total: 15, hits: 11, sequence, nombre: "Iñaki", grupo: 4, previos: [["Ana;~x", 9], ["Luis", 12]] }));
+  ok("un reto de grupo se lee con su tamaño", enGrupo.ok === true && enGrupo.duelo.grupo === 4);
+  ok("y con lo que sacaron los anteriores", JSON.stringify(enGrupo.duelo.previos) === JSON.stringify([["Ana  x", 9], ["Luis", 12]]));
+  ok("la marca de quien lo pasa se sigue comprobando", enGrupo.duelo.rival.hits === 11 && enGrupo.duelo.rival.nombre === "Iñaki");
+  ok("un reto de dos no lleva grupo", leido.duelo.grupo === undefined);
+  const deMas = D.descodificar(D.codificar({ mode: "history", seed: "x1", total: 1, hits: 1, sequence: [true], nombre: "A", grupo: 3, previos: [["B", 1], ["C", 1], ["D", 1]] }));
+  ok("no viajan más resultados de los que caben en el grupo", deMas.ok === true && deMas.duelo.previos.length === 1);
+  const roto = w.CONTINUUM.LocalTransport.encodeText(w.CONTINUUM.LocalTransport.decodeText(payload) + "|9|x~1");
+  ok("un grupo fuera de 3 o 4 se rechaza", D.descodificar(roto).ok === false);
+
   ok("el enlace apunta a la propia aplicación sin enviar el duelo en la consulta HTTP", D.enlace(payload).startsWith("https://continuumjuego.es/invitation.html") && D.enlace(payload).includes("#duelo="));
+}
+
+console.log("\nMismas cartas en grupo: cada uno se lo pasa al siguiente");
+{
+  const D = boot().CONTINUUM.Duelo;
+  const semilla = "grupo123", sequence = [true, true, false, true, true, true, false, true, true, true, true, false, true, true, true];
+  const segunda = boot({ url: `https://hilo.test/?duelo=${D.codificar({ mode: "history", seed: semilla, total: 15, hits: 12, sequence, nombre: "Fernando", grupo: 3, previos: [] })}` });
+  segunda.document.getElementById("duel-name").value = "Marta";
+  click(segunda, '[data-action="accept-duel"]');
+  await jugar(segunda);
+  juegaDuelo(segunda, "history", { falla: n => n % 4 === 3 });
+  ok("quien no es la última ve que falta gente", /Falta 1 persona de 3/.test(texto(segunda)));
+  ok("y la clasificación de quienes ya han jugado", segunda.document.querySelectorAll(".duel-group-ranking li").length === 2 && /Fernando/.test(texto(segunda)));
+  ok("y puede pasar el reto", /Pasar el reto/.test(texto(segunda)) && existe(segunda, '[data-action="share-duel"]'));
+
+  const tercera = boot({ url: `https://hilo.test/?duelo=${D.codificar({ mode: "history", seed: semilla, total: 15, hits: sequence.filter((x, i) => x && i % 4 !== 3).length, sequence: sequence.map((x, i) => x && i % 4 !== 3), nombre: "Marta", grupo: 3, previos: [["Fernando", 12]] })}` });
+  tercera.document.getElementById("duel-name").value = "Luis";
+  click(tercera, '[data-action="accept-duel"]');
+  await jugar(tercera);
+  juegaDuelo(tercera, "history", {});
+  ok("la última ve la clasificación completa", tercera.document.querySelectorAll(".duel-group-ranking li").length === 3 && /Ya habéis jugado los 3/.test(texto(tercera)));
+  ok("con los tres nombres", /Fernando/.test(texto(tercera)) && /Marta/.test(texto(tercera)));
 }
 
 console.log("\nLa huella del mazo impide comparar dos partidas distintas");

@@ -276,7 +276,13 @@ console.log("\nCrear un duelo de cifras y jugarlo");
     porTurnos.checked = true;
     porTurnos.dispatchEvent(new w.Event("change", { bubbles: true }));
     // «Ordenar» por turnos va con las reglas de Retos rápidos (pide sala en internet); escribir la cifra sigue con su duelo.
-    ok("por turnos, ordenar elige qué pasa al fallar y no las rondas", !existe(w, 'input[name="turn-rounds"]') && existe(w, '[data-duel-block="turnos-orden"] input[name="turn-keep"]'));
+    ok("por turnos, ordenar elige qué pasa al fallar y no las rondas", !existe(w, 'input[name="turn-rounds"]') && existe(w, '[data-duel-keep]:not([hidden]) input[name="turn-keep"]'));
+    ok("y cuántos juegan, de 2 a 4", existe(w, '[data-duel-group]:not([hidden]) #duel-group') && [...w.document.querySelectorAll('#duel-group option')].map(o => o.value).join() === "2,3,4");
+    // Orden común con Retos rápidos: jugadores, qué pasa al fallar, reloj, nombre y botón; sin textos de explicación.
+    const pos = sel => [...w.document.querySelectorAll('*')].indexOf(w.document.querySelector(sel));
+    const orden = ['#duel-group', '[data-duel-keep]', '.tiempo-field, [data-tiempo]', '#duel-name', '[data-duel-block="turnos-orden"] [data-action="start-turn-duel"]'].map(pos);
+    ok("los campos siguen el mismo orden que en Retos rápidos", orden.every(p => p >= 0) && orden.every((p, i) => !i || p > orden[i - 1]));
+    ok("sin textos de explicación debajo de los ajustes", !existe(w, '.duel-brief'));
     const aCifrasTurnos = w.document.querySelector('input[name="duel-kind"][value="cifras"]');
     aCifrasTurnos.checked = true;
     aCifrasTurnos.dispatchEvent(new w.Event("change", { bubbles: true }));
@@ -319,7 +325,7 @@ console.log("\nCrear un duelo de cifras y jugarlo");
     }
   }
   ok("ambos ejes se recuerdan", w.localStorage.getItem("hilo-duelo-prueba-v1") === "cifras" && w.localStorage.getItem("hilo-duelo-ritmo-v1") === "seguidos");
-  ok("avisa de la regla que lo sostiene", /si sales de la aplicación, la carta se cierra/i.test(texto(w)));
+  ok("la configuración no repite la explicación (va en la pantalla de antes de jugar)", !existe(w, '.duel-brief'));
 
   w.document.getElementById("duel-name").value = "Fernando";
   click(w, '[data-action="start-cifras"]');

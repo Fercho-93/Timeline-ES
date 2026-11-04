@@ -452,7 +452,6 @@
             <div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares.markup(duelName(), { size: 38, seed: CT.Avatares.ownSeed() })}</span><input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}"></div>
             <small class="field-help">Se usará en la partida. Puedes cambiarlo en Atlas.</small>
           </div>
-          <div class="duel-brief" data-comp-brief><p>${compBrief(ritmo)}</p></div>
           <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="comp-friends-start"><span data-comp-start>${compStartLabel(ritmo)}</span> <span>→</span></button>
         </div>
       </section>
@@ -2708,16 +2707,24 @@
   // cartas de este mazo: quien crea el duelo elige qué pasa al fallar. Elegir varias rondas es cosa de Retos rápidos.
   const TURN_KEEP_KEY = "continuum-turnos-fallo-v1";
   const turnKeep = () => CT.Storage.getItem(TURN_KEEP_KEY) === "seguir";
-  function turnRulesFields() {
+  // Cuántos juegan por turnos (al ordenar) y con las mismas cartas: de 2 a 4. En directo manda el máximo de la sala (2–10).
+  const DUEL_GROUP_KEY = "continuum-amigos-grupo-v1";
+  const duelGroup = () => { const n = Number(CT.Storage.getItem(DUEL_GROUP_KEY)); return [2, 3, 4].includes(n) ? n : 2; };
+  const groupShown = (ritmo, prueba) => ritmo === "seguidos" || (ritmo === "turnos" && prueba === "orden");
+  function duelGroupField(ritmo, prueba) {
+    const n = duelGroup();
+    return `<div class="field" data-duel-group${groupShown(ritmo, prueba) ? "" : " hidden"}><label for="duel-group">Jugadores</label><select id="duel-group">${[2, 3, 4].map(k => `<option value="${k}"${k === n ? " selected" : ""}>${k} jugadores</option>`).join("")}</select></div>`;
+  }
+  function turnRulesFields(visible = true) {
     const opcion = (name, clave, titulo, pie, on) => `<label class="segmented-option${on ? " is-on" : ""}"><input type="radio" name="${name}" value="${clave}"${on ? " checked" : ""}><span><b>${titulo}</b><small>${pie}</small></span></label>`;
-    return `<div class="field duel-kind-field"><span class="field-label" id="turn-keep-label">Si alguien falla</span>
+    return `<div class="field duel-kind-field" data-duel-keep${visible ? "" : " hidden"}><span class="field-label" id="turn-keep-label">Si alguien falla</span>
         <div class="segmented" role="radiogroup" aria-labelledby="turn-keep-label">${opcion("turn-keep", "fuera", "Arriesgar o plantarse", "Un fallo pierde los aciertos provisionales de la ronda; plantarse los asegura", !turnKeep())}${opcion("turn-keep", "seguir", "Seguir hasta el final", "Un fallo no suma, pero se juega toda la ronda y gana quien acierte más", turnKeep())}</div></div>`;
   }
   // Crea el duelo por turnos del mazo elegido: lo abre Retos rápidos, que lleva la sala, la partida y «Tus duelos».
   function startCollectionTurnDuel() {
     const keep = (app.querySelector('input[name="turn-keep"]:checked')?.value || (turnKeep() ? "seguir" : "fuera")) === "seguir";
     CT.Quick.openCollectionDuel((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); },
-      { deck: selectedModeKey, name: duelName(), length: 1, keep, back: duelHome })
+      { deck: selectedModeKey, name: duelName(), length: 1, keep, players: duelGroup(), back: duelHome })
       // Si no se llega a crear, se vuelve a esta misma pantalla con el aviso (no a la de Retos rápidos).
       .catch(error => { if (screen === 'quick-challenges' || screen === 'duel-home') { CT.Quick.leave(); duelHome(); } showToast(error?.message || "No se pudo crear el duelo. Comprueba tu conexión."); });
   }
@@ -2776,31 +2783,25 @@
           </div>
         </div>
         ${sinRed ? '<p class="hint" data-offline-note style="margin-top:10px">No hay internet: jugaréis por la Wi-Fi.</p>' : ""}
-        ${CT.ManoInicial.maximoField()}
-        ${CT.ManoInicial.field()}
+        ${CT.ManoInicial.maximoField()}`)}
+      ${duelGroupField(ritmo, prueba)}
+      ${preDirecto(`${CT.ManoInicial.field()}
         ${CT.ManoInicial.poderesField()}`)}
+      ${turnRulesFields(ritmo === "turnos" && prueba === "orden")}
       ${CT.Tiempo.field("amigos", { porDefecto: 15 })}
       <div class="field duel-identity-field">
         <label for="duel-name">Tu nombre de perfil</label>
         <div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares.markup(duelName(), { size: 38, seed: CT.Avatares.ownSeed() })}</span><input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}"></div>
         <small class="field-help">Se usará en la partida. Puedes cambiarlo en Atlas.</small>
       </div>
-      ${bloque("directo", `<div class="duel-brief"><p>Jugáis todos a la vez, cada uno desde su móvil, y veis la línea avanzar al mismo tiempo. En la sala de espera, un minijuego decide quién empieza. Por internet invitas con el código, el enlace o el QR; sin internet, con un QR.</p></div>
-        <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-live-room">Crear sala <span>→</span></button>`)}
-      ${bloque("seguidos-orden", `<div class="duel-brief"><p>Juegas tú ahora ${CT.Duelo.CARTAS} cartas al azar de este mazo y mandas un enlace: quien lo abra juega las mismas cuando quiera y al terminar ve el cara a cara. Gana quien más acierte. Sin vidas: se juegan todas.</p>
-        <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Con tiempo, el reloj no se para: si sales de la aplicación, la carta se da por fallada.</span></p></div>
-        ${enOrden ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-solo">Continuar ${contra(solo) ? `el duelo contra ${escapeHtml(contra(solo))}` : "tu duelo"} <span>→</span></button>` : ""}
+      ${bloque("directo", `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-live-room">Crear sala <span>→</span></button>`)}
+      ${bloque("seguidos-orden", `${enOrden ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-solo">Continuar ${contra(solo) ? `el duelo contra ${escapeHtml(contra(solo))}` : "tu duelo"} <span>→</span></button>` : ""}
         <button class="btn ${enOrden ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-duel">${enOrden ? "Empezar otro duelo" : "Jugar y retar"} <span>→</span></button>`)}
-      ${regla ? bloque("seguidos-cifras", `<div class="duel-brief"><p>Juegas tú ahora ${Cifras.CARTAS} cartas de este mazo, escribiendo la cifra de cada una (${escapeHtml(regla.pregunta)}), y mandas un enlace: quien lo abra juega las mismas cuando quiera. Si te acercas lo suficiente, es un acierto. Gana quien más acierte; si empatáis, quien haya respondido más rápido.</p>
-        <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Con tiempo, el reloj no se para: si sales de la aplicación, la carta se cierra.</span></p></div>
-        ${enCifras ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-cifras">Continuar ${contra(enCifras) ? `el duelo contra ${escapeHtml(contra(enCifras))}` : "tu duelo de cifras"} <span>→</span></button>` : ""}
+      ${regla ? bloque("seguidos-cifras", `${enCifras ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-cifras">Continuar ${contra(enCifras) ? `el duelo contra ${escapeHtml(contra(enCifras))}` : "tu duelo de cifras"} <span>→</span></button>` : ""}
         <button class="btn ${enCifras ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-cifras">${enCifras ? "Empezar otro duelo" : "Jugar y retar"} <span>→</span></button>`) : ""}
-      ${bloque("turnos-orden", `${turnRulesFields()}
-        ${sinRedTurnos}
+      ${bloque("turnos-orden", `${sinRedTurnos}
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`)}
-      ${regla ? bloque("turnos-cifras", `<div class="duel-brief"><p>Entre dos, cada uno desde su móvil y cuando pueda: os turnáis carta a carta, escribiendo la cifra de cada una. Juegas tú la primera y después le mandas el enlace a tu rival. En la revancha empieza tu rival.</p>
-        <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Respondes cuando te toque. Con tiempo, el reloj empieza al abrir tu carta.</span></p></div>
-        ${sinRedTurnos}
+      ${regla ? bloque("turnos-cifras", `${sinRedTurnos}
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`) : ""}
     </div>`;
   }
@@ -2973,7 +2974,7 @@
       // Un duelo que se estrena aquí se juega a reloj. Uno que llega por enlace se juega
       // como lo jugó quien retó: los enlaces anteriores al reloj no lo llevan, y ponérselo
       // a quien los acepta sería compararlo contra una marca hecha sin plazo.
-      duelo = duel || { seed: CT.Duelo.crearSemilla(), total: CT.Duelo.CARTAS, rival: null, ms: CT.Tiempo.chosen("amigos", 15) * 1000 };
+      duelo = duel || { seed: CT.Duelo.crearSemilla(), total: CT.Duelo.CARTAS, rival: null, ms: CT.Tiempo.chosen("amigos", 15) * 1000, grupo: duelGroup(), previos: [] };
       barajado = CT.Duelo.reparto(selectedModeKey, duelo.seed, duelo.total);
     } else if (kind === "daily") {
       const azar = seededRandom(seedFrom(`${today()}:${selectedModeKey}`));
@@ -3264,14 +3265,42 @@
   // El final de un duelo tiene dos caras. Si lo has creado tú, todavía no hay con quién
   // compararse: lo que toca es mandar el enlace. Si lo has aceptado, sí hay marcador, y
   // la gracia está en verlo carta a carta.
+  // «Mismas cartas» en grupo (3 o 4): la clasificación de quienes ya han jugado y, mientras falte alguien, el
+  // enlace para el siguiente, que llevará también tu resultado. El último ve la clasificación completa.
+  function cierreGrupo({ grupo, previos, mia, total, modeName, payload }) {
+    const filas = [...previos.map(([nombre, marca]) => ({ nombre, marca })), { nombre: "Tú", marca: mia, yo: true }].sort((a, b) => b.marca - a.marca);
+    const faltan = Math.max(0, grupo - filas.length), arriba = filas[0].marca, cabeza = filas.filter(f => f.marca === arriba);
+    const lista = `<ol class="duel-group-ranking">${filas.map(f => `<li${f.yo ? ' class="is-you"' : ""}><b>${escapeHtml(f.nombre)}</b> · ${f.marca} de ${total}</li>`).join("")}</ol>`;
+    if (faltan) {
+      lastDuelShare = `${duelName()} te pasa el reto en Continuum · ${modeName}\nSois ${grupo}: juega las mismas cartas y pásaselo al siguiente.\n${CT.Duelo.enlace(payload)}`;
+      return {
+        icono: "🎯", eyebrow: previos.length ? "Pasa el reto" : "Reto listo",
+        titular: `<strong>${mia}</strong> de ${total}.`,
+        cuerpo: `${lista}<p class="lead centrado">${faltan === 1 ? "Falta 1 persona" : `Faltan ${faltan} personas`} de ${grupo}: mándale el enlace a la siguiente.</p>`,
+        acciones: `<button class="btn btn-primary" data-action="share-duel">${previos.length ? "Pasar el reto" : "Retar a tus amigos"} <span>→</span></button>`
+      };
+    }
+    const gano = cabeza.length === 1 && cabeza[0].yo;
+    lastDuelShare = `Reto en Continuum · ${modeName}\n${filas.map((f, i) => `${i + 1}. ${f.yo ? duelName() : f.nombre} · ${f.marca}/${total}`).join("\n")}`;
+    return {
+      icono: gano ? "🏆" : cabeza.length > 1 && cabeza.some(f => f.yo) ? "🤝" : "🎯",
+      eyebrow: gano ? "Has ganado" : cabeza.length > 1 ? "Empate en cabeza" : `Gana ${escapeHtml(cabeza[0].nombre)}`,
+      titular: `<strong>${mia}</strong> de ${total}.`,
+      cuerpo: `${lista}<p class="lead centrado">Ya habéis jugado los ${grupo}.</p>`,
+      acciones: `<button class="btn btn-secondary" data-action="share-duel">Compartir el resultado</button>`
+    };
+  }
   function cierreDuelo(partida, total) {
     const mode = CT.mode(partida.mode);
     const mio = { hits: partida.hits, sequence: partida.sequence || [] };
     const rival = partida.duelo?.rival || null;
+    const grupo = partida.duelo?.grupo > 2 ? partida.duelo.grupo : 2;
+    const previos = grupo > 2 ? [...(partida.duelo.previos || []), ...(rival ? [[rival.nombre || "Jugador", rival.hits]] : [])] : [];
     const payload = CT.Duelo.codificar({
       mode: partida.mode, seed: partida.duelo.seed, total, deck: partida.savedDeck,
-      hits: mio.hits, sequence: mio.sequence, nombre: duelName(), ms: Number(partida.duelo.ms) || 0
+      hits: mio.hits, sequence: mio.sequence, nombre: duelName(), ms: Number(partida.duelo.ms) || 0, grupo, previos
     });
+    if (grupo > 2) return cierreGrupo({ grupo, previos, mia: mio.hits, total, modeName: mode.name, payload });
 
     if (!rival) {
       lastDuelShare = CT.Duelo.invitacion({ modeName: mode.name, nombre: duelName(), hits: mio.hits, total, payload, ms: Number(partida.duelo.ms) || 0 });
@@ -3491,11 +3520,12 @@
   } catch { /* La visibilidad del documento ya cubre el caso general. */ }
 
   function startCifras(duel = null) {
-    const duelo = duel || { seed: CT.Duelo.crearSemilla(), total: Cifras.CARTAS, rival: null, ms: CT.Tiempo.chosen("amigos", 15) * 1000 };
+    const duelo = duel || { seed: CT.Duelo.crearSemilla(), total: Cifras.CARTAS, rival: null, ms: CT.Tiempo.chosen("amigos", 15) * 1000, grupo: duelGroup(), previos: [] };
     cifras = {
       mode: selectedModeKey, seed: duelo.seed, total: duelo.total, ms: Number.isFinite(Number(duelo.ms)) ? Number(duelo.ms) : Cifras.MS,
       cartas: Cifras.cartas(selectedModeKey, duelo.seed, duelo.total),
-      jugadas: [], empezadaEn: null, rival: duelo.rival, finished: false, pendiente: null
+      jugadas: [], empezadaEn: null, rival: duelo.rival, finished: false, pendiente: null,
+      grupo: duelo.grupo > 2 ? duelo.grupo : 2, previos: Array.isArray(duelo.previos) ? duelo.previos : []
     };
     abreCarta();
   }
@@ -3602,14 +3632,17 @@
     const mios = { puntos: Cifras.puntosPartida(mode, seed, total, jugadas, plazo), aciertos, tiempo: Cifras.tiempo(jugadas, plazo), jugadas };
     const resultado = rival ? Cifras.compara(mios, rival) : 0;
     const salidas = jugadas.filter(jugada => jugada.salida).length;
-    const payload = Cifras.codificar({ mode, seed, total, jugadas, nombre: duelName(), ms: cifras.ms });
+    const grupo = cifras.grupo > 2 ? cifras.grupo : 2;
+    const previos = grupo > 2 ? [...(cifras.previos || []), ...(rival ? [[rival.nombre || "Jugador", rival.aciertos]] : [])] : [];
+    const payload = Cifras.codificar({ mode, seed, total, jugadas, nombre: duelName(), ms: cifras.ms, grupo, previos });
     const gano = !!rival && resultado > 0;
     const logros = CT.Progreso.finishGame({ mode, kind: "duel", hits: aciertos, total, won: gano });
     if (logros.length) CT.Effects.achievement?.();
     const sessionLogros = [...new Map(logros.map(item => [item.id || item.name, item])).values()];
 
     let icono = "🎯", eyebrow = "Duelo de cifras listo", titular = `<strong>${aciertos}</strong> de ${total} aciertos.`, cuerpo = "", acciones = "";
-    if (!rival) {
+    if (grupo > 2) ({ icono, eyebrow, titular, cuerpo, acciones } = cierreGrupo({ grupo, previos, mia: aciertos, total, modeName, payload }));
+    else if (!rival) {
       lastDuelShare = Cifras.invitacion({ modeName, nombre: duelName(), aciertos, total, payload, ms: cifras.ms });
       cuerpo = `<p class="lead centrado">Manda el enlace a quien quieras: recibirá estas mismas ${total} cartas, ${cifras.ms ? `con los mismos ${Math.round(cifras.ms / 1000)} segundos para cada una` : "también sin tiempo"}.</p>`;
       acciones = `<button class="btn btn-primary" data-action="share-duel">Mandar el reto <span>→</span></button>`;
@@ -3810,6 +3843,7 @@
           ? `<p class="solo-intro-rule">${Math.round(pendingDuel.ms / 1000)} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se ${esCifras ? "cierra" : "da por fallada"}.</p>`
           : `<p class="solo-intro-rule">Sin tiempo: se juega sin plazo, como lo jugó ${escapeHtml(quien)}.</p>`}
         <div class="solo-stats" style="grid-template-columns:1fr"><span><b>${esCifras ? `${rival.aciertos} de ${total}` : `${rival.hits} de ${total}`}</b><small>la marca que hay que batir</small></span></div>
+        ${pendingDuel.grupo > 2 ? `<p class="hint">Reto de grupo: sois ${pendingDuel.grupo}. ${[...(pendingDuel.previos || []).map(([n]) => n), quien].length === 1 ? "Ya ha jugado" : "Ya han jugado"} ${escapeHtml([...(pendingDuel.previos || []).map(([n]) => n), quien].join(", "))}.</p>` : ""}
         <div class="field" style="margin-top:16px">
           <label for="duel-name">Tu nombre de perfil</label>
           <input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}">
@@ -4411,6 +4445,7 @@
     }
     // Competición con amigos: con más temas caben menos cartas por persona si se juega por turnos.
     if (event.target.id === "competition-length" && screen === "competition-friends") { compSyncCards(); return; }
+    if (event.target.id === "duel-group") { CT.Storage.setItem(DUEL_GROUP_KEY, event.target.value); return; }
     if (event.target.name === "turn-keep") {
       CT.Storage.setItem(TURN_KEEP_KEY, event.target.value);
       event.target.closest(".segmented")?.querySelectorAll(".segmented-option").forEach(opcion => opcion.classList.toggle("is-on", opcion.querySelector("input").checked));
@@ -4425,6 +4460,8 @@
       const selectedPace = event.target.name === "duel-pace" ? value : duelPace();
       app.querySelectorAll("[data-duel-block]").forEach(bloque => { bloque.hidden = bloque.dataset.duelBlock !== duelBlockKey(selectedPace, selectedKind); });
       app.querySelectorAll("[data-duel-pre]").forEach(bloque => { bloque.hidden = selectedPace !== "directo"; });
+      app.querySelectorAll("[data-duel-group]").forEach(campo => { campo.hidden = !groupShown(selectedPace, selectedKind); });
+      app.querySelectorAll("[data-duel-keep]").forEach(campo => { campo.hidden = !(selectedPace === "turnos" && selectedKind === "orden"); });
       const campoPrueba = app.querySelector("[data-duel-kind-field]");
       if (campoPrueba) campoPrueba.hidden = selectedPace === "directo";
       // La pastilla elegida se marca en el propio elemento: el `:has()` del CSS lo haría
