@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 867,
+  "cache": 873,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Partidas con amigos de 2 a 10 jugadores en Grandes colecciones (Retos rápidos de 2 a 4), «¿Quién empieza?» al pulsar Empezar, más opciones de temas en la competición en solitario y tarjetas de Grandes colecciones y Retos rápidos con descripción que las diferencia"
+  "reason": "Jugar con amigos simplificado (en directo o por turnos, solo ordenar cartas), Grandes colecciones de 2 a 10 y Retos rápidos de 2 a 4, duelo por turnos de colecciones con mano propia y reposición del mazo al fallar, portada «Vas a jugar a» en todas las partidas y menús de partida iguales"
 }
