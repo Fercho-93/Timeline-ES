@@ -1175,6 +1175,8 @@
     result = null;
     saveGame();
     renderPass();
+    // La portada del mazo, como en el resto de partidas: la pantalla de pasar el móvil espera debajo.
+    CT.UI.deckSplash(selectedModeKey, { key: `local:${Date.now()}` });
   }
 
   function ownsLocalAtlas(player) {
@@ -2566,7 +2568,6 @@
         ${pendiente ? `<button class="btn btn-primary btn-block" data-action="resume-solo">Continuar ${solo.kind === "marathon" ? "la maratón" : "la ronda"} · ${CT.Ghost.level(solo.difficulty).name} <span>→</span></button>` : ""}
         <div class="panel solo-panel">
           <div class="solo-panel-head"><h3>Ronda de ${SOLO_ROUND_CARDS} cartas</h3></div>
-          <p>Cada carta cuesta más de encajar que la anterior. Acaba la ronda con vidas y la superas: cada vida que te quede es una estrella.</p>
           ${CT.Ghost.difficultyCards("solo-difficulty", selectedDifficulty)}
           <p class="hint" data-level-record>${textoRondaRecord(records, selectedDifficulty)}</p>
           <button class="btn ${pendiente ? "btn-secondary" : "btn-primary"} btn-block" data-action="start-free">${pendiente ? "Empezar otra ronda" : "Empezar ronda"}</button>
@@ -3008,6 +3009,12 @@
     result = null;
     saveSolo();
     soloView();
+    // La portada del mazo, como en Retos rápidos. El reloj de la primera carta empieza al retirarla.
+    const partida = solo;
+    CT.UI.deckSplash(selectedModeKey, { lead: kind === "daily" ? "Reto diario" : "Vas a jugar a", key: `solo:${Date.now()}`, onClose: () => {
+      if (solo !== partida || !solo.cartaEmpezadaEn || solo.played) return;
+      solo.cartaEmpezadaEn = Date.now(); if (solo.empezadoEn) solo.empezadoEn = Date.now(); saveSolo(); soloView();
+    } });
   }
 
   // El plazo por carta de esta partida. En un duelo, el de hoy si se estrenó aquí o el que
@@ -3528,6 +3535,9 @@
       grupo: duelo.grupo > 2 ? duelo.grupo : 2, previos: Array.isArray(duelo.previos) ? duelo.previos : []
     };
     abreCarta();
+    // La portada del mazo encima; el reloj de la primera carta vuelve a empezar al retirarla.
+    const partida = cifras;
+    CT.UI.deckSplash(selectedModeKey, { key: `cifras:${Date.now()}`, onClose: () => { if (cifras === partida && !cifras.jugadas.length && !cifras.pendiente) abreCarta(); } });
   }
 
   // Reanudar: si la carta seguía abierta, el tiempo que ha pasado por fuera cuenta igual,
@@ -4264,16 +4274,27 @@
     if (CT.UI.isPlaying(screen)) { requestPlayExit(); return; }
     backMenu();
   }
+  // El menú ⋯ de una partida es el mismo en Grandes colecciones y en Retos rápidos (quick-challenges.js, `menu`):
+  // de qué parte del juego es, la regla en una línea, «Seguir jugando», Guía y Ajustes en una fila,
+  // «Guardar y salir» y, aparte, «Salir sin guardar». El zoom de las cartas lo añade immersion.js debajo de la regla.
+  function menuPartida({ regla, guardar, descartar }) {
+    const [izquierda, derecha] = CT.axis(selectedModeKey).ends || ["Antes", "Después"];
+    overlay(`<div class="overlay"><div class="modal room-menu"><div class="eyebrow">Grandes colecciones</div><h2>Opciones de la partida</h2>
+      <p class="hint">De ${escapeHtml(izquierda.toLowerCase())} a ${escapeHtml(derecha.toLowerCase())}.${regla ? ` ${regla}` : ""}</p>
+      <div class="actions actions-columna"><button class="btn btn-primary" data-action="close-menu">Seguir jugando</button>
+        <div class="actions-par"><button class="btn btn-secondary" data-action="rules">Guía</button>${CT.settingsButton()}</div>
+        <button class="btn btn-secondary" data-action="${guardar}">Guardar y salir</button></div>
+      <div class="actions actions-columna">${descartar ? `<button class="btn btn-ghost exit-discard" data-action="${descartar}">Salir sin guardar</button>` : ""}</div>
+    </div></div>`, true);
+  }
   function soloOptions() {
     // En la competición, salir sin guardar borra el progreso de todas las rondas, no solo
     // del intento actual (`abandon-solo` lo pregunta con su propio mensaje).
-    const puedeSalirSinGuardar = !!solo;
-    overlay(`<div class="overlay"><div class="modal"><h2>Opciones de la partida</h2><div class="actions actions-columna">
-      <button class="btn btn-primary" data-action="close-menu">Seguir jugando</button>
-      <button class="btn btn-secondary" data-action="rules">Guía</button>${CT.settingsButton()}
-      <button class="btn btn-secondary" data-action="solo-menu">Guardar y salir</button>
-      ${puedeSalirSinGuardar ? '<button class="btn btn-ghost exit-discard" data-action="abandon-solo">Salir sin guardar</button>' : ''}
-    </div></div></div>`, true);
+    const vidas = solo && solo.kind !== "duel" && Number.isFinite(solo.lives) ? solo.lives : null;
+    menuPartida({
+      regla: solo?.kind === "duel" ? "Se juegan todas las cartas: gana quien más acierte." : vidas !== null ? `Cada fallo cuesta una vida: ${vidas === 1 ? "te queda 1" : `te quedan ${vidas}`}.` : "",
+      guardar: "solo-menu", descartar: solo ? "abandon-solo" : ""
+    });
   }
 
   // Salir sin guardar: se descarta el intento entero, no cuenta para las estadísticas ni
@@ -4289,7 +4310,7 @@
     if (soloSlot === "daily") { soloSlot = "mode"; home(); } else if (eraDuelo) duelHome(); else soloHome();
   }
   function gameMenu() {
-    overlay(`<div class="overlay"><div class="modal"><h2>Opciones de la partida</h2><div class="actions actions-columna"><button class="btn btn-primary" data-action="close-menu">Seguir jugando</button><button class="btn btn-secondary" data-action="rules">Guía</button>${CT.settingsButton()}<button class="btn btn-secondary" data-action="ui-back">Guardar y salir</button><button class="btn btn-ghost exit-discard" data-action="abandon">Salir sin guardar</button></div></div></div>`, true);
+    menuPartida({ regla: "", guardar: "ui-back", descartar: "abandon" });
   }
 
   const showToast = message => CT.toast(message);

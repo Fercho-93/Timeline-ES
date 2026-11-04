@@ -36,7 +36,7 @@
     // Desde la pantalla por la que se entró, la flecha sale de Retos rápidos a la pantalla
     // anterior del juego; desde cualquier otra, vuelve a esa pantalla de entrada.
     const back=playing ? 'data-quick="exit"' : page===entry ? 'data-action="ui-back"' : 'data-quick="formats"';
-    paint(`<div class="shell quick-shell">${CT.UI.header(back, state ? 'data-quick="menu"' : '', playing, state ? topTitle : '', state ? '' : 'data-quick="guide"')}${state ? content : `<div class="quick-content">${content}</div>`}</div>`, playing ? state ? true : 'lobby' : false);
+    paint(`<div class="shell quick-shell">${CT.UI.header(back, state ? 'data-quick="menu"' : '', playing, state ? topTitle : '')}${state ? content : `<div class="quick-content">${content}</div>`}</div>`, playing ? state ? true : 'lobby' : false);
     // En una sala, cada jugada ajena repinta la pantalla: la portada del mazo sigue encima hasta que se toque.
     if(splashLayer && !splashLayer.isConnected && !splashLayer.dataset.closed && state && splashLayer.dataset.game===(state.config.historyId||'sin-id') && splashLayer.dataset.index===String(state.index)) app().append(splashLayer);
     if(state && room && !myTurn()) for(const el of app().querySelectorAll('[data-quick="select"],[data-quick="slot"],[data-quick="confirm"],[data-quick="bank"],[data-quick="next"],[data-quick="ack"]')) el.disabled=true;
@@ -1226,7 +1226,7 @@
     const internet = room && connection?.kind === 'internet';
     const layer = document.createElement('div'); layer.className = 'overlay';
     layer.innerHTML = `<div class="modal room-menu"><div class="eyebrow">${deckOf(state.config) ? 'Grandes colecciones' : 'Retos rápidos'}</div><h2>Opciones de la partida</h2>
-      <p class="hint">${esc(c.rule)}.${c.asOf ? ` Datos a ${esc(c.asOf)}.` : ''} ${E.keepPlaying(state) ? `Cada carta bien colocada suma un acierto; un fallo no suma, pero sigues hasta terminar ${R_('el reto', 'la ronda')}.` : `Cada acierto es provisional: plantarte lo asegura y fallar pierde los de ${R_('este reto', 'esta ronda')} y te retira.`}</p>
+      <p class="hint">${esc(c.rule)}.${c.asOf ? ` Datos a ${esc(c.asOf)}.` : ''} ${E.keepPlaying(state) ? 'Un fallo no suma, pero sigues hasta el final.' : 'Cada acierto es provisional: plantarte lo asegura.'}</p>
       <div class="actions actions-columna">${button('close-menu', 'Seguir jugando', 'btn btn-primary')}<div class="actions-par">${button('guide', 'Guía', 'btn btn-secondary')}<button class="btn btn-secondary" data-settings-action="open">Ajustes</button></div>
         ${button('formats', internet ? (state.config.kind === 'duel' ? 'Salir del duelo' : 'Salir de la sala') : 'Guardar y salir', 'btn btn-secondary')}</div>
       ${playersSection()}

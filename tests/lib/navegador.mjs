@@ -10,7 +10,23 @@ import { REPO, read } from "./comun.mjs";
 import { gameHtml } from "../game-fixture.mjs";
 
 export const playwright = await import(process.env.PLAYWRIGHT_MODULE ? pathToFileURL(process.env.PLAYWRIGHT_MODULE).href : "playwright");
-export const { chromium, webkit } = playwright;
+
+// La portada «Vas a jugar a…» (CT.UI.gameSplash) tapa la mesa hasta que se toca. Las pruebas no la miran, así que
+// se retira sola en cuanto aparece (como haría quien juega); la de Retos rápidos cada prueba la quita a su manera.
+export const QUITA_PORTADAS = () => {
+  setInterval(() => document.querySelector('[data-game-splash]:not([data-closed])')?.click(), 50);
+};
+const sinPortadas = motor => new Proxy(motor, { get(destino, clave) {
+  if (clave !== "launch") return destino[clave];
+  return async (...args) => {
+    const navegador = await destino.launch(...args);
+    const nuevoContexto = navegador.newContext.bind(navegador);
+    navegador.newContext = async (...opciones) => { const contexto = await nuevoContexto(...opciones); await contexto.addInitScript(QUITA_PORTADAS); return contexto; };
+    navegador.newPage = async (...opciones) => { const contexto = await navegador.newContext(...opciones); const pagina = await contexto.newPage(); pagina.on("close", () => contexto.close().catch(() => {})); return pagina; };
+    return navegador;
+  };
+} });
+export const chromium = sinPortadas(playwright.chromium), webkit = sinPortadas(playwright.webkit);
 
 // [nombre, motor] de los motores que toca probar (WebKit y Chromium salvo que ENGINES diga otra cosa).
 export const motores = () => [["webkit", webkit], ["chromium", chromium]]

@@ -25,14 +25,14 @@
     settings: '<path d="m9 2-.5 3-2 1-2.6-1.2-2 3.4L4 10v3l-2.1 1.8 2 3.4L6.5 17l2 1L9 22h6l.5-4 2-1 2.6 1.2 2-3.4L20 13v-3l2.1-1.8-2-3.4L17.5 6l-2-1L15 2Z"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="3.5"/><path d="M10 10h4v4h-4Z" stroke-width=".7"/>'
   };
   const menuIcon = name => `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${menuIcons[name]}</svg>`;
-  // `help`, si lo hay, son los atributos de un botón de guía propio de la pantalla.
-  function header(back = '', menu = '', inGame = false, title = '', help = '') {
+  // Sin botón «?» propio: la Guía está en la barra de abajo y, en partida, en el menú ⋯.
+  function header(back = '', menu = '', inGame = false, title = '') {
     // La tercera columna es una fila propia, no una sola celda: así aloja los botones de
     // guía y de menú, sin que ninguno de los dos tenga que adivinar el sitio del otro.
     return `<header class="topbar atlas-topbar${inGame ? ' atlas-game-topbar' : ''}">
       ${back ? `<button class="icon-btn atlas-back" ${back} aria-label="Volver a la pantalla anterior">${icon('back')}</button>` : '<span></span>'}
       ${inGame ? (title ? `<div class="topbar-title">${title}</div>` : '<span></span>') : '<div class="brand">Continuum</div>'}
-      <div class="atlas-topbar-actions">${help ? `<button class="icon-btn atlas-help" ${help} aria-label="Guía">${icon('guide')}</button>` : ''}${menu ? `<button class="icon-btn atlas-menu" ${menu} aria-label="Opciones de la partida" aria-haspopup="dialog">${icon('more')}</button>` : ''}</div>
+      <div class="atlas-topbar-actions">${menu ? `<button class="icon-btn atlas-menu" ${menu} aria-label="Opciones de la partida" aria-haspopup="dialog">${icon('more')}</button>` : ''}</div>
     </header>`;
   }
   function nav(screen) {
@@ -989,5 +989,36 @@
     }
   }
 
-  CT.UI = {isPlaying: screen => playing.has(screen), handArrival, header, nav, mount, captureBoard, compactResult, confirmExit, askDialog, confirmDialog, pulseGiftDialog, reveal, openSurface, closeSurface};
+  // Portada «Vas a jugar a…» al entrar en una partida, igual en todas las modalidades: tres láminas, de qué va y
+  // «Toca para continuar». Retos rápidos la pinta con sus mazos (quick-challenges.js); las colecciones, con tres
+  // láminas del mazo. `key` evita volver a enseñarla cuando la misma partida se repinta (las salas lo hacen a menudo).
+  let lastSplash = '';
+  function gameSplash({ lead = 'Vas a jugar a', title, art = [], key = '', onClose = null } = {}) {
+    const app = document.getElementById('app');
+    if (!app || !title || (key && key === lastSplash)) return null;
+    lastSplash = key;
+    const esc = CT.escapeHtml;
+    const layer = document.createElement('div');
+    layer.className = 'quick-splash'; layer.dataset.gameSplash = ''; layer.setAttribute('role', 'button'); layer.tabIndex = 0;
+    layer.setAttribute('aria-label', `${lead}: ${title}. Toca para continuar.`);
+    layer.innerHTML = `<div class="quick-splash-inner"><div class="quick-splash-fan" aria-hidden="true">${art.slice(0, 3).map(src => `<img src="${esc(src)}" alt="" decoding="async">`).join('')}</div><div class="eyebrow">${esc(lead)}</div><h2>${esc(title)}</h2><span class="quick-splash-hint">Toca para continuar</span></div>`;
+    // Mientras tapa la mesa no corre ningún reloj: quien la usa arranca el suyo en `onClose`.
+    const close = () => { if (layer.dataset.closed) return; layer.dataset.closed = '1'; layer.classList.add('is-leaving'); setTimeout(() => layer.remove(), 260); onClose?.(); };
+    layer.addEventListener('click', close);
+    layer.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); close(); } });
+    // Fuera de #app: las salas repintan la pantalla con cada cambio y se la llevarían por delante.
+    document.querySelector('[data-game-splash]')?.remove();
+    document.body.append(layer);
+    try { layer.focus({ preventScroll: true }); } catch { /* sin foco también se toca */ }
+    CT.Effects?.transition?.('open');
+    return layer;
+  }
+  // La de un mazo de las colecciones: su nombre y tres de sus láminas (la primera, una del medio y la última).
+  function deckSplash(modeKey, { lead = 'Vas a jugar a', key = '', onClose = null } = {}) {
+    if (!CT.has?.(modeKey)) return null;
+    const art = CT.cards(modeKey).map(card => CT.animalArt(modeKey, card).match(/src="([^"]+)"/)?.[1]).filter(Boolean);
+    const pick = [...new Set([art[0], art[Math.floor(art.length / 2)], art.at(-1)].filter(Boolean))];
+    return gameSplash({ lead, title: CT.mode(modeKey).name, art: pick, key, onClose });
+  }
+  CT.UI = {isPlaying: screen => playing.has(screen), handArrival, gameSplash, deckSplash, header, nav, mount, captureBoard, compactResult, confirmExit, askDialog, confirmDialog, pulseGiftDialog, reveal, openSurface, closeSurface};
 })();

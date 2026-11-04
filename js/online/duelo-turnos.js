@@ -229,6 +229,11 @@ function render() {
   if (focused?.dataset.turnAction === 'select-slot') app.querySelector('[data-turn-action="confirm-place"]')?.focus({ preventScroll: true });
   window.scrollTo({ left: 0, top: oldTop, behavior: 'instant' });
   startTurnClock(active && !!card && !gate);
+  // Al abrir el duelo, la portada de lo que se juega, como en el resto de modalidades (una vez por duelo y sesión).
+  if (!sameGame && !ended(current)) {
+    const key = `turn:${current.id}`;
+    if (compModes(current)) CT.UI?.gameSplash?.({ title: gameLabel(current), key }); else CT.UI?.deckSplash?.(current.mode, { key });
+  }
 }
 async function place(index) {
   if (!Number.isInteger(index) || index < 0 || !current || index > timelineCards(current).length) return;

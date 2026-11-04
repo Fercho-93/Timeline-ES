@@ -80,6 +80,21 @@ console.log("\nUna partida en solitario cuadra con lo anotado");
   abreMazo(w, "historia", "history");
   (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
   click(w, '[data-action="start-free"]');
+  // Al entrar en la partida sale la portada del mazo, como en Retos rápidos, y se quita tocándola.
+  const portada = w.document.querySelector('[data-game-splash]');
+  ok("al empezar sale la portada de lo que se va a jugar", !!portada && /Vas a jugar a/i.test(portada.textContent) && /Historia de España/.test(portada.textContent) && portada.querySelectorAll('img').length === 3);
+  ok("sin botón de interrogación arriba", !w.document.querySelector('.atlas-help'));
+  portada?.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+  // El menú ⋯ de la partida tiene la misma forma que el de Retos rápidos.
+  {
+    const menu = w.document.querySelector('[data-action="solo-options"]');
+    menu?.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    const modal = w.document.querySelector('.overlay .modal.room-menu');
+    ok("el menú ⋯ de la partida tiene la misma forma que el de Retos rápidos", !!modal && /Grandes colecciones/.test(modal.querySelector('.eyebrow')?.textContent || '')
+      && !!modal.querySelector('.actions-par [data-action="rules"]') && !!modal.querySelector('.actions-par [data-settings-action="open"]')
+      && !!modal.querySelector('[data-action="close-menu"].btn-primary') && !!modal.querySelector('[data-action="solo-menu"]') && !!modal.querySelector('.exit-discard[data-action="abandon-solo"]'));
+    modal?.querySelector('[data-action="close-menu"]')?.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+  }
   // Un fallo de cada tres: hacen falta aciertos y fallos para comprobar las dos ramas.
   const { jugadas, aciertos } = juegaSolitario(w, { falla: n => n % 3 === 2 });
   const p = perfil(w);

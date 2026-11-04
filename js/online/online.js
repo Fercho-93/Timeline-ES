@@ -1233,6 +1233,8 @@ function renderGame() {
     ${!pulsing && roomState.phase !== "reveal" ? CT.Powers.pulsePower(roomState.pulsePower, user.uid, me.hand.length, 'data-online-action="pulse-open"', myTurn && !roomState.ghost?.fresh && roomState.deck.length + roomState.discard.length > 0 && pulseTargetUids().length > 0) : ""}
   </div>`, "online-game");
   manageTurnTimer();
+  // Al empezar la partida, la portada del mazo, como en el resto de modalidades (la competición tiene su propio cartel).
+  if (roomState.round === 1 && !roomState.turnsInRound && roomState.timeline?.length === 1 && !roomState.tournament) CT.UI.deckSplash(modeKey(), { key: `online:${roomCode}:${roomState.timeline[0]}` });
   // Igual que en el juego local: arrastrar una carta hasta un hueco es otra forma de
   // llegar a la confirmación. Fuera de turno las cartas están desactivadas y no arrancan.
   CT.enableDrag({

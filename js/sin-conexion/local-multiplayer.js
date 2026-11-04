@@ -1007,6 +1007,8 @@ function starterPanelMarkupContent(isHost) {
       ${roomState.phase === "reveal" ? revealOverlay(currentUid) : ""}
     </div>`, "local-game");
     manageTurnTimer();
+    // Al empezar la partida, la portada del mazo, como en el resto de modalidades (la competición tiene su propio cartel).
+    if (roomState.round === 1 && !roomState.turnsInRound && roomState.timeline?.length === 1 && !roomState.tournament) CT.UI.deckSplash(modeKey, { key: `wifi:${roomState.roomCode}:${roomState.timeline[0]}` });
     CT.enableDrag?.({
       cardSelector: ".hand-card", slotSelector: ".slot",
       onDrop: (id, index) => {
