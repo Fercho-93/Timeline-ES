@@ -2698,6 +2698,9 @@
   }
   // Crea el duelo por turnos del mazo elegido: lo abre Retos rápidos, que lleva la sala, la partida y «Tus duelos».
   function startCollectionTurnDuel() {
+    // Sin pantalla intermedia: el botón dice «Creando…» hasta que sale la portada de la partida.
+    const boton = app.querySelector('[data-action="start-turn-duel"]');
+    if (boton) { boton.disabled = true; boton.textContent = "Creando el duelo…"; }
     CT.Quick.openCollectionDuel((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); },
       { deck: selectedModeKey, name: duelName(), length: 1, players: duelGroup(), hand: CT.ManoInicial.get(), back: duelHome })
       // Si no se llega a crear, se vuelve a esta misma pantalla con el aviso (no a la de Retos rápidos).

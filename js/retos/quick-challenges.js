@@ -357,8 +357,12 @@
   };
   // El duelo por turnos se guarda en el servidor entre jugadas: sin internet no se puede crear.
   const OFFLINE_TURNS='Sin internet no se puede crear un duelo por turnos. Podéis jugar en directo, también por la Wi-Fi.';
-  function duelSetup() {
+  // El estado de «crear un duelo» a cero, sin pintar nada.
+  function resetDuel() {
     stopNetwork(); duelFirst=0; duelDeck=null; duelPlayers=null; page='duel-setup'; format='duel'; netKind='internet'; roomCapacity=2; state=null; record=null; selected=null; slot=null;
+  }
+  function duelSetup() {
+    resetDuel();
     const pace=duelPace();
     // Sin internet, en directo solo cabe la Wi-Fi: se marca sola, sin cambiar lo guardado.
     const offline=navigator.onLine===false, net=offline?'wifi':liveNet();
@@ -562,15 +566,14 @@
   // Crea un duelo nuevo con los mismos ajustes (revancha o reto desde el cara a cara). Empieza quien no abrió el anterior;
   // si se sabe contra quién es, el reto le llega a su lista de duelos, como en las colecciones.
   async function createDuelRoom({renderPage,name,length,keep,iStart,invite,back,deck=null,players=2,hand=4}) {
-    paint=renderPage;entry='duel-setup';duelSetup();backTo=back||null;duelFirst=iStart?0:1;duelDeck=CT.has(deck)?deck:null;
+    // Sin pintar el formulario de Retos rápidos por debajo: la pantalla desde la que se pide se queda hasta que sale la mesa.
+    paint=renderPage;entry='duel-setup';resetDuel();backTo=back||null;duelFirst=iStart?0:1;duelDeck=CT.has(deck)?deck:null;
     // El número de jugadores va por aquí y no por el desplegable (que solo llega a 4): en colecciones pueden ser hasta 10.
     duelPlayers=Math.min(Math.max(Number(players)||2,2),seatsMax());
     duelHand=Math.min(Math.max(Number(hand)||4,1),E.MAX_HAND);
     CT.Storage.setItem(DUEL_PACE,'turnos');CT.Storage.setItem(DUEL_KEEP,keep?'seguir':'fuera');
     pendingInvite=invite||null;
-    app().querySelector('#quick-net-name').value=name||CT.Identidad?.propio?.()||'';
-    app().querySelector('#quick-free-length').value=String(length||3);
-    await connectRoom(true);
+    await connectRoom(true,{name:name||CT.Identidad?.propio?.()||'',length:length||3});
   }
   // Revancha o reto desde la lista: a partir de la fila de un duelo ya conocido.
   async function challenge(renderPage,code,back) {
@@ -674,23 +677,23 @@
     if(draft){const input=app().querySelector('#quick-room-starter-input');if(input&&!input.value)input.value=draft;}
     const start=app().querySelector('[data-quick="start-room"]');if(start)start.disabled=count<2;
   }
-  async function connectRoom(create) {
+  async function connectRoom(create,opts=null) {
     // Desde «Partida con amigos», solo el ritmo «Por turnos» crea un duelo; en directo es una sala.
     if(create)duelRoom=page==='duel-setup'&&duelPace()==='turnos';
     // El duelo por turnos va siempre por internet, aunque antes se probara una sala por Wi-Fi desde esta pantalla.
     // Las alternativas ya las dice el aviso de encima del botón; el error solo dice qué ha pasado.
     if(create&&duelRoom){netKind='internet';if(navigator.onLine===false)throw Error('Sin internet no se puede crear un duelo por turnos.');}
-    const nameInput=app().querySelector(create?'#quick-net-name':'#quick-net-name-join') || app().querySelector('#quick-net-name'), name=nameInput.value.trim();if(!name)throw Error('Escribe tu nombre.');{const rechazado=CT.Moderacion?.problema(name);if(rechazado)throw Error(rechazado);}
+    const nameInput=opts?null:(app().querySelector(create?'#quick-net-name':'#quick-net-name-join') || app().querySelector('#quick-net-name')), name=String(opts?opts.name:nameInput.value).trim();if(!name)throw Error('Escribe tu nombre.');{const rechazado=CT.Moderacion?.problema(name);if(rechazado)throw Error(rechazado);}
     // Un duelo por turnos es de 2 a 4, como cualquier partida de Retos rápidos con amigos.
     if (create) roomCapacity = duelRoom ? (duelPlayers ?? Math.min(Math.max(Number(app().querySelector('#quick-duel-group')?.value)||2,2),MAX_FRIENDS)) : Number(app().querySelector('#quick-net-players')?.value) || roomCapacity;
     // La duración que se eligió al crear la sala; en la sala ya no hay desplegable, y sin esto siempre eran 3 retos.
-    if (create) roomLength = Number(app().querySelector('#quick-net-length')?.value || app().querySelector('#quick-free-length')?.value) || 3;
-    let code=app().querySelector('#quick-net-code').value.trim();
-    // Crear un duelo por turnos: la pantalla de «Preparando…» se queda hasta que sale la mesa (antes parpadeaba un instante
-    // entre el formulario y la partida). Si falla, se vuelve al formulario.
+    if (create) roomLength = opts?Number(opts.length)||3:Number(app().querySelector('#quick-net-length')?.value || app().querySelector('#quick-free-length')?.value) || 3;
+    let code=(app().querySelector('#quick-net-code')?.value||'').trim();
+    // Crear un duelo por turnos: no hay pantalla intermedia. El botón dice «Creando…» hasta que sale la partida; si
+    // falla, se vuelve al formulario.
     const preparing=create&&duelRoom;
-    if(preparing)preparingScreen();
-    try{ await connectNetwork(); }catch(e){ if(preparing)duelSetup(); throw e; }
+    if(preparing)app().querySelectorAll('[data-quick="create-room"]').forEach(b=>{b.disabled=true;b.textContent='Creando el duelo…';});
+    try{ await connectNetwork(); }catch(e){ if(preparing&&!opts)duelSetup(); throw e; }
     async function connectNetwork() {
     const epoch=networkEpoch, change=(...args)=>{if(epoch===networkEpoch)roomChanged(...args);}, fail=e=>{if(epoch===networkEpoch)errorNotice(e);};
     if(netKind==='internet') {
@@ -705,11 +708,6 @@
       shell(`<section class="setup-section"><h2 data-focus tabindex="-1">Devuelve esta respuesta</h2><div class="panel"><p>Compártela con quien creó la sala para completar la conexión.</p><div class="field"><textarea id="quick-signal" readonly rows="4">${esc(answer)}</textarea></div>${button('share-signal','Compartir respuesta','btn btn-primary btn-block')}${button('qr-signal','Mostrar QR de la respuesta','btn btn-secondary btn-block')}<p>La sala aparecerá al conectar. Si no conecta, comprobad que estáis en la misma red Wi-Fi.</p><p id="quick-error" role="alert"></p></div></section>`);
     }
     }
-  }
-  // «Preparando el duelo…»: lo único que se ve entre pulsar «Crear» y que aparezca la mesa.
-  function preparingScreen() {
-    shell(`<section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> ${duelDeck?'Grandes colecciones':'Retos rápidos'}</div><h2 data-focus tabindex="-1">Preparando el duelo…</h2>
-      <section class="panel lobby-settings" role="status"><div class="waiting-orbit"><span></span></div></section></section>`);
   }
   async function networkAction(action) {
     if(busy)return;busy=true;
