@@ -25,6 +25,12 @@
     }
     return collections.get(id);
   }
+  // El mazo de un duelo de colección: todas las cartas de valor distinto, barajadas (lo reparte quien lo crea).
+  function colDeck(key) {
+    const c = challenge(COLLECTION + key);
+    if (!c) throw Error('INVALID_DECK');
+    return CT.shuffle(CT.uniqueValueIds(key, CT.cards(key).map(card => card.id))).map(String);
+  }
   const isCollection = id => typeof id === 'string' && id.startsWith(COLLECTION);
   const challenge = id => isCollection(id) ? collection(id) : catalog.challenges.find(c => c.id === id);
   // Las rondas de un duelo de colección: tantas como se pidan (y quepan), de MULTI_CARDS cartas distintas cada una
@@ -39,6 +45,14 @@
   const clone = value => JSON.parse(JSON.stringify(value));
   // Tope de rondas de un duelo de colección (de un mismo mazo).
   const MAX_ROUNDS = 5;
+  // Duelo por turnos de Grandes colecciones: su propio motor, con la lógica de las colecciones. Cada jugador tiene su
+  // mano (de las cartas que se eligieron), se juega una carta por turno y, si falla, esa carta no entra en la línea y se
+  // repone otra del mazo; gana quien se queda sin cartas al cerrar la vuelta (si varios, final con una cifra secreta).
+  // `config.hand` lo distingue de los duelos de colección anteriores (mismo mazo para todos, como Retos rápidos).
+  const isColDuel = config => !!config && config.kind === 'duel' && Number.isInteger(config.hand) && isCollection(config.rounds?.[0]?.id);
+  const MAX_HAND = 6;
+  // Para barajar el descarte al agotarse el mazo: el mismo resultado en todos los móviles.
+  const reshuffle = list => [...list].reverse();
   function create(config) {
     if (!config || !Array.isArray(config.names) || config.names.length < 1 || config.names.length > 10 ||
         config.names.some(n => typeof n !== 'string' || !n.trim() || n.length > 24) ||
@@ -55,6 +69,7 @@
       if (!c || !Array.isArray(round.order) || round.order.length < 2 || round.order.length > c.cards.length ||
           new Set(round.order).size !== round.order.length || round.order.some(id => !c.cards.some(card => card.id === id))) throw Error('INVALID_DECK');
     }
+    if (isColDuel(config)) return colCreate(config);
     const s = {config: clone(config), index: 0, players: config.names.map(name => ({name: name.trim(), score: 0, points: 0, status: 'active'}))};
     startRound(s);
     return s;
@@ -62,7 +77,7 @@
   // ¿Un fallo deja fuera del reto? Con `config.keep` explícito manda él: true = se sigue hasta agotar las cartas (el fallo
   // solo no suma), false = quien falla pierde lo provisional y no vuelve a jugar hasta el siguiente reto. Sin él (partidas
   // guardadas antes de existir la opción) se mantiene lo de entonces: sigue quien juega solo sin ser un duelo.
-  const keepPlaying = s => typeof s.config.keep === 'boolean' ? s.config.keep : s.config.names.length === 1 && s.config.kind !== 'duel';
+  const keepPlaying = s => isColDuel(s.config) ? true : typeof s.config.keep === 'boolean' ? s.config.keep : s.config.names.length === 1 && s.config.kind !== 'duel';
   function startRound(s) {
     const round = s.config.rounds[s.index];
     s.timeline = [round.order[0]];
@@ -87,6 +102,7 @@
     }
   }
   function step(input, command) {
+    if (isColDuel(input.config)) return colStep(input, command);
     const s = clone(input), c = challenge(s.config.rounds[s.index].id), p = s.players[s.current];
     if (command?.type === 'place' && s.phase === 'turn') {
       if (!s.remaining.includes(command.cardId) || !Number.isInteger(command.index) || command.index < 0 || command.index > s.timeline.length) throw Error('INVALID_PLACEMENT');
@@ -119,6 +135,66 @@
     } else throw Error('INVALID_ACTION');
     return s;
   }
+  function colCreate(config) {
+    const round = config.rounds[0], n = config.names.length;
+    if (config.rounds.length !== 1 || n < 2 || config.hand < 1 || config.hand > MAX_HAND || round.order.length < n * config.hand + 1) throw Error('INVALID_CONFIG');
+    const deck = round.order.slice();
+    const players = config.names.map(name => ({name: name.trim(), hand: deck.splice(0, config.hand), score: 0, points: 0, hits: 0, status: 'active', roundScore: 0}));
+    const s = {config: clone(config), index: 0, players, timeline: [deck.shift()], deck, discard: [], current: Number.isInteger(config.first) ? config.first : 0,
+      phase: 'turn', result: null, turnsInRound: 0, round: 1, final: null, winner: null, winners: null, remaining: []};
+    s.remaining = s.players[s.current].hand.slice();
+    return s;
+  }
+  // Qué carta sale en la final: de las que no están en la mesa ni en ninguna mano (determinista, sin azar).
+  function colFinalCard(s, players, previous) {
+    const key = c => c.id, used = previous?.used || [];
+    const exposed = new Set([...s.timeline, ...s.players.flatMap(p => p.hand)]);
+    const cards = challenge(s.config.rounds[0].id).cards;
+    let pool = cards.filter(c => !exposed.has(key(c)) && !used.includes(c.id));
+    if (!pool.length) pool = cards.filter(c => !used.includes(c.id));
+    if (!pool.length) pool = cards;
+    const card = pool[0], mode = challenge(s.config.rounds[0].id).collection;
+    return {round: (previous?.round || 0) + 1, players: [...players], cardId: card.id, target: Math.round(card.value * CT.Final.factor(mode)), guesses: {}, used: [...used, card.id]};
+  }
+  function colEnd(s, winners) {
+    s.phase = 'round-end'; s.winners = winners; s.winner = winners[0]; s.final = s.final ? {...s.final, done: true} : null;
+    s.players.forEach((p, i) => { p.status = winners.includes(i) ? 'banked' : 'active'; p.roundScore = p.hits; p.score = winners.includes(i) ? 1 : 0; });
+  }
+  function colAdvance(s) {
+    s.turnsInRound++;
+    if (s.turnsInRound >= s.players.length) {
+      const empty = s.players.map((p, i) => i).filter(i => s.players[i].hand.length === 0);
+      if (empty.length === 1) { colEnd(s, empty); return; }
+      if (empty.length > 1) { s.final = colFinalCard(s, empty, null); s.current = empty[0]; s.remaining = []; return; }
+      s.turnsInRound = 0; s.round++;
+    }
+    s.current = (s.current + 1) % s.players.length;
+    s.remaining = s.players[s.current].hand.slice();
+  }
+  function colStep(input, command) {
+    const s = clone(input), c = challenge(s.config.rounds[0].id), p = s.players[s.current];
+    if (command?.type === 'place' && s.phase === 'turn' && !s.final) {
+      const value = id => c.cards.find(card => card.id === id).value;
+      if (!p.hand.includes(command.cardId) || !Number.isInteger(command.index) || command.index < 0 || command.index > s.timeline.length) throw Error('INVALID_PLACEMENT');
+      const play = CT.Engine.play({hand: p.hand, timeline: s.timeline, deck: s.deck, discard: s.discard}, command.cardId, command.index, value, reshuffle);
+      p.hand = play.hand; s.timeline = play.timeline; s.deck = play.deck; s.discard = play.discard;
+      if (play.correct) p.hits++;
+      s.result = {cardId: command.cardId, correct: play.correct, lost: 0, player: s.current, keep: true, attempted: command.index, drawn: play.drawnCardId ?? null, returned: play.returned};
+      s.phase = 'result';
+    } else if (command?.type === 'ack' && s.phase === 'result') {
+      s.result = null; s.phase = 'turn'; colAdvance(s);
+    } else if (command?.type === 'guess' && s.phase === 'turn' && s.final && !s.final.done && s.final.players.includes(s.current) && Number.isSafeInteger(command.value) && !(s.current in s.final.guesses)) {
+      s.final.guesses[s.current] = command.value;
+      const waiting = s.final.players.filter(i => !(i in s.final.guesses));
+      if (waiting.length) s.current = waiting[0];
+      else {
+        const rank = CT.Final.rank({players: s.final.players, target: s.final.target}, s.final.guesses);
+        if (rank.winners.length === 1) colEnd(s, rank.winners);
+        else { s.final = colFinalCard(s, rank.winners, s.final); s.current = rank.winners[0]; }
+      }
+    } else throw Error('INVALID_ACTION');
+    return s;
+  }
   // Se reconstruye la partida con comandos legales; nunca se confía en un marcador guardado.
   function restore(record) {
     if (!record || record.version !== catalog.version || !Array.isArray(record.commands) || record.commands.length > 2000) throw Error('INVALID_SAVE');
@@ -137,5 +213,5 @@
   // Jugando solo (los mazos de hoy y el reto diario): 10 cartas que colocar en cada reto, como una ronda de
   // Grandes colecciones, más la que abre la línea. Un mazo más pequeño se juega entero.
   const SOLO_CARDS = 10;
-  CT.QuickEngine = {create, step, restore, challenge, keepPlaying, timeoutPlacement, MULTI_CARDS, SOLO_CARDS, isCollection, collectionRounds, COLLECTION};
+  CT.QuickEngine = {create, step, restore, challenge, keepPlaying, timeoutPlacement, MULTI_CARDS, SOLO_CARDS, isCollection, collectionRounds, COLLECTION, isColDuel, colDeck, MAX_HAND};
 })();

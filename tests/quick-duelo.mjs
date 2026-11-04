@@ -253,6 +253,80 @@ assert.equal(w.location.origin, 'https://continuum.test');
   assert.equal(R.state(diez).players.length, 10, 'un duelo de diez reserva diez plazas');
   assert.throws(() => R.reduce(R.create('me', 'Tester', 11), 'me', {type: 'start', rounds: rondas, kind: 'duel'}), /Sala no válida|dos personas/, 'más de diez no cabe');
 }
+// Duelo por turnos de Grandes colecciones: motor propio con mano individual, reposición al fallar y final de desempate.
+{
+  const c = E.challenge('col:history'), val = id => c.cards.find(x => x.id === id).value;
+  const deck = E.colDeck('history');
+  assert.equal(new Set(deck.map(val)).size, deck.length, 'el mazo no repite valores');
+  const config = {names: ['Ana', 'Bea', 'Cid'], rounds: [{id: 'col:history', order: deck}], kind: 'duel', hand: 3, historyId: 'x'};
+  let s = E.create(config);
+  assert.equal(E.isColDuel(config), true);
+  assert.equal(E.keepPlaying(s), true, 'en colecciones no hay «plantarse»: un fallo no echa a nadie');
+  assert.equal(JSON.stringify(s.players.map(p => p.hand.length)), JSON.stringify([3, 3, 3]), 'cada jugador tiene su mano');
+  assert.equal(new Set(s.players.flatMap(p => p.hand)).size, 9, 'las manos son distintas');
+  assert.equal(s.timeline.length, 1);
+  assert.equal(s.deck.length, deck.length - 10, 'el resto es el mazo de reposición');
+  assert.deepEqual(s.remaining, s.players[0].hand, 'se ve la mano de quien juega');
+  const bien = (st, id) => { for (let i = 0; i <= st.timeline.length; i++) if (E.step(st, {type: 'place', cardId: id, index: i}).result.correct) return i; };
+  const mal = (st, id) => { for (let i = 0; i <= st.timeline.length; i++) if (!E.step(st, {type: 'place', cardId: id, index: i}).result.correct) return i; return null; };
+  // Acertar: la carta entra en la línea y la mano baja.
+  const primera = s.players[0].hand[0], hueco = bien(s, primera);
+  s = E.step(s, {type: 'place', cardId: primera, index: hueco});
+  assert.equal(s.result.correct, true); assert.equal(s.players[0].hand.length, 2); assert.ok(s.timeline.includes(primera));
+  assert.throws(() => E.step(s, {type: 'place', cardId: s.players[1].hand[0], index: 0}), /INVALID/, 'en el turno de otro no se juega');
+  s = E.step(s, {type: 'ack'});
+  assert.equal(s.current, 1);
+  // Fallar: la carta no entra en la línea y se repone otra del mazo (sigue con las mismas cartas).
+  const falla = s.players[1].hand.find(id => mal(s, id) !== null), largo = s.timeline.length, mazo = s.deck.length;
+  s = E.step(s, {type: 'place', cardId: falla, index: mal(s, falla)});
+  assert.equal(s.result.correct, false); assert.equal(s.timeline.length, largo, 'la carta fallada no entra en la línea');
+  assert.equal(s.players[1].hand.length, 3, 'repone: tiene las mismas cartas que antes');
+  assert.ok(!s.players[1].hand.includes(falla) && s.discard.includes(falla) && s.deck.length === mazo - 1, 'la fallada va al descarte y la nueva sale del mazo');
+  assert.ok(s.result.drawn && s.players[1].hand.includes(s.result.drawn));
+  s = E.step(s, {type: 'ack'});
+  // Gana quien se queda sin cartas al cerrar la vuelta.
+  const jugar = (st, quien) => { const id = st.players[st.current].hand[0]; return E.step(E.step(st, {type: 'place', cardId: id, index: quien === 'bien' ? bien(st, id) : mal(st, id)}), {type: 'ack'}); };
+  let t = E.create({...config, names: ['Ana', 'Bea'], hand: 2});
+  t = jugar(t, 'bien');
+  assert.equal(t.phase, 'turn', 'todavía falta que juegue Bea');
+  t = jugar(t, 'mal');
+  assert.equal(t.phase, 'turn', 'nadie se ha quedado sin cartas: sigue la partida');
+  assert.equal(JSON.stringify(t.players.map(p => p.hand.length)), '[1,2]', 'Bea falló y repone; Ana lleva una menos');
+  assert.equal(t.round, 2, 'segunda vuelta');
+  t = jugar(t, 'bien'); t = jugar(t, 'bien');
+  assert.equal(t.phase, 'round-end'); assert.equal(JSON.stringify(t.winners), JSON.stringify([0]), 'gana Ana, la única sin cartas al cerrar la vuelta');
+  // Varios sin cartas a la vez: final de desempate con una cifra secreta; gana la más cercana.
+  let u = E.create({...config, names: ['Ana', 'Bea'], hand: 1});
+  u = jugar(u, 'bien'); u = jugar(u, 'bien');
+  assert.equal(u.phase, 'turn'); assert.ok(u.final, 'empatan sin cartas: final'); assert.equal(JSON.stringify(u.final.players), JSON.stringify([0, 1]));
+  assert.throws(() => E.step(u, {type: 'place', cardId: deck[0], index: 0}), /INVALID/, 'en la final no se colocan cartas');
+  const real = u.final.target;
+  u = E.step(u, {type: 'guess', value: real + 1000});
+  assert.equal(u.current, 1, 'después responde la otra persona');
+  assert.throws(() => E.step(u, {type: 'guess', value: 1.5}), /INVALID/, 'solo enteros');
+  u = E.step(u, {type: 'guess', value: real});
+  assert.equal(u.phase, 'round-end'); assert.equal(JSON.stringify(u.winners), JSON.stringify([1]), 'gana la cifra más cercana');
+  // Empate en la final: otra carta, solo con los empatados.
+  let v = E.create({...config, names: ['Ana', 'Bea'], hand: 1});
+  v = jugar(v, 'bien'); v = jugar(v, 'bien');
+  const primeraCarta = v.final.cardId;
+  v = E.step(E.step(v, {type: 'guess', value: v.final.target + 5}), {type: 'guess', value: v.final.target - 5});
+  assert.equal(v.phase, 'turn'); assert.equal(v.final.round, 2, 'otra carta'); assert.notEqual(v.final.cardId, primeraCarta); assert.equal(JSON.stringify(v.final.players), JSON.stringify([0, 1]));
+  // Sala: «hand» viaja en la configuración y el motor de la sala lo reconstruye igual en todos los móviles.
+  const R = CT.QuickRoom;
+  let room = R.create('ana', 'Ana', 3); room = R.reduce(room, 'ana', {type: 'start', rounds: [{id: 'col:history', order: deck}], kind: 'duel', hand: 2, historyId: 'sala'});
+  assert.equal(room.config.hand, 2); assert.equal(R.state(room).players.length, 3); assert.equal(room.config.names.length, 3);
+  assert.equal(room.actor, 'ana');
+  const abre = R.state(room).players[0].hand[0];
+  room = R.reduce(room, 'ana', {type: 'place', cardId: abre, index: bien(R.state(room), abre)}); room = R.reduce(room, 'ana', {type: 'ack'});
+  assert.equal(room.actor, room.members[1] || room.host, 'el turno pasa a la siguiente plaza');
+  room = R.reduce(room, 'bea', {type: 'join', name: 'Bea'});
+  assert.equal(room.actor, 'bea', 'quien entra juega su turno con su mano');
+  CT.QuickNetwork.mine = async () => [{code: 'KKKKKKKKK2', room, uid: 'ana'}];
+  const [fila] = await CT.Quick.duels();
+  assert.match(fila.marcador, /^Tú 1 carta · Bea 2 cartas · Jugador 3 2 cartas$/, 'Tus duelos cuenta las cartas que le quedan a cada uno');
+  assert.equal(fila.collection, 'history');
+}
 // Grandes colecciones por turnos: el mazo elegido se juega con estas reglas, en rondas de 9 cartas más la de salida.
 {
   const R = CT.QuickRoom, c = E.challenge('col:history');

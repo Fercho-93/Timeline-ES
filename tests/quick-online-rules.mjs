@@ -370,6 +370,29 @@ try {
     assert.equal(t.actor,'outsider');
     t=R.reduce(t,'outsider',{type:'place',cardId:'poker-4',index:0});await assertSucceeds(write(out,t));
   }
+  // Duelo por turnos de colección con su propio motor: mano propia (hand), jugadas con carta de la mano y final con cifras.
+  {
+    await env.clearFirestore();
+    const colRef=doc(host,'quickRooms','ABCDEFGH23'),ids=E.colDeck('history');
+    let t=R.create('host','Ana',2);await assertSucceeds(write(host,t));
+    t=R.reduce(t,'host',{type:'start',rounds:[{id:'col:history',order:ids}],kind:'duel',hand:1,first:0});await assertSucceeds(write(host,t));
+    await assertFails(write(host,{...t,revision:t.revision,config:{...t.config,hand:9}}));
+    const bien=(st,id)=>{for(let i=0;i<=st.timeline.length;i++)if(E.step(st,{type:'place',cardId:id,index:i}).result.correct)return i;};
+    const mano=s=>s.players[s.current].hand[0];
+    let st=R.state(t);t=R.reduce(t,'host',{type:'place',cardId:mano(st),index:bien(st,mano(st))});await assertSucceeds(write(host,t));
+    t=R.reduce(t,'host',{type:'ack'});await assertSucceeds(write(host,t));
+    t=R.reduce(t,'guest',{type:'join',name:'Bea'});await assertSucceeds(write(guest,t));
+    st=R.state(t);t=R.reduce(t,'guest',{type:'place',cardId:mano(st),index:bien(st,mano(st))});await assertSucceeds(write(guest,t));
+    t=R.reduce(t,'guest',{type:'ack'});await assertSucceeds(write(guest,t));
+    assert.equal(R.state(t).phase,'turn');assert.ok(R.state(t).final,'los dos se quedan sin cartas: final');
+    // La final: cada finalista escribe su cifra (un entero), solo en su turno.
+    const target=R.state(t).final.target;
+    await assertFails(write(guest,{...t,commands:[...t.commands,{type:'guess',value:target,by:'guest'}],revision:t.revision+1,actor:'guest'}));
+    t=R.reduce(t,'host',{type:'guess',value:target+100});await assertSucceeds(write(host,t));
+    await assertFails(write(guest,{...t,commands:[...t.commands.slice(0,-1)],revision:t.revision}));
+    t=R.reduce(t,'guest',{type:'guess',value:target});await assertSucceeds(write(guest,t));
+    assert.equal(t.phase,'finished');assert.equal(JSON.stringify(R.state(t).winners),'[1]');
+  }
   // Duelo por turnos de diez (Grandes colecciones): las diez plazas se reservan al empezar y se ocupan en orden.
   {
     await env.clearFirestore();

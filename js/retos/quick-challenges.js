@@ -97,14 +97,19 @@
   let previewCode=null, serverRoom=null, duelRoom=false, duelStarting=false, duelFirst=0, backTo=null, pendingInvite=null;
   // Duelo por turnos de Grandes colecciones: el mazo elegido (su clave). Se juega con estas mismas reglas, con rondas
   // de ese mazo en vez de retos sorpresa (QuickEngine: «col:<mazo>»).
-  let duelDeck=null, duelPlayers=null;
+  let duelDeck=null, duelPlayers=null, duelHand=4;
   const deckOf=config=>{const id=config?.rounds?.[0]?.id;return E.isCollection(id)?E.challenge(id)?.collection||null:null;};
   // En un duelo de colección no se juegan retos sino rondas del mismo mazo: el texto se adapta.
   const R_=(reto,ronda)=>deckOf(state?.config)?ronda:reto;
   // Lo que se ve encima de un duelo: de qué parte del juego es.
   const duelSection=config=>deckOf(config)||duelDeck?'Grandes colecciones':'Retos rápidos';
   // Las rondas de un duelo: retos sorpresa o, si es de colección, rondas de su mazo.
-  const duelRounds=count=>duelDeck?E.collectionRounds(duelDeck,count):rounds(count,null,null,E.MULTI_CARDS);
+  // Un duelo de colección es de motor propio: una sola "ronda" con el mazo entero barajado, de donde salen las manos y el mazo de reposición.
+  const duelRounds=count=>duelDeck?[{id:E.COLLECTION+duelDeck,order:E.colDeck(duelDeck)}]:rounds(count,null,null,E.MULTI_CARDS);
+  const isCol=()=>!!state&&E.isColDuel(state.config);
+  // Tu sitio en la mesa y tus cartas: en un duelo de colección cada uno tiene la suya (las de los demás no se enseñan).
+  const mySeat=()=>room?room.members.indexOf(myId):state?.current??0;
+  const handIds=()=>isCol()?(state.players[mySeat()]?.hand||[]):state.remaining;
   function stopNetwork() {quickClock?.stop();quickClock=null;clearInterval(publicClock);publicClock=null;networkEpoch++;connection?.close();connection=null;room=null;serverRoom=null;myId=null;busy=false;invite=null;duelRoom=false;duelStarting=false;}
   function errorNotice(e) {busy=false;const message=e?.code==='permission-denied'||/missing or insufficient permissions/i.test(e?.message||'')?'No se pudo guardar el cambio en el duelo. Vuelve a abrirlo e inténtalo de nuevo.':e.message || String(e);let el=app().querySelector('#quick-error');if(!el){el=document.createElement('p');el.id='quick-error';el.setAttribute('role','alert');(app().querySelector('.modal') || app().querySelector('.quick-shell'))?.append(el);}if(el)el.textContent=message;CT.announce(message);}
   // `fresh`: en solitario, las cartas que aún no están en la colección salen antes que las ya descubiertas,
@@ -442,7 +447,7 @@
     }
     else {
       lobby(code || connection?.code);
-      if(duelRoom && myId===room.host && !duelStarting){duelStarting=true;void networkAction({type:'start',rounds:duelRounds(roomLength||3),kind:'duel',historyId:historyId(),keep:duelKeep(),seconds:CT.Tiempo.get('amigos',15),first:duelFirst}).then(()=>{duelStarting=false;});}
+      if(duelRoom && myId===room.host && !duelStarting){duelStarting=true;void networkAction({type:'start',rounds:duelRounds(roomLength||3),kind:'duel',historyId:historyId(),...(duelDeck?{hand:duelHand}:{keep:duelKeep()}),seconds:CT.Tiempo.get('amigos',15),first:duelFirst}).then(()=>{duelStarting=false;});}
     }
   }
   // Mesa pública de Retos rápidos: la misma sala de espera que en Grandes colecciones.
@@ -526,13 +531,15 @@
     const seat=i=>i<joined?shown(room.names[i]):pair?shown(room.invitedName||'tu amigo'):`Jugador ${i+1}`;
     const others=s.players.map((p,i)=>i).filter(i=>i!==me);
     const rival=pair?seat(other):(others.filter(i=>i<joined).map(seat).join(', ')||'tus amigos'),c=E.challenge(s.config.rounds[s.index].id),total=s.config.rounds[s.index].order.length-1;
-    const mine=p=>p.score+p.points,mios=mine(s.players[me]),suyos=Math.max(...others.map(i=>mine(s.players[i])));
+    const col=E.isColDuel(cfg), mine=p=>p.score+p.points,mios=mine(s.players[me]),suyos=Math.max(...others.map(i=>mine(s.players[i])));
+    // En un duelo de colección el marcador son las cartas que le quedan a cada uno.
+    const cartas=i=>`${s.players[i].hand.length} ${s.players[i].hand.length===1?'carta':'cartas'}`;
     // El cara a cara cuenta duelos de dos: en uno de grupo no hay un único rival.
-    const base={rival,rivalUid:pair?(friendIn?room.members[other]:room.invitedUid||null):null,rivalIn:pair?friendIn:joined===cap,me:room.names[me],deck:c.title,marcador:`Tú ${mios} · ${others.map(i=>`${seat(i)} ${mine(s.players[i])}`).join(' · ')} aciertos`,updatedAt:at,...details};
-    const where=`${deckOf(cfg)?'Ronda':'Mazo'} ${s.index+1} de ${s.config.rounds.length} · carta ${Math.max(1,Math.min(total,s.phase==='turn'?s.timeline.length:s.timeline.length-1))} de ${total}`;
+    const base={rival,rivalUid:pair?(friendIn?room.members[other]:room.invitedUid||null):null,rivalIn:pair?friendIn:joined===cap,me:room.names[me],deck:c.title,marcador:col?`Tú ${cartas(me)} · ${others.map(i=>`${seat(i)} ${cartas(i)}`).join(' · ')}`:`Tú ${mios} · ${others.map(i=>`${seat(i)} ${mine(s.players[i])}`).join(' · ')} aciertos`,updatedAt:at,...details};
+    const where=col?`Vuelta ${s.round} · te quedan ${cartas(me)}`:`${deckOf(cfg)?'Ronda':'Mazo'} ${s.index+1} de ${s.config.rounds.length} · carta ${Math.max(1,Math.min(total,s.phase==='turn'?s.timeline.length:s.timeline.length-1))} de ${total}`;
     if(room.declined)return {...base,grupo:'historial',pendiente:false,estado:'Cancelado: rechazó tu reto',detalle:'Cerrado',done:true,marcador:''};
     if(room.resigned){const yo=room.resigned===uid;return {...base,grupo:'historial',pendiente:false,estado:yo?'Te rendiste':'Ganaste: tu rival se rindió',detalle:'Terminado',done:true,result:yo?'loss':'win'};}
-    if(room.phase==='finished'){const result=mios>suyos?'win':mios<suyos?'loss':'draw';return {...base,grupo:'historial',pendiente:false,estado:{win:'Ganaste',loss:'Perdiste',draw:'Empate'}[result],detalle:'Terminado',done:true,result};}
+    if(room.phase==='finished'){const result=col?(s.winners?.includes(me)?(s.winners.length>1?'draw':'win'):'loss'):mios>suyos?'win':mios<suyos?'loss':'draw';return {...base,grupo:'historial',pendiente:false,estado:{win:'Ganaste',loss:'Perdiste',draw:'Empate'}[result],detalle:'Terminado',done:true,result};}
     // Le toca a una plaza que aún nadie ha ocupado: se espera a que alguien abra el enlace.
     if(room.phase==='turn'&&s.current>=joined)return {...base,grupo:'enviada',pendiente:false,estado:pair?(room.invitedUid?`Esperando a que ${rival} acepte`:'Esperando a que tu amigo abra el enlace'):`Esperando a que entre ${seat(s.current)}`,detalle:where,marcador:pair?'':base.marcador};
     const mioTurno=room.actor===uid, turnoDe=room.phase==='round-end'?seat(0):seat(s.current);
@@ -551,10 +558,11 @@
   // Entra en un duelo de la lista. `back` es a donde se vuelve al salir.
   // Crea un duelo nuevo con los mismos ajustes (revancha o reto desde el cara a cara). Empieza quien no abrió el anterior;
   // si se sabe contra quién es, el reto le llega a su lista de duelos, como en las colecciones.
-  async function createDuelRoom({renderPage,name,length,keep,iStart,invite,back,deck=null,players=2}) {
+  async function createDuelRoom({renderPage,name,length,keep,iStart,invite,back,deck=null,players=2,hand=4}) {
     paint=renderPage;entry='duel-setup';duelSetup();backTo=back||null;duelFirst=iStart?0:1;duelDeck=CT.has(deck)?deck:null;
     // El número de jugadores va por aquí y no por el desplegable (que solo llega a 4): en colecciones pueden ser hasta 10.
     duelPlayers=Math.min(Math.max(Number(players)||2,2),seatsMax());
+    duelHand=Math.min(Math.max(Number(hand)||4,1),E.MAX_HAND);
     CT.Storage.setItem(DUEL_PACE,'turnos');CT.Storage.setItem(DUEL_KEEP,keep?'seguir':'fuera');
     pendingInvite=invite||null;
     app().querySelector('#quick-net-name').value=name||CT.Identidad?.propio?.()||'';
@@ -578,7 +586,7 @@
     if(!row)throw Error('No se encuentra ese reto.');
     paint=renderPage;entry='duel-setup';backTo=back||null;previewCode=code;
     shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Duelo con un amigo · ${row.collection?'Grandes colecciones':'Retos rápidos'}</div><h2 data-focus tabindex="-1">${esc(row.rival)} te ha retado</h2></div></section>
-      <section class="panel lobby-settings"><p>${row.collection?`Duelo por turnos de ${esc(row.deck)}: ${row.length} ${row.length===1?'ronda':'rondas'} de ${E.MULTI_CARDS-1} cartas.`:`Duelo por turnos de Retos rápidos: ${row.length} ${row.length===1?'mazo':'mazos'}.`} ${row.keep?'Quien falla no suma esa carta, pero se juega todo el mazo.':'Quien falla pierde lo provisional y no juega más ese reto.'}</p><p class="hint">${esc(row.rival)} ya ha hecho su jugada: al aceptar verás cuál fue y seguirás tú.</p>
+      <section class="panel lobby-settings"><p>${row.collection?`Duelo por turnos de ${esc(row.deck)}: cada uno con su mano; si fallas, repones del mazo, y gana quien se queda sin cartas.`:`Duelo por turnos de Retos rápidos: ${row.length} ${row.length===1?'mazo':'mazos'}.`} ${row.keep?'Quien falla no suma esa carta, pero se juega todo el mazo.':'Quien falla pierde lo provisional y no juega más ese reto.'}</p><p class="hint">${esc(row.rival)} ya ha hecho su jugada: al aceptar verás cuál fue y seguirás tú.</p>
         ${button('accept-invite','Aceptar el reto <span>→</span>','btn btn-primary btn-block')}${button('decline-invite','Rechazar','btn btn-ghost btn-block exit-discard')}${button('back-invite','Volver a Tus duelos','btn btn-secondary btn-block')}<p id="quick-error" role="alert"></p></section>`);
   }
   async function resignDuel(code) {await CT.QuickNetwork.actOnce(code,{type:'resign'});}
@@ -629,7 +637,7 @@
     const rule=keep?'Quien falla no suma esa carta, pero se juega todo el mazo.':'Quien falla pierde lo provisional y no juega más ese reto.';
     shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> ${room?.capacity > 2 ? 'Duelo con amigos' : 'Duelo con un amigo'} · ${duelSection(room?.config)}</div><h2 data-focus tabindex="-1">${host?'Duelo preparado':'Duelo en marcha'}</h2></div>
       <section class="panel lobby-settings"><div class="waiting-orbit"><span></span></div>
-        ${host?`<h3>Esperando a tu amigo</h3><p>Mándale el enlace. En cuanto lo abra, empieza el duelo: ${length} ${duelDeck?(length===1?'ronda':'rondas'):(length===1?'mazo':'mazos')}, un turno cada uno desde su móvil. ${rule}</p>${room.members.length>=2?button('start-room','Empezar el duelo <span>→</span>','btn btn-primary btn-block'):button('share-room','Compartir enlace','btn btn-primary btn-block')}<p class="hint">La partida se guarda entre turnos: puedes dejarla y volver cuando quieras.</p>`
+        ${host?`<h3>Esperando a tu amigo</h3><p>Mándale el enlace. En cuanto lo abra, empieza el duelo: ${duelDeck?`cada uno con su mano de ${duelHand} cartas, una carta por turno desde su móvil.`:`${length} ${length===1?'mazo':'mazos'}, un turno cada uno desde su móvil. ${rule}`}</p>${room.members.length>=2?button('start-room','Empezar el duelo <span>→</span>','btn btn-primary btn-block'):button('share-room','Compartir enlace','btn btn-primary btn-block')}<p class="hint">La partida se guarda entre turnos: puedes dejarla y volver cuando quieras.</p>`
           :`<h3>Esperando a ${friend}</h3><p>El duelo empieza en cuanto ${friend} lo abra en su móvil.</p>`}
         <p id="quick-error" role="alert"></p></section>`);
   }
@@ -788,7 +796,7 @@
     if(action==='rematch-room'){
       const cfg=state.config, me=state.players[room.members.indexOf(myId)].name, other=room.members.find(m=>m!==myId);
       const grupo=room.capacity>2;
-      await createDuelRoom({renderPage:paint,name:me,length:cfg.rounds.length,keep:cfg.keep!==false,iStart:grupo||me!==cfg.names[cfg.first||0],deck:deckOf(cfg),players:room.capacity,invite:!grupo&&other?{uid:other,name:room.names[room.members.indexOf(other)],source:connection?.code}:null,back:backTo});
+      await createDuelRoom({renderPage:paint,name:me,length:cfg.rounds.length,hand:cfg.hand,keep:cfg.keep!==false,iStart:grupo||me!==cfg.names[cfg.first||0],deck:deckOf(cfg),players:room.capacity,invite:!grupo&&other?{uid:other,name:room.names[room.members.indexOf(other)],source:connection?.code}:null,back:backTo});
       return true;
     }
     if(action==='accept-invite'){const code=previewCode;await openRoom(paint,code,backTo);return true;}
@@ -907,6 +915,8 @@
   // ha fallado (✕) lo lleva marcado; el nombre y las cifras se recortan solos, nunca se salen de la ficha.
   function scores() {
     const keep = E.keepPlaying(state), n = state.players.length;
+    // En un duelo de colección el marcador son las cartas que le quedan a cada uno: gana quien se queda sin ninguna.
+    if (isCol()) return `<div class="quick-scores" data-n="${n}" style="--cols:${Math.min(n, 4)}" role="group" aria-label="Cartas que le quedan a cada jugador">${state.players.map((p, i) => `<span class="quick-score${i === state.current ? ' is-active' : ''}"${i === state.current ? ' aria-current="true"' : ''} role="group" aria-label="${esc(`${playerName(p, i)}: ${p.hand.length} ${p.hand.length === 1 ? 'carta' : 'cartas'}`)}"><i class="quick-score-avatar">${playerAvatar(p, i)}</i><span class="quick-score-copy"><b>${esc(playerName(p, i))}</b><em><strong>${p.hand.length}</strong><small class="quick-score-open">${p.hand.length === 1 ? 'carta' : 'cartas'}</small></em></span></span>`).join('')}</div>`;
     return `<div class="quick-scores" data-n="${n}" style="--cols:${Math.min(n, 4)}" role="group" aria-label="Marcador">${state.players.map((p, i) => {
       const gone = p.status === 'gone', out = gone || (!keep && p.status === 'failed'), banked = !keep && p.status === 'banked';
       const label = `${playerName(p, i)}: ${gone ? `${p.score} asegurados. Ha salido de la partida` : keep ? `${p.points + p.score} ${p.points + p.score === 1 ? 'acierto' : 'aciertos'}. Sigue jugando` : `${p.score} asegurados, ${p.points} en juego. ${out ? 'Fuera de este reto' : banked ? 'Se ha plantado' : 'Sigue jugando'}`}`;
@@ -970,6 +980,8 @@
   // La línea tal y como se ve al resolver una jugada. Si se ha fallado, la carta aún no está en ella:
   // se enseña el hueco donde iba de verdad, igual que en Grandes colecciones, y entra al continuar.
   function resultLine(c, r, get) {
+    // En un duelo de colección la carta fallada no entra en la línea: se descarta y se repone otra.
+    if (isCol()) return state.timeline.map(id => cardMarkup(c, get(id))).join('');
     if (r.correct) return state.timeline.map(id => cardMarkup(c, get(id))).join('');
     const line = state.timeline.filter(id => id !== r.cardId), at = state.timeline.indexOf(r.cardId);
     return [...line.map((id, i) => resultGap(i, i === at) + cardMarkup(c, get(id))), resultGap(line.length, line.length === at)].join('');
@@ -982,6 +994,12 @@
   // Lo que pasa tras colocar una carta, dicho a quien juega solo («Pierdes 2 aciertos…») o a una mesa
   // («Ana pierde 2 aciertos…»). Con 0 aciertos provisionales no hay nada que «perder»: se dice tal cual.
   function resultNote(r, p) {
+    // (Sin depender de nada de fuera: la prueba extrae esta función suelta.)
+    if (state.config && Number.isInteger(state.config.hand) && String(state.config.rounds?.[0]?.id || '').startsWith('col:')) {
+      const name = esc(p.name), left = p.hand.length;
+      if (r.correct) return left ? `Bien colocada. ${name} se queda con ${left} ${left === 1 ? 'carta' : 'cartas'}.` : `Bien colocada: ${name} se queda sin cartas.`;
+      return r.returned ? `Esa carta no encaja. Ya no quedan cartas en el mazo: ${name} la conserva.` : `Esa carta no encaja: se descarta y ${name} repone otra del mazo. Sigue con ${left} ${left === 1 ? 'carta' : 'cartas'}.`;
+    }
     const solo = !room && state.players.length === 1, name = esc(p.name);
     // Retos o rondas (duelo de colección), sin depender de nada de fuera de la función.
     const R_ = (reto, ronda) => String(state.config?.rounds?.[0]?.id || '').startsWith('col:') ? ronda : reto;
@@ -1006,6 +1024,30 @@
       ${button('duels-list', 'Volver a Tus duelos', 'btn btn-secondary btn-block')}
       <button class="btn btn-secondary" data-action="home">Guardar y volver al inicio</button>${button('abandon','Salir sin guardar','btn btn-ghost exit-discard')}</section>
       <details class="panel quick-panel"><summary>Ver el orden completo y las fuentes</summary><ol>${c.cards.filter(item => state.config.rounds[state.index].order.includes(item.id)).sort((a, b) => (a.value - b.value) * c.direction).map(item => `<li><strong>${esc(item.title)} · ${esc(item.label)}</strong><p>${esc(item.detail)} ${sourceLinks(item)}</p></li>`).join('')}</ol></details>`);
+  }
+  // La final de desempate de un duelo de colección: varios se quedaron sin cartas a la vez; cada finalista escribe en secreto
+  // su cifra de una carta neutral y gana quien más se acerca (si empatan, otra carta).
+  function colFinalView(heading, c) {
+    const f = state.final, mode = c.collection, mine = mySeat(), iPlay = f.players.includes(mine) && !(mine in f.guesses) && state.current === mine;
+    const names = f.players.map(i => esc(playerName(state.players[i], i))).join(' y ');
+    const raw = c.cards.find(item => item.id === f.cardId)?.raw, plate = raw === undefined ? '' : CT.Final.question(mode, {...f, cardId: raw});
+    shell(`${heading}<section class="panel quick-panel"><div class="eyebrow">Final de desempate</div><h2>${f.round > 1 ? 'Empate: otra carta' : 'Varios se han quedado sin cartas'}</h2>
+      <p>Finalistas: ${names}. Cada uno escribe su cifra en secreto y gana quien más se acerque.</p>${plate}
+      ${iPlay ? `${CT.Final.form(mode, 'data-quick-final-form')}<p id="quick-error" role="alert"></p>` : `<p class="hint">${f.players.every(i => i in f.guesses) ? 'Todos han respondido.' : `Esperando a ${esc(playerName(state.players[state.current], state.current))}.`}</p>`}
+      ${button('exit', 'Salir de la sala', 'btn btn-ghost btn-block')}</section>`);
+  }
+  // El final de un duelo de colección: quién ha ganado y cuántas cartas le quedaban a cada uno.
+  function colEndView(heading, c) {
+    const winners = state.winners || [], names = winners.map(i => esc(playerName(state.players[i], i))), me = winners.includes(mySeat());
+    const f = state.final, rank = f ? CT.Final.rank({players: f.players, target: f.target}, f.guesses) : null;
+    const rows = state.players.map((p, i) => `<li${winners.includes(i) ? ' class="is-you"' : ''}><b>${esc(playerName(p, i))}</b> · ${p.hand.length} ${p.hand.length === 1 ? 'carta' : 'cartas'} · ${p.hits} ${p.hits === 1 ? 'acierto' : 'aciertos'}${f?.players.includes(i) && i in f.guesses ? ` · final: ${esc(CT.Final.value(c.collection, f.guesses[i]))}` : ''}</li>`).join('');
+    shell(`${heading}<section class="panel quick-panel"><h2>${me ? '¡Has ganado!' : `Gana ${names.join(' y ')}`}</h2>
+      <p>${f ? `Ganó la final con la cifra más cercana (valor real: ${esc(CT.Final.value(c.collection, f.target))}).` : 'Terminó la vuelta sin cartas en la mano.'}</p>
+      <ul class="quick-group-ranking">${rows}</ul>
+      ${room && room.members.length === room.capacity ? rematchButton() : ''}
+      ${button('duels-list', 'Volver a Tus duelos', 'btn btn-secondary btn-block')}
+      <button class="btn btn-secondary" data-action="home">Guardar y volver al inicio</button></section>
+      <details class="panel quick-panel"><summary>Ver el orden completo de la línea y las fuentes</summary><ol>${[...state.timeline].map(id => c.cards.find(item => item.id === id)).map(item => `<li><strong>${esc(item.title)} · ${esc(item.label)}</strong><p>${esc(item.detail)} ${sourceLinks(item)}</p></li>`).join('')}</ol></details>`);
   }
   function lastNote() {
     if(!room||!record||state.phase!=='turn')return '';
@@ -1039,7 +1081,7 @@
     }catch{}
     const at=Date.now();try{CT.Storage.setItem(TURN_START,JSON.stringify({key,at}));}catch{}return at;
   }
-  function timedTurn(){return !!state&&state.phase==='turn'&&myTurn()&&Number(state.config.seconds)>0&&!(room&&room.members.length<state.players.length&&state.current!==0);}
+  function timedTurn(){return !!state&&state.phase==='turn'&&!state.final&&myTurn()&&Number(state.config.seconds)>0&&!(room&&room.members.length<state.players.length&&state.current!==0);}
   function turnKey(){return `${state.config.historyId||'sin-id'}:${state.index}:${record?.commands?.length||0}`;}
   function stopClock(){quickClock?.stop();quickClock=null;}
   function pauseClock(){
@@ -1110,7 +1152,7 @@
     // Plantarse: botón a todo el ancho bajo la barra, para verlo a la primera. Siempre dice con cuántos puntos
     // te plantas (los aciertos provisionales de este reto); con ninguno va más discreto, con el mismo alto.
     const pass = keep ? '' : `<button class="quick-bank${p.points ? ' has-points' : ''}" data-quick="bank">${p.points ? '<span class="quick-bank-mark" aria-hidden="true">✓</span>' : ''}Plantarme con ${p.points} ${p.points === 1 ? 'acierto' : 'aciertos'}</button>`;
-    const heading = `${room && outboxHere() ? '<p class="hint" role="status">Sin conexión: tu jugada está guardada en este móvil y se enviará sola al volver.</p>' : ''}${room ? `<p class="hint">${room.members.length < state.players.length ? (room.capacity === 2 ? 'Duelo por turnos: juega tu primera carta y después invita a tu rival con el enlace' : `Duelo por turnos · ${room.members.length} de ${room.capacity}: comparte el enlace para que entren los demás`) : myTurn() ? "Tu turno" : `Turno de ${esc(p.name)}`}${record?.config?.kind === 'duel' ? '' : ` · ${connection?.kind==='local' ? 'Misma Wi-Fi' : 'Sala por internet'}`}</p>` : ''}<h1 class="solo-lectores" data-focus tabindex="-1">${esc(c.title)}${!room && state.players.length === 1 ? '' : ` · Turno de ${esc(p.name)}`}</h1><div class="quick-bar${state.players.length > 2 ? ' quick-bar-many' : ''}"><span class="quick-left"><b>${state.remaining.length}</b> por colocar</span>${scores()}</div>${state.phase === 'turn' && myTurn() ? pass : ''}`;
+    const heading = `${room && outboxHere() ? '<p class="hint" role="status">Sin conexión: tu jugada está guardada en este móvil y se enviará sola al volver.</p>' : ''}${room ? `<p class="hint">${room.members.length < state.players.length ? (room.capacity === 2 ? 'Duelo por turnos: juega tu primera carta y después invita a tu rival con el enlace' : `Duelo por turnos · ${room.members.length} de ${room.capacity}: comparte el enlace para que entren los demás`) : myTurn() ? "Tu turno" : `Turno de ${esc(p.name)}`}${record?.config?.kind === 'duel' ? '' : ` · ${connection?.kind==='local' ? 'Misma Wi-Fi' : 'Sala por internet'}`}</p>` : ''}<h1 class="solo-lectores" data-focus tabindex="-1">${esc(c.title)}${!room && state.players.length === 1 ? '' : ` · Turno de ${esc(p.name)}`}</h1><div class="quick-bar${state.players.length > 2 ? ' quick-bar-many' : ''}"><span class="quick-left"><b>${handIds().length}</b> ${isCol() ? (handIds().length === 1 ? 'carta en tu mano' : 'cartas en tu mano') : 'por colocar'}</span>${scores()}</div>${state.phase === 'turn' && myTurn() ? pass : ''}`;
     if (room?.resigned) {
       const yo = room.resigned === myId, rival = esc(state.players.find((_, i) => room.members[i] !== myId)?.name || 'Tu rival');
       shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Duelo con un amigo · ${duelSection(state.config)}</div><h2 data-focus tabindex="-1">${yo ? 'Te has rendido' : `${rival} se ha rendido`}</h2></div></section>
@@ -1120,6 +1162,8 @@
     // Le toca a una plaza del duelo que aún nadie ha ocupado: se espera a que alguien abra el enlace.
     const waitingFriend = room && state.phase === 'turn' && room.members.length < state.players.length;
     if (waitingFriend && state.current >= room.members.length) {duelInvite(); return;}
+    if (isCol() && state.final && state.phase !== 'round-end') {colFinalView(heading, c); return;}
+    if (isCol() && state.phase === 'round-end') {colEndView(heading, c); return;}
     if (state.phase === 'round-end') {
       const final = state.index + 1 === state.config.rounds.length;
       const best = Math.max(...state.players.map(player => player.score));
@@ -1145,7 +1189,7 @@
       if(room && !myTurn()){shell(`${heading}${CT.timelineMap(null,state.timeline)}<div class="timeline-wrap"><div class="timeline">${resultLine(c,r,get)}</div></div><section class="panel quick-panel"><h2>${r.correct?'¡Bien colocado!':'No encaja ahí'}</h2><p>${esc(item.title)} · ${esc(item.label)}</p><p>Esperando a que continúe ${esc(p.name)}.</p></section>`);celebrateOnce(r);return;}
       shell(`${heading}${CT.timelineMap(null, state.timeline)}<div class="timeline-wrap"><div class="timeline">${resultLine(c, r, get)}</div></div><div class="overlay" data-quick-result data-result-card="${r.correct ? esc(item.id) : ''}"${correctionAttrs(r, item)}><section class="modal quick-result ${r.correct ? 'success' : 'failure'}"><div class="result-mark" aria-hidden="true">${r.correct ? '✓' : '×'}</div><div class="eyebrow" aria-hidden="true">${r.correct ? '¡Bien colocado!' : 'No encaja ahí'}</div><h2><span class="solo-lectores">${r.correct ? '¡Bien colocado!' : 'No encaja ahí'}: </span>${esc(item.title)}${item.artist?`<small class="quick-card-artist">${esc(item.artist)}</small>`:""}</h2>${fresh ? '<div class="quick-new-card"><span aria-hidden="true">✦</span> Nueva carta en tu colección</div>' : ''}<div class="reveal">${resultArt(item)}<div class="year">${esc(item.label)}</div><p>${esc(item.detail)}</p></div><p class="quick-sources">${sourceLinks(item)}</p>
         <p class="quick-result-note">${resultNote(r, p)}</p>
-        ${button('ack', room && room.members.length < state.players.length ? 'Continuar y retar a mi amigo' : state.remaining.length ? 'Siguiente carta <span>→</span>' : 'Ver el resultado <span>→</span>', 'btn btn-primary btn-block')}${room ? button('exit','Salir de la sala','btn btn-ghost btn-block') : ''}</section></div>`);
+        ${button('ack', room && room.members.length < state.players.length ? 'Continuar y retar a mi amigo' : isCol() ? 'Siguiente turno <span>→</span>' : state.remaining.length ? 'Siguiente carta <span>→</span>' : 'Ver el resultado <span>→</span>', 'btn btn-primary btn-block')}${room ? button('exit','Salir de la sala','btn btn-ghost btn-block') : ''}</section></div>`);
       CT.openDialog(app().querySelector('[data-quick-result]'), false);
       return;
     }
@@ -1158,12 +1202,12 @@
     // se ve llena y el reloj arranca cuando se toca la portada. Antes corría debajo de ella.
     const covered=nextDeck||(!!splashLayer&&!splashLayer.dataset.closed&&splashLayer.dataset.game===(state.config.historyId||'sin-id')&&splashLayer.dataset.index===String(state.index));
     const ms=Number(state.config.seconds)*1000, timed=timedTurn(), startedAt=timed&&!covered?turnStartedAt(turnKey()):0;
-    shell(`${heading}${timed?CT.Tiempo.bar(covered?ms:ms-(Date.now()-startedAt),ms):''}${lastNote()}<section><div class="hand-title"><h3>${room ? 'Cartas comunes' : 'Tus cartas'}</h3></div><div class="hand">${state.remaining.filter(id => !(slot !== null && selected === id)).map(id => `<button class="hand-card${selected === id ? ' selected' : ''}" data-quick="select" data-id="${id}" aria-pressed="${selected === id}"${room && !myTurn() ? ' disabled' : ''}><span class="hidden-date">Valor oculto</span>${CT.cardBack('quick')}<strong>${esc(get(id).title)}${get(id).artist?`<small class="quick-card-artist">${esc(get(id).artist)}</small>`:""}</strong><span class="card-arrow">→</span></button>`).join('')}</div>
+    shell(`${heading}${timed?CT.Tiempo.bar(covered?ms:ms-(Date.now()-startedAt),ms):''}${lastNote()}<section><div class="hand-title"><h3>${room && !isCol() ? 'Cartas comunes' : 'Tus cartas'}</h3></div><div class="hand">${handIds().filter(id => !(slot !== null && selected === id)).map(id => `<button class="hand-card${selected === id ? ' selected' : ''}" data-quick="select" data-id="${id}" aria-pressed="${selected === id}"${room && !myTurn() ? ' disabled' : ''}><span class="hidden-date">Valor oculto</span>${CT.cardBack('quick')}<strong>${esc(get(id).title)}${get(id).artist?`<small class="quick-card-artist">${esc(get(id).artist)}</small>`:""}</strong><span class="card-arrow">→</span></button>`).join('')}</div>
       <p class="hint">${selected ? 'Toca un hueco y confirma, o arrastra la carta hasta su lugar.' : 'Toca una carta o mantenla pulsada para arrastrarla hasta un hueco.'}</p></section>
       <section class="board-timeline-section"><div class="hand-title"><h3>${esc(timelineTitle(c))}</h3></div>${timelineEnds(c)}${CT.timelineMap(null, state.timeline)}
       <div class="timeline-wrap"><div class="timeline" aria-label="${esc(timelineTitle(c))}: orden de izquierda a derecha">${state.timeline.map((id, i) => gap(i) + cardMarkup(c, get(id))).join('')}${gap(state.timeline.length)}</div></div></section>`);
     CT.enableDrag({cardSelector: '.quick-shell .hand-card', slotSelector: '.quick-shell .slot', parseCardId: id => id, onDrop(id, index) {
-      if (!myTurn() || !app().querySelector('.quick-shell') || state?.phase !== 'turn' || !state.remaining.includes(id)) return;
+      if (!myTurn() || !app().querySelector('.quick-shell') || state?.phase !== 'turn' || !handIds().includes(id)) return;
       selected = id; slot = index; render(); focusPlacement();
     }});
     if(timed&&!covered){const key=turnKey();quickClock=CT.Tiempo.clock({empezadoEn:startedAt,ms,root:app(),onTimeout:()=>{
@@ -1234,6 +1278,16 @@
       <div class="actions actions-columna">${room && room.capacity === 2 && room.members.length === 2 && state.config.kind === 'duel' && !room.resigned && room.phase !== 'finished' ? button('resign', 'Rendirme', 'btn btn-ghost exit-discard') : ''}${internet ? '' : button('abandon', 'Salir sin guardar', 'btn btn-ghost exit-discard')}</div></div>`;
     app().append(layer); CT.openDialog(layer, true);
   }
+  document.addEventListener('submit', event => {
+    const form = event.target.closest?.('[data-quick-final-form]');
+    if (!form || !state || !isCol() || !state.final) return;
+    event.preventDefault();
+    const mode = E.challenge(state.config.rounds[0].id).collection, err = () => app().querySelector('#quick-error');
+    try {
+      const value = CT.Final.parse(mode, form.elements.guess.value, form.elements.era?.value === 'bc');
+      void networkAction({type: 'guess', value});
+    } catch (e) { if (err()) err().textContent = e.message; }
+  });
   document.addEventListener('change', event => {
     if (event.target.id === 'quick-duel-group') {CT.Storage.setItem(DUEL_GROUP, event.target.value); return;}
     if (event.target.name === 'quick-duel-pace' && app().querySelector('[data-quick-duel-block]')) {
@@ -1336,7 +1390,7 @@
     }
     if (action === 'resume') {record = load(); format=record?.config?.kind || 'local'; if (!record) {setup(); return;} state = E.restore(record); selected = null; slot = null; render(); return;}
     if (!state || !myTurn()) return;
-    if (action === 'select' && state.phase === 'turn' && state.remaining.includes(target.dataset.id)) {selected = target.dataset.id; slot = null; CT.Effects?.tap(); render(); focusPlacement();}
+    if (action === 'select' && state.phase === 'turn' && handIds().includes(target.dataset.id)) {selected = target.dataset.id; slot = null; CT.Effects?.tap(); render(); focusPlacement();}
     else if (action === 'slot' && selected && state.phase === 'turn') {slot = Number(target.dataset.index); CT.Effects?.tap(); render(); focusPlacement();}
     else if (action === 'cancel') {slot = null; render();}
     else if (action === 'confirm' && selected && slot !== null) {CT.Effects?.stamp(); dispatch({type: 'place', cardId: selected, index: slot});}
@@ -1382,7 +1436,7 @@
     openLocal(renderPage){paint=renderPage;backTo=null;entry='setup';format='local';setup();},
     openDuel(renderPage){paint=renderPage;entry='duel-setup';format='duel';backTo=null;duelSetup();},
     // Duelo por turnos de Grandes colecciones: el mazo elegido, con estas reglas (lo crea «Cada uno en su móvil · Por turnos»).
-    openCollectionDuel(renderPage,{deck,name,length,keep,back,players=2}){if(!CT.has(deck))return Promise.reject(Error('Ese mazo no existe.'));return createDuelRoom({renderPage,name,length,keep,iStart:true,invite:null,back,deck,players});},
+    openCollectionDuel(renderPage,{deck,name,length,keep,back,players=2,hand=4}){if(!CT.has(deck))return Promise.reject(Error('Ese mazo no existe.'));return createDuelRoom({renderPage,name,length,keep,iStart:true,invite:null,back,deck,players,hand});},
     duels, openRoom, challenge, resignDuel, cancelInvitation, declineInvite, previewInvite, reshare,
     Duel:{pack:packCommands,unpack:unpackCommands,payload:duelPayload,read:readDuel,fingerprint:duelFingerprint,rounds},
     openNetwork(renderPage,kind,capacity,only){paint=renderPage;backTo=null;entry='network';networkSetup(kind,capacity,only);},

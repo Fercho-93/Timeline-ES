@@ -2685,9 +2685,9 @@
   const LIVE_NET_KEY = "hilo-sala-red-v1";
   function liveNet() { return CT.Storage.getItem(LIVE_NET_KEY) === "wifi" ? "wifi" : "internet"; }
   const duelBlockKey = ritmo => ritmo;
-  // «Por turnos» se juega con el motor de los duelos de Retos rápidos, con una ronda de cartas de este mazo. Aquí no se
-  // elige qué pasa al fallar (eso es de Retos rápidos): en colecciones un fallo no echa a nadie, la carta no suma y se
-  // sigue hasta el final. Elegir varias rondas también es cosa de Retos rápidos.
+  // «Por turnos» de Grandes colecciones tiene su propio motor (quick-challenges-engine.js, `colStep`): cada jugador tiene su
+  // mano (las cartas iniciales que se elijan), juega una carta por turno y, si falla, esa carta no entra en la línea y repone
+  // otra del mazo; gana quien se queda sin cartas. No hay «Si alguien falla» ni rondas: eso es de Retos rápidos.
   // Cuántos juegan por turnos: de 2 a 10, como en directo (ahí manda el máximo de la sala).
   const DUEL_GROUP_KEY = "continuum-amigos-grupo-v1";
   const duelGroup = () => { const n = Number(CT.Storage.getItem(DUEL_GROUP_KEY)); return n >= 2 && n <= 10 && Number.isInteger(n) ? n : 2; };
@@ -2699,7 +2699,7 @@
   // Crea el duelo por turnos del mazo elegido: lo abre Retos rápidos, que lleva la sala, la partida y «Tus duelos».
   function startCollectionTurnDuel() {
     CT.Quick.openCollectionDuel((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); },
-      { deck: selectedModeKey, name: duelName(), length: 1, keep: true, players: duelGroup(), back: duelHome })
+      { deck: selectedModeKey, name: duelName(), length: 1, players: duelGroup(), hand: CT.ManoInicial.get(), back: duelHome })
       // Si no se llega a crear, se vuelve a esta misma pantalla con el aviso (no a la de Retos rápidos).
       .catch(error => { if (screen === 'quick-challenges' || screen === 'duel-home') { CT.Quick.leave(); duelHome(); } showToast(error?.message || "No se pudo crear el duelo. Comprueba tu conexión."); });
   }
@@ -2748,8 +2748,8 @@
         ${sinRed ? '<p class="hint" data-offline-note style="margin-top:10px">No hay internet: jugaréis por la Wi-Fi.</p>' : ""}
         ${CT.ManoInicial.maximoField()}`)}
       ${duelGroupField(ritmo)}
-      ${preDirecto(`${CT.ManoInicial.field()}
-        ${CT.ManoInicial.poderesField()}`)}
+      ${CT.ManoInicial.field()}
+      ${preDirecto(CT.ManoInicial.poderesField())}
       ${CT.Tiempo.field("amigos", { porDefecto: 15 })}
       <div class="field duel-identity-field">
         <label for="duel-name">Tu nombre de perfil</label>

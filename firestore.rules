@@ -193,9 +193,11 @@ service cloud.firestore {
           // Con `first`, el turno empieza en esa persona: `actor` pasa a ser ella.
           && b.diff(a).affectedKeys().hasOnly(['config','phase','actor','revision','updatedAt'])
           && (b.actor == a.actor || ('first' in b.config.keys() && a.members.size() >= 2 && b.actor == a.members[b.config.first]))
-          && b.config is map && b.config.keys().hasOnly(['names','rounds','kind','historyId','keep','first','seconds'])
+          && b.config is map && b.config.keys().hasOnly(['names','rounds','kind','historyId','keep','first','seconds','hand'])
           && (!('seconds' in b.config.keys()) || b.config.seconds in [15, 20, 30])
           && (!('keep' in b.config.keys()) || b.config.keep is bool)
+          // Duelo de colección: cuántas cartas tiene cada mano.
+          && (!('hand' in b.config.keys()) || (b.config.hand is int && b.config.hand >= 1 && b.config.hand <= 6))
           && (!('first' in b.config.keys()) || ((a.members.size() == 1 && b.config.first is int && b.config.first >= 0 && b.config.first < a.capacity)
               || (a.members.size() >= 2 && b.config.first is int && b.config.first >= 0 && b.config.first < a.members.size())))
           // Duelo por turnos empezado a solas: una plaza por jugador, con su nombre provisional hasta que entre
@@ -231,6 +233,9 @@ service cloud.firestore {
               && last.cardId is string && last.cardId.size() <= 32 && last.index is int && last.index>=0 && last.index<=a.commands.size()+1
               && b.phase=='result' && b.actor==a.actor)
             || (a.phase=='turn' && last=={'type':'bank','by':request.auth.uid} && b.phase in ['turn','round-end','finished'])
+            // La final de desempate de un duelo de colección: cada finalista escribe su cifra (un entero escalado).
+            || (a.phase=='turn' && last.keys().hasOnly(['type','value','by']) && last.type=='guess' && last.by==request.auth.uid && last.value is int
+                && b.phase in ['turn','round-end','finished'])
             || (a.phase=='result' && last=={'type':'ack','by':request.auth.uid} && b.phase in ['turn','round-end','finished'])
             || (a.phase=='round-end' && request.auth.uid==a.host && last=={'type':'next','by':request.auth.uid} && b.phase=='turn'))
           && (!(b.phase in ['round-end','finished']) || b.actor==a.host);
