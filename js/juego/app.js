@@ -2685,10 +2685,9 @@
   const LIVE_NET_KEY = "hilo-sala-red-v1";
   function liveNet() { return CT.Storage.getItem(LIVE_NET_KEY) === "wifi" ? "wifi" : "internet"; }
   const duelBlockKey = ritmo => ritmo;
-  // «Por turnos · Ordenar» se juega con las reglas de Retos rápidos (sus duelos por turnos), con una ronda de
-  // cartas de este mazo: quien crea el duelo elige qué pasa al fallar. Elegir varias rondas es cosa de Retos rápidos.
-  const TURN_KEEP_KEY = "continuum-turnos-fallo-v1";
-  const turnKeep = () => CT.Storage.getItem(TURN_KEEP_KEY) === "seguir";
+  // «Por turnos» se juega con el motor de los duelos de Retos rápidos, con una ronda de cartas de este mazo. Aquí no se
+  // elige qué pasa al fallar (eso es de Retos rápidos): en colecciones un fallo no echa a nadie, la carta no suma y se
+  // sigue hasta el final. Elegir varias rondas también es cosa de Retos rápidos.
   // Cuántos juegan por turnos: de 2 a 10, como en directo (ahí manda el máximo de la sala).
   const DUEL_GROUP_KEY = "continuum-amigos-grupo-v1";
   const duelGroup = () => { const n = Number(CT.Storage.getItem(DUEL_GROUP_KEY)); return n >= 2 && n <= 10 && Number.isInteger(n) ? n : 2; };
@@ -2697,16 +2696,10 @@
     const n = duelGroup();
     return `<div class="field" data-duel-group${groupShown(ritmo) ? "" : " hidden"}><label for="duel-group">Jugadores</label><select id="duel-group">${[2, 3, 4, 5, 6, 7, 8, 9, 10].map(k => `<option value="${k}"${k === n ? " selected" : ""}>${k} jugadores</option>`).join("")}</select></div>`;
   }
-  function turnRulesFields(visible = true) {
-    const opcion = (name, clave, titulo, pie, on) => `<label class="segmented-option${on ? " is-on" : ""}"><input type="radio" name="${name}" value="${clave}"${on ? " checked" : ""}><span><b>${titulo}</b><small>${pie}</small></span></label>`;
-    return `<div class="field duel-kind-field" data-duel-keep${visible ? "" : " hidden"}><span class="field-label" id="turn-keep-label">Si alguien falla</span>
-        <div class="segmented" role="radiogroup" aria-labelledby="turn-keep-label">${opcion("turn-keep", "fuera", "Arriesgar o plantarse", "Un fallo pierde los aciertos provisionales de la ronda; plantarse los asegura", !turnKeep())}${opcion("turn-keep", "seguir", "Seguir hasta el final", "Un fallo no suma, pero se juega toda la ronda y gana quien acierte más", turnKeep())}</div></div>`;
-  }
   // Crea el duelo por turnos del mazo elegido: lo abre Retos rápidos, que lleva la sala, la partida y «Tus duelos».
   function startCollectionTurnDuel() {
-    const keep = (app.querySelector('input[name="turn-keep"]:checked')?.value || (turnKeep() ? "seguir" : "fuera")) === "seguir";
     CT.Quick.openCollectionDuel((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); },
-      { deck: selectedModeKey, name: duelName(), length: 1, keep, players: duelGroup(), back: duelHome })
+      { deck: selectedModeKey, name: duelName(), length: 1, keep: true, players: duelGroup(), back: duelHome })
       // Si no se llega a crear, se vuelve a esta misma pantalla con el aviso (no a la de Retos rápidos).
       .catch(error => { if (screen === 'quick-challenges' || screen === 'duel-home') { CT.Quick.leave(); duelHome(); } showToast(error?.message || "No se pudo crear el duelo. Comprueba tu conexión."); });
   }
@@ -2757,7 +2750,6 @@
       ${duelGroupField(ritmo)}
       ${preDirecto(`${CT.ManoInicial.field()}
         ${CT.ManoInicial.poderesField()}`)}
-      ${turnRulesFields(ritmo === "turnos")}
       ${CT.Tiempo.field("amigos", { porDefecto: 15 })}
       <div class="field duel-identity-field">
         <label for="duel-name">Tu nombre de perfil</label>
@@ -4428,11 +4420,6 @@
     // Competición con amigos: con más temas caben menos cartas por persona si se juega por turnos.
     if (event.target.id === "competition-length" && screen === "competition-friends") { compSyncCards(); return; }
     if (event.target.id === "duel-group") { CT.Storage.setItem(DUEL_GROUP_KEY, event.target.value); return; }
-    if (event.target.name === "turn-keep") {
-      CT.Storage.setItem(TURN_KEEP_KEY, event.target.value);
-      event.target.closest(".segmented")?.querySelectorAll(".segmented-option").forEach(opcion => opcion.classList.toggle("is-on", opcion.querySelector("input").checked));
-      return;
-    }
     if (event.target.name === "duel-pace" || event.target.name === "live-net") {
       const value = event.target.value;
       if (event.target.name === "duel-pace") CT.Storage.setItem(DUEL_PACE_KEY, value);
@@ -4441,7 +4428,6 @@
       app.querySelectorAll("[data-duel-block]").forEach(bloque => { bloque.hidden = bloque.dataset.duelBlock !== duelBlockKey(selectedPace); });
       app.querySelectorAll("[data-duel-pre]").forEach(bloque => { bloque.hidden = selectedPace !== "directo"; });
       app.querySelectorAll("[data-duel-group]").forEach(campo => { campo.hidden = !groupShown(selectedPace); });
-      app.querySelectorAll("[data-duel-keep]").forEach(campo => { campo.hidden = selectedPace !== "turnos"; });
       // La pastilla elegida se marca en el propio elemento: el `:has()` del CSS lo haría
       // solo, pero no todos los navegadores en los que se juega esto lo soportan.
       app.querySelectorAll(".segmented-option").forEach(opcion => {

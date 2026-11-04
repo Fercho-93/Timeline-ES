@@ -245,11 +245,11 @@ console.log("\nEscribir la cifra ya no es una modalidad de jugar con amigos");
   ok("jugar con amigos es solo en directo o por turnos", [...w.document.querySelectorAll('input[name="duel-pace"]')].map(i => i.value).join() === "directo,turnos");
   ok("sin elegir prueba ni crear duelos de cifras", !existe(w, 'input[name="duel-kind"]') && !existe(w, '[data-action="start-cifras"]') && !/Escribir la cifra/.test(texto(w)));
   ok("sin textos de explicación debajo de los ajustes", !existe(w, ".duel-brief"));
-  ok("por turnos se elige cuántos sois y qué pasa al fallar", existe(w, "#duel-group") && existe(w, 'input[name="turn-keep"]'));
+  ok("por turnos se elige cuántos sois, y no qué pasa al fallar (en colecciones cada uno repone del mazo)", existe(w, "#duel-group") && !existe(w, 'input[name="turn-keep"]') && !/Si alguien falla/.test(texto(w)));
   {
-    // Orden común: ritmo, conexión, máximo, jugadores, cartas, poderes, si alguien falla, reloj, nombre y botón.
+    // Orden común: ritmo, conexión, máximo, jugadores, cartas, poderes, reloj, nombre y botón.
     const todos = [...w.document.querySelectorAll('*')];
-    const posiciones = ['input[name="duel-pace"]', 'input[name="live-net"]', '#live-max-players', '#duel-group', '#hand-size, [data-mano-inicial]', '[data-duel-keep]', 'input[data-tiempo]', '#duel-name', '[data-action="start-turn-duel"]']
+    const posiciones = ['input[name="duel-pace"]', 'input[name="live-net"]', '#live-max-players', '#duel-group', '#hand-size, [data-mano-inicial]', 'input[data-tiempo]', '#duel-name', '[data-action="start-turn-duel"]']
       .map(sel => { const el = w.document.querySelector(sel); return el ? todos.indexOf(el) : -1; });
     ok("el formulario de amigos sigue el orden común de campos", posiciones.every(p => p >= 0) && posiciones.every((p, i) => i === 0 || p > posiciones[i - 1]));
   }
