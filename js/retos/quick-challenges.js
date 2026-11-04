@@ -1241,6 +1241,20 @@
     if (slot !== null) app().querySelector('[data-quick="confirm"]')?.focus({preventScroll:true});
     CT.announce(slot === null ? 'Carta elegida. Elige un hueco.' : `Hueco ${slot + 1} elegido. Confirma la colocación.`);
   }
+  // «Salir sin guardar» de un duelo por internet (la partida vive en el servidor, así que «sin guardar» es cerrarla):
+  // si nadie ha entrado aún, se cancela el duelo y su enlace deja de valer; con dos dentro, uno se rinde. En un duelo de grupo
+  // ya empezado no hay salida de ese tipo (se sigue desde «Tus duelos»).
+  function duelDiscard() {
+    if (!room || !state || state.config?.kind !== 'duel' || room.phase === 'finished' || connection?.kind !== 'internet') return null;
+    const code = connection.code, lone = room.members.length === 1 && room.host === myId;
+    if (lone) return {label: 'Salir sin guardar', proceed: () => CT.UI.confirmDialog('Se cancela el duelo y el enlace que hayas mandado dejará de valer.', async () => {
+      CT.closeDialog?.(); try { await cancelInvitation(code); } catch (e) { errorNotice(e); return; } toEntry();
+    }, {title: '¿Cancelar el duelo?', confirmLabel: 'Cancelar el duelo', cancelLabel: 'Seguir jugando'})};
+    if (room.capacity === 2 && room.members.length === 2 && !room.resigned) return {label: 'Salir sin guardar', proceed: () => CT.UI.confirmDialog('Te rindes: tu rival gana el duelo y se queda en tu historial.', () => {
+      CT.closeDialog?.(); void networkAction({type: 'resign'}).then(() => toEntry());
+    }, {title: '¿Rendirte y salir?', confirmLabel: 'Rendirme y salir', cancelLabel: 'Seguir jugando'})};
+    return null;
+  }
   function abandonQuick() {
     if(connection?.kind==='internet'){toEntry();return;}
     const hadRoom=!!room;
@@ -1384,7 +1398,7 @@
       if(!todayDecks().some(c=>c.id===id)){freeSetup();return;}
       prepare({names:['Tú'],rounds:rounds(1,id,null,E.SOLO_CARDS+1,true),kind:'free',length:1,seconds:CT.Tiempo.chosen('quick-solo')}); return;
     }
-    if (action === 'exit') {CT.UI.confirmExit(connection?.kind==='local' ? 'Al salir se cierra la conexión con la sala local.' : 'La partida se conserva para que puedas continuar después.', toEntry, undefined, undefined, (state || room) && connection?.kind!=='internet' ? {label:'Salir sin guardar', proceed:abandonQuick} : null); return;}
+    if (action === 'exit') {CT.UI.confirmExit(connection?.kind==='local' ? 'Al salir se cierra la conexión con la sala local.' : 'La partida se conserva para que puedas continuar después.', toEntry, undefined, undefined, (state || room) && connection?.kind!=='internet' ? {label:'Salir sin guardar', proceed:abandonQuick} : duelDiscard()); return;}
     if (action === 'abandon') {CT.UI.confirmExit('Se borrará esta partida y no podrás continuarla después.', abandonQuick, '¿Salir sin guardar?', 'Salir sin guardar'); return;}
     if (action === 'setup') {setup(); return;}
     if (action === 'starter-guess') {starterGuess(); return;}
