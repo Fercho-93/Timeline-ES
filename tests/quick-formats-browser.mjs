@@ -38,19 +38,11 @@ try {
   assert.equal(await p.locator('[data-quick="bank"]').count(),0,'en solitario no hay que plantarse');
   await playRound(p);
   assert.match(await p.locator('.quick-panel h2').innerText(),/Tu resultado/);
-  // Cada uno en su móvil → Retos rápidos → Mismas cartas: juegas y mandas el enlace.
+  // Con amigos ya no hay «Mismas cartas»: solo en directo o por turnos.
   await p.locator('[data-action="home"]').click();
   await toFriends(p);
-  await p.locator('label:has(input[name="quick-duel-pace"][value="seguidos"])').click();
-  await p.locator('.quick-length-chip[data-length="1"]').click();await p.locator('[data-quick="start-duel"]').click();
-  await dismissSplash(p);await p.locator('[data-quick="ready"]').click();
-  await playRound(p);
-  const link=await p.locator('#quick-result-link').inputValue();
-  // El enlace apunta a la web publicada: se abre aquí con la misma invitación.
-  const rival=await open('Bea');await rival.goto(`http://127.0.0.1:${server.address().port}/${new URL(link).hash}`);await rival.reload();await rival.evaluate(()=>window.CONTINUUM_SPLASH?.finish());await dismissSplash(rival);
-  // Las mismas cartas en el mismo orden y la misma forma de jugarlas: empate.
-  await playRound(rival);assert.ok(await rival.getByText(/Habéis empatado/).isVisible());
-  await p.close();await rival.close();
+  assert.deepEqual(await p.locator('input[name="quick-duel-pace"]').evaluateAll(l=>l.map(i=>i.value)),['directo','turnos']);
+  await p.close();
   // Real WebRTC connection between two independent browser contexts: sala en directo sin internet.
   const host=await open('Ana'),guest=await open('Bea');
   await toFriends(host);

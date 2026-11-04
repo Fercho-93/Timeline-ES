@@ -56,13 +56,19 @@ async function jugar(w) {
   await duerme(80);
 }
 
-// Entra en el duelo de cifras de un mazo, con el nombre puesto.
-async function abreDuelo(w, { block = "geografia", mode = "population", nombre = "Fernando" } = {}) {
-  abreMazo(w, block, mode);
-  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
+// Un enlace de duelo de cifras de otra persona (los duelos de cifras ya no se crean: solo se abren los enviados antes).
+function enlaceCifras({ mode = "population", semilla = "cifras99", nombre = "Fernando" } = {}) {
+  const w = boot(), C = w.CONTINUUM.Duelo.Cifras;
+  const jugadas = C.cartas(mode, semilla, 10).map(card => ({ respuesta: w.CONTINUUM.sortValue(mode, card) * 1.2, ms: 2000, salida: false }));
+  return `https://hilo.test/?duelo=${C.codificar({ mode, seed: semilla, total: 10, jugadas, nombre })}`;
+}
+// Abre ese duelo en una ventana nueva, lo acepta y empieza a jugar.
+async function abreDuelo({ mode = "population", nombre = "Marta", almacen = {} } = {}) {
+  const w = boot({ url: enlaceCifras({ mode }), almacen });
   w.document.getElementById("duel-name").value = nombre;
-  click(w, '[data-action="start-cifras"]');
+  click(w, '[data-action="accept-duel"]');
   await jugar(w);
+  return w;
 }
 
 // Juega el duelo en curso hasta el final. `responde` recibe la carta y decide qué
@@ -231,123 +237,28 @@ console.log("\nUn enlace de cifras roto no rompe nada");
   ok("una carta sin responder y sin salir sí es válida", D.descodificar(aBase64url(w, `2|population|abc|1|0|::0|${huella}|Ana`)).ok === true);
 }
 
-console.log("\nCrear un duelo de cifras y jugarlo");
+console.log("\nEscribir la cifra ya no es una modalidad de jugar con amigos");
 {
   const w = boot();
   abreMazo(w, "geografia", "population");
   (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
-  // El duelo es una sola opción del menú con las dos modalidades dentro.
-  ok("hay una sola pantalla: en directo y cuatro combinaciones de duelo", w.document.querySelectorAll('[data-duel-block]').length === 5 && /Cada uno en su móvil/.test(texto(w)));
-  ok("por defecto, en directo, sin elegir prueba", w.document.querySelector('[data-duel-block="directo"]').hidden === false && w.document.querySelector('[data-duel-kind-field]').hidden === true);
+  ok("jugar con amigos es solo en directo o por turnos", [...w.document.querySelectorAll('input[name="duel-pace"]')].map(i => i.value).join() === "directo,turnos");
+  ok("sin elegir prueba ni crear duelos de cifras", !existe(w, 'input[name="duel-kind"]') && !existe(w, '[data-action="start-cifras"]') && !/Escribir la cifra/.test(texto(w)));
+  ok("sin textos de explicación debajo de los ajustes", !existe(w, ".duel-brief"));
+  ok("por turnos se elige cuántos sois y qué pasa al fallar", existe(w, "#duel-group") && existe(w, 'input[name="turn-keep"]'));
   {
-    // Mismo orden que en el resto de modalidades: ritmo, conexión, máximo, cartas, poderes, tiempo, nombre y botón.
+    // Orden común: ritmo, conexión, máximo, jugadores, cartas, poderes, si alguien falla, reloj, nombre y botón.
     const todos = [...w.document.querySelectorAll('*')];
-    const posiciones = ['input[name="duel-pace"]', 'input[name="live-net"]', '#live-max-players', '#hand-size, [data-mano-inicial]', '[data-poder]', 'input[data-tiempo]', '#duel-name', '[data-action="start-live-room"]']
+    const posiciones = ['input[name="duel-pace"]', 'input[name="live-net"]', '#live-max-players', '#duel-group', '#hand-size, [data-mano-inicial]', '[data-duel-keep]', 'input[data-tiempo]', '#duel-name', '[data-action="start-turn-duel"]']
       .map(sel => { const el = w.document.querySelector(sel); return el ? todos.indexOf(el) : -1; });
     ok("el formulario de amigos sigue el orden común de campos", posiciones.every(p => p >= 0) && posiciones.every((p, i) => i === 0 || p > posiciones[i - 1]));
   }
-  const sinInternet = w.document.querySelector('input[name="live-net"][value="wifi"]');
-  sinInternet.checked = true;
-  sinInternet.dispatchEvent(new w.Event("change", { bubbles: true }));
-  ok("en directo se elige internet o la misma Wi-Fi", w.localStorage.getItem("hilo-sala-red-v1") === "wifi" && w.document.querySelector('[data-duel-block="directo"]').hidden === false);
-  // Sin internet, en directo se marca sola la Wi-Fi, sin cambiar lo que había guardado.
-  w.localStorage.setItem("hilo-sala-red-v1", "internet");
+  // Sin internet, en directo se marca sola la Wi-Fi y por turnos se avisa de que no se puede crear.
   Object.defineProperty(w.navigator, "onLine", { configurable: true, get: () => false });
   abreMazo(w, "geografia", "population");
   (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
-  ok("sin internet se propone la Wi-Fi y se avisa", w.document.querySelector('input[name="live-net"][value="wifi"]').checked && !!w.document.querySelector('[data-offline-note]') && w.localStorage.getItem("hilo-sala-red-v1") === "internet");
-  // Por turnos el duelo se guarda en el servidor: sin internet se avisa en los dos bloques y el botón no sigue.
-  ok("sin internet, por turnos se avisa de que no se puede crear", w.document.querySelectorAll('[data-duel-block^="turnos-"] [data-offline-turnos]').length === 2);
-  {
-    const porTurnos = w.document.querySelector('input[name="duel-pace"][value="turnos"]');
-    porTurnos.checked = true;
-    porTurnos.dispatchEvent(new w.Event("change", { bubbles: true }));
-    click(w, '[data-duel-block="turnos-orden"] [data-action="start-turn-duel"]');
-    ok("y no se pasa a preparar el duelo", !existe(w, '[data-action="duel-play"]') && /Sin internet no se puede crear un duelo por turnos/.test(w.document.getElementById("toast").textContent));
-    w.localStorage.setItem("hilo-duelo-ritmo-v1", "directo");
-  }
-  Object.defineProperty(w.navigator, "onLine", { configurable: true, get: () => true });
-  abreMazo(w, "geografia", "population");
-  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
-  ok("con internet no hay aviso de turnos", !existe(w, '[data-offline-turnos]'));
-  {
-    // Mientras los avisos al móvil estén apagados, no se promete ninguno: la jugada del rival se ve en «Tus duelos».
-    const porTurnos = w.document.querySelector('input[name="duel-pace"][value="turnos"]');
-    porTurnos.checked = true;
-    porTurnos.dispatchEvent(new w.Event("change", { bubbles: true }));
-    // «Ordenar» por turnos va con las reglas de Retos rápidos (pide sala en internet); escribir la cifra sigue con su duelo.
-    ok("por turnos, ordenar elige qué pasa al fallar y no las rondas", !existe(w, 'input[name="turn-rounds"]') && existe(w, '[data-duel-keep]:not([hidden]) input[name="turn-keep"]'));
-    ok("y cuántos juegan, de 2 a 10", existe(w, '[data-duel-group]:not([hidden]) #duel-group') && [...w.document.querySelectorAll('#duel-group option')].map(o => o.value).join() === "2,3,4,5,6,7,8,9,10");
-    // Orden común con Retos rápidos: jugadores, qué pasa al fallar, reloj, nombre y botón; sin textos de explicación.
-    const pos = sel => [...w.document.querySelectorAll('*')].indexOf(w.document.querySelector(sel));
-    const orden = ['#duel-group', '[data-duel-keep]', '.tiempo-field, [data-tiempo]', '#duel-name', '[data-duel-block="turnos-orden"] [data-action="start-turn-duel"]'].map(pos);
-    ok("los campos siguen el mismo orden que en Retos rápidos", orden.every(p => p >= 0) && orden.every((p, i) => !i || p > orden[i - 1]));
-    ok("sin textos de explicación debajo de los ajustes", !existe(w, '.duel-brief'));
-    const aCifrasTurnos = w.document.querySelector('input[name="duel-kind"][value="cifras"]');
-    aCifrasTurnos.checked = true;
-    aCifrasTurnos.dispatchEvent(new w.Event("change", { bubbles: true }));
-    click(w, '[data-duel-block="turnos-cifras"] [data-action="start-turn-duel"]');
-    w.localStorage.removeItem("hilo-duelo-prueba-v1");
-    ok("por turnos no se promete un aviso que no llega", existe(w, '[data-action="duel-play"]') && /lo verás en «Tus duelos»/.test(texto(w)) && !/recibirás un aviso/.test(texto(w)));
-    w.localStorage.setItem("hilo-duelo-ritmo-v1", "directo");
-  }
-  abreMazo(w, "geografia", "population");
-  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
-  const aSeguidos = w.document.querySelector('input[name="duel-pace"][value="seguidos"]');
-  aSeguidos.checked = true;
-  aSeguidos.dispatchEvent(new w.Event("change", { bubbles: true }));
-  ok("con mismas cartas aparece la prueba", w.document.querySelector('[data-duel-kind-field]').hidden === false);
-  // Las dos modalidades se ven a la vez, no escondidas dentro de un desplegable, y se
-  // ve cuál está elegida: es una elección que hay que hacer, no un ajuste con un valor
-  // puesto de antemano.
-  const opciones = [...w.document.querySelectorAll('[aria-labelledby="duel-kind-label"] .segmented-option')];
-  ok("las dos modalidades están a la vista", opciones.length === 2 && w.document.querySelectorAll('input[name="duel-kind"]').length === 2);
-  ok("se anuncia como un grupo de opciones", w.document.querySelector('.segmented')?.getAttribute('role') === 'radiogroup');
-  ok("y se marca cuál está elegida", opciones.filter(o => o.classList.contains('is-on')).length === 1 && opciones[0].classList.contains('is-on'));
-
-  // Elegir la otra cambia la marca y el bloque que se enseña.
-  const aCifras = w.document.querySelector('input[name="duel-kind"][value="cifras"]');
-  aCifras.checked = true;
-  aCifras.dispatchEvent(new w.Event("change", { bubbles: true }));
-  const tras = [...w.document.querySelectorAll('[aria-labelledby="duel-kind-label"] .segmented-option')];
-  ok("elegir la otra modalidad mueve la marca", tras[1].classList.contains('is-on') && !tras[0].classList.contains('is-on'));
-  ok("y enseña su bloque, escondiendo el anterior",
-    w.document.querySelector('[data-duel-block="seguidos-cifras"]').hidden === false && w.document.querySelector('[data-duel-block="seguidos-orden"]').hidden === true);
-  for (const pace of ['turnos', 'seguidos']) {
-    for (const kind of ['orden', 'cifras']) {
-      for (const [name, value] of [['duel-pace', pace], ['duel-kind', kind]]) {
-        const input = w.document.querySelector(`input[name="${name}"][value="${value}"]`);
-        input.checked = true;
-        input.dispatchEvent(new w.Event('change', { bubbles: true }));
-      }
-      const visible = [...w.document.querySelectorAll('[data-duel-block]')].filter(el => !el.hidden);
-      ok(`ejes independientes: ${pace} + ${kind}`, visible.length === 1 && visible[0].dataset.duelBlock === `${pace}-${kind}`);
-    }
-  }
-  ok("ambos ejes se recuerdan", w.localStorage.getItem("hilo-duelo-prueba-v1") === "cifras" && w.localStorage.getItem("hilo-duelo-ritmo-v1") === "seguidos");
-  ok("la configuración no repite la explicación (va en la pantalla de antes de jugar)", !existe(w, '.duel-brief'));
-
-  w.document.getElementById("duel-name").value = "Fernando";
-  click(w, '[data-action="start-cifras"]');
-  ok("antes de jugar se explica la modalidad", existe(w, ".demo-cifras") && existe(w, '[data-action="duel-play"]'));
-  await jugar(w);
-  ok("empieza la partida", existe(w, '[data-action="cifra-answer"]'));
-  ok("el nombre se guarda para la próxima", w.localStorage.getItem("hilo-nombre-v1") === "Fernando");
-  ok("se ve el reloj", existe(w, ".reloj-bar"));
-  ok("y el campo donde escribir la cifra", existe(w, "#cifra-input"));
-  ok("no se enseña el detalle de la carta, que muchas veces lleva la cifra dentro", !existe(w, ".reveal"));
-
-  const C = w.CONTINUUM.Duelo.Cifras;
-  const escritas = juegaCifras(w, "population", card => w.CONTINUUM.sortValue("population", card), { tarda: () => 1000 });
-  ok(`se juegan las ${C.CARTAS} cartas`, escritas.length === C.CARTAS);
-  ok("la partida termina", /Duelo de cifras listo/.test(texto(w)));
-  ok("clavarlas todas son 10 de 10 aciertos", /10 de 10 aciertos/.test(texto(w)));
-  ok("y ofrece mandar el reto", existe(w, '[data-action="share-duel"]'));
-  ok("todavía no hay marcador: no hay rival contra quien compararse", !existe(w, ".duel-grid"));
-
-  const perfil = JSON.parse(w.localStorage.getItem("hilo-perfil-v1"));
-  ok("el perfil lo registra como cifras", perfil.byMode.population.byKind.cifras === C.CARTAS);
-  ok("crear un duelo no cuenta como victoria", perfil.totals.wins === 0);
+  ok("sin internet se propone la Wi-Fi y se avisa", w.document.querySelector('input[name="live-net"][value="wifi"]').checked && !!w.document.querySelector('[data-offline-note]'));
+  ok("sin internet, por turnos se avisa de que no se puede crear", w.document.querySelectorAll('[data-duel-block="turnos"] [data-offline-turnos]').length === 1);
 }
 
 console.log("\nAceptar un duelo de cifras por enlace");
@@ -384,7 +295,7 @@ console.log("\nAceptar un duelo de cifras por enlace");
   ok("con las dos tiradas, carta a carta", rival.document.querySelectorAll(".duel-row").length === 2);
   ok("se ve el nombre de quien retaba", /Fernando/.test(texto(rival)));
   ok("gana quien más puntos suma", /Has ganado el duelo/.test(texto(rival)));
-  ok("y se puede devolver el reto", existe(rival, '[data-action="start-cifras"]'));
+  ok("y ya no se ofrece devolver el reto con un enlace nuevo", !existe(rival, '[data-action="start-cifras"]'));
 
   const perfil = JSON.parse(rival.localStorage.getItem("hilo-perfil-v1"));
   ok("la victoria es tuya: hay una marca concreta enfrente", perfil.totals.wins === 1);
@@ -392,8 +303,7 @@ console.log("\nAceptar un duelo de cifras por enlace");
 
 console.log("\nEl reloj no se para: salir de la aplicación cierra la carta");
 {
-  const w = boot();
-  await abreDuelo(w);
+  const w = await abreDuelo();
   const antes = estado(w, "population");
   ok("la carta lleva apuntado el instante en que empezó", Number.isFinite(antes.empezadaEn));
 
@@ -417,8 +327,7 @@ console.log("\nEl reloj no se para: salir de la aplicación cierra la carta");
 
 console.log("\nNi recargar ni cerrar la aplicación devuelven el plazo entero");
 {
-  const w = boot();
-  await abreDuelo(w);
+  const w = await abreDuelo();
   const guardado = estado(w, "population");
   ok("la partida se guarda con el reloj en marcha", Number.isFinite(guardado.empezadaEn));
 
@@ -451,26 +360,29 @@ console.log("\nSalir del duelo de cifras no toca la partida local del mismo mazo
   // El duelo guarda `cifras`, no `game`. Su salida es la suya: la general de la partida
   // borraba con «Salir sin guardar» la partida en un solo móvil de este mazo y dejaba el
   // duelo a medias.
-  const w = boot();
-  abreMazo(w, "geografia", "population");
-  w.CONTINUUM.openDeckAs("local");
-  click(w, '[data-action="start"]');
-  for (let i = 0; i < 12 && existe(w, "#starter-guess-input"); i++) {
-    w.document.getElementById("starter-guess-input").value = "1000000";
-    click(w, '[data-action="starter-guess-submit"]');
+  const w0 = boot();
+  abreMazo(w0, "geografia", "population");
+  w0.CONTINUUM.openDeckAs("local");
+  click(w0, '[data-action="start"]');
+  for (let i = 0; i < 12 && existe(w0, "#starter-guess-input"); i++) {
+    w0.document.getElementById("starter-guess-input").value = "1000000";
+    click(w0, '[data-action="starter-guess-submit"]');
   }
-  click(w, '[data-action="starter-start"]');
-  const local = () => w.localStorage.getItem("hilo-game-population-v1");
+  click(w0, '[data-action="starter-start"]');
+  const local = () => w0.localStorage.getItem("hilo-game-population-v1");
   ok("hay una partida local guardada en el mazo", !!local());
 
-  await abreDuelo(w);
+  // Se abre el duelo en otra ventana que ya trae esa partida local guardada.
+  const w2 = await abreDuelo({ almacen: { "hilo-game-population-v1": local(), "hilo-selected-mode-v1": "population" } });
+  const w = w2;
+  const local2 = () => w2.localStorage.getItem("hilo-game-population-v1");
   ok("se juega el duelo de cifras", w.document.querySelector("#app").dataset.screen === "cifras");
   // «Guardar y salir» por la flecha: el duelo queda guardado con su carta abierta.
   click(w, '[data-action="ui-back"]');
   ok("la flecha pregunta con el aviso del reloj", /el reloj no se para/.test(texto(w)) && existe(w, "[data-exit-discard]"));
   click(w, "[data-exit-confirm]");
   ok("guardar y salir conserva el duelo", Number.isFinite(estado(w, "population")?.empezadaEn));
-  ok("y la partida local", !!local());
+  ok("y la partida local", !!local2());
 
   click(w, '[data-action="resume-cifras"]');
   ok("el duelo se retoma", w.document.querySelector("#app").dataset.screen === "cifras");
@@ -479,13 +391,12 @@ console.log("\nSalir del duelo de cifras no toca la partida local del mismo mazo
   click(w, '[data-action="abandon"]');
   click(w, "[data-exit-discard]");
   ok("salir sin guardar borra el duelo", estado(w, "population") === null);
-  ok("y deja intacta la partida local del mismo mazo", !!local());
+  ok("y deja intacta la partida local del mismo mazo", !!local2());
 }
 
 console.log("\nSe acaba el plazo");
 {
-  const w = boot();
-  await abreDuelo(w);
+  const w = await abreDuelo();
   w.document.querySelector("#cifra-input").value = "1000000";
   w.avanza(w.CONTINUUM.Duelo.Cifras.MS + 200);
   await duerme(250);
@@ -498,8 +409,7 @@ console.log("\nSe acaba el plazo");
 
 console.log("\nLo que escribe una persona en español");
 {
-  const w = boot();
-  await abreDuelo(w);
+  const w = await abreDuelo();
   const escribe = valor => { w.document.querySelector("#cifra-input").value = valor; click(w, '[data-action="cifra-answer"]'); const jugada = estado(w, "population").jugadas.at(-1); click(w, '[data-action="cifras-next"]'); return jugada.respuesta; };
   ok("los puntos de millar se entienden", escribe("47.000.000") === 47000000);
   ok("los espacios también", escribe("47 000 000") === 47000000);
@@ -620,8 +530,7 @@ console.log("\nEtiqueta, ayuda, teclado y botones del campo de cifra cuentan lo 
 
 console.log("\nEl campo de respuesta dice en qué se puede responder");
 {
-  const w = boot();
-  await abreDuelo(w, { block: "naturaleza", mode: "animals" });
+  const w = await abreDuelo({ mode: "animals" });
   // El teclado numérico no deja escribir «mg»: las unidades se tocan, y quedan escritas tras el número.
   const botones = [...w.document.querySelectorAll("#cifra-input ~ .cifra-chips .cifra-chip")].map(b => b.textContent);
   ok("se ofrecen como botones las unidades admitidas", ["kg", "g", "mg", "t"].every(u => botones.includes(u)));
@@ -649,10 +558,8 @@ console.log("\nEl campo de respuesta dice en qué se puede responder");
 
 console.log("\nAntes de jugar se explica, y se empieza al pulsar, sin cuenta atrás");
 {
-  const w = boot();
-  abreMazo(w, "geografia", "population");
-  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
-  click(w, '[data-action="start-cifras"]');
+  const w = boot({ url: enlaceCifras() });
+  click(w, '[data-action="accept-duel"]');
   ok("no se entra directamente a la partida", !existe(w, '[data-action="cifra-answer"]'));
   ok("se explica cómo funciona la modalidad", existe(w, ".demo-cifras") && /Es un acierto si te quedas cerca/.test(texto(w)));
   ok("se dicen el plazo y lo que pasa al salirse", /15 segundos por carta/.test(texto(w)) && /la carta se cierra/.test(texto(w)));

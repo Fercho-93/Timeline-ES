@@ -85,16 +85,15 @@ assert.match(app.textContent, /Retos rápidos con amigos/);
 assert.match(app.textContent, /mismos retos/);
 assert.match(app.textContent, /En directo/);
 assert.match(app.textContent, /Por turnos/);
-assert.match(app.textContent, /Mismas cartas/);
-// Los tres ritmos, como en las colecciones: en directo (sala), por turnos (sala de dos) y mismas cartas (enlace).
-assert.deepEqual([...app.querySelectorAll('input[name="quick-duel-pace"]')].map(i => i.value), ['directo', 'turnos', 'seguidos']);
+assert.doesNotMatch(app.textContent, /Mismas cartas/, '«Mismas cartas» ya no existe con amigos');
+// Dos ritmos, como en las colecciones: en directo (sala) y por turnos (el duelo).
+assert.deepEqual([...app.querySelectorAll('input[name="quick-duel-pace"]')].map(i => i.value), ['directo', 'turnos']);
 assert.equal(app.querySelector('input[name="quick-duel-pace"]:checked').value, 'directo', 'por defecto, en directo');
 assert.equal(app.querySelector('[data-quick-duel-block="directo"]').hidden, false);
-assert.equal(app.querySelector('[data-quick-duel-block="seguidos"]').hidden, true);
 assert.equal(app.querySelector('[data-quick-duel-block="turnos"]').hidden, true);
 assert.ok(app.querySelector('[data-quick-duel-pre] #quick-net-players'), 'en directo se elige el máximo de la sala');
 assert.equal(app.querySelector('[data-quick-group]').hidden, true, 'y no el número de jugadores de los otros ritmos');
-assert.equal(app.querySelector('#quick-duel-group').value, '2', 'por turnos y con las mismas cartas, de entrada, dos');
+assert.equal(app.querySelector('#quick-duel-group').value, '2', 'por turnos, de entrada, dos');
 assert.ok(!app.querySelector('.duel-brief'), 'sin textos de explicación debajo de los ajustes');
 assert.equal(app.querySelector('[data-quick-keep-field]').hidden, false, 'en directo también se elige qué pasa al fallar');
 assert.ok(app.querySelector('#quick-profile-name[readonly]'), 'el nombre es el del perfil');
@@ -114,12 +113,6 @@ assert.equal(app.querySelectorAll('.quick-length-chip:not([hidden])').length, 3)
 const sinInternet = app.querySelector('input[name="quick-live-net"][value="wifi"]'); sinInternet.checked = true;
 sinInternet.dispatchEvent(new w.Event('change', {bubbles: true}));
 assert.equal(w.CONTINUUM.Storage.getItem('continuum-quick-live-net-v1'), 'wifi');
-const completa = app.querySelector('input[name="quick-duel-pace"][value="seguidos"]'); completa.checked = true;
-completa.dispatchEvent(new w.Event('change', {bubbles: true}));
-assert.equal(app.querySelector('[data-quick-duel-block="seguidos"]').hidden, false);
-assert.equal(app.querySelector('[data-quick-duel-block="directo"]').hidden, true);
-assert.equal(app.querySelector('[data-quick-keep-field]').hidden, true, 'con las mismas cartas un fallo nunca corta');
-assert.ok(app.querySelector('[data-quick="start-duel"]'));
 assert.ok(app.querySelector('[data-quick-duel-block="turnos"] [data-quick="create-room"]'), 'por turnos se crea una sala de dos');
 assert.equal(app.querySelector('details.duel-join'), null, 'unirse a un duelo va por «Unirme a una partida»');
 // Qué pasa al fallar se elige al crear el duelo por turnos (no en una sala de espera: el duelo no tiene mesa).
@@ -130,8 +123,9 @@ assert.doesNotMatch(app.textContent, /Escribir la cifra/, 'en Retos rápidos sie
 // Cambiar de ritmo enseña el otro bloque sin repintar y se recuerda.
 const turnos = app.querySelector('input[value="turnos"]'); turnos.checked = true;
 turnos.dispatchEvent(new w.Event('change', {bubbles: true}));
-assert.equal(app.querySelector('[data-quick-duel-block="seguidos"]').hidden, true);
+assert.equal(app.querySelector('[data-quick-duel-block="directo"]').hidden, true);
 assert.equal(app.querySelector('[data-quick-duel-block="turnos"]').hidden, false);
+assert.equal(app.querySelector('[data-quick-group]').hidden, false, 'por turnos se elige cuántos sois');
 assert.equal(w.CONTINUUM.Storage.getItem('continuum-quick-duel-pace-v1'), 'turnos');
 // Sin internet, en directo se marca sola la Wi-Fi, sin cambiar lo que había guardado.
 w.CONTINUUM.Storage.setItem('continuum-quick-duel-pace-v1', 'directo');

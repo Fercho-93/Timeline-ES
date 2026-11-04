@@ -291,7 +291,7 @@
   // Cada uno en su móvil: por un lado unirse a lo que ya ha creado otro; por otro, crear (mazo, retos o competición).
   let createRoomOpen = false;
   function createRoomGroup(route) {
-    return `<div class="mode-create-room"><button type="button" class="mode-entry mode-create-toggle" data-action="create-room-toggle" aria-expanded="${createRoomOpen}" aria-controls="mode-create-list"><span class="mode-entry-art" aria-hidden="true"><img src="assets/menu-wifi.webp" alt="" loading="lazy" decoding="async"></span><span class="mode-entry-copy"><b>Crear partida</b><small>Elige qué jugar y después el ritmo: en directo, por turnos o con las mismas cartas.</small><span class="mode-entry-cta" aria-hidden="true">${createRoomOpen ? 'Ocultar' : 'Elegir qué jugar'} <span>${createRoomOpen ? '↑' : '↓'}</span></span></span></button>
+    return `<div class="mode-create-room"><button type="button" class="mode-entry mode-create-toggle" data-action="create-room-toggle" aria-expanded="${createRoomOpen}" aria-controls="mode-create-list"><span class="mode-entry-art" aria-hidden="true"><img src="assets/menu-wifi.webp" alt="" loading="lazy" decoding="async"></span><span class="mode-entry-copy"><b>Crear partida</b><small>Elige qué jugar y después el ritmo: en directo o por turnos.</small><span class="mode-entry-cta" aria-hidden="true">${createRoomOpen ? 'Ocultar' : 'Elegir qué jugar'} <span>${createRoomOpen ? '↑' : '↓'}</span></span></span></button>
       <div id="mode-create-list" class="mode-create-list"${createRoomOpen ? '' : ' hidden'}>${inlineCollections(route)}${modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos cortos y sorpresa de cualquier dato. Arriesgad o plantaos.', false, `data-friend-quick="${route}"`, 'Preparar partida')}</div></div>`;
   }
   function openFriendHub(route) {
@@ -334,7 +334,7 @@
   function openFriendsHub() {
     hub('hub-friends', 'Jugar con amigos', 'Juntos', [
       modeDoor('local-hub', 'menu-local.webp', 'Un solo móvil', 'Pasad un mismo móvil en cada turno.'),
-      modeDoor('friend-hub', 'menu-private.webp', 'Cada uno en su móvil', 'En directo, por turnos o con las mismas cartas. Por internet o en la misma Wi-Fi.', false, 'data-friend-hub="online"')
+      modeDoor('friend-hub', 'menu-private.webp', 'Cada uno en su móvil', 'En directo o por turnos. Por internet o en la misma Wi-Fi.', false, 'data-friend-hub="online"')
     ].join(''), modeArt['friends-hub']);
   }
 

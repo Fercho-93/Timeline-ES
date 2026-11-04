@@ -240,11 +240,11 @@
       { chapter: 2, title: "Con amigos", duration: 11000,
         html: `<div class="tv-board">${path(["Jugar", "Jugar con amigos"])}<div class="tv-ways">
           <div class="tv-way tv-way-one"><img class="tv-menu-art" src="assets/menu-local.webp" alt=""><b>Un solo móvil</b><span class="tv-pass"><span class="tv-phone" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10.5 18.5h3"/></svg></span><span class="tv-people"><b>Ana</b><b>Luis</b><b>Sara</b></span></span><small>De 2 a 10 personas</small></div>
-          <div class="tv-way tv-way-many"><img class="tv-menu-art" src="assets/menu-private.webp" alt=""><b>Cada uno en su móvil</b><span class="tv-rhythms"><span><b>En directo</b>Todos a la vez</span><span><b>Por turnos</b>Un duelo a dos, sin prisa</span><span><b>Mismas cartas</b>Juegas y retas con un enlace</span></span></div></div></div>`,
+          <div class="tv-way tv-way-many"><img class="tv-menu-art" src="assets/menu-private.webp" alt=""><b>Cada uno en su móvil</b><span class="tv-rhythms"><span><b>En directo</b>Todos a la vez</span><span><b>Por turnos</b>Un duelo, sin prisa</span></span></div></div></div>`,
         steps: [
           [0, c => { c.say("Si compartís móvil, pasadlo a quien le toque jugar."); c.add(".tv-way-one", "is-in"); }],
           [500, c => c.cycle(".tv-people b", 800, 2)],
-          [4400, c => { c.add(".tv-way-many", "is-in"); c.stagger(".tv-rhythms > span", 450); c.say("O cada uno en el suyo: en directo, por turnos o con las mismas cartas."); }],
+          [4400, c => { c.add(".tv-way-many", "is-in"); c.stagger(".tv-rhythms > span", 450); c.say("O cada uno en el suyo: en directo o por turnos."); }],
           [8200, c => c.say("Para entrar en una partida, toca «Unirme a una partida».")]
         ] },
       { chapter: 2, title: "Poderes", duration: 11400,

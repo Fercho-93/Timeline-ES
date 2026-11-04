@@ -226,15 +226,12 @@ try {
    // `#app`, que recorta un eje y por eso es contenedor de desplazamiento— y el pliegue
    // se dibujaba como un arco dorado sobre el rótulo, por heredar la chapa del ✓.
    const duelPage=await newPage({viewport:{width:390,height:664},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
+   // Un duelo de otra persona, abierto desde su enlace (ya no se crean desde la pantalla).
    await duelPage.goto(url);
+   const duelPayload=await duelPage.evaluate(()=>{const seq=[true,false,true,true,false,true,true,true,false,true,true,false,true,true,true];return window.CONTINUUM.Duelo.codificar({mode:'animals',seed:'muelle01',total:15,hits:seq.filter(Boolean).length,sequence:seq,nombre:'Ana'});});
+   await duelPage.goto(`${url}?duelo=${duelPayload}`);
    await duelPage.evaluate(() => window.CONTINUUM_SPLASH?.finish());
-   await openCollections(duelPage);
-   await duelPage.locator('[data-block="naturaleza"]').click();
-   await duelPage.locator('[data-mode="animals"]').click();
-   // El mismo mazo, cada uno en su móvil y con las mismas cartas.
-   await duelPage.evaluate(()=>window.CONTINUUM.openDeckAs('online'));
-   await duelPage.locator('label:has(input[name="duel-pace"][value="seguidos"])').click();
-   await duelPage.locator('[data-action="start-duel"]').click();
+   await duelPage.locator('[data-action="accept-duel"]').click();
    await duelPage.locator('[data-action="duel-play"]').click();
    // La carta del turno va arriba, sobre la línea; se ve entera y sin el pliegue dorado.
    const selectedStyle=await duelPage.locator('.hand-solo .hand-card.selected').evaluate(el=>({

@@ -267,7 +267,7 @@ for (const reduce of [false, true]) {
     (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
     assert.equal(doc.getElementById('app').dataset.screen, 'duel-home');
     assert.equal(doc.querySelectorAll('.solo-fold').length, 0);
-    assert.ok(doc.querySelector('.solo-panel [data-action="start-duel"]'));
+    assert.ok(doc.querySelector('.solo-panel [data-action="start-live-room"]') && !doc.querySelector('[data-action="start-duel"]'));
     click(w, '[data-action="back-menu"]');
     assert.equal(doc.getElementById('app').dataset.screen, 'hub-solo');
     (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('local');

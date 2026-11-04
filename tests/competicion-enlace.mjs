@@ -64,28 +64,22 @@ function juegaCompeticion(w, { falla = () => false } = {}) {
 }
 const enlaceDe = textoCompartido => textoCompartido.match(/#duelo=([A-Za-z0-9_-]+)/)?.[1];
 
-console.log("\nEl formulario ofrece «Mismas cartas»");
+console.log("\nLa competición con amigos: en directo o por turnos");
 {
   const w = boot();
   abreCompeticion(w);
   const ritmos = [...w.document.querySelectorAll('input[name="comp-pace"]')].map(i => i.value);
-  ok("hay tres ritmos, como con un mazo", ritmos.join() === "directo,turnos,seguidos");
-  cambia(w, w.document.querySelector('input[name="comp-pace"][value="seguidos"]'));
-  ok("el ritmo se recuerda", w.localStorage.getItem("hilo-competicion-ritmo-v1") === "seguidos");
-  ok("sin conexión ni máximo de jugadores", [...w.document.querySelectorAll("[data-comp-net-field]")].every(el => el.hidden));
-  ok("sin la nota del tope por turnos", [...w.document.querySelectorAll("[data-comp-turn-field]")].every(el => el.hidden));
-  ok("sin «Todos los temas»", w.document.querySelector("[data-comp-all]").disabled);
-  ok("el botón dice «Jugar y retar»", /Jugar y retar/.test(w.document.querySelector('[data-action="comp-friends-start"]').textContent));
-  ok("la entradilla habla de las mismas cartas", /las mismas cartas para todos/.test(w.document.querySelector("[data-comp-lead]").textContent));
-  ok("de 1 a 6 cartas por tema", [...w.document.getElementById("competition-cards").options].filter(o => !o.disabled).length === 6);
-  // Repintada con «Mismas cartas» guardado, la pantalla sale igual.
+  ok("hay dos ritmos: en directo y por turnos", ritmos.join() === "directo,turnos");
+  ok("sin «Mismas cartas»", !/Mismas cartas/.test(texto(w)));
+  ok("sin textos de explicación debajo de los ajustes", !existe(w, ".duel-brief"));
+  // Un «Mismas cartas» guardado de antes cae en directo.
+  w.localStorage.setItem("hilo-competicion-ritmo-v1", "seguidos");
   abreCompeticion(w);
-  ok("repintada, sigue en «Mismas cartas»", w.document.querySelector('input[name="comp-pace"]:checked').value === "seguidos" && !visible(w.document.querySelector("[data-comp-net-field]")));
-  // Sin internet también se puede: el enlace lleva todo.
-  Object.defineProperty(w.navigator, "onLine", { configurable: true, get: () => false });
-  abreCompeticion(w);
-  click(w, '[data-action="comp-friends-start"]');
-  ok("sin internet se puede crear", existe(w, '[data-action="duel-play"]') && /Competición/.test(texto(w)));
+  ok("un ritmo guardado que ya no existe se muestra en directo", w.document.querySelector('input[name="comp-pace"]:checked').value === "directo");
+  cambia(w, w.document.querySelector('input[name="comp-pace"][value="turnos"]'));
+  ok("el ritmo se recuerda", w.localStorage.getItem("hilo-competicion-ritmo-v1") === "turnos");
+  ok("por turnos, sin conexión ni máximo de jugadores", [...w.document.querySelectorAll("[data-comp-net-field]")].every(el => el.hidden));
+  ok("el botón dice «Empezar competición»", /Empezar competición/.test(w.document.querySelector('[data-action="comp-friends-start"]').textContent));
   w.close();
 }
 
@@ -139,49 +133,13 @@ console.log("\nEl enlace de la competición");
   w.close();
 }
 
-console.log("\nQuien la crea la juega y manda el enlace");
-let enlace = null, cartasAna = null, temasAna = null;
+// Los enlaces de competición ya no se crean desde la pantalla: se abren los que alguien mandó antes. Se prepara uno.
+let enlace = null, temasAna = null;
 {
   const w = boot({ nombre: "Ana" });
-  // Una competición en solitario a medias no se toca.
-  w.CONTINUUM.ModeHubs.open("hub-solo");
-  w.document.querySelector('[data-inline-route]')?.click();
-  click(w, '[data-action="competition-menu"]');
-  w.document.getElementById("competition-length").value = "3";
-  click(w, '[data-action="start-competition"]');
-  click(w, '[data-action="comp-next-round"]');
-  // Contraste: la competición en solitario sí tiene vidas (y la de enlace, más abajo, no).
-  ok("la competición en solitario enseña sus vidas", existe(w, ".vida"));
-  const soloAntes = w.localStorage.getItem(COMP_SOLO);
-  ok("hay una competición en solitario guardada", !!soloAntes);
-
-  abreCompeticion(w);
-  cambia(w, w.document.querySelector('input[name="comp-pace"][value="seguidos"]'));
-  cambia(w, w.document.getElementById("competition-length"), 3);
-  cambia(w, w.document.getElementById("competition-cards"), 2);
-  cambia(w, w.document.querySelector('input[data-tiempo="amigos"][value="30"]'));
-  click(w, '[data-action="comp-friends-start"]');
-  ok("antes de jugar se explica", /3 temas al azar/.test(texto(w)) && /2 cartas en cada uno/.test(texto(w)) && /30 segundos por carta/.test(texto(w)));
-  click(w, '[data-action="duel-play"]');
-  const c = guardada(w);
-  ok("se guarda aparte", !!c && c.duelo && c.duelo.temas.length === 3 && c.cardsPerRound === 2 && c.ms === 30000 && c.difficulty === "easy");
-  ok("cada tema empieza con su cartel", /Tema 1 de 3/.test(texto(w)) && existe(w, '[data-action="comp-next-round"]'));
-  ok("sin Gran mezcla", !c.duelo.temas.includes("mixed"));
-  temasAna = c.duelo.temas;
-  const jugada = juegaCompeticion(w, { falla: i => i === 0 });
-  cartasAna = jugada.cartas;
-  ok("se juegan todas las cartas", jugada.secuencia.length === 6);
-  ok("la carta fallada no entra en la línea", jugada.lineaTrasFallo && jugada.lineaTrasFallo.despues === jugada.lineaTrasFallo.antes);
-  ok("termina con la competición lista", /Competición lista/.test(texto(w)) && /5 de 6/.test(texto(w)));
-  ok("con una fila por tema", w.document.querySelectorAll(".comp-summary li").length === 3);
-  ok("la competición en solitario sigue como estaba", w.localStorage.getItem(COMP_SOLO) === soloAntes);
-  ok("cuenta para «Vuelta completa»", w.CONTINUUM.Progreso.read().marks.comps === 1);
-  click(w, '[data-action="share-duel"]');
-  await duerme(10);
-  ok("se manda un enlace de duelo", /te reta en Continuum · Competición de 3 temas/.test(w.compartido || "") && /📊 5\/6, a 30 segundos por carta/.test(w.compartido || ""));
-  ok("sin nombrar ningún tema", temasAna.every(t => !(w.compartido || "").includes(w.CONTINUUM.mode(t).name)));
-  enlace = enlaceDe(w.compartido || "");
-  ok("el enlace se puede leer", !!enlace);
+  const D = w.CONTINUUM.Duelo, C = D.Competicion;
+  temasAna = w.CONTINUUM.Tournament.modes().slice(0, 3);
+  enlace = C.codificar({ temas: temasAna, seed: "ana12345", porTema: 2, sequence: [true, false, true, true, true, true], nombre: "Ana", ms: 30000 });
   w.close();
 }
 
@@ -198,7 +156,7 @@ console.log("\nQuien lo abre juega lo mismo y ve el cara a cara");
   click(w, '[data-action="duel-play"]');
   ok("con los temas del enlace, en su orden", guardada(w)?.duelo.temas.join() === temasAna.join());
   const jugada = juegaCompeticion(w);
-  ok("las mismas cartas, en el mismo orden", jugada.cartas.join() === cartasAna.join());
+  ok("se juegan los seis cartas de los tres temas, en su orden", jugada.cartas.length === 6 && jugada.cartas.every((c, i) => c.startsWith(temasAna[Math.floor(i / 2)] + ":")));
   ok("gana quien más acierta", /Has ganado la competición/.test(texto(w)) && /6 a 5/.test(texto(w)));
   ok("tema a tema", w.document.querySelectorAll(".comp-summary li").length === 3 && /Tú 2 · Ana 1/.test(texto(w)));
   ok("con las dos cuadrículas", w.document.querySelectorAll(".duel-row i").length === 12);
@@ -207,21 +165,17 @@ console.log("\nQuien lo abre juega lo mismo y ve el cara a cara");
   click(w, '[data-action="share-duel"]');
   await duerme(10);
   ok("el resultado se comparte partido por temas", /Gano yo: 6 a 5/.test(w.compartido || "") && /Yo 🟩🟩 🟩🟩 🟩🟩/.test(w.compartido || ""));
-  click(w, '[data-action="comp-duel-rematch"]');
-  ok("devolver el reto prepara otra con la misma forma", /3 temas al azar/.test(texto(w)) && /2 cartas en cada uno/.test(texto(w)) && !/la marca de/.test(texto(w)));
+  ok("ya no se ofrece devolver el reto con un enlace nuevo", !existe(w, '[data-action="comp-duel-rematch"]'));
   w.close();
 }
 
 console.log("\nCon las mismas cartas, el reloj no se para");
 {
-  const w = boot({ nombre: "Ana" });
-  abreCompeticion(w);
-  cambia(w, w.document.querySelector('input[name="comp-pace"][value="seguidos"]'));
-  cambia(w, w.document.querySelector('input[data-tiempo="amigos"][value="15"]'));
-  click(w, '[data-action="comp-friends-start"]');
+  const w = boot({ url: `https://hilo.test/#duelo=${enlace}`, nombre: "Ana" });
+  click(w, '[data-action="accept-duel"]');
   click(w, '[data-action="duel-play"]');
   click(w, '[data-action="comp-next-round"]');
-  ok("en la partida no hay vidas", !existe(w, ".vida") && /tu tirada/.test(texto(w)));
+  ok("en la partida no hay vidas", !existe(w, ".vida"));
   const almacen = Object.fromEntries(Object.keys(w.localStorage).map(k => [k, w.localStorage.getItem(k)]));
   w.close();
   // El móvil se cierra con la carta delante y se vuelve a abrir más tarde.
@@ -240,7 +194,7 @@ console.log("\nLa Guía la explica");
 {
   const w = boot();
   const guia = w.CONTINUUM.guideMarkup("history", "competition");
-  ok("en el capítulo de la competición", /Con las mismas cartas/.test(guia) && /cada uno se compara con quien la creó/.test(guia));
+  ok("en el capítulo de la competición, sin «Mismas cartas»", /Por turnos/.test(guia) && !/Con las mismas cartas/.test(guia));
   w.close();
 }
 

@@ -100,7 +100,7 @@ await click('[data-inline-route="online"]');
 await click('#mode-inline-drawer [data-action="set-block"]');
 await click('#mode-inline-drawer .collection-entry.active [data-action="set-mode"]');
 assert.equal(screen(), 'duel-home', 'con el mazo elegido solo queda el ritmo');
-assert.ok(app().querySelector('[data-action="start-live-room"]') && app().querySelector('[data-action="start-turn-duel"]') && app().querySelector('[data-action="start-duel"]'));
+assert.ok(app().querySelector('[data-action="start-live-room"]') && app().querySelector('[data-action="start-turn-duel"]') && !app().querySelector('[data-action="start-duel"]'));
 await expectBack('hub-friends-online');
 await expectBack('hub-friends');
 await expectBack('home');

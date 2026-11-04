@@ -76,7 +76,6 @@ async function flows(vp) {
     await click('.mode-entry[data-action="friends-join"]'); await at('friends-join'); await back('hub-friends-online');
     await click('[data-action="create-room-toggle"]');
     await deck('online'); await at('duel-home');
-    await click('label:has(input[name="duel-pace"][value="seguidos"])'); await click('[data-action="start-duel"]'); await at('duelo-listo'); await back('duel-home');
     await click('label:has(input[name="duel-pace"][value="directo"])'); await click('label:has(input[name="live-net"][value="wifi"])'); await click('[data-action="start-live-room"]');
     if (!(await screen()).startsWith('local-')) problems.push(`[${vp.width}] la sala por Wi-Fi no se abrió (${await screen()})`);
     await back('duel-home');

@@ -384,9 +384,8 @@
   // Por turnos, una partida admite hasta 30 cartas (`MAX_CARDS` de js/online/duelo-turnos.js, el
   // tope de las reglas): como mucho cinco temas, y en cada uno las cartas por persona que quepan.
   const COMP_TURN_THEMES = 5, COMP_TURN_CARDS = 30;
-  // Tres ritmos, como con un mazo: en directo (una sala), por turnos (entre dos, en el servidor)
-  // y con las mismas cartas (juegas tú y mandas un enlace; ver `startCompDuel`).
-  function compPace() { const guardado = CT.Storage.getItem(COMP_PACE_KEY); return guardado === "turnos" || guardado === "seguidos" ? guardado : "directo"; }
+  // Dos ritmos, como con un mazo: en directo (una sala) y por turnos (entre dos, en el servidor).
+  function compPace() { return CT.Storage.getItem(COMP_PACE_KEY) === "turnos" ? "turnos" : "directo"; }
   // Cuántas cartas por persona y tema se pueden elegir: de 1 a 6 en directo; por turnos, las que
   // quepan en el tope (con 5 temas, 3; con 3, 5). El desplegable no ofrece más de las que se jugarán.
   function compCardsCap(ritmo, temas) {
@@ -441,7 +440,7 @@
           <div class="field"><label for="competition-cards">Cartas por persona en cada tema</label><select id="competition-cards">${[1, 2, 3, 4, 5, 6].map(n => `<option${n === cartas ? " selected" : ""}${n > topeCartas ? " hidden disabled" : ""}>${n}</option>`).join("")}</select>
             <div style="margin-bottom:14px" data-comp-turn-field${soloTurnos}><small class="field-help" data-comp-cards-help>${compCardsHelp(temas)}</small></div></div>
           <div class="solo-panel-head"><h3>Cómo jugáis</h3></div>
-          ${grupo("comp-pace", "comp-pace-label", "Ritmo", [["directo", "En directo", "Todos a la vez, en una sala", "directo"], ["turnos", "Por turnos", "Cada uno cuando pueda", "turnos"], ["seguidos", "Mismas cartas", "Juegas tú y mandas el reto", "seguidos"]], ritmo)}
+          ${grupo("comp-pace", "comp-pace-label", "Ritmo", [["directo", "En directo", "Todos a la vez, en una sala", "directo"], ["turnos", "Por turnos", "Cada uno cuando pueda", "turnos"]], ritmo)}
           ${grupo("live-net", "comp-net-label", "Conexión", [["internet", "Por internet", "Cada uno donde esté", "internet"], ["wifi", "Sin internet", "Cerca, en la misma Wi-Fi", "wifi"]], red, ` data-comp-net-field${soloDirecto}`)}
           ${sinRed ? `<p class="hint" data-offline-note data-comp-net-field${soloDirecto}>No hay internet: jugaréis por la Wi-Fi.</p>
           <p class="hint" data-offline-turnos data-comp-turn-field${soloTurnos}>${SIN_RED_COMP_TURNOS}</p>` : ""}
@@ -462,32 +461,17 @@
   function compLead(ritmo) {
     return ritmo === "turnos"
       ? "Cada uno en su móvil. Varios temas al azar de las Grandes colecciones, por turnos entre dos; gana quien más acierte en total."
-      : ritmo === "seguidos"
-        ? "Cada uno en su móvil y cuando quiera. Varios temas al azar de las Grandes colecciones, con las mismas cartas para todos; gana quien más acierte en total."
-        : "Cada uno en su móvil. Varios temas al azar de las Grandes colecciones, todos a la vez; cada tema ganado suma un punto y gana quien más sume al final.";
+      : "Cada uno en su móvil. Varios temas al azar de las Grandes colecciones, todos a la vez; cada tema ganado suma un punto y gana quien más sume al final.";
   }
-  const compStartLabel = ritmo => ritmo === "seguidos" ? "Jugar y retar" : "Empezar competición";
+  const compStartLabel = () => "Empezar competición";
   // Un duelo o una competición por turnos se guarda en el servidor entre jugada y jugada: sin
   // internet no se puede crear. Se dice antes de pulsar y, si se pulsa igual, al pulsar.
-  const SIN_RED_TURNOS = "Sin internet no se puede crear un duelo por turnos. Podéis jugar en directo, por la Wi-Fi, o con «Mismas cartas».";
-  const SIN_RED_COMP_TURNOS = "Sin internet no se puede crear una competición por turnos. Podéis jugarla en directo, por la Wi-Fi, o con «Mismas cartas».";
+  const SIN_RED_TURNOS = "Sin internet no se puede crear un duelo por turnos. Podéis jugar en directo, también por la Wi-Fi.";
+  const SIN_RED_COMP_TURNOS = "Sin internet no se puede crear una competición por turnos. Podéis jugarla en directo, también por la Wi-Fi.";
   function avisoSinRed(texto) { CT.toast(texto, 3500); announce(texto); }
-  // Qué pasa con cada ritmo, dicho en una frase.
-  function compBrief(ritmo) {
-    return ritmo === "turnos"
-      ? `Entre dos, cada uno desde su móvil y cuando pueda: hasta ${COMP_TURN_THEMES} temas al azar y os turnáis carta a carta. Juegas tú la primera y después le mandas el enlace a tu rival.`
-      : ritmo === "seguidos"
-        ? "Juegas tú ahora y mandas un enlace: quien lo abra juega los mismos temas y las mismas cartas cuando quiera y al terminar ve el cara a cara. Vale para todo el grupo: cada uno se compara contigo. Gana quien más acierte. Sin vidas: se juegan todas las cartas. Con tiempo, el reloj no se para: si sales de la aplicación, la carta se da por fallada."
-        : `Jugáis todos a la vez en una sala, con los temas uno detrás de otro. ${CT.Tournament.PUNTOS} En la sala de espera, un minijuego decide quién empieza.`;
-  }
   function startCompFriends() {
     const opciones = competitionOptions(), ritmo = compPace();
     const red = app.querySelector('input[name="live-net"]:checked')?.value || liveNet();
-    // Con las mismas cartas no hace falta conexión: el enlace lleva todo.
-    if (ritmo === "seguidos") {
-      compDuelReady(null, { rounds: Math.min(opciones.rounds, COMP_TURN_THEMES), cards: Math.min(opciones.cards, CT.Duelo.Competicion.CARTAS), ms: CT.Tiempo.chosen("amigos", 15) * 1000 });
-      return;
-    }
     if (ritmo === "turnos") {
       if (navigator.onLine === false) { avisoSinRed(SIN_RED_COMP_TURNOS); return; }
       const competicion = { rounds: Math.min(opciones.rounds, COMP_TURN_THEMES), cards: opciones.cards };
@@ -2609,7 +2593,7 @@
     pendingIndex = null;
     paint(`<div class="shell">${header("back-menu")}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2 class="solo-title" data-focus tabindex="-1">Cada uno en su móvil</h2>
-        <p class="lead">Elige cómo jugáis: todos a la vez, por turnos o con las mismas cartas.</p></div>
+        <p class="lead">Elige cómo jugáis: todos a la vez o por turnos.</p></div>
         ${duelPanel()}
       </section>
     </div>`);
@@ -2691,30 +2675,27 @@
   // que pasa al salirse de la aplicación— pesa mucho más que en lo que se diferencian,
   // que es si la carta se coloca en la línea o se responde con una cifra. Por eso el menú
   // enseña una sola opción y la modalidad se elige dentro.
-  const DUEL_KIND_KEY = "hilo-duelo-prueba-v1";
   const DUEL_PACE_KEY = "hilo-duelo-ritmo-v1";
 
-  function duelKind() {
-    const guardado = CT.Storage.getItem(DUEL_KIND_KEY) || CT.Storage.getItem("hilo-duelo-modo-v1");
-    return guardado === "cifras" && reglaCifra() ? "cifras" : "orden";
-  }
-  // Sin nada guardado se empieza en directo, la primera opción.
-  function duelPace() { const guardado = CT.Storage.getItem(DUEL_PACE_KEY); return guardado === "turnos" || guardado === "seguidos" ? guardado : "directo"; }
+  // Con amigos solo se ordenan cartas: escribir la cifra queda para el minijuego de quién empieza y el desempate.
+  const duelKind = () => "orden";
+  // Dos ritmos: en directo o por turnos. Sin nada guardado (o con el «Mismas cartas» de antes, que ya no existe), en directo.
+  function duelPace() { return CT.Storage.getItem(DUEL_PACE_KEY) === "turnos" ? "turnos" : "directo"; }
   // En directo se juega por internet o, cerca y sin conexión, por la misma Wi-Fi.
   const LIVE_NET_KEY = "hilo-sala-red-v1";
   function liveNet() { return CT.Storage.getItem(LIVE_NET_KEY) === "wifi" ? "wifi" : "internet"; }
-  function duelBlockKey(ritmo, prueba) { return ritmo === "directo" ? "directo" : `${ritmo}-${prueba}`; }
+  const duelBlockKey = ritmo => ritmo;
   // «Por turnos · Ordenar» se juega con las reglas de Retos rápidos (sus duelos por turnos), con una ronda de
   // cartas de este mazo: quien crea el duelo elige qué pasa al fallar. Elegir varias rondas es cosa de Retos rápidos.
   const TURN_KEEP_KEY = "continuum-turnos-fallo-v1";
   const turnKeep = () => CT.Storage.getItem(TURN_KEEP_KEY) === "seguir";
-  // Cuántos juegan por turnos (al ordenar) y con las mismas cartas: de 2 a 10, como en directo (ahí manda el máximo de la sala).
+  // Cuántos juegan por turnos: de 2 a 10, como en directo (ahí manda el máximo de la sala).
   const DUEL_GROUP_KEY = "continuum-amigos-grupo-v1";
   const duelGroup = () => { const n = Number(CT.Storage.getItem(DUEL_GROUP_KEY)); return n >= 2 && n <= 10 && Number.isInteger(n) ? n : 2; };
-  const groupShown = (ritmo, prueba) => ritmo === "seguidos" || (ritmo === "turnos" && prueba === "orden");
-  function duelGroupField(ritmo, prueba) {
+  const groupShown = ritmo => ritmo === "turnos";
+  function duelGroupField(ritmo) {
     const n = duelGroup();
-    return `<div class="field" data-duel-group${groupShown(ritmo, prueba) ? "" : " hidden"}><label for="duel-group">Jugadores</label><select id="duel-group">${[2, 3, 4, 5, 6, 7, 8, 9, 10].map(k => `<option value="${k}"${k === n ? " selected" : ""}>${k} jugadores</option>`).join("")}</select></div>`;
+    return `<div class="field" data-duel-group${groupShown(ritmo) ? "" : " hidden"}><label for="duel-group">Jugadores</label><select id="duel-group">${[2, 3, 4, 5, 6, 7, 8, 9, 10].map(k => `<option value="${k}"${k === n ? " selected" : ""}>${k} jugadores</option>`).join("")}</select></div>`;
   }
   function turnRulesFields(visible = true) {
     const opcion = (name, clave, titulo, pie, on) => `<label class="segmented-option${on ? " is-on" : ""}"><input type="radio" name="${name}" value="${clave}"${on ? " checked" : ""}><span><b>${titulo}</b><small>${pie}</small></span></label>`;
@@ -2731,41 +2712,29 @@
   }
 
   function duelPanel() {
-    // Un duelo aceptado y dejado a medias no se puede volver a empezar desde el enlace si
-    // ya lo has cerrado, así que se ofrece continuarlo: con él se iría la marca del rival.
-    const enOrden = solo && solo.kind === "duel";
+    const ritmo = duelPace();
+    // Un duelo de un enlace que ya enviaron antes, aceptado y dejado a medias: se puede continuar (ya no se crean de nuevos).
+    const enOrden = solo && solo.kind === "duel" && !solo.finished;
     const enCifras = cargaCifras();
     const contra = partida => partida?.duelo?.rival || partida?.rival ? (partida.duelo?.rival || partida.rival).nombre || "quien te retaba" : null;
-    const regla = reglaCifra();
-    const prueba = duelKind();
-    const ritmo = duelPace();
+    const continuar = (accion, rival) => `<button class="btn btn-primary btn-block" style="margin-bottom:14px" data-action="${accion}">Continuar ${rival ? `el duelo contra ${escapeHtml(rival)}` : "tu duelo"} <span>→</span></button>`;
     // Sin internet, en directo solo cabe la Wi-Fi: se marca sola, sin cambiar lo guardado.
     const sinRed = navigator.onLine === false;
     const red = sinRed ? "wifi" : liveNet();
-    const bloque = (clave, cuerpo) => `<div data-duel-block="${clave}"${clave === duelBlockKey(ritmo, prueba) ? "" : " hidden"}>${cuerpo}</div>`;
+    const bloque = (clave, cuerpo) => `<div data-duel-block="${clave}"${clave === duelBlockKey(ritmo) ? "" : " hidden"}>${cuerpo}</div>`;
     // Por turnos hace falta internet para crear el duelo: sin él se dice antes de pulsar.
     const sinRedTurnos = sinRed ? `<p class="hint" data-offline-turnos>${SIN_RED_TURNOS}</p>` : "";
     // Lo que solo se elige en directo (conexión, máximo, cartas y poderes) va antes del tiempo y del nombre, como en el resto de formularios.
     const preDirecto = cuerpo => `<div data-duel-pre="directo"${ritmo === "directo" ? "" : " hidden"}>${cuerpo}</div>`;
     return `<div class="panel solo-panel">
+      ${enOrden ? continuar("resume-solo", contra(solo)) : ""}${enCifras ? continuar("resume-cifras", contra(enCifras)) : ""}
       <div class="solo-panel-head"><h3>Cómo jugáis</h3></div>
       <div class="field duel-kind-field">
         <span class="field-label" id="duel-pace-label">Ritmo</span>
         <div class="segmented" role="radiogroup" aria-labelledby="duel-pace-label">
-          ${[["directo", "En directo", "Todos a la vez, en una sala"], ["turnos", "Por turnos", "Cada uno cuando pueda"], ["seguidos", "Mismas cartas", "Juegas tú y mandas el reto"]]
+          ${[["directo", "En directo", "Todos a la vez, en una sala"], ["turnos", "Por turnos", "Cada uno cuando pueda"]]
             .map(([clave, titulo, pie]) => `<label class="segmented-option${clave === ritmo ? " is-on" : ""}">
               <input type="radio" name="duel-pace" value="${clave}"${clave === ritmo ? " checked" : ""}>
-              <i class="duel-option-mark" aria-hidden="true">${glyph(GLYPHS[clave])}</i>
-              <span><b>${titulo}</b><small>${pie}</small></span>
-            </label>`).join("")}
-        </div>
-      </div>
-      <div class="field duel-kind-field" data-duel-kind-field${ritmo === "directo" ? " hidden" : ""}>
-        <span class="field-label" id="duel-kind-label">Prueba</span>
-        <div class="segmented" role="radiogroup" aria-labelledby="duel-kind-label">
-          ${[["orden", "Ordenar las cartas", "Colocarlas en la línea"], ...(regla ? [["cifras", "Escribir la cifra", "Responder con el número"]] : [])]
-            .map(([clave, titulo, pie]) => `<label class="segmented-option${clave === prueba ? " is-on" : ""}">
-              <input type="radio" name="duel-kind" value="${clave}"${clave === prueba ? " checked" : ""}>
               <i class="duel-option-mark" aria-hidden="true">${glyph(GLYPHS[clave])}</i>
               <span><b>${titulo}</b><small>${pie}</small></span>
             </label>`).join("")}
@@ -2785,10 +2754,10 @@
         </div>
         ${sinRed ? '<p class="hint" data-offline-note style="margin-top:10px">No hay internet: jugaréis por la Wi-Fi.</p>' : ""}
         ${CT.ManoInicial.maximoField()}`)}
-      ${duelGroupField(ritmo, prueba)}
+      ${duelGroupField(ritmo)}
       ${preDirecto(`${CT.ManoInicial.field()}
         ${CT.ManoInicial.poderesField()}`)}
-      ${turnRulesFields(ritmo === "turnos" && prueba === "orden")}
+      ${turnRulesFields(ritmo === "turnos")}
       ${CT.Tiempo.field("amigos", { porDefecto: 15 })}
       <div class="field duel-identity-field">
         <label for="duel-name">Tu nombre de perfil</label>
@@ -2796,14 +2765,8 @@
         <small class="field-help">Se usará en la partida. Puedes cambiarlo en Atlas.</small>
       </div>
       ${bloque("directo", `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-live-room">Crear sala <span>→</span></button>`)}
-      ${bloque("seguidos-orden", `${enOrden ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-solo">Continuar ${contra(solo) ? `el duelo contra ${escapeHtml(contra(solo))}` : "tu duelo"} <span>→</span></button>` : ""}
-        <button class="btn ${enOrden ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-duel">${enOrden ? "Empezar otro duelo" : "Jugar y retar"} <span>→</span></button>`)}
-      ${regla ? bloque("seguidos-cifras", `${enCifras ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-cifras">Continuar ${contra(enCifras) ? `el duelo contra ${escapeHtml(contra(enCifras))}` : "tu duelo de cifras"} <span>→</span></button>` : ""}
-        <button class="btn ${enCifras ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-cifras">${enCifras ? "Empezar otro duelo" : "Jugar y retar"} <span>→</span></button>`) : ""}
-      ${bloque("turnos-orden", `${sinRedTurnos}
+      ${bloque("turnos", `${sinRedTurnos}
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`)}
-      ${regla ? bloque("turnos-cifras", `${sinRedTurnos}
-        <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`) : ""}
     </div>`;
   }
 
@@ -3329,7 +3292,7 @@
       titular: `${mio.hits} <span style="opacity:.6">a</span> ${rival.hits}`,
       cuerpo: `<p class="lead centrado">${empate ? `Habéis acertado lo mismo que ${escapeHtml(quien)}.` : gano ? `Has superado a ${escapeHtml(quien)}.` : `${escapeHtml(quien)} te ha ganado esta vez.`}</p>
         ${duelGridMarkup(quien, rival.sequence, mio.sequence)}`,
-      acciones: `<button class="btn btn-primary" data-action="start-duel">Devolver el reto <span>→</span></button><button class="btn btn-secondary" data-action="share-duel">Compartir el resultado</button>`
+      acciones: `<button class="btn btn-primary" data-action="share-duel">Compartir el resultado</button>`
     };
   }
 
@@ -3665,7 +3628,7 @@
       titular = `${aciertos} <span style="opacity:.6">a</span> ${rival.aciertos}`;
       cuerpo = `<p class="lead centrado">${empate ? `Mismos aciertos y mismo tiempo que ${escapeHtml(quien)}.` : porTiempo ? (gano ? `Mismos aciertos, pero has respondido más rápido que ${escapeHtml(quien)}.` : `Mismos aciertos, pero ${escapeHtml(quien)} respondió más rápido.`) : gano ? `Has superado a ${escapeHtml(quien)}.` : `${escapeHtml(quien)} te ha ganado esta vez.`}</p>
         ${cifrasGridMarkup(quien, rival.jugadas, jugadas, mode, cifras.cartas, plazo)}`;
-      acciones = `<button class="btn btn-primary" data-action="start-cifras">Devolver el reto <span>→</span></button><button class="btn btn-secondary" data-action="share-duel">Compartir el resultado</button>`;
+      acciones = `<button class="btn btn-primary" data-action="share-duel">Compartir el resultado</button>`;
     }
 
     cifras.finished = true;
@@ -4178,7 +4141,7 @@
         eyebrow: empate ? "Empate" : gano ? "Has ganado la competición" : "Competición perdida",
         titular: `${mio.hits} <span style="opacity:.6">a</span> ${rival.hits}`,
         cuerpo: `<p class="lead centrado">${empate ? `Habéis acertado lo mismo que ${escapeHtml(quien)}.` : gano ? `Has superado a ${escapeHtml(quien)}.` : `${escapeHtml(quien)} te ha ganado esta vez.`}</p>`,
-        acciones: `<button class="btn btn-primary" data-action="comp-duel-rematch">Devolver el reto <span>→</span></button><button class="btn btn-secondary" data-action="share-duel">Compartir el resultado</button>`
+        acciones: `<button class="btn btn-primary" data-action="share-duel">Compartir el resultado</button>`
       };
     }
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel">
@@ -4459,8 +4422,6 @@
       compSyncCards();
       const lead = app.querySelector("[data-comp-lead]");
       if (lead) lead.textContent = compLead(ritmo);
-      const brief = app.querySelector("[data-comp-brief] p");
-      if (brief) brief.textContent = compBrief(ritmo);
       app.querySelectorAll(".segmented-option").forEach(opcion => opcion.classList.toggle("is-on", opcion.querySelector("input").checked));
       return;
     }
@@ -4472,19 +4433,15 @@
       event.target.closest(".segmented")?.querySelectorAll(".segmented-option").forEach(opcion => opcion.classList.toggle("is-on", opcion.querySelector("input").checked));
       return;
     }
-    if (event.target.name === "duel-kind" || event.target.name === "duel-pace" || event.target.name === "live-net") {
+    if (event.target.name === "duel-pace" || event.target.name === "live-net") {
       const value = event.target.value;
-      if (event.target.name === "duel-kind") CT.Storage.setItem(DUEL_KIND_KEY, value);
-      else if (event.target.name === "duel-pace") CT.Storage.setItem(DUEL_PACE_KEY, value);
+      if (event.target.name === "duel-pace") CT.Storage.setItem(DUEL_PACE_KEY, value);
       else CT.Storage.setItem(LIVE_NET_KEY, value);
-      const selectedKind = event.target.name === "duel-kind" ? value : duelKind();
       const selectedPace = event.target.name === "duel-pace" ? value : duelPace();
-      app.querySelectorAll("[data-duel-block]").forEach(bloque => { bloque.hidden = bloque.dataset.duelBlock !== duelBlockKey(selectedPace, selectedKind); });
+      app.querySelectorAll("[data-duel-block]").forEach(bloque => { bloque.hidden = bloque.dataset.duelBlock !== duelBlockKey(selectedPace); });
       app.querySelectorAll("[data-duel-pre]").forEach(bloque => { bloque.hidden = selectedPace !== "directo"; });
-      app.querySelectorAll("[data-duel-group]").forEach(campo => { campo.hidden = !groupShown(selectedPace, selectedKind); });
-      app.querySelectorAll("[data-duel-keep]").forEach(campo => { campo.hidden = !(selectedPace === "turnos" && selectedKind === "orden"); });
-      const campoPrueba = app.querySelector("[data-duel-kind-field]");
-      if (campoPrueba) campoPrueba.hidden = selectedPace === "directo";
+      app.querySelectorAll("[data-duel-group]").forEach(campo => { campo.hidden = !groupShown(selectedPace); });
+      app.querySelectorAll("[data-duel-keep]").forEach(campo => { campo.hidden = selectedPace !== "turnos"; });
       // La pastilla elegida se marca en el propio elemento: el `:has()` del CSS lo haría
       // solo, pero no todos los navegadores en los que se juega esto lo soportan.
       app.querySelectorAll(".segmented-option").forEach(opcion => {
@@ -4715,15 +4672,6 @@
       if (!setMode(target.dataset.soloDeck)) return;
       if (target.dataset.resume === "true") resumeSolo(); else soloHome();
     }
-    // Vale tanto para estrenar un duelo como para devolver uno recién jugado: en los dos
-    // casos es una semilla nueva, así que nadie repite cartas que ya conoce.
-    // El campo del nombre solo está donde se pide. Al devolver un reto desde el cara a
-    // cara no lo hay, y guardar lo que devuelve un elemento inexistente borraría el
-    // nombre que ya tenías puesto.
-    else if (action === "start-duel") { guardaNombreSiLoHay(); duelReady("orden"); }
-    // El duelo de cifras se estrena igual, y «Devolver el reto» pasa por aquí desde el
-    // cara a cara, donde el campo del nombre no existe y no hay nada que guardar.
-    else if (action === "start-cifras") { guardaNombreSiLoHay(); duelReady("cifras"); }
     else if (action === "friends-join-scan") CT.LocalShare.scanQr({ title: "Escanear invitación", hint: "Encuadra el código QR de la sala o del duelo.", onText: friendsJoinWith }).catch(() => friendsJoinWith(""));
     else if (action === "friends-join-camera") void askCamera();
     else if (action === "comp-friends-start") startCompFriends();
@@ -4813,7 +4761,6 @@
     // La competición con las mismas cartas: seguir la que quedó a medias, devolver el reto
     // (otros temas al azar con la misma forma) y volver a su formulario.
     else if (action === "resume-comp-duel") resumeCompetition(false, COMP_DUEL_KEY);
-    else if (action === "comp-duel-rematch") compDuelReady(null, compDuelAjustes || { rounds: 3, cards: 3, ms: CT.Tiempo.chosen("amigos", 15) * 1000 });
     else if (action === "comp-friends-open") competitionFriends();
     else if (action === "resume-competition") resumeCompetition();
     else if (action === "start-competition") startCompetition();

@@ -292,7 +292,7 @@
 :is(#app, #app-splash) .tv-people { display: flex; gap: 6px; }
 :is(#app, #app-splash) .tv-people b { padding: 4px 10px; border-radius: 999px; background: #ffffff14; font: 600 .7rem/1.5 var(--ui-font); transition: background .3s, color .3s, transform .3s var(--tv-ease-out); }
 :is(#app, #app-splash) .tv-people b.is-on { background: var(--tv-glow); color: var(--tv-ink); transform: translateY(-3px); box-shadow: 0 6px 14px #0006; }
-:is(#app, #app-splash) .tv-rhythms { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; width: 100%; }
+:is(#app, #app-splash) .tv-rhythms { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; width: 100%; }
 :is(#app, #app-splash) .tv-rhythms > span { display: grid; align-content: start; gap: 3px; padding: 7px 6px; border-radius: 10px; background: #ffffff10; color: var(--tv-soft); font: .64rem/1.25 var(--ui-font); text-align: center; opacity: 0; transition: opacity .4s; }
 :is(#app, #app-splash) .tv-rhythms > span.is-in { opacity: 1; }
 :is(#app, #app-splash) .tv-rhythms b { color: var(--tv-glow); font: 700 .72rem/1.2 var(--ui-font); }

@@ -48,11 +48,16 @@ async function jugar(w) {
 }
 const partida = w => JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
 // Entra en un duelo de orden recién creado.
-async function abreDuelo(w) {
-  abreMazo(w, "historia", "history");
-  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
-  click(w, '[data-action="start-duel"]');
+// Los duelos ya no se crean desde la pantalla: se abren desde un enlace que alguien mandó antes. Devuelve la
+// ventana en la que se acepta y se empieza a jugar.
+async function abreDuelo() {
+  const D = boot().CONTINUUM.Duelo;
+  const sequence = [true, true, false, true, true, true, false, true, true, true, true, false, true, true, true];
+  const payload = D.codificar({ mode: "history", seed: "abre1234", total: 15, hits: sequence.filter(Boolean).length, sequence, nombre: "Fernando" });
+  const w = boot({ url: `https://hilo.test/?duelo=${payload}` });
+  click(w, '[data-action="accept-duel"]');
   await jugar(w);
+  return w;
 }
 const click = (w, sel) => {
   const el = w.document.querySelector(sel);
@@ -88,8 +93,7 @@ function juegaDuelo(w, mode, { falla = () => false } = {}) {
 
 console.log("\nEn el duelo por enlace la carta fallada sigue sin entrar en la línea");
 {
-  const w = boot();
-  await abreDuelo(w);
+  const w = await abreDuelo();
   const antes = partida(w);
   const cards = new Map(w.CONTINUUM.cards("history").map(c => [c.id, c]));
   const bien = w.CONTINUUM.correctIndex("history", antes.timeline.map(id => cards.get(id)), cards.get(antes.current));
@@ -253,29 +257,14 @@ function cruda(w, texto) {
   return w.btoa(binario).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-console.log("\nCrear un duelo y jugarlo");
+console.log("\nCon amigos ya no hay «Mismas cartas»");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
   (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
-  ok("el duelo es uno de los ritmos de jugar con amigos", /Cada uno en su móvil/.test(texto(w)) && /Mismas cartas/.test(texto(w)));
-  w.document.getElementById("duel-name").value = "Fernando";
-  click(w, '[data-action="start-duel"]');
-  ok("antes de jugar se explica la modalidad", existe(w, ".demo-orden") && existe(w, '[data-action="duel-play"]'));
-  await jugar(w);
-  ok("empieza la partida", existe(w, '[data-action="solo-place"]'));
-  ok("el nombre se guarda para la próxima", w.localStorage.getItem("hilo-nombre-v1") === "Fernando");
-  ok("un duelo no enseña vidas: se juegan todas las cartas", !existe(w, ".solo-lives"));
-
-  const secuencia = juegaDuelo(w, "history", { falla: n => n % 4 === 3 });
-  ok(`se juegan las ${w.CONTINUUM.Duelo.CARTAS} cartas enteras`, secuencia.length === w.CONTINUUM.Duelo.CARTAS);
-  ok("la partida termina", /Duelo listo/.test(texto(w)));
-  ok("y ofrece mandar el reto", existe(w, '[data-action="share-duel"]'));
-  ok("todavía no hay marcador: no hay rival contra quien compararse", !existe(w, ".duel-grid"));
-
-  const perfil = JSON.parse(w.localStorage.getItem("hilo-perfil-v1"));
-  ok("el perfil lo registra como duelo", perfil.byMode.history.byKind.duel === secuencia.length);
-  ok("crear un duelo no cuenta como victoria", perfil.totals.wins === 0);
+  ok("jugar con amigos es en directo o por turnos", /Cada uno en su móvil/.test(texto(w)) && /Por turnos/.test(texto(w)) && !/Mismas cartas/.test(texto(w)));
+  ok("sin «Prueba»: con amigos solo se ordenan cartas", !existe(w, 'input[name="duel-kind"]') && !/Escribir la cifra/.test(texto(w)));
+  ok("y no se puede crear un reto de enlace", !existe(w, '[data-action="start-duel"]') && !existe(w, '[data-action="start-cifras"]'));
 }
 
 console.log("\nAceptar un duelo por enlace");
@@ -316,7 +305,7 @@ console.log("\nAceptar un duelo por enlace");
   ok("al terminar hay cara a cara", existe(rival, ".duel-grid"));
   ok("con las dos tiradas, carta a carta", rival.document.querySelectorAll(".duel-row").length === 2);
   ok("se ve el nombre de quien retaba", /Fernando/.test(texto(rival)));
-  ok("y se puede devolver el reto", existe(rival, '[data-action="start-duel"]'));
+  ok("y ya no se ofrece devolver el reto con un enlace nuevo", !existe(rival, '[data-action="start-duel"]'));
 
   const gano = aciertos > marca;
   ok(`el veredicto corresponde al marcador (${aciertos} a ${marca})`,
@@ -324,30 +313,6 @@ console.log("\nAceptar un duelo por enlace");
   const perfil = JSON.parse(rival.localStorage.getItem("hilo-perfil-v1"));
   ok("la victoria en un duelo sí es tuya: hay una marca concreta enfrente", perfil.totals.wins === (gano ? 1 : 0));
   ok("y el logro va con ella", !!perfil.achievements.duelo === gano);
-}
-
-console.log("\nDevolver el reto conserva tu nombre");
-{
-  // «Devolver el reto» sale en el cara a cara, donde no hay campo de nombre. Guardar lo
-  // que devuelve un campo inexistente dejaría el nombre en blanco sin que nadie lo pida.
-  const D = boot().CONTINUUM.Duelo;
-  const sequence = [true, true, false];
-  const payload = D.codificar({ mode: "history", seed: "vuelta", total: 3, hits: 2, sequence, nombre: "Fernando" });
-  const w = boot({ url: `https://hilo.test/?duelo=${payload}` });
-  w.document.getElementById("duel-name").value = "Marta";
-  click(w, '[data-action="accept-duel"]');
-  ok("el nombre queda guardado al aceptar", w.localStorage.getItem("hilo-nombre-v1") === "Marta");
-  await jugar(w);
-  juegaDuelo(w, "history");
-  ok("se llega al cara a cara", existe(w, ".duel-grid"));
-  ok("y ahí no hay campo de nombre", !existe(w, "#duel-name"));
-  click(w, '[data-action="start-duel"]');
-  ok("devolver el reto no borra tu nombre", w.localStorage.getItem("hilo-nombre-v1") === "Marta");
-  await jugar(w);
-  ok("y empieza un duelo nuevo", existe(w, '[data-action="solo-place"]'));
-  const nuevo = JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
-  ok("con semilla nueva, para no repetir cartas ya vistas", nuevo.duelo.seed !== "vuelta");
-  ok("y sin rival: es un reto que estrenas tú", nuevo.duelo.rival === null);
 }
 
 console.log("\nUn duelo de otro mazo cambia de mazo al aceptarlo");
@@ -395,8 +360,7 @@ console.log("\nEl duelo no se cuela donde no debe");
 
 console.log("\nEl duelo de orden también se juega a reloj");
 {
-  const w = boot();
-  await abreDuelo(w);
+  const w = await abreDuelo();
   ok("la carta lleva reloj", existe(w, ".reloj-bar"));
   ok("y queda apuntado el instante en que empezó", Number.isFinite(partida(w).cartaEmpezadaEn));
 
@@ -419,8 +383,7 @@ console.log("\nEl duelo de orden también se juega a reloj");
 
 console.log("\nSe acaban los veinte segundos");
 {
-  const w = boot();
-  await abreDuelo(w);
+  const w = await abreDuelo();
   w.avanza(w.CONTINUUM.Duelo.MS + 200);
   await duerme(250);
   ok("agotado el plazo, la carta se cierra sola", existe(w, ".overlay"));
@@ -430,8 +393,7 @@ console.log("\nSe acaban los veinte segundos");
 
 console.log("\nCerrar la aplicación no devuelve el plazo");
 {
-  const w = boot();
-  await abreDuelo(w);
+  const w = await abreDuelo();
   const guardada = partida(w);
   const vuelta = boot({ almacen: {
     "hilo-selected-mode-v1": "history",
@@ -455,8 +417,7 @@ console.log("\nCerrar la aplicación no devuelve el plazo");
 
 console.log("\n«Guardar y salir» en un duelo avisa de que su reloj no se para");
 {
-  const w = boot();
-  await abreDuelo(w);
+  const w = await abreDuelo();
   click(w, '[data-action="solo-options"]');
   click(w, '[data-action="solo-menu"]');
   ok("el aviso dice que la carta abierta contará como fallada", /no se para.*fallada/.test(w.document.querySelector("[data-exit-dialog]")?.textContent || ""));
