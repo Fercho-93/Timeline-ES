@@ -1244,15 +1244,20 @@
   // «Salir sin guardar» de un duelo por internet (la partida vive en el servidor, así que «sin guardar» es cerrarla):
   // si nadie ha entrado aún, se cancela el duelo y su enlace deja de valer; con dos dentro, uno se rinde. En un duelo de grupo
   // ya empezado no hay salida de ese tipo (se sigue desde «Tus duelos»).
+  // La confirmación se abre cuando el diálogo de salida ya se ha ido (se cierra con un fundido; si se intenta antes, no sale).
+  function afterExitDialog(open, tries = 25) {
+    if (app().querySelector('[data-exit-dialog]') && tries > 0) { setTimeout(() => afterExitDialog(open, tries - 1), 80); return; }
+    open();
+  }
   function duelDiscard() {
     if (!room || !state || state.config?.kind !== 'duel' || room.phase === 'finished' || connection?.kind !== 'internet') return null;
     const code = connection.code, lone = room.members.length === 1 && room.host === myId;
-    if (lone) return {label: 'Salir sin guardar', proceed: () => CT.UI.confirmDialog('Se cancela el duelo y el enlace que hayas mandado dejará de valer.', async () => {
+    if (lone) return {label: 'Salir sin guardar', proceed: () => afterExitDialog(() => CT.UI.confirmDialog('Se cancela el duelo y el enlace que hayas mandado dejará de valer.', async () => {
       CT.closeDialog?.(); try { await cancelInvitation(code); } catch (e) { errorNotice(e); return; } toEntry();
-    }, {title: '¿Cancelar el duelo?', confirmLabel: 'Cancelar el duelo', cancelLabel: 'Seguir jugando'})};
-    if (room.capacity === 2 && room.members.length === 2 && !room.resigned) return {label: 'Salir sin guardar', proceed: () => CT.UI.confirmDialog('Te rindes: tu rival gana el duelo y se queda en tu historial.', () => {
+    }, {title: '¿Cancelar el duelo?', confirmLabel: 'Cancelar el duelo', cancelLabel: 'Seguir jugando'}))};
+    if (room.capacity === 2 && room.members.length === 2 && !room.resigned) return {label: 'Salir sin guardar', proceed: () => afterExitDialog(() => CT.UI.confirmDialog('Te rindes: tu rival gana el duelo y se queda en tu historial.', () => {
       CT.closeDialog?.(); void networkAction({type: 'resign'}).then(() => toEntry());
-    }, {title: '¿Rendirte y salir?', confirmLabel: 'Rendirme y salir', cancelLabel: 'Seguir jugando'})};
+    }, {title: '¿Rendirte y salir?', confirmLabel: 'Rendirme y salir', cancelLabel: 'Seguir jugando'}))};
     return null;
   }
   function abandonQuick() {
