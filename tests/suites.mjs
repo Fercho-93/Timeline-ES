@@ -88,6 +88,7 @@ export const SUITES = {
     "scripts/audit-content.mjs",
     "tests/entrada-multijugador.mjs",
     "tests/navegacion-volver.mjs",
+    "tests/guia-modos.mjs",
     "tests/avatar-propio.mjs",
     "tests/final.mjs",
     "tests/tournament.mjs",

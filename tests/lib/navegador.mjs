@@ -11,10 +11,12 @@ import { gameHtml } from "../game-fixture.mjs";
 
 export const playwright = await import(process.env.PLAYWRIGHT_MODULE ? pathToFileURL(process.env.PLAYWRIGHT_MODULE).href : "playwright");
 
-// La portada «Vas a jugar a…» (CT.UI.gameSplash) tapa la mesa hasta que se toca. Las pruebas no la miran, así que
-// se retira sola en cuanto aparece (como haría quien juega); la de Retos rápidos cada prueba la quita a su manera.
+// La portada «Vas a jugar a…» (CT.UI.gameSplash) tapa la mesa hasta que se toca, y la lámina de cada forma de jugar
+// (Jugar solo, con amigos, online) tapa su pantalla. Las pruebas no las miran, así que se retiran solas en cuanto
+// aparecen (como haría quien juega); la de Retos rápidos cada prueba la quita a su manera. La lámina de las formas
+// de jugar la mira tests/guia-modos.mjs.
 export const QUITA_PORTADAS = () => {
-  setInterval(() => document.querySelector('[data-game-splash]:not([data-closed])')?.click(), 50);
+  setInterval(() => document.querySelector('[data-game-splash]:not([data-closed]), [data-mode-guide]:not([data-closed])')?.click(), 50);
 };
 const sinPortadas = motor => new Proxy(motor, { get(destino, clave) {
   if (clave !== "launch") return destino[clave];

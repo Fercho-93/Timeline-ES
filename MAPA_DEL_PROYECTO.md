@@ -94,7 +94,7 @@ cuando hacen falta.
 
 | Archivo | Qué es |
 | --- | --- |
-| `home-modes-v1.js` | Las entradas ilustradas de la pantalla de Inicio y las pantallas de elección («Jugar solo», «Jugar con amigos»…). |
+| `home-modes-v1.js` | Las entradas ilustradas de la pantalla de Inicio y las pantallas de elección («Jugar solo», «Jugar con amigos»…), con la lámina del árbol de opciones que sale al entrar en cada una. |
 | `starter-presentation.js` | La lámina del minijuego de quién empieza, la misma en Grandes colecciones, Retos rápidos y salas de amigos. |
 | `tutorial.js` | La guía en vídeo: escenas que se reproducen solas con subtítulos y un dedo que hace las jugadas. Se abre desde la Guía y desde «Ver el manual». |
 | `settings.js` | La pantalla de Ajustes. |

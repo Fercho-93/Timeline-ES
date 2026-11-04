@@ -107,6 +107,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `final.mjs` | test | La cifra correcta de la final se comprueba contra la carta. |
 | `firebase-local.mjs` | test | El SDK de Firebase va dentro de la app (`vendor/firebase/`), coincide con el instalado y viaja en el paquete móvil y en la caché. |
 | `game-fixture.mjs` | (auxiliar) | Prepara `index.html` para arrancar las pruebas después del acceso y la bienvenida. |
+| `guia-modos.mjs` | test | La lámina con el árbol de opciones al entrar en Jugar solo, con amigos y online: se retira con un toque, se va con su pantalla y «No volver a mostrar» la apaga. |
 | `identidad-fixture.js` | (auxiliar) | Identidad de prueba ya elegida para las suites que no prueban la bienvenida. |
 | `identidad.mjs` | test | La bienvenida: el avatar del invitado y el nombre editable sin perderlo. |
 | `imagenes-retos-rapidos.mjs` | test | Cada carta de Retos rápidos usa una ilustración propia que existe y coincide con su posición. |

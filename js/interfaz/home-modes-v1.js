@@ -2,7 +2,8 @@
 // resumen del ranking) y las pantallas a las que llevan: Jugar solo, Jugar con amigos, Jugar
 // online con su lista de mesas públicas y Crear mesa. Inicio lo pinta app.js; este archivo
 // lo reordena cada vez que se pinta (un MutationObserver al final) y pinta sus pantallas
-// con `CT.showScreen`, para que entren en el rastro de «Volver».
+// con `CT.showScreen`, para que entren en el rastro de «Volver». Al entrar desde Inicio en una de
+// las tres formas de jugar, una lámina enseña de un vistazo el árbol de lo que hay dentro.
 (function () {
   'use strict';
 
@@ -338,6 +339,92 @@
     ].join(''), modeArt['friends-hub']);
   }
 
+  // Al entrar desde Inicio en una de las tres formas de jugar sale una lámina, como la portada
+  // del mazo, con el árbol de lo que hay dentro: qué se puede jugar y cómo. Un toque la retira;
+  // «No volver a mostrar» la apaga para esa forma de jugar.
+  const GUIDES = {
+    solo: {
+      screen: 'hub-solo', name: 'Jugar solo', title: 'A tu ritmo', art: modeArt['solo-hub'],
+      branches: [
+        ['menu-collections.webp', 'Grandes colecciones', 'Mazos por temas', [['Ronda', '10 cartas'], ['Maratón', 'el mazo entero, 3 vidas'], ['Competición', 'temas al azar, uno tras otro']]],
+        ['menu-quick.webp', 'Retos rápidos', 'Mazos cortos y sorpresa', [['Mazos de hoy', '4 nuevos cada día']]]
+      ]
+    },
+    friends: {
+      screen: 'hub-friends', name: 'Jugar con amigos', title: 'Juntos, como prefiráis', art: modeArt['friends-hub'],
+      branches: [
+        ['menu-local.webp', 'Un solo móvil', 'Os lo vais pasando', [['Grandes colecciones', 'mazos por temas'], ['Retos rápidos', 'arriesgad o plantaos'], ['Competición', 'varios temas seguidos']]],
+        ['menu-private.webp', 'Cada uno en su móvil', 'Por internet o en la misma Wi-Fi', [['Crear partida', 'en directo o por turnos'], ['Unirme', 'con QR, enlace o código'], ['Tus duelos', 'a quién le toca']]]
+      ]
+    },
+    online: {
+      screen: 'hub-online', name: 'Jugar online', title: 'Una mesa con más gente', art: modeArt['online-hub'],
+      branches: [
+        ['menu-wifi.webp', 'Crear mesa', 'Tú eliges juego, plazas y tiempo', []],
+        ['menu-online.webp', 'Mesas abiertas', 'Siéntate donde haya sitio', []],
+        ['menu-quick.webp', 'Partida rápida', 'Te sentamos en la primera libre', [['Grandes colecciones', 'hasta 3 temas'], ['Retos rápidos', '3 retos sorpresa']]]
+      ]
+    }
+  };
+  const GUIDE_KEY = 'continuum-guia-modos-v1';
+  function guidesHidden() {
+    try { const saved = JSON.parse(localStorage.getItem(GUIDE_KEY) || '{}'); return saved && typeof saved === 'object' ? saved : {}; } catch { return {}; }
+  }
+  function hideGuide(kind) {
+    try { localStorage.setItem(GUIDE_KEY, JSON.stringify({ ...guidesHidden(), [kind]: true })); } catch { /* sin guardado, vuelve a salir la próxima vez */ }
+  }
+  let guideLayer = null;
+  function closeGuide({ focus = true } = {}) {
+    const layer = guideLayer;
+    if (!layer || layer.dataset.closed) return;
+    layer.dataset.closed = '1';
+    guideLayer = null;
+    layer.classList.add('is-leaving');
+    setTimeout(() => layer.remove(), 260);
+    if (focus) app.querySelector('[data-focus]')?.focus?.({ preventScroll: true });
+  }
+  function showGuide(kind) {
+    const guide = GUIDES[kind];
+    if (!guide || guidesHidden()[kind]) return;
+    guideLayer?.remove(); guideLayer = null;
+    const leaves = list => list.length ? `<ul class="mode-guide-leaves">${list.map(([name, note]) => `<li><b>${escapeHtml(name)}</b> <span>${escapeHtml(note)}</span></li>`).join('')}</ul>` : '';
+    const layer = document.createElement('div');
+    layer.className = 'quick-splash mode-guide';
+    layer.dataset.modeGuide = kind;
+    layer.setAttribute('role', 'dialog');
+    layer.setAttribute('aria-modal', 'true');
+    layer.setAttribute('aria-labelledby', 'mode-guide-title');
+    layer.innerHTML = `<div class="mode-guide-inner">
+      <img class="mode-guide-hero" src="assets/${guide.art}" alt="" aria-hidden="true" decoding="async">
+      <div class="eyebrow">${escapeHtml(guide.name)}</div>
+      <h2 id="mode-guide-title">${escapeHtml(guide.title)}</h2>
+      <ol class="mode-guide-tree">${guide.branches.map(([art, name, note, list]) => `<li class="mode-guide-branch">
+        <span class="mode-guide-node"><img src="assets/${art}" alt="" aria-hidden="true" decoding="async"><span><b>${escapeHtml(name)}</b><small>${escapeHtml(note)}</small></span></span>${leaves(list)}</li>`).join('')}</ol>
+      <button type="button" class="mode-guide-go" data-mode-guide-go>Toca para continuar</button>
+      <button type="button" class="mode-guide-hide" data-mode-guide-hide>No volver a mostrar</button>
+    </div>`;
+    layer.addEventListener('click', event => {
+      if (event.target.closest('[data-mode-guide-hide]')) hideGuide(kind);
+      closeGuide();
+    });
+    layer.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { event.preventDefault(); closeGuide(); }
+      // El foco no sale de la lámina mientras está abierta: solo tiene sus dos botones.
+      if (event.key === 'Tab') {
+        const buttons = [...layer.querySelectorAll('button')];
+        const at = buttons.indexOf(document.activeElement);
+        event.preventDefault();
+        buttons[(at + (event.shiftKey ? buttons.length - 1 : 1)) % buttons.length]?.focus();
+      }
+    });
+    layer.dataset.screen = guide.screen;
+    guideLayer = layer;
+    // Fuera de #app, como la portada del mazo: así no la borra el repintado de la pantalla.
+    document.body.append(layer);
+    try { layer.querySelector('[data-mode-guide-go]').focus({ preventScroll: true }); } catch { /* sin foco también se toca */ }
+    window.CONTINUUM?.Effects?.transition?.('open');
+  }
+
   app.addEventListener('click', event => {
     const playToggle = event.target.closest('[data-action="toggle-modes"]');
     if (playToggle && app.dataset.screen === 'home') {
@@ -473,6 +560,8 @@
     else if (action === 'local-hub') openLocalHub();
     else if (action === 'friend-hub') openFriendHub(target.dataset.friendHub);
     else openFriendsHub();
+    const guide = { 'solo-hub': 'solo', 'friends-hub': 'friends', 'online-hub': 'online' }[action];
+    if (guide) showGuide(guide);
   }, true);
 
   app.addEventListener('change', event => {
@@ -488,7 +577,7 @@
 
   const hubs = {'hub-online': openOnlineHub, 'hub-online-create': openPublicCreate, 'hub-online-collections': openOnlineCollections, 'hub-solo': openSoloHub, 'hub-friends-local': openLocalHub, 'hub-friends-online': () => openFriendHub('online'), 'hub-friends': openFriendsHub};
   // `refreshHome` solo lo usan las pruebas: reordena Inicio sin esperar al observador.
-  if (window.CONTINUUM) window.CONTINUUM.ModeHubs = { open(screen) { (hubs[screen] || openSoloHub)(); }, refreshHome() { restructureHome(); } };
+  if (window.CONTINUUM) window.CONTINUUM.ModeHubs = { open(screen) { (hubs[screen] || openSoloHub)(); }, refreshHome() { restructureHome(); }, guides: GUIDES };
 
   // El resumen del inicio habla el mismo idioma que el ranking: aciertos de hoy, de esta semana y la racha.
   function rankingSummary() {
@@ -518,7 +607,8 @@
   }
 
   // Si la ventana ya se ha cerrado (pruebas), no queda documento sobre el que trabajar.
-  const observer = new MutationObserver(()=>{if(typeof document==='undefined'||!document||!app.ownerDocument?.defaultView)return;restructureHome();addRankingSummary();});
+  // La lámina de las formas de jugar se va con su pantalla (por ejemplo, con el «atrás» del sistema).
+  const observer = new MutationObserver(()=>{if(typeof document==='undefined'||!document||!app.ownerDocument?.defaultView)return;if(guideLayer&&app.dataset.screen!==guideLayer.dataset.screen)closeGuide({focus:false});restructureHome();addRankingSummary();});
   observer.observe(app, { childList: true, subtree: true });
   restructureHome();
   addRankingSummary();

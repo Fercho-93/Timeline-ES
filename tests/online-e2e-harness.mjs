@@ -39,7 +39,7 @@ export async function startHarness() {
     // La edad ya respondida (js/jugador/edad.js): la pregunta se prueba en tests/edad.mjs.
     await ctx.addInitScript(() => { try { localStorage.setItem('continuum-edad-v1', 'mayor'); } catch { /* sin almacenamiento */ } });
     // La portada «Vas a jugar a…» se retira sola, como la tocaría quien juega (tests/lib/navegador.mjs).
-    await ctx.addInitScript(() => { setInterval(() => document.querySelector('[data-game-splash]:not([data-closed])')?.click(), 50); });
+    await ctx.addInitScript(() => { setInterval(() => document.querySelector('[data-game-splash]:not([data-closed]), [data-mode-guide]:not([data-closed])')?.click(), 50); });
     const page = await ctx.newPage();
     const log = [];
     page.on('pageerror', e => log.push(`pageerror ${e.message}`));
