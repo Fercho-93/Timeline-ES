@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 865,
+  "cache": 867,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Grandes colecciones por turnos con la dinámica de Retos rápidos en una sola ronda, rival pendiente como «Rival por invitar» y menú de la partida con jugadores, «Denunciar o bloquear», «Expulsar» y «Rendirme»; menú de la sala reordenado"
+  "reason": "Partidas con amigos de 2 a 10 jugadores en Grandes colecciones (Retos rápidos de 2 a 4), «¿Quién empieza?» al pulsar Empezar, más opciones de temas en la competición en solitario y tarjetas de Grandes colecciones y Retos rápidos con descripción que las diferencia"
 }
