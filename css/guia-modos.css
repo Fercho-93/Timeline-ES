@@ -1,226 +1,192 @@
-/* La lámina de cada forma de jugar (js/interfaz/guia-modos.js): la misma portada de papel que la
-   del mazo, con escenas animadas en vez de texto. Va fuera de #app (en <body>); si no cabe, se
-   desplaza y el pie queda siempre a la vista. */
+/* La lámina de cada forma de jugar (js/interfaz/guia-modos.js): papel beige como la portada del mazo,
+   una tira de «cómo se juega» y una tabla Grandes colecciones | Retos rápidos que se lee en horizontal.
+   El estado sin animar es la lámina terminada; las animaciones pasan una sola vez, fila a fila
+   (cada bloque lleva --at), y solo con movimiento permitido. Va fuera de #app (en <body>); si no
+   cabe, se desplaza y el pie queda siempre a la vista.
+   Cada color dice una sola cosa: verde = acierto (con ✓), rojo = fallo (con ✕ y borde discontinuo),
+   acento = carta por colocar, hueco, turno y etiquetas; dorado = premio. */
 .mode-guide {
-  --guide-edge: #b79a69; --guide-ink: #2b2118; --guide-muted: #65584a; --guide-card: #fffaf2b3; --guide-paper: #fbf3e2;
-  --g-accent: var(--terracota, #8a3f2f); --g-ok: #4d7a49; --g-ko: #b04a33; --g-back: #a0815a; --g-avatar: #8c6d4a; --g-heart: #b04a33;
-  place-items: start center; overflow-y: auto; overscroll-behavior: contain; padding: max(18px, env(safe-area-inset-top)) 16px 0;
+  --guide-ink: #2b2118; --guide-muted: #65584a; --guide-card: #fffaf2b3; --guide-paper: #fbf3e2;
+  --g-edge: #9c8460; --g-ok: #4d7a49; --g-ko: #b04a33; --g-accent: var(--terracota, #8a3f2f);
+  --g-back: #7d6040; --g-gold: #a8741f; --g-art: #e6d5b5; --g-heart: #b04a33;
+  --ease-pop: cubic-bezier(.2, .8, .2, 1.25); --ease-move: cubic-bezier(.2, .8, .2, 1);
+  place-items: start center; overflow-y: auto; overscroll-behavior: contain; padding: max(14px, env(safe-area-inset-top)) 16px 0;
 }
-.mode-guide-inner { display: grid; justify-items: stretch; width: min(100%, 420px); gap: 10px; margin: auto; text-align: left; }
-@media (prefers-reduced-motion: no-preference) { .mode-guide-inner { animation: quick-ready-in 520ms var(--ease-out, ease-out) both; } }
-.mode-guide-head { display: flex; align-items: center; justify-content: center; gap: 14px; }
-.mode-guide-hero { flex: none; width: 56px; height: 56px; border: 3px solid var(--guide-paper); border-radius: 50%; object-fit: cover; background: #eadbc4; box-shadow: 0 6px 14px rgba(54,41,26,.22); }
-.mode-guide-head .eyebrow { display: block; }
-.mode-guide h2 { margin: 2px 0 0; font-size: clamp(1.5rem, 6.4vw, 1.95rem); }
+.mode-guide-inner { display: grid; align-content: start; justify-items: stretch; width: min(100%, 420px); min-height: 100%; gap: 10px; margin: 0 auto; text-align: left; }
+@media (prefers-reduced-motion: no-preference) { .mode-guide-inner { animation: quick-ready-in 420ms var(--ease-out, ease-out) both; } }
 
-/* Cada escena: el dibujo animado y un rótulo de pocas palabras. */
-.mode-guide-scene { display: grid; gap: 6px; margin: 0; }
-.mode-guide-scene figcaption { color: var(--guide-ink); font: 600 .82rem/1.25 var(--ui-font, inherit); text-align: center; }
-.mode-guide-how { justify-items: center; padding: 10px 12px; border: 1px solid #b79a6975; border-radius: 12px; background: var(--guide-card); }
-.mode-guide-how .g-scene { width: min(100%, 200px); }
-.mode-guide-games { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.mode-guide-game { display: grid; align-content: start; gap: 6px; padding: 10px 8px; border: 1px solid #b79a6975; border-radius: 12px; background: var(--guide-card); }
-.mode-guide-game > b { color: var(--guide-ink); font: 500 1rem/1.15 var(--font-display); text-align: center; }
-.mode-guide-game .g-scene { width: 100%; }
-.mode-guide-section { margin: 4px 0 -2px; color: var(--g-accent); font: 600 .7rem/1.3 var(--ui-font, inherit); letter-spacing: .18em; text-transform: uppercase; text-align: center; }
+/* A · Cabecera: dónde estás y quién juega. */
+.mode-guide-head { display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: 10px; }
+.mode-guide-hero { width: 40px; height: 40px; border: 2px solid var(--guide-paper); border-radius: 50%; object-fit: cover; background: #eadbc4; box-shadow: 0 4px 10px rgba(54,41,26,.2); }
+.mode-guide-head .eyebrow { display: block; justify-content: start; font-size: .68rem; letter-spacing: .2em; }
+.mode-guide h2 { margin: 1px 0 0; font-size: 1.35rem; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* ── Piezas de dibujo ── */
-.g-scene { display: block; height: auto; overflow: visible; }
-.g-scene * { transform-box: fill-box; transform-origin: center; }
-.g-rule { stroke: var(--guide-edge); stroke-width: 1.2; }
-.g-card { fill: var(--guide-paper); stroke: var(--guide-edge); stroke-width: 1.1; }
-.g-card.g-new { fill: var(--g-accent); stroke: none; }
-.g-card.g-back { fill: var(--g-back); stroke: var(--guide-paper); stroke-width: 1; }
-.g-gap { fill: none; stroke: var(--g-accent); stroke-width: 1.3; stroke-dasharray: 4 3; }
-.g-scene text { font-family: var(--ui-font, sans-serif); font-weight: 600; text-anchor: middle; fill: var(--guide-ink); }
-.g-year { font-size: 12px; }
-.g-mark { font-size: 16px; fill: #fff6e8 !important; }
-.g-city { font-size: 9px; }
-.g-rule-banner { fill: var(--g-accent); }
-.g-rule-text { font-size: 10.5px; fill: #fff6e8 !important; }
-.g-badge circle { stroke: var(--guide-paper); stroke-width: 1.2; }
-.g-badge-ok circle { fill: var(--g-ok); }
-.g-badge-ko circle { fill: var(--g-ko); }
-.g-badge path { fill: none; stroke: #fff; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.g-badge { opacity: 0; }
-.g-avatar circle { fill: var(--g-avatar); }
-.g-avatar .g-avatar-ring { fill: none; stroke: var(--g-accent); stroke-width: 1.6; opacity: 0; }
-.g-avatar text { font-size: 9px; fill: #fff6e8; }
-.g-heart { fill: var(--g-heart); stroke: var(--g-heart); stroke-width: 1.2; stroke-linejoin: round; }
-.g-pip { fill: none; stroke: var(--g-ok); stroke-width: 1.6; opacity: 0; }
-.g-bubble { fill: var(--g-ok); }
-.g-bubble-text { font-size: 7.5px; fill: #fff !important; }
-.g-shared-bank { opacity: 0; }
-.g-table { fill: var(--guide-card); stroke: var(--guide-edge); stroke-width: 1.2; }
-.g-table-wait { font-size: 10px; fill: var(--guide-muted) !important; font-weight: 500 !important; }
-.g-table-go { font-size: 12px; fill: var(--g-accent) !important; opacity: 0; }
-.g-seat-empty { fill: none; stroke: var(--guide-edge); stroke-width: 1.2; stroke-dasharray: 3 2.5; }
-.g-seat-person { opacity: 0; }
+/* B · Cómo se juega. */
+.mode-guide-how { display: grid; justify-items: center; gap: 4px; margin: 0; padding: 8px 10px; border: 1px solid color-mix(in srgb, var(--g-edge) 45%, transparent); border-radius: 12px; background: var(--guide-card); }
+.mode-guide-how .g-how { width: min(100%, 300px); }
+.mode-guide figcaption, .mode-guide-caption { margin: 0; color: var(--guide-ink); font: 600 .82rem/1.2 var(--ui-font, inherit); text-align: center; text-wrap: balance; }
 
-/* ── Animaciones ──
-   Todas las piezas de una escena comparten su ciclo (--cycle). Con movimiento reducido no se
-   mueve nada: cada escena se queda en su fotograma más explicativo (--freeze). */
-.g-scene-line { --cycle: 4.5s; --freeze: 3.2s; }
-.g-scene-lives { --cycle: 7s; --freeze: 4.8s; }
-.g-scene-surprise { --cycle: 6s; --freeze: 4.8s; }
-.g-scene-hands { --cycle: 8s; --freeze: 4.6s; }
-.g-scene-shared { --cycle: 9s; --freeze: 7.6s; }
-.g-scene-table { --cycle: 6s; --freeze: 4.4s; }
-.g-scene [class*="g-"] { animation-duration: var(--cycle); animation-iteration-count: infinite; animation-timing-function: ease-in-out; animation-fill-mode: both; }
-@media (prefers-reduced-motion: reduce) {
-  .g-scene [class*="g-"] { animation-play-state: paused !important; animation-delay: calc(-1 * var(--freeze)) !important; }
-}
+/* C · La tabla: dos columnas que se comparan fila a fila. */
+.mode-guide-table { position: relative; display: grid; gap: 6px; padding: 10px 10px 8px; border: 1px solid color-mix(in srgb, var(--g-edge) 45%, transparent); border-radius: 12px; background: var(--guide-card); }
+.mode-guide-cols, .mode-guide-row { position: relative; display: grid; grid-template-columns: 1fr 1fr; column-gap: 10px; row-gap: 2px; }
+.mode-guide-colhead { display: grid; justify-items: center; gap: 1px; margin: 0 0 2px; text-align: center; }
+.mode-guide-colhead b { color: var(--guide-ink); font: 500 1rem/1.15 var(--font-display); }
+.mode-guide-colhead small { color: var(--guide-muted); font: .72rem/1.2 var(--ui-font, inherit); }
+.mode-guide-colhead .g-axis-mini { width: min(100%, 120px); margin-top: 2px; }
+/* La etiqueta de fila ocupa las dos columnas, con un filete a cada lado. */
+.mode-guide-rowlabel { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; margin: 0; color: var(--g-accent); font: 600 .64rem/1.3 var(--ui-font, inherit); letter-spacing: .16em; text-transform: uppercase; }
+.mode-guide-rowlabel::before, .mode-guide-rowlabel::after { content: ""; flex: 1; border-top: 1px solid color-mix(in srgb, var(--g-edge) 45%, transparent); }
+.mode-guide-rowlabel span { position: relative; padding: 1px 6px; border-radius: 6px; }
+.mode-guide-cell { display: grid; justify-items: center; gap: 1px; margin: 0; }
+.mode-guide-cell .g-scene { width: 100%; max-width: 170px; }
+.mode-guide-cell figcaption { font-size: .8rem; }
+.mode-guide-choose p { display: grid; gap: 1px; margin: 0; text-align: center; }
+.mode-guide-choose b { color: var(--guide-ink); font: 600 .8rem/1.2 var(--ui-font, inherit); }
+.mode-guide-choose small { color: var(--guide-muted); font: .72rem/1.25 var(--ui-font, inherit); text-wrap: balance; }
+@media (max-width: 380px) { .mode-guide-table { padding-inline: 8px; } .mode-guide-cols, .mode-guide-row { column-gap: 8px; } }
 
-/* Cómo se juega: la carta baja a su hueco y se queda bien colocada. */
-.g-line-drop { animation-name: g-line-drop; }
-.g-line-drop .g-new { animation-name: g-line-ok; }
-.g-line-drop .g-mark { animation-name: g-line-mark; }
-.g-line-ok { animation-name: g-line-badge; }
-.g-line-gap { animation-name: g-line-gap; }
-/* El hueco se borra al llenarse: si no, su borde asoma alrededor de la carta. */
-@keyframes g-line-gap { 0%, 40% { opacity: 1; } 42%, 94% { opacity: 0; } 100% { opacity: 1; } }
-@keyframes g-line-drop { 0% { opacity: 0; transform: none; } 8%, 18% { opacity: 1; transform: none; } 40%, 88% { opacity: 1; transform: translateY(46px); } 96% { opacity: 0; transform: translateY(46px); } 100% { opacity: 0; transform: none; } }
-@keyframes g-line-ok { 0%, 40% { fill: var(--g-accent); } 46%, 100% { fill: var(--g-ok); } }
-@keyframes g-line-mark { 0%, 40% { opacity: 1; } 46%, 100% { opacity: 0; } }
-@keyframes g-line-badge { 0%, 42% { opacity: 0; transform: scale(.4); } 50% { opacity: 1; transform: scale(1.15); } 56%, 88% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
+/* D · Dónde jugáis (amigos) o cómo empieza una mesa (online). */
+.mode-guide-end { display: grid; gap: 4px; justify-items: center; }
+.mode-guide-end .mode-guide-rowlabel { width: 100%; }
+.mode-guide-where { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+.mode-guide-where p { display: grid; grid-template-columns: 36px minmax(0, 1fr); align-items: center; gap: 8px; margin: 0; }
+.mode-guide-where .g-pict { width: 36px; }
+.mode-guide-where b { display: block; color: var(--guide-ink); font: 600 .8rem/1.2 var(--ui-font, inherit); }
+.mode-guide-where small { display: block; color: var(--guide-muted); font: .72rem/1.25 var(--ui-font, inherit); }
+.mode-guide-end .g-start { width: min(100%, 320px); }
 
-/* Solo, Grandes colecciones: un acierto se queda; un fallo quita una vida. */
-.g-lives-a { animation-name: g-lives-a; }
-.g-lives-a-card { animation-name: g-lives-a-card; }
-.g-lives-a-ok { animation-name: g-lives-a-ok; }
-.g-lives-b { animation-name: g-lives-b; }
-.g-lives-b-card { animation-name: g-lives-b-card; }
-.g-lives-b-ko { animation-name: g-lives-b-ko; }
-.g-lives-heart { animation-name: g-lives-heart; }
-@keyframes g-lives-a { 0% { opacity: 0; transform: none; } 5%, 12% { opacity: 1; transform: none; } 26%, 90% { opacity: 1; transform: translateY(44px); } 96% { opacity: 0; transform: translateY(44px); } 100% { opacity: 0; transform: none; } }
-@keyframes g-lives-a-card { 0%, 26% { fill: var(--g-accent); } 30%, 100% { fill: var(--g-ok); } }
-@keyframes g-lives-a-ok { 0%, 28% { opacity: 0; transform: scale(.4); } 33% { opacity: 1; transform: scale(1.15); } 37%, 90% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; } }
-@keyframes g-lives-b { 0%, 38% { opacity: 0; transform: none; } 42%, 46% { opacity: 1; transform: none; } 60%, 74% { opacity: 1; transform: translateY(44px); } 80%, 99% { opacity: 0; transform: translateY(44px); } 100% { opacity: 0; transform: none; } }
-@keyframes g-lives-b-card { 0%, 60% { fill: var(--g-accent); } 63%, 100% { fill: var(--g-ko); } }
-@keyframes g-lives-b-ko { 0%, 62% { opacity: 0; transform: scale(.4); } 66% { opacity: 1; transform: scale(1.15); } 70%, 76% { opacity: 1; transform: none; } 80%, 100% { opacity: 0; } }
-@keyframes g-lives-heart { 0%, 64% { fill: var(--g-heart); transform: none; } 67% { transform: scale(1.3); } 70%, 94% { fill: transparent; transform: scale(.9); } 100% { fill: var(--g-heart); transform: none; } }
-
-/* Solo, Retos rápidos: el mazo sorpresa enseña su regla y las cartas se ordenan con ella. */
-.g-flip-back { animation-name: g-flip-back; }
-.g-flip-rule { animation-name: g-flip-rule; }
-.g-sort-1 { animation-name: g-sort-1; }
-.g-sort-2 { animation-name: g-sort-2; }
-.g-sort-3 { animation-name: g-sort-3; }
-@keyframes g-flip-back { 0%, 15% { transform: none; opacity: 1; } 25%, 92% { transform: scaleX(0); opacity: 1; } 93% { opacity: 0; transform: scaleX(0); } 100% { opacity: 1; transform: none; } }
-@keyframes g-flip-rule { 0%, 25% { transform: scaleX(0); opacity: 1; } 35%, 90% { transform: none; opacity: 1; } 96% { opacity: 0; transform: none; } 100% { opacity: 0; transform: scaleX(0); } }
-/* Lisboa, Roma y Pekín salen desordenadas y se colocan de oeste a este. */
-@keyframes g-sort-1 { 0%, 36% { opacity: 0; transform: translateX(48px); } 42%, 50% { opacity: 1; transform: translateX(48px); } 68%, 90% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
-@keyframes g-sort-2 { 0%, 36% { opacity: 0; transform: translateX(48px); } 42%, 50% { opacity: 1; transform: translateX(48px); } 68%, 90% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
-@keyframes g-sort-3 { 0%, 36% { opacity: 0; transform: translateX(-96px); } 42%, 50% { opacity: 1; transform: translateX(-96px); } 68%, 90% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: none; } }
-
-/* En grupo, Grandes colecciones: A juega de su mano y acierta; B falla, descarta y roba. */
-.g-hands-a { animation-name: g-hands-a; }
-.g-hands-a-card { animation-name: g-hands-a-card; }
-.g-hands-a-ok { animation-name: g-hands-a-ok; }
-.g-hands-b { animation-name: g-hands-b; }
-.g-hands-b-card { animation-name: g-hands-b-card; }
-.g-hands-b-ko { animation-name: g-hands-b-ko; }
-.g-hands-draw { animation-name: g-hands-draw; }
-.g-hands-gap { animation-name: g-hands-gap; }
-.g-hands-draw .g-card { animation-name: g-hands-draw-face; }
-.g-hands-pa .g-avatar-ring { animation-name: g-hands-ring-a; }
-.g-hands-pb .g-avatar-ring { animation-name: g-hands-ring-b; }
-@keyframes g-hands-a { 0%, 12% { opacity: 1; transform: none; } 26%, 90% { opacity: 1; transform: translate(30px, -45px); } 95% { opacity: 0; transform: translate(30px, -45px); } 97% { opacity: 0; transform: none; } 100% { opacity: 1; transform: none; } }
-@keyframes g-hands-a-card { 0%, 26% { fill: var(--g-accent); } 29%, 94% { fill: var(--g-ok); } 97%, 100% { fill: var(--g-accent); } }
-@keyframes g-hands-a-ok { 0%, 27% { opacity: 0; transform: scale(.4); } 31% { opacity: 1; transform: scale(1.15); } 35%, 90% { opacity: 1; transform: none; } 95%, 100% { opacity: 0; } }
-@keyframes g-hands-b { 0%, 40% { opacity: 1; transform: none; } 54%, 62% { opacity: 1; transform: translate(24px, -45px); } 68%, 96% { opacity: 0; transform: translate(24px, -45px); } 97% { opacity: 0; transform: none; } 100% { opacity: 1; transform: none; } }
-@keyframes g-hands-b-card { 0%, 54% { fill: var(--g-accent); } 57%, 96% { fill: var(--g-ko); } 97%, 100% { fill: var(--g-accent); } }
-@keyframes g-hands-b-ko { 0%, 55% { opacity: 0; transform: scale(.4); } 59% { opacity: 1; transform: scale(1.15); } 62%, 66% { opacity: 1; transform: none; } 70%, 100% { opacity: 0; } }
-@keyframes g-hands-draw { 0%, 70% { opacity: 1; transform: none; } 82%, 92% { opacity: 1; transform: translate(31px, 0); } 95% { opacity: 0; transform: translate(31px, 0); } 97% { opacity: 0; transform: none; } 100% { opacity: 1; transform: none; } }
-@keyframes g-hands-draw-face { 0%, 80% { fill: var(--g-back); } 84%, 95% { fill: var(--g-accent); } 97%, 100% { fill: var(--g-back); } }
-@keyframes g-hands-gap { 0%, 25% { opacity: 1; } 27%, 94% { opacity: 0; } 100% { opacity: 1; } }
-@keyframes g-hands-ring-a { 0%, 34% { opacity: 1; } 37%, 100% { opacity: 0; } }
-@keyframes g-hands-ring-b { 0%, 35% { opacity: 0; } 38%, 88% { opacity: 1; } 92%, 100% { opacity: 0; } }
-
-/* En grupo, Retos rápidos: A y B aciertan del mismo mazo (punto provisional), C falla y queda
-   fuera, y A se planta: su punto queda asegurado. */
-.g-shared-k1 { animation-name: g-shared-k1; }
-.g-shared-k2 { animation-name: g-shared-k2; }
-.g-shared-k3 { animation-name: g-shared-k3; }
-.g-shared-k1-card { animation-name: g-shared-k1-card; }
-.g-shared-k2-card { animation-name: g-shared-k2-card; }
-.g-shared-k3-card { animation-name: g-shared-k3-card; }
-.g-shared-k3-ko { animation-name: g-shared-k3-ko; }
-.g-shared-pa { animation-name: g-shared-pa; }
-.g-shared-pb { animation-name: g-shared-pb; }
-.g-shared-c { animation-name: g-shared-c; }
-.g-shared-bank { animation-name: g-shared-bank; }
-.g-shared-a .g-avatar-ring { animation-name: g-shared-ring-a; }
-.g-shared-b .g-avatar-ring { animation-name: g-shared-ring-b; }
-.g-shared-c .g-avatar-ring { animation-name: g-shared-ring-c; }
-@keyframes g-shared-k1 { 0%, 4% { opacity: 1; transform: none; } 14%, 90% { opacity: 1; transform: translate(-15px, -37px); } 95% { opacity: 0; transform: translate(-15px, -37px); } 97% { opacity: 0; transform: none; } 100% { opacity: 1; transform: none; } }
-@keyframes g-shared-k2 { 0%, 26% { opacity: 1; transform: none; } 36%, 90% { opacity: 1; transform: translate(41px, -37px); } 95% { opacity: 0; transform: translate(41px, -37px); } 97% { opacity: 0; transform: none; } 100% { opacity: 1; transform: none; } }
-@keyframes g-shared-k3 { 0%, 48% { opacity: 1; transform: none; } 58%, 62% { opacity: 1; transform: translate(63px, -37px); } 68%, 97% { opacity: 0; transform: translate(63px, -37px); } 98% { opacity: 0; transform: none; } 100% { opacity: 1; transform: none; } }
-@keyframes g-shared-k1-card { 0%, 14% { fill: var(--g-accent); } 17%, 95% { fill: var(--g-ok); } 97%, 100% { fill: var(--g-accent); } }
-@keyframes g-shared-k2-card { 0%, 36% { fill: var(--g-accent); } 39%, 95% { fill: var(--g-ok); } 97%, 100% { fill: var(--g-accent); } }
-@keyframes g-shared-k3-card { 0%, 58% { fill: var(--g-accent); } 61%, 97% { fill: var(--g-ko); } 98%, 100% { fill: var(--g-accent); } }
-@keyframes g-shared-k3-ko { 0%, 59% { opacity: 0; transform: scale(.4); } 63% { opacity: 1; transform: scale(1.15); } 66%, 70% { opacity: 1; transform: none; } 74%, 100% { opacity: 0; } }
-@keyframes g-shared-pa { 0%, 16% { opacity: 0; fill: transparent; transform: scale(.4); } 20% { opacity: 1; transform: scale(1.3); } 23%, 74% { opacity: 1; fill: transparent; transform: none; } 78%, 90% { opacity: 1; fill: var(--g-ok); transform: scale(1.15); } 95%, 100% { opacity: 0; fill: transparent; } }
-@keyframes g-shared-pb { 0%, 38% { opacity: 0; transform: scale(.4); } 42% { opacity: 1; transform: scale(1.3); } 45%, 90% { opacity: 1; transform: none; } 95%, 100% { opacity: 0; } }
-@keyframes g-shared-c { 0%, 61% { opacity: 1; } 65%, 92% { opacity: .3; } 98%, 100% { opacity: 1; } }
-@keyframes g-shared-bank { 0%, 70% { opacity: 0; transform: scale(.6); } 75% { opacity: 1; transform: scale(1.08); } 78%, 90% { opacity: 1; transform: none; } 95%, 100% { opacity: 0; } }
-@keyframes g-shared-ring-a { 0%, 22% { opacity: 1; } 24%, 66% { opacity: 0; } 68%, 90% { opacity: 1; } 93%, 100% { opacity: 0; } }
-@keyframes g-shared-ring-b { 0%, 23% { opacity: 0; } 25%, 44% { opacity: 1; } 46%, 100% { opacity: 0; } }
-@keyframes g-shared-ring-c { 0%, 45% { opacity: 0; } 47%, 64% { opacity: 1; } 66%, 100% { opacity: 0; } }
-
-/* Online: la mesa se llena plaza a plaza y la partida empieza. */
-.g-seat-1 .g-seat-person { animation-name: g-seat-1; }
-.g-seat-2 .g-seat-person { animation-name: g-seat-2; }
-.g-seat-3 .g-seat-person { animation-name: g-seat-3; }
-.g-seat-4 .g-seat-person { animation-name: g-seat-4; }
-.g-table-wait { animation-name: g-table-wait; }
-.g-table-go { animation-name: g-table-go; }
-@keyframes g-seat-1 { 0%, 8% { opacity: 0; transform: scale(.4); } 12% { opacity: 1; transform: scale(1.15); } 15%, 90% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; } }
-@keyframes g-seat-2 { 0%, 22% { opacity: 0; transform: scale(.4); } 26% { opacity: 1; transform: scale(1.15); } 29%, 90% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; } }
-@keyframes g-seat-3 { 0%, 36% { opacity: 0; transform: scale(.4); } 40% { opacity: 1; transform: scale(1.15); } 43%, 90% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; } }
-@keyframes g-seat-4 { 0%, 50% { opacity: 0; transform: scale(.4); } 54% { opacity: 1; transform: scale(1.15); } 57%, 90% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; } }
-@keyframes g-table-wait { 0%, 56% { opacity: 1; } 59%, 96% { opacity: 0; } 100% { opacity: 1; } }
-@keyframes g-table-go { 0%, 58% { opacity: 0; transform: scale(.5); } 63% { opacity: 1; transform: scale(1.2); } 67%, 90% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; } }
-
-/* ── El árbol de modalidades ── */
-.mode-guide-tree { display: grid; gap: 12px; width: 100%; margin: 0; padding: 0 0 0 22px; list-style: none; }
-.mode-guide-branch { position: relative; }
-/* El tronco: cada rama lo baja hasta el nudo de la siguiente (12 px de hueco + 23 px). */
-.mode-guide-branch:not(:last-child) > .mode-guide-node::after { content: ""; position: absolute; top: 23px; bottom: -35px; left: -16px; width: 1px; background: var(--guide-edge); }
-.mode-guide-branch::before { content: ""; position: absolute; top: 23px; left: -16px; width: 14px; height: 1px; background: var(--guide-edge); }
-.mode-guide-branch::after { content: ""; position: absolute; top: 20px; left: -19px; width: 6px; height: 6px; border: 1px solid var(--guide-edge); background: var(--guide-paper); transform: rotate(45deg); }
-.mode-guide-node { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 11px; padding: 6px 12px 6px 6px; border: 1px solid #b79a6975; border-radius: 12px; background: var(--guide-card); }
-.mode-guide-node img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; background: #eadbc4; }
-.mode-guide-node b { display: block; color: var(--guide-ink); font: 500 1.05rem/1.2 var(--font-display); }
-.mode-guide-node small { display: block; margin-top: 1px; color: var(--guide-muted); font: .82rem/1.3 var(--ui-font, inherit); }
-.mode-guide-leaves { display: grid; gap: 4px; margin: 8px 0 0 26px; padding: 0 0 0 14px; border-left: 1px dashed #b79a69a6; list-style: none; }
-.mode-guide-leaves li { position: relative; color: var(--guide-muted); font: .84rem/1.32 var(--ui-font, inherit); }
-.mode-guide-leaves li::before { content: ""; position: absolute; top: .65em; left: -14px; width: 9px; height: 1px; background: #b79a69a6; }
-.mode-guide-leaves b { color: var(--guide-ink); font-weight: 600; }
-.mode-guide-choose { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin: 8px 0 0 26px; }
-.mode-guide-choose em { margin-right: 2px; color: var(--g-accent); font: 600 .66rem/1.3 var(--ui-font, inherit); font-style: normal; letter-spacing: .12em; text-transform: uppercase; }
-.mode-guide-choose span { padding: 3px 9px; border: 1px solid #b79a69a6; border-radius: 999px; color: var(--guide-ink); font: .78rem/1.3 var(--ui-font, inherit); }
-@media (prefers-reduced-motion: no-preference) {
-  .mode-guide-branch { animation: quick-ready-in 460ms var(--ease-out, ease-out) both; }
-  .mode-guide-branch:nth-child(2) { animation-delay: 90ms; }
-  .mode-guide-branch:nth-child(3) { animation-delay: 180ms; }
-}
-
-/* El pie, siempre a la vista aunque la lámina se desplace. */
-.mode-guide-foot { position: sticky; bottom: 0; display: grid; justify-items: center; gap: 2px; margin: 0 -16px; padding: 14px 16px max(10px, env(safe-area-inset-bottom)); background: linear-gradient(transparent, #efe1c4 34%); }
+/* E · El pie, siempre a la vista aunque la lámina se desplace. */
+.mode-guide-foot { position: sticky; bottom: 0; display: grid; justify-items: center; gap: 2px; margin: auto -16px 0; padding: 12px 16px max(10px, env(safe-area-inset-bottom)); background: linear-gradient(transparent, #ecdcbc 38%); }
 .mode-guide-go { padding: 8px 18px; border: 0; background: none; color: var(--guide-ink); font: 600 .75rem/1.3 var(--ui-font, inherit); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
 .mode-guide-hide { padding: 4px 12px; border: 0; background: none; color: var(--guide-muted); font: .78rem/1.3 var(--ui-font, inherit); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .mode-guide :is(.mode-guide-go, .mode-guide-hide):focus-visible { outline: 2px solid var(--g-accent); outline-offset: 2px; border-radius: 6px; }
 
+/* ── Piezas de dibujo ── */
+.g-scene { display: block; height: auto; overflow: visible; }
+/* Solo las piezas que se animan giran o escalan sobre su propio centro: en un SVG, transform-origin
+   también movería los giros fijos del atributo transform (abanicos, descarte, reloj). */
+.g-scene :is([class^="a-"], [class*=" a-"], .g-how-card, .g-turn-a, .g-turn-b) { transform-box: fill-box; transform-origin: center; }
+.g-scene text { font-family: var(--ui-font, sans-serif); font-weight: 700; text-anchor: middle; fill: var(--guide-ink); }
+.g-scene .t-start { text-anchor: start; }
+.g-scene .t-end { text-anchor: end; }
+.g-rule { fill: none; stroke: var(--g-edge); stroke-width: 1.3; }
+.g-rule-head { fill: none; stroke: var(--g-edge); stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+.g-scene .g-axis { fill: var(--guide-muted); font-weight: 600; }
+.g-body { fill: var(--guide-paper); stroke: var(--g-edge); stroke-width: 1.1; }
+.g-body-new { stroke: var(--g-accent); stroke-width: 1.4; }
+.g-body-ok { stroke: var(--g-ok); stroke-width: 1.8; }
+.g-body-ko { stroke: var(--g-ko); stroke-width: 1.6; stroke-dasharray: 3 2; }
+.g-body-back { fill: var(--g-back); stroke: var(--guide-paper); stroke-width: 1; }
+.g-body-ghost { fill: none; stroke: var(--g-edge); stroke-width: 1.1; stroke-dasharray: 3 2; }
+.g-back-frame { fill: none; stroke: #fff6e8; stroke-width: .8; opacity: .7; }
+.g-art { fill: var(--g-art); }
+.g-band { fill: var(--guide-muted); opacity: .55; }
+.g-band-ok { fill: var(--g-ok); opacity: 1; }
+.g-band-ko { fill: var(--g-ko); opacity: 1; }
+.g-scene .g-q { fill: var(--g-accent); }
+.g-gap { fill: none; stroke: var(--g-accent); stroke-width: 1.3; stroke-dasharray: 4 3; }
+.g-scene .g-plus { fill: var(--g-accent); font-weight: 600; }
+.g-scene .g-year { fill: var(--guide-ink); }
+.g-scene .g-year-ok { fill: #fff; }
+.g-scene .g-tag { fill: var(--guide-ink); font-weight: 600; }
+.g-plane { fill: none; stroke: var(--guide-ink); stroke-width: 1.4; stroke-linecap: round; }
+.g-body-new-edge { fill: none; stroke: var(--g-accent); stroke-width: 1.4; }
+.g-body-ok-edge { fill: none; stroke: var(--g-ok); stroke-width: 2; }
+.g-arrow { fill: none; stroke: var(--guide-muted); stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
+.g-fix { fill: none; stroke: var(--g-ko); stroke-width: 1.1; stroke-dasharray: 2.5 2; stroke-linecap: round; }
+.g-attempt { fill: none; stroke: var(--g-ko); stroke-width: 1.2; stroke-dasharray: 2.5 2; }
+.g-link { fill: none; stroke: var(--guide-muted); stroke-width: 1; stroke-dasharray: 2 2; }
+.g-badge circle { stroke: var(--guide-paper); stroke-width: 1.2; }
+.g-badge-ok circle { fill: var(--g-ok); }
+.g-badge-ko circle { fill: var(--g-ko); }
+.g-badge path { fill: none; stroke: #fff; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.g-heart { stroke-width: 1.2; stroke-linejoin: round; }
+.g-heart-full { fill: var(--g-heart); stroke: var(--g-heart); }
+.g-heart-lost { fill: none; stroke: var(--g-heart); }
+.g-heart-none { fill: none; stroke: var(--guide-muted); }
+.g-heart-cross { stroke: var(--guide-muted); stroke-width: 1.4; stroke-linecap: round; }
+.g-star { fill: var(--g-gold); stroke: var(--g-gold); stroke-width: 1; stroke-linejoin: round; }
+.g-star-empty { fill: none; }
+.g-crown { fill: var(--g-gold); }
+.g-player .g-head, .g-pict .g-head { fill: var(--guide-paper); stroke: var(--guide-ink); stroke-width: 1.6; }
+.g-player text { fill: var(--guide-ink); }
+.g-turn { fill: none; stroke: var(--g-accent); stroke-width: 2; }
+.g-disc circle { fill: var(--guide-ink); }
+.g-scene .g-disc text { fill: var(--guide-paper); }
+.g-disc-zero circle { fill: var(--guide-paper); stroke: var(--g-gold); stroke-width: 1.6; }
+.g-scene .g-disc-zero text { fill: var(--guide-ink); }
+.g-chip rect { stroke-width: 1.3; }
+.g-chip-open rect { fill: none; stroke: var(--guide-muted); stroke-dasharray: 3 2; }
+.g-chip-banked rect { fill: var(--g-ok); stroke: var(--g-ok); }
+.g-scene .g-chip-banked text { fill: #fff; }
+.g-lock path { fill: none; stroke: #fff; stroke-width: 1.2; }
+.g-lock rect { fill: #fff; }
+.g-chip-out rect { fill: var(--guide-paper); stroke: var(--g-ko); stroke-width: 1.4; }
+.g-scene .g-chip-out text { fill: var(--g-ko); }
+.g-chip-cross { stroke: var(--g-ko); stroke-width: 1.5; stroke-linecap: round; }
+.g-scene .g-note { fill: var(--guide-ink); font-weight: 600; }
+.g-scene .g-big { fill: var(--guide-ink); }
+.g-album { fill: var(--guide-paper); stroke: var(--g-edge); stroke-width: 1.1; }
+.g-album-spine { stroke: var(--g-edge); stroke-width: 1; }
+.g-slot { fill: none; stroke: var(--g-edge); stroke-width: 1; }
+.g-slot-on { fill: color-mix(in srgb, var(--g-ok) 25%, transparent); stroke: var(--g-ok); }
+.g-phone { fill: var(--guide-paper); stroke: var(--guide-ink); stroke-width: 1.6; }
+.g-dot { fill: var(--g-accent); }
+.g-table { fill: var(--guide-paper); stroke: var(--g-edge); stroke-width: 1.3; }
+.g-seat { fill: none; stroke: var(--g-edge); stroke-width: 1.4; stroke-dasharray: 2.5 2; }
+.g-clock { fill: var(--guide-paper); stroke: var(--g-edge); stroke-width: 1.1; }
+.g-clock-arc { fill: none; stroke: var(--g-accent); stroke-width: 2.4; stroke-dasharray: 88 88; stroke-linecap: round; }
+.g-scene .g-go { fill: var(--guide-ink); }
+
+/* Lo que solo existe mientras se anima, y lo que solo se ve sin animación. */
+.mode-guide .a-travel, .mode-guide .g-turn-a, .mode-guide .g-how-unknown { opacity: 0; }
+.mode-guide .g-trace { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .mode-guide .g-trace { display: inline; }
+  .mode-guide .g-turn-a { opacity: .35; stroke-dasharray: 2.5 2; }
+}
+
+/* ── Animaciones: una sola pasada; el estado final es el de reposo ── */
+@media (prefers-reduced-motion: no-preference) {
+  .mode-guide .a-pop { animation: mg-pop .45s var(--ease-pop) calc(var(--at, 0s) + var(--d, 0s)) both; }
+  .mode-guide .a-in { animation: mg-in .45s var(--ease-move) calc(var(--at, 0s) + var(--d, 0s)) both; }
+  .mode-guide .a-miss { animation: mg-miss 1.1s var(--ease-move) calc(var(--at, 0s) + var(--d, 0s)) both; }
+  .mode-guide .a-drop { animation: mg-in .4s var(--ease-move) calc(var(--at, 0s) + var(--d, 0s)) both; }
+  .mode-guide .a-lose { animation: mg-lose .45s ease-out calc(var(--at, 0s) + .8s) both; }
+  .mode-guide .a-fan { transform-box: view-box; animation: mg-fan .45s var(--ease-move) calc(var(--at, 0s) + var(--d, 0s)) both; }
+  .mode-guide .a-travel { animation: mg-travel .6s var(--ease-move) calc(var(--at, 0s) + var(--d, 0s)) both; }
+  .mode-guide .a-pulse { animation: mg-pulse .35s ease-out calc(var(--at, 0s) + 1s) both; }
+  .mode-guide .mode-guide-rowlabel span { animation: mg-row .9s ease-out var(--at, 0s) both; }
+  .mode-guide .mode-guide-how .g-how-card { animation: mg-how 2.2s var(--ease-move) var(--at) both; }
+  .mode-guide .mode-guide-how .g-how-unknown { animation: mg-unknown 2.2s linear var(--at) both; }
+  .mode-guide .mode-guide-how .g-how-known { animation: mg-known 2.2s linear var(--at) both; }
+  .mode-guide .mode-guide-how .g-how-s1 { animation: mg-hesitate 2.2s linear var(--at) both; }
+  .mode-guide .g-turn-a { animation: mg-out .3s ease-out calc(var(--at) + 2.4s) both; }
+  .mode-guide .g-turn-b { animation: mg-pop .4s var(--ease-pop) calc(var(--at) + 2.4s) both; }
+  .mode-guide .g-clock-arc { animation: mg-drain .9s linear var(--at) both; }
+}
+@keyframes mg-pop { 0% { opacity: 0; transform: scale(.4); } 60% { opacity: 1; transform: scale(1.15); } 100% { opacity: 1; transform: none; } }
+@keyframes mg-in { 0% { opacity: 0; transform: translate(var(--fx, 0px), var(--fy, 0px)); } 100% { opacity: 1; transform: none; } }
+@keyframes mg-out { 0% { opacity: 1; } 100% { opacity: 0; } }
+/* La carta fallada aparece donde se intentó y pasa a su sitio. */
+@keyframes mg-miss { 0% { opacity: 0; transform: translateX(var(--fx)); } 20%, 32% { opacity: 1; transform: translateX(var(--fx)); } 72%, 100% { opacity: 1; transform: none; } }
+@keyframes mg-lose { 0% { fill: var(--g-heart); transform: none; } 50% { fill: var(--g-heart); transform: scale(1.3); } 100% { fill: transparent; transform: none; } }
+@keyframes mg-fan { 0% { transform: rotate(var(--rot)); } 100% { transform: none; } }
+@keyframes mg-travel { 0% { opacity: 0; transform: translate(var(--fx), var(--fy)); } 15% { opacity: 1; } 82% { opacity: 1; transform: none; } 100% { opacity: 0; transform: none; } }
+@keyframes mg-pulse { 0%, 100% { transform: none; } 50% { transform: scale(1.3); } }
+@keyframes mg-row { 0% { background: transparent; } 30% { background: color-mix(in srgb, var(--g-accent) 16%, transparent); } 100% { background: transparent; } }
+/* La carta de la tira: aparece sobre el primer hueco, duda, va al bueno, baja y se revela. */
+@keyframes mg-how { 0% { opacity: 0; transform: translate(-72px, -20px) rotate(-6deg); } 12%, 34% { opacity: 1; transform: translate(-72px, -20px) rotate(-6deg); } 57% { transform: translate(0, -20px) rotate(-6deg); } 73%, 100% { opacity: 1; transform: none; } }
+@keyframes mg-unknown { 0%, 74% { opacity: 1; } 86%, 100% { opacity: 0; } }
+@keyframes mg-known { 0%, 74% { opacity: 0; } 86%, 100% { opacity: 1; } }
+@keyframes mg-hesitate { 0%, 12% { stroke-dasharray: 4 3; } 14%, 34% { stroke-dasharray: none; } 38%, 100% { stroke-dasharray: 4 3; } }
+@keyframes mg-drain { 0% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 88; } }
+
+/* ── Tema oscuro: latón como acento, para que no se confunda con el rojo del fallo ── */
 :root[data-theme="dark"] .mode-guide {
-  --guide-edge: #9c8056; --guide-ink: var(--edition-ink); --guide-muted: var(--edition-muted); --guide-card: #2b2016b3; --guide-paper: #3a2a1b;
-  --g-accent: #b8653d; --g-ok: #6b9a5f; --g-ko: #c75a40; --g-back: #6d5435; --g-avatar: #7a5e3e; --g-heart: #c75a40;
+  --guide-ink: var(--edition-ink); --guide-muted: var(--edition-muted); --guide-card: #2b2016b3; --guide-paper: #2b2016;
+  --g-edge: #a88a5e; --g-ok: #4f8546; --g-ko: #d0644a; --g-accent: var(--edition-brass, #d4bb8b);
+  --g-back: #94744c; --g-gold: #d3a54a; --g-art: #4a3826; --g-heart: #d0644a;
 }
 :root[data-theme="dark"] .mode-guide-hero { border-color: #3a2818; background: #2b2016; }
-:root[data-theme="dark"] :is(.mode-guide-how, .mode-guide-game, .mode-guide-node) { border-color: #9c805666; }
-:root[data-theme="dark"] .mode-guide-node img { background: #20170f; }
-:root[data-theme="dark"] :is(.mode-guide-section, .mode-guide-choose em) { color: var(--edition-brass); }
-:root[data-theme="dark"] :is(.mode-guide-leaves, .mode-guide-choose span) { border-color: #9c8056a6; }
-:root[data-theme="dark"] .mode-guide-leaves li::before { background: #9c8056a6; }
-:root[data-theme="dark"] .mode-guide-branch::after { background: #24170d; }
-:root[data-theme="dark"] .mode-guide-foot { background: linear-gradient(transparent, #1d140c 34%); }
+:root[data-theme="dark"] .mode-guide-foot { background: linear-gradient(transparent, #1d140c 38%); }

@@ -328,7 +328,7 @@
     hub('hub-solo', 'Jugar solo', 'A tu ritmo', [
       soloShortcuts(),
       inlineCollections('collections'),
-      modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos cortos y sorpresa de cualquier dato. Arriesga o plántate.', false, 'data-solo-route="quick"', 'Preparar partida')
+      modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos cortos de cualquier dato. 10 cartas: un fallo no te echa.', false, 'data-solo-route="quick"', 'Preparar partida')
     ].join(''), modeArt['solo-hub']);
   }
 

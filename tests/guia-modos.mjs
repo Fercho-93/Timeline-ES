@@ -1,6 +1,8 @@
-// La lámina de cada forma de jugar (js/interfaz/home-modes-v1.js): al entrar desde Inicio en Jugar
-// solo, Jugar con amigos o Jugar online sale el árbol de lo que hay dentro, sobre la pantalla ya
-// pintada. Un toque la retira, se va con su pantalla y «No volver a mostrar» la apaga solo para esa.
+// La lámina de cada forma de jugar (js/interfaz/guia-modos.js): al entrar desde Inicio en Jugar
+// solo, Jugar con amigos o Jugar online sale sobre la pantalla ya pintada. Arriba, la tira de cómo
+// se juega; debajo, la tabla Grandes colecciones | Retos rápidos fila a fila (Tienes, Si fallas,
+// Gana o Al final, Eliges), con un pictograma y un rótulo corto por celda; en grupo, un bloque
+// final. Un toque la retira, se va con su pantalla y «No volver a mostrar» la apaga solo para esa.
 import { gameHtml } from './game-fixture.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -29,14 +31,16 @@ async function enter(action) {
   await tick();
 }
 async function home() { app.querySelector('.topbar .atlas-back').click(); await tick(300); assert.equal(app.dataset.screen, 'home'); }
+// Palabras visibles de un rótulo; «30 s» va con espacio duro y cuenta como una.
+const words = text => text.trim().split(/ +/).length;
 
 const CASES = [
-  ['solo-hub', 'solo', 'hub-solo', ['Grandes colecciones', 'Retos rápidos']],
-  ['friends-hub', 'friends', 'hub-friends', ['Un solo móvil', 'Cada uno en su móvil']],
-  ['online-hub', 'online', 'hub-online', ['Crear mesa', 'Mesas abiertas', 'Partida rápida']]
+  ['solo-hub', 'solo', 'hub-solo', ['Tienes', 'Si fallas', 'Al final', 'Eliges'], null],
+  ['friends-hub', 'friends', 'hub-friends', ['Tienes', 'Si fallas', 'Gana', 'Eliges'], 'Dónde jugáis'],
+  ['online-hub', 'online', 'hub-online', ['Tienes', 'Si fallas', 'Gana', 'Eliges'], 'Cómo empieza']
 ];
 
-for (const [action, kind, screen, branches] of CASES) {
+for (const [action, kind, screen, rows, end] of CASES) {
   await enter(action);
   assert.equal(app.dataset.screen, screen, 'la pantalla se pinta debajo de la lámina');
   const layer = guide();
@@ -45,17 +49,27 @@ for (const [action, kind, screen, branches] of CASES) {
   assert.equal(layer.parentElement, doc.body, 'fuera de #app, para que no la borre un repintado');
   assert.equal(layer.getAttribute('role'), 'dialog');
   assert.equal(layer.getAttribute('aria-modal'), 'true');
-  assert.deepEqual([...layer.querySelectorAll('.mode-guide-node b')].map(b => b.textContent), branches, `${action}: las ramas del árbol`);
-  // Cómo se juega y los dos juegos cara a cara: escenas animadas con un rótulo corto, y la regla
-  // entera en su aria-label para quien no ve el dibujo.
-  const scenes = [...layer.querySelectorAll('svg.g-scene')];
-  assert.equal(scenes.length, 3, `${action}: tres escenas`);
-  scenes.forEach(svg => {
+  // La tira de cómo se juega: la carta del ejemplo (1903) entre 1804 y 1973, con su regla entera.
+  const how = layer.querySelector('.mode-guide-how svg[role="img"]');
+  assert.ok(how, `${action}: la tira de cómo se juega`);
+  assert.match(how.textContent, /1804[\s\S]*1903[\s\S]*1973|1450[\s\S]*1804/);
+  assert.ok(how.getAttribute('aria-label').length > 100, `${action}: la tira cuenta la regla`);
+  // La tabla: las dos columnas, las filas en orden y seis pictogramas con su regla y un rótulo corto.
+  assert.deepEqual([...layer.querySelectorAll('.mode-guide-colhead b')].map(b => b.textContent), ['Grandes colecciones', 'Retos rápidos']);
+  assert.deepEqual([...layer.querySelectorAll('.mode-guide-table .mode-guide-rowlabel')].map(p => p.textContent), rows);
+  const cells = [...layer.querySelectorAll('.mode-guide-table figure.mode-guide-cell')];
+  assert.equal(cells.length, 6, `${action}: seis celdas`);
+  cells.forEach(cell => {
+    const svg = cell.querySelector('svg');
     assert.equal(svg.getAttribute('role'), 'img');
-    assert.ok(svg.getAttribute('aria-label').length > 40, `${action}: cada escena cuenta su regla`);
-    assert.ok(svg.closest('figure').querySelector('figcaption').textContent.split(' ').length <= 7, `${action}: rótulos de pocas palabras`);
+    assert.ok(svg.getAttribute('aria-label').length > 40, `${action}: cada celda cuenta su regla`);
+    assert.ok(words(cell.querySelector('figcaption').textContent) <= 4, `${action}: «${cell.querySelector('figcaption').textContent}» pasa de 4 palabras`);
   });
-  assert.deepEqual([...layer.querySelectorAll('.mode-guide-game > b')].map(b => b.textContent), ['Grandes colecciones', 'Retos rápidos']);
+  assert.equal(layer.querySelectorAll('.mode-guide-choose p:not(.mode-guide-rowlabel)').length, 2, `${action}: la fila «Eliges» de cada juego`);
+  // El bloque final, solo en grupo.
+  assert.equal(layer.querySelector('.mode-guide-end .mode-guide-rowlabel')?.textContent || null, end);
+  // Ninguna etiqueta de fila ni el árbol antiguo: la lámina no tiene nada pulsable salvo el pie.
+  assert.equal(layer.querySelectorAll('button').length, 2, `${action}: solo los dos botones del pie`);
   assert.equal(doc.activeElement, layer.querySelector('[data-mode-guide-go]'), 'el foco va a la lámina');
   // Un toque en cualquier parte la retira y devuelve el foco al título de la pantalla.
   layer.click();
@@ -98,17 +112,32 @@ await enter('local-hub');
 assert.equal(app.dataset.screen, 'hub-friends-local');
 assert.equal(guide(), null, 'dentro de Jugar con amigos no vuelve a salir');
 
-// Con amigos y online, las escenas son las del juego en grupo (cada uno su mano; un mismo mazo
-// para todos) y lo dicen; jugando solo, las vidas y el mazo sorpresa.
+// Lo que cuenta cada lámina, contra las reglas (CT.guideMarkup y el motor de Retos rápidos).
 const G = w.CONTINUUM.GuiaModos.guides;
-const sceneKeys = kind => [G[kind].how[0], ...G[kind].games.map(g => g[0])];
-assert.deepEqual(sceneKeys('solo'), ['line', 'lives', 'surprise']);
-assert.deepEqual(sceneKeys('friends'), ['line', 'hands', 'shared']);
-assert.deepEqual(sceneKeys('online'), ['table', 'hands', 'shared']);
-const rules = kind => [G[kind].how[2], ...G[kind].games.map(g => g[2])].join(' ');
-assert.match(rules('friends'), /mano/); assert.match(rules('friends'), /robas/); assert.match(rules('friends'), /plantarte/);
-assert.match(rules('online'), /plántate/); assert.match(rules('online'), /2 a 4/);
+const rules = kind => [G[kind].how[2], ...G[kind].rows.flatMap(([, , a, b]) => [a[2], b[2]]), G[kind].end?.rule || ''].join(' ');
+const shown = kind => [G[kind].how[1], ...G[kind].rows.flatMap(([, , a, b]) => [a[1], b[1]]), ...G[kind].choose.flat()].join(' ');
+// Jugando solo: vidas en las colecciones; en Retos rápidos no hay vidas, ni sorpresa, ni plantarse
+// (el motor sigue siempre con una sola persona: keepPlaying).
 assert.match(rules('solo'), /tres vidas/);
+assert.match(rules('solo'), /No hay vidas/);
+assert.doesNotMatch(shown('solo') + rules('solo'), /sorpresa|plánt|plant/i);
+assert.equal(w.CONTINUUM.QuickEngine.keepPlaying({ config: { names: ['Yo'], kind: 'free', rounds: [] } }), true);
+// En grupo: la mano y el robo en las colecciones; cartas comunes y plantarse en Retos rápidos.
+for (const kind of ['friends', 'online']) {
+  assert.match(rules(kind), /mano/); assert.match(rules(kind), /robas/); assert.match(rules(kind), /descarte/);
+  assert.match(rules(kind), /nadie tiene mano/); assert.match(rules(kind), /plantarte/);
+  assert.match(rules(kind), /sin cartas/); assert.match(rules(kind), /aciertos ha asegurado|más aciertos asegura|aciertos/);
+}
+assert.match(shown('friends'), /2 a 10/); assert.match(shown('friends'), /2 a 4/);
+assert.match(G.online.end.html, /30 s/); assert.match(G.online.end.html, /2 a 4/);
+assert.match(rules('friends'), /7 días/);
+// Los años del ejemplo son los del mazo de inventos.
+const inventos = w.CONTINUUM.cards('inventions').map(c => c.year);
+for (const year of [1450, 1804, 1903, 1973]) assert.ok(inventos.includes(year), `el mazo de inventos tiene ${year}`);
+
+// La puerta de Retos rápidos en Jugar solo ya no promete plantarse.
+w.CONTINUUM.ModeHubs.open('hub-solo'); await tick();
+assert.doesNotMatch(app.querySelector('[data-solo-route="quick"]').textContent, /plánt/i);
 
 console.log('guia-modos: ok');
 w.close();
