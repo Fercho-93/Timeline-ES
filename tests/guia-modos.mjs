@@ -52,7 +52,8 @@ for (const [action, kind, screen, rows, end] of CASES) {
   // La tira de cómo se juega: la carta del ejemplo (1903) entre 1804 y 1973, con su regla entera.
   const how = layer.querySelector('.mode-guide-how svg[role="img"]');
   assert.ok(how, `${action}: la tira de cómo se juega`);
-  assert.match(how.textContent, /1804[\s\S]*1903[\s\S]*1973|1450[\s\S]*1804/);
+  const year = y => Number([...how.querySelectorAll('text')].find(t => t.textContent === String(y))?.getAttribute('x'));
+  assert.ok(year(1450) < year(1804) && year(1804) < year(1903) && year(1903) < year(1973), `${action}: 1903 entre 1804 y 1973`);
   assert.ok(how.getAttribute('aria-label').length > 100, `${action}: la tira cuenta la regla`);
   // La tabla: las dos columnas, las filas en orden y seis pictogramas con su regla y un rótulo corto.
   assert.deepEqual([...layer.querySelectorAll('.mode-guide-colhead b')].map(b => b.textContent), ['Grandes colecciones', 'Retos rápidos']);
@@ -65,7 +66,14 @@ for (const [action, kind, screen, rows, end] of CASES) {
     assert.ok(svg.getAttribute('aria-label').length > 40, `${action}: cada celda cuenta su regla`);
     assert.ok(words(cell.querySelector('figcaption').textContent) <= 4, `${action}: «${cell.querySelector('figcaption').textContent}» pasa de 4 palabras`);
   });
-  assert.equal(layer.querySelectorAll('.mode-guide-choose p:not(.mode-guide-rowlabel)').length, 2, `${action}: la fila «Eliges» de cada juego`);
+  const choose = [...layer.querySelectorAll('.mode-guide-choose > p:not(.mode-guide-rowlabel)')];
+  assert.equal(choose.length, 2, `${action}: la fila «Eliges» de cada juego`);
+  assert.match(choose[0].textContent, /^Grandes colecciones, eliges:/, 'el lector de pantalla sabe de qué juego es cada opción');
+  assert.match(choose[1].textContent, /^Retos rápidos, eliges:/);
+  // Fila a fila: cada bloque tiene su momento, después del anterior (nada destella antes de tiempo).
+  const at = [...layer.querySelectorAll('.mode-guide-how, .mode-guide-row, .mode-guide-end')].map(el => parseFloat(el.style.getPropertyValue('--at')));
+  assert.ok(at.every(t => t > 0), `${action}: todos los bloques tienen su momento`);
+  assert.ok(at.every((t, i) => !i || t > at[i - 1]), `${action}: en orden: ${at.join(', ')}`);
   // El bloque final, solo en grupo.
   assert.equal(layer.querySelector('.mode-guide-end .mode-guide-rowlabel')?.textContent || null, end);
   // Ninguna etiqueta de fila ni el árbol antiguo: la lámina no tiene nada pulsable salvo el pie.
@@ -126,9 +134,14 @@ assert.equal(w.CONTINUUM.QuickEngine.keepPlaying({ config: { names: ['Yo'], kind
 for (const kind of ['friends', 'online']) {
   assert.match(rules(kind), /mano/); assert.match(rules(kind), /robas/); assert.match(rules(kind), /descarte/);
   assert.match(rules(kind), /nadie tiene mano/); assert.match(rules(kind), /plantarte/);
-  assert.match(rules(kind), /sin cartas/); assert.match(rules(kind), /aciertos ha asegurado|más aciertos asegura|aciertos/);
+  assert.match(rules(kind), /sin cartas/); assert.match(rules(kind), /aciertos ha asegurado/);
 }
 assert.match(shown('friends'), /2 a 10/); assert.match(shown('friends'), /2 a 4/);
+// Las cifras, ancladas al motor: 10 cartas jugando solo y manos de 1 a 6.
+const E = w.CONTINUUM.QuickEngine;
+assert.equal(E.SOLO_CARDS, 10); assert.equal(E.MAX_HAND, 6);
+assert.match(shown('solo'), new RegExp(`${E.SOLO_CARDS} cartas`));
+assert.match(shown('friends'), new RegExp(`1 a ${E.MAX_HAND}`));
 assert.match(G.online.end.html, /30 s/); assert.match(G.online.end.html, /2 a 4/);
 assert.match(rules('friends'), /7 días/);
 // Los años del ejemplo son los del mazo de inventos.
@@ -138,6 +151,7 @@ for (const year of [1450, 1804, 1903, 1973]) assert.ok(inventos.includes(year), 
 // La puerta de Retos rápidos en Jugar solo ya no promete plantarse.
 w.CONTINUUM.ModeHubs.open('hub-solo'); await tick();
 assert.doesNotMatch(app.querySelector('[data-solo-route="quick"]').textContent, /plánt/i);
+assert.match(app.querySelector('[data-solo-route="quick"]').textContent, new RegExp(`${E.SOLO_CARDS} cartas: un fallo no te echa`));
 
 console.log('guia-modos: ok');
 w.close();

@@ -4,15 +4,17 @@
    (cada bloque lleva --at), y solo con movimiento permitido. Va fuera de #app (en <body>); si no
    cabe, se desplaza y el pie queda siempre a la vista.
    Cada color dice una sola cosa: verde = acierto (con ✓), rojo = fallo (con ✕ y borde discontinuo),
-   acento = carta por colocar, hueco, turno y etiquetas; dorado = premio. */
+   acento (sepia en claro, latón en oscuro: nunca rojo) = carta por colocar, hueco, turno y etiquetas;
+   dorado = premio. */
 .mode-guide {
   --guide-ink: #2b2118; --guide-muted: #65584a; --guide-card: #fffaf2b3; --guide-paper: #fbf3e2;
-  --g-edge: #9c8460; --g-ok: #4d7a49; --g-ko: #b04a33; --g-accent: var(--terracota, #8a3f2f);
+  --g-edge: #9c8460; --g-ok: #4d7a49; --g-ko: #b04a33; --g-accent: #5e4a2c;
   --g-back: #7d6040; --g-gold: #a8741f; --g-art: #e6d5b5; --g-heart: #b04a33;
   --ease-pop: cubic-bezier(.2, .8, .2, 1.25); --ease-move: cubic-bezier(.2, .8, .2, 1);
-  place-items: start center; overflow-y: auto; overscroll-behavior: contain; padding: max(14px, env(safe-area-inset-top)) 16px 0;
+  place-items: start center; overflow-x: clip; overflow-y: auto; overscroll-behavior: contain; padding: max(14px, env(safe-area-inset-top)) 16px 0;
 }
-.mode-guide-inner { display: grid; align-content: start; justify-items: stretch; width: min(100%, 420px); min-height: 100%; gap: 10px; margin: 0 auto; text-align: left; }
+/* En columna flexible: así el pie (margin-top: auto) baja al fondo cuando la lámina cabe. */
+.mode-guide-inner { display: flex; flex-direction: column; width: min(100%, 420px); min-height: 100%; gap: 10px; margin: 0 auto; text-align: left; }
 @media (prefers-reduced-motion: no-preference) { .mode-guide-inner { animation: quick-ready-in 420ms var(--ease-out, ease-out) both; } }
 
 /* A · Cabecera: dónde estás y quién juega. */
@@ -29,10 +31,10 @@
 /* C · La tabla: dos columnas que se comparan fila a fila. */
 .mode-guide-table { position: relative; display: grid; gap: 6px; padding: 10px 10px 8px; border: 1px solid color-mix(in srgb, var(--g-edge) 45%, transparent); border-radius: 12px; background: var(--guide-card); }
 .mode-guide-cols, .mode-guide-row { position: relative; display: grid; grid-template-columns: 1fr 1fr; column-gap: 10px; row-gap: 2px; }
-.mode-guide-colhead { display: grid; justify-items: center; gap: 1px; margin: 0 0 2px; text-align: center; }
+.mode-guide-colhead { display: grid; align-content: start; justify-items: center; gap: 1px; margin: 0 0 2px; text-align: center; }
 .mode-guide-colhead b { color: var(--guide-ink); font: 500 1rem/1.15 var(--font-display); }
 .mode-guide-colhead small { color: var(--guide-muted); font: .72rem/1.2 var(--ui-font, inherit); }
-.mode-guide-colhead .g-axis-mini { width: min(100%, 120px); margin-top: 2px; }
+.mode-guide-colhead .mode-guide-axis { color: var(--g-accent); font-weight: 600; }
 /* La etiqueta de fila ocupa las dos columnas, con un filete a cada lado. */
 .mode-guide-rowlabel { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; margin: 0; color: var(--g-accent); font: 600 .64rem/1.3 var(--ui-font, inherit); letter-spacing: .16em; text-transform: uppercase; }
 .mode-guide-rowlabel::before, .mode-guide-rowlabel::after { content: ""; flex: 1; border-top: 1px solid color-mix(in srgb, var(--g-edge) 45%, transparent); }
@@ -40,7 +42,7 @@
 .mode-guide-cell { display: grid; justify-items: center; gap: 1px; margin: 0; }
 .mode-guide-cell .g-scene { width: 100%; max-width: 170px; }
 .mode-guide-cell figcaption { font-size: .8rem; }
-.mode-guide-choose p { display: grid; gap: 1px; margin: 0; text-align: center; }
+.mode-guide-choose > p:not(.mode-guide-rowlabel) { display: grid; align-content: start; gap: 1px; margin: 0; text-align: center; }
 .mode-guide-choose b { color: var(--guide-ink); font: 600 .8rem/1.2 var(--ui-font, inherit); }
 .mode-guide-choose small { color: var(--guide-muted); font: .72rem/1.25 var(--ui-font, inherit); text-wrap: balance; }
 @media (max-width: 380px) { .mode-guide-table { padding-inline: 8px; } .mode-guide-cols, .mode-guide-row { column-gap: 8px; } }
@@ -51,12 +53,17 @@
 .mode-guide-where { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
 .mode-guide-where p { display: grid; grid-template-columns: 36px minmax(0, 1fr); align-items: center; gap: 8px; margin: 0; }
 .mode-guide-where .g-pict { width: 36px; }
-.mode-guide-where b { display: block; color: var(--guide-ink); font: 600 .8rem/1.2 var(--ui-font, inherit); }
+.mode-guide-where b { display: block; color: var(--guide-ink); font: 600 .8rem/1.2 var(--ui-font, inherit); text-wrap: balance; }
 .mode-guide-where small { display: block; color: var(--guide-muted); font: .72rem/1.25 var(--ui-font, inherit); }
 .mode-guide-end .g-start { width: min(100%, 320px); }
 
 /* E · El pie, siempre a la vista aunque la lámina se desplace. */
-.mode-guide-foot { position: sticky; bottom: 0; display: grid; justify-items: center; gap: 2px; margin: auto -16px 0; padding: 12px 16px max(10px, env(safe-area-inset-bottom)); background: linear-gradient(transparent, #ecdcbc 38%); }
+.mode-guide-foot { position: sticky; bottom: 0; z-index: 1; display: grid; justify-items: center; gap: 2px; margin: auto 0 0; padding: 22px 0 max(10px, env(safe-area-inset-bottom)); }
+/* El fondo del pie ocupa todo el ancho de la pantalla y es opaco antes de los botones. */
+.mode-guide-foot::before { content: ""; position: absolute; z-index: -1; inset: 0 calc(50% - 50vw); background: linear-gradient(transparent, #ecdcbc 18px); }
+.mode-guide-more { display: none; margin: 0 0 2px; color: var(--g-accent); font: 600 .72rem/1.3 var(--ui-font, inherit); }
+.mode-guide.has-more .mode-guide-more { display: block; }
+.mode-guide .g-sr { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .mode-guide-go { padding: 8px 18px; border: 0; background: none; color: var(--guide-ink); font: 600 .75rem/1.3 var(--ui-font, inherit); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
 .mode-guide-hide { padding: 4px 12px; border: 0; background: none; color: var(--guide-muted); font: .78rem/1.3 var(--ui-font, inherit); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .mode-guide :is(.mode-guide-go, .mode-guide-hide):focus-visible { outline: 2px solid var(--g-accent); outline-offset: 2px; border-radius: 6px; }
@@ -78,6 +85,9 @@
 .g-body-ko { stroke: var(--g-ko); stroke-width: 1.6; stroke-dasharray: 3 2; }
 .g-body-back { fill: var(--g-back); stroke: var(--guide-paper); stroke-width: 1; }
 .g-body-ghost { fill: none; stroke: var(--g-edge); stroke-width: 1.1; stroke-dasharray: 3 2; }
+.g-body-ghost-ko { fill: none; stroke: var(--g-ko); stroke-width: 1.4; stroke-dasharray: 3 2; }
+.g-emblem { fill: var(--g-accent); opacity: .75; }
+.g-here { fill: var(--g-accent); }
 .g-back-frame { fill: none; stroke: #fff6e8; stroke-width: .8; opacity: .7; }
 .g-art { fill: var(--g-art); }
 .g-band { fill: var(--guide-muted); opacity: .55; }
@@ -115,13 +125,13 @@
 .g-scene .g-disc text { fill: var(--guide-paper); }
 .g-disc-zero circle { fill: var(--guide-paper); stroke: var(--g-gold); stroke-width: 1.6; }
 .g-scene .g-disc-zero text { fill: var(--guide-ink); }
-.g-chip rect { stroke-width: 1.3; }
-.g-chip-open rect { fill: none; stroke: var(--guide-muted); stroke-dasharray: 3 2; }
-.g-chip-banked rect { fill: var(--g-ok); stroke: var(--g-ok); }
+.g-chip > rect { stroke-width: 1.3; }
+.g-chip-open > rect { fill: none; stroke: var(--guide-muted); stroke-dasharray: 3 2; }
+.g-chip-banked > rect { fill: var(--g-ok); stroke: var(--g-ok); }
 .g-scene .g-chip-banked text { fill: #fff; }
 .g-lock path { fill: none; stroke: #fff; stroke-width: 1.2; }
-.g-lock rect { fill: #fff; }
-.g-chip-out rect { fill: var(--guide-paper); stroke: var(--g-ko); stroke-width: 1.4; }
+.g-lock rect { fill: #fff; stroke: none; }
+.g-chip-out > rect { fill: var(--guide-paper); stroke: var(--g-ko); stroke-width: 1.4; }
 .g-scene .g-chip-out text { fill: var(--g-ko); }
 .g-chip-cross { stroke: var(--g-ko); stroke-width: 1.5; stroke-linecap: round; }
 .g-scene .g-note { fill: var(--guide-ink); font-weight: 600; }
@@ -136,14 +146,20 @@
 .g-seat { fill: none; stroke: var(--g-edge); stroke-width: 1.4; stroke-dasharray: 2.5 2; }
 .g-clock { fill: var(--guide-paper); stroke: var(--g-edge); stroke-width: 1.1; }
 .g-clock-arc { fill: none; stroke: var(--g-accent); stroke-width: 2.4; stroke-dasharray: 88 88; stroke-linecap: round; }
+.g-scene .g-player text { font-weight: 700; }
 .g-scene .g-go { fill: var(--guide-ink); }
 
-/* Lo que solo existe mientras se anima, y lo que solo se ve sin animación. */
+/* Lo que solo existe mientras se anima. */
 .mode-guide .a-travel, .mode-guide .g-turn-a, .mode-guide .g-how-unknown { opacity: 0; }
-.mode-guide .g-trace { display: none; }
-@media (prefers-reduced-motion: reduce) {
-  .mode-guide .g-trace { display: inline; }
-  .mode-guide .g-turn-a { opacity: .35; stroke-dasharray: 2.5 2; }
+
+/* Pantallas bajas: más apretado, para que la tabla quepa sobre el pie. */
+@media (max-height: 700px) {
+  .mode-guide-inner { gap: 6px; }
+  .mode-guide-how { padding: 4px 8px; }
+  .mode-guide-how .g-how { width: min(100%, 250px); }
+  .mode-guide-table { gap: 3px; padding-block: 6px; }
+  .mode-guide-cell .g-scene { max-width: 150px; }
+  .mode-guide h2 { font-size: 1.2rem; }
 }
 
 /* ── Animaciones: una sola pasada; el estado final es el de reposo ── */
@@ -156,18 +172,21 @@
   .mode-guide .a-fan { transform-box: view-box; animation: mg-fan .45s var(--ease-move) calc(var(--at, 0s) + var(--d, 0s)) both; }
   .mode-guide .a-travel { animation: mg-travel .6s var(--ease-move) calc(var(--at, 0s) + var(--d, 0s)) both; }
   .mode-guide .a-pulse { animation: mg-pulse .35s ease-out calc(var(--at, 0s) + 1s) both; }
-  .mode-guide .mode-guide-rowlabel span { animation: mg-row .9s ease-out var(--at, 0s) both; }
+  .mode-guide .mode-guide-rowlabel span { animation: mg-row .9s ease-out var(--at) both; }
+  /* Hasta que llega su fila, cada celda espera atenuada (nunca a medio pintar a plena luz). */
+  .mode-guide :is(.mode-guide-row, .mode-guide-end) > :not(.mode-guide-rowlabel) { animation: mg-wait .35s ease-out var(--at) both; }
   .mode-guide .mode-guide-how .g-how-card { animation: mg-how 2.2s var(--ease-move) var(--at) both; }
   .mode-guide .mode-guide-how .g-how-unknown { animation: mg-unknown 2.2s linear var(--at) both; }
   .mode-guide .mode-guide-how .g-how-known { animation: mg-known 2.2s linear var(--at) both; }
   .mode-guide .mode-guide-how .g-how-s1 { animation: mg-hesitate 2.2s linear var(--at) both; }
-  .mode-guide .g-turn-a { animation: mg-out .3s ease-out calc(var(--at) + 2.4s) both; }
-  .mode-guide .g-turn-b { animation: mg-pop .4s var(--ease-pop) calc(var(--at) + 2.4s) both; }
+  .mode-guide .g-turn-a { animation: mg-out .3s ease-out calc(var(--at) + 1.95s) both; }
+  .mode-guide .g-turn-b { animation: mg-pop .4s var(--ease-pop) calc(var(--at) + 1.95s) both; }
   .mode-guide .g-clock-arc { animation: mg-drain .9s linear var(--at) both; }
 }
 @keyframes mg-pop { 0% { opacity: 0; transform: scale(.4); } 60% { opacity: 1; transform: scale(1.15); } 100% { opacity: 1; transform: none; } }
 @keyframes mg-in { 0% { opacity: 0; transform: translate(var(--fx, 0px), var(--fy, 0px)); } 100% { opacity: 1; transform: none; } }
 @keyframes mg-out { 0% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes mg-wait { 0% { opacity: .28; } 100% { opacity: 1; } }
 /* La carta fallada aparece donde se intentó y pasa a su sitio. */
 @keyframes mg-miss { 0% { opacity: 0; transform: translateX(var(--fx)); } 20%, 32% { opacity: 1; transform: translateX(var(--fx)); } 72%, 100% { opacity: 1; transform: none; } }
 @keyframes mg-lose { 0% { fill: var(--g-heart); transform: none; } 50% { fill: var(--g-heart); transform: scale(1.3); } 100% { fill: transparent; transform: none; } }
@@ -180,13 +199,14 @@
 @keyframes mg-unknown { 0%, 74% { opacity: 1; } 86%, 100% { opacity: 0; } }
 @keyframes mg-known { 0%, 74% { opacity: 0; } 86%, 100% { opacity: 1; } }
 @keyframes mg-hesitate { 0%, 12% { stroke-dasharray: 4 3; } 14%, 34% { stroke-dasharray: none; } 38%, 100% { stroke-dasharray: 4 3; } }
-@keyframes mg-drain { 0% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 88; } }
+/* El reloj se llena hasta los 30 s y queda entero, como en reposo. */
+@keyframes mg-drain { 0% { stroke-dashoffset: 88; } 100% { stroke-dashoffset: 0; } }
 
 /* ── Tema oscuro: latón como acento, para que no se confunda con el rojo del fallo ── */
 :root[data-theme="dark"] .mode-guide {
   --guide-ink: var(--edition-ink); --guide-muted: var(--edition-muted); --guide-card: #2b2016b3; --guide-paper: #2b2016;
-  --g-edge: #a88a5e; --g-ok: #4f8546; --g-ko: #d0644a; --g-accent: var(--edition-brass, #d4bb8b);
+  --g-edge: #a88a5e; --g-ok: #4d7a49; --g-ko: #d0644a; --g-accent: var(--edition-brass, #d4bb8b);
   --g-back: #94744c; --g-gold: #d3a54a; --g-art: #4a3826; --g-heart: #d0644a;
 }
 :root[data-theme="dark"] .mode-guide-hero { border-color: #3a2818; background: #2b2016; }
-:root[data-theme="dark"] .mode-guide-foot { background: linear-gradient(transparent, #1d140c 38%); }
+:root[data-theme="dark"] .mode-guide-foot::before { background: linear-gradient(transparent, #1d140c 18px); }
