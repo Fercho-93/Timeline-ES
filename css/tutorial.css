@@ -1,6 +1,8 @@
 /* La guía en vídeo: una linterna mágica. Pantalla cálida con luz en movimiento, cartas de papel,
    subtítulos sobre un degradado y controles de reproductor (línea de escenas arriba, mando
-   abajo). Se ve igual en la Guía del juego (#app) y suelta sobre la portada (#app-splash). */
+   abajo). Se ve igual en la Guía del juego (#app) y suelta sobre la portada (#app-splash).
+   La pantalla reserva tres franjas fijas: título arriba, mesa en medio y subtítulo abajo; cada
+   escena cabe en la mesa de un móvil de 360 px (unos 336 × 270 px). */
 #app .guide-handbook > .guide-masthead { margin: 4px 0 14px; text-align: center; }
 #app .guide-handbook > .guide-masthead .eyebrow { justify-content: center; color: var(--edition-brass); font: 600 .625rem/1.5 var(--ui-font); letter-spacing: .2em; }
 #app .guide-handbook > .guide-masthead h1 { margin: 6px auto 8px; color: var(--journal-ink); font: 400 clamp(2.2rem, 9vw, 3.2rem)/1.05 var(--font-display); letter-spacing: -.045em; }
@@ -9,6 +11,8 @@
 :is(#app, #app-splash) .tv-player {
   --tv-screen: #1f150e; --tv-screen-2: #4a3321; --tv-glow: #e9cb8f; --tv-glow-soft: #e9cb8f66;
   --tv-ok: #4f9166; --tv-bad: #b4532f; --tv-text: #fff7e8; --tv-soft: #f3e6cc;
+  --tv-paper: #f3eee4; --tv-ink: #302d27; --tv-ink-soft: #5e584d;
+  --tv-cardback: radial-gradient(ellipse at 50% 43%, #fffaf0 0 18%, transparent 55%), repeating-conic-gradient(from 0deg at 50% 43%, #b897600b 0deg 1deg, transparent 1deg 15deg), repeating-linear-gradient(45deg, #a77b380b 0 1px, transparent 1px 10px), repeating-linear-gradient(-45deg, #a77b380b 0 1px, transparent 1px 10px), linear-gradient(145deg, #f9efdb, #e7d0a6);
   --tv-ease: cubic-bezier(.4, 0, .2, 1); --tv-ease-out: cubic-bezier(.2, .7, .2, 1);
   max-width: 560px; margin: 4px auto 26px;
 }
@@ -16,7 +20,7 @@
 /* ── La pantalla ─────────────────────────────────────────────────────────────────────── */
 :is(#app, #app-splash) .tv-screen {
   position: relative; overflow: hidden; isolation: isolate;
-  height: clamp(380px, 104vw, 440px); border-radius: 22px;
+  height: clamp(400px, 112vw, 460px); border-radius: 22px;
   background: radial-gradient(120% 90% at 50% 20%, var(--tv-screen-2), var(--tv-screen) 70%);
   box-shadow: inset 0 0 0 1px #e9cb8f3d, inset 0 0 0 5px #0000002e, inset 0 0 0 6px #e9cb8f14, 0 22px 44px -10px #1c140c99;
   color: var(--tv-text); cursor: pointer; user-select: none; -webkit-user-select: none;
@@ -30,7 +34,7 @@
 /* Viñeta y velo inferior para los subtítulos. */
 :is(#app, #app-splash) .tv-screen::before {
   content: ""; position: absolute; z-index: 1; inset: 0; pointer-events: none;
-  background: radial-gradient(130% 100% at 50% 40%, transparent 55%, #0c07044d 100%), linear-gradient(to top, #120b06eb 0, #120b0680 68px, transparent 128px);
+  background: radial-gradient(130% 100% at 50% 40%, transparent 55%, #0c07044d 100%), linear-gradient(to top, #120b06eb 0, #120b0680 68px, transparent 120px);
 }
 :is(#app, #app-splash) .tv-scene-title {
   position: absolute; z-index: 3; top: 22px; left: 16px; right: 16px; display: flex; align-items: center; gap: 8px;
@@ -38,9 +42,9 @@
 }
 :is(#app, #app-splash) .tv-scene-title::before { content: ""; flex: 0 0 14px; height: 1px; background: var(--tv-glow); opacity: .7; }
 :is(#app, #app-splash) .tv-scene-title.is-in { animation: tv-fade-down .6s var(--tv-ease-out) both; }
-:is(#app, #app-splash) .tv-stage, :is(#app, #app-splash) .tv-fade { position: absolute; inset: 46px 12px 84px; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; }
+:is(#app, #app-splash) .tv-stage, :is(#app, #app-splash) .tv-fade { position: absolute; inset: 44px 12px 84px; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; }
 :is(#app, #app-splash) .tv-stage { z-index: 2; }
-:is(#app, #app-splash) .tv-stage.is-enter > * { animation: tv-scene-in .55s var(--tv-ease-out) both; }
+:is(#app, #app-splash) .tv-stage.is-enter > :not(.tv-flyer) { animation: tv-scene-in .55s var(--tv-ease-out) both; }
 :is(#app, #app-splash) .tv-fade { z-index: 1; opacity: 0; pointer-events: none; }
 :is(#app, #app-splash) .tv-fade.is-out { animation: tv-scene-out .4s ease both; }
 :is(#app, #app-splash) .tv-fade * { animation: none !important; transition: none !important; }
@@ -55,7 +59,7 @@
 
 /* Subtítulos: sin caja, sobre el velo; cada frase entra desde abajo. */
 :is(#app, #app-splash) .tv-caption {
-  position: absolute; z-index: 4; left: 18px; right: 18px; bottom: 16px; min-height: 50px; margin: 0;
+  position: absolute; z-index: 4; left: 16px; right: 16px; bottom: 14px; min-height: 54px; margin: 0;
   display: grid; place-items: center; padding: 0 4px;
   color: var(--tv-text); font: 500 .95rem/1.4 var(--ui-font); text-align: center; text-wrap: balance; text-shadow: 0 1px 2px #000c, 0 0 18px #0009;
 }
@@ -83,75 +87,84 @@
 :is(#app, #app-splash) .tv-finger.is-in { opacity: 1; }
 :is(#app, #app-splash) .tv-finger.is-press svg { transform: scale(.86) rotate(-4deg); }
 :is(#app, #app-splash) .tv-finger::after { content: ""; position: absolute; top: 2px; left: 6px; width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--tv-glow); opacity: 0; }
-:is(#app, #app-splash) .tv-finger.is-tap::after { animation: tv-ripple .6s ease-out; }
+:is(#app, #app-splash) .tv-finger.is-tap::after, :is(#app, #app-splash) .tv-finger.is-press::after { animation: tv-ripple .6s ease-out; }
 
 /* ── Cartas ──────────────────────────────────────────────────────────────────────────── */
 :is(#app, #app-splash) .tv-card {
   position: relative; display: grid; grid-template-rows: auto auto auto; justify-items: center; align-content: start;
-  width: 66px; min-width: 0; padding: 4px 4px 6px;
-  color: var(--tv-ink);
+  width: 66px; min-width: 0; padding: 4px 4px 6px; border-radius: 7px;
+  background: linear-gradient(170deg, #fcfaf5, #f3eee4 50%, #e8ddc9); color: var(--tv-ink);
   box-shadow: inset 0 0 0 1px #c9ab7a66, 0 1px 0 #fff8, 0 10px 22px -6px #000c;
-  transition: transform .9s var(--tv-ease), box-shadow .3s, opacity .4s, background .3s;
+  transition: transform .9s var(--tv-ease), box-shadow .3s, opacity .4s, background .3s, width .55s var(--tv-ease-out), padding .55s var(--tv-ease-out), margin .55s var(--tv-ease-out);
 }
-:is(#app, #app-splash) .tv-art { position: relative; display: grid; place-items: center; width: 100%; aspect-ratio: 2 / 3; max-height: 74px; overflow: hidden; border-radius: 5px; background: #e8dcc2; box-shadow: inset 0 0 0 1px #0000001f; }
-:is(#app, #app-splash) .tv-art img { width: 100%; height: 100%; object-fit: cover; }
+:is(#app, #app-splash) .tv-art, :is(#app, #app-splash) .tv-back { position: relative; display: grid; place-items: center; width: 100%; aspect-ratio: 2 / 3; max-height: 74px; overflow: hidden; border-radius: 5px; }
+:is(#app, #app-splash) .tv-art { background: #e8dcc2; box-shadow: inset 0 0 0 1px #0000001f; }
+:is(#app, #app-splash) .tv-art img { width: 100%; height: 100%; object-fit: cover; transition: opacity .3s; }
 :is(#app, #app-splash) .tv-art i { font-style: normal; color: #9b7a45; }
+:is(#app, #app-splash) .tv-back { display: none; background: var(--tv-cardback); box-shadow: inset 0 0 0 1px #ab804d, inset 0 0 0 3px #fff5e1, inset 0 0 0 4px #bc93575c; }
+:is(#app, #app-splash) .tv-back .carta-reverso { position: absolute; inset: 0; display: grid; place-items: center; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; background: none; box-shadow: none; transform: none; }
+:is(#app, #app-splash) .tv-back .carta-reverso::before, :is(#app, #app-splash) .tv-back .carta-reverso::after { content: none; }
+:is(#app, #app-splash) .tv-back .reverso-emblema { position: static; width: 88%; height: auto; max-height: 80%; object-fit: contain; transform: none; filter: drop-shadow(0 2px 2px #734f2938); }
 :is(#app, #app-splash) .tv-card b { margin-top: 4px; font: 700 .76rem/1.1 var(--ui-font); white-space: nowrap; letter-spacing: -.01em; }
-:is(#app, #app-splash) .tv-card small { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 2px; font: .52rem/1.2 var(--ui-font); text-align: center; color: var(--tv-ink-soft); hyphens: auto; }
+:is(#app, #app-splash) .tv-card small { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 2px; font: .54rem/1.2 var(--ui-font); text-align: center; color: var(--tv-ink-soft); }
+:is(#app, #app-splash) .tv-card .tv-value { position: relative; }
 /* El dato oculto: un sello con la interrogación y, debajo, qué dato es. */
-:is(#app, #app-splash) .tv-card .tv-secret { display: none; margin-top: 4px; color: #9b411d; font: 700 .74rem/1 var(--ui-font); text-align: center; }
-:is(#app, #app-splash) .tv-card .tv-secret i { display: block; margin-top: 2px; font: 600 .42rem/1.2 var(--ui-font); font-style: normal; letter-spacing: .06em; text-transform: uppercase; color: #6b4f2c; }
-:is(#app, #app-splash) .tv-card.is-hidden .tv-value { display: none; }
-:is(#app, #app-splash) .tv-card.is-hidden .tv-secret { display: block; }
+:is(#app, #app-splash) .tv-card .tv-secret { display: none; margin-top: 4px; color: #9b411d; font: 700 .74rem/1 var(--ui-font); text-align: center; white-space: normal; }
+:is(#app, #app-splash) .tv-card .tv-secret i { display: block; margin-top: 2px; font: 700 .46rem/1.2 var(--ui-font); font-style: normal; letter-spacing: .05em; text-transform: uppercase; color: #6b4f2c; }
 :is(#app, #app-splash) .tv-card.is-hidden { background: linear-gradient(160deg, #fff7e4, #ecdcbb); }
-:is(#app, #app-splash) .tv-card.is-hidden .tv-art::after { content: "?"; position: absolute; right: 3px; bottom: 3px; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--tv-glow); color: var(--tv-ink); font: 800 .68rem/1 var(--ui-font); box-shadow: 0 2px 6px #0006; }
-:is(#app, #app-splash) .tv-card.is-ok { box-shadow: 0 0 0 3px var(--tv-ok), 0 0 22px #4f916688, 0 8px 18px #0008; animation: tv-pop .5s var(--tv-ease-out); }
+:is(#app, #app-splash) .tv-card.is-hidden .tv-value, :is(#app, #app-splash) .tv-card.is-hidden .tv-art { display: none; }
+:is(#app, #app-splash) .tv-card.is-hidden .tv-secret, :is(#app, #app-splash) .tv-card.is-hidden .tv-back { display: block; }
+:is(#app, #app-splash) .tv-card.is-hidden .tv-back { display: grid; }
+:is(#app, #app-splash) .tv-card.is-ok { box-shadow: 0 0 0 3px var(--tv-ok), 0 0 22px #4f916688, 0 8px 18px #0008; }
 :is(#app, #app-splash) .tv-card.is-bad { box-shadow: 0 0 0 3px var(--tv-bad), 0 0 22px #b4532f88, 0 8px 18px #0008; }
-:is(#app, #app-splash) .tv-card.is-ok .tv-value { color: var(--tv-ok); }
-:is(#app, #app-splash) .tv-card.is-bad .tv-value { color: var(--tv-bad); }
-:is(#app, #app-splash) .tv-card.is-moved { animation: tv-pop .5s ease; }
-:is(#app, #app-splash) .tv-card.is-lifted { z-index: 5; box-shadow: 0 22px 34px #000b; transition: transform .9s var(--tv-ease), box-shadow .2s; }
+:is(#app, #app-splash) .tv-card.is-ok .tv-value { color: #2f7049; }
+:is(#app, #app-splash) .tv-card.is-bad .tv-value { color: #a1431f; }
+:is(#app, #app-splash) .tv-card.is-lifted { z-index: 5; box-shadow: 0 22px 34px #000b; }
+:is(#app, #app-splash) .tv-card.is-held, :is(#app, #app-splash) .tv-card.is-selected { box-shadow: 0 0 0 2px var(--tv-glow), 0 0 18px #e9cb8f88, 0 14px 24px -6px #000c; }
+/* Darse la vuelta: la carta se estrecha hasta el canto y vuelve ya descubierta. */
+:is(#app, #app-splash) .tv-card.is-flipping { animation: tv-flip .46s ease-in-out; }
+:is(#app, #app-splash) .tv-card.is-tick { animation: tv-pop .5s ease; }
+/* Qué se ve (el título) y qué se adivina (el dato), señalados por turnos. */
+:is(#app, #app-splash) .tv-card.is-mark-title small, :is(#app, #app-splash) .tv-card.is-mark-secret .tv-secret { border-radius: 4px; background: #e9cb8f66; box-shadow: 0 0 0 3px #e9cb8f66; transition: background .3s, box-shadow .3s; }
+:is(#app, #app-splash) .tv-card.is-mark-title small { color: var(--tv-ink); }
+/* Datos ocultos por la dificultad (la lámina sigue) y por el poder Fantasma (también la lámina). */
+:is(#app, #app-splash) .tv-card.is-ghost .tv-value, :is(#app, #app-splash) .tv-card.is-ghost-full .tv-value { color: transparent; }
+:is(#app, #app-splash) .tv-card.is-ghost .tv-value::after, :is(#app, #app-splash) .tv-card.is-ghost-full .tv-value::after { content: "— —"; position: absolute; inset: 0; color: var(--tv-ink-soft); text-align: center; }
+:is(#app, #app-splash) .tv-card.is-ghost-full .tv-art img { opacity: 0; }
+:is(#app, #app-splash) .tv-card.is-ghost-full .tv-art::after { content: "◌"; position: absolute; color: #8a6b45; font-size: 1.1rem; }
+/* Una carta que aún no está en la línea: no ocupa sitio hasta que entra. */
+:is(#app, #app-splash) .tv-card.tv-extra:not(.is-in) { width: 0; padding-inline: 0; margin-inline: 0 !important; opacity: 0; box-shadow: none; overflow: hidden; }
+
 :is(#app, #app-splash) .tv-big { width: 112px; padding: 6px 6px 9px; border-radius: 12px; opacity: 0; transform: translateY(22px) rotate(-4deg); }
-:is(#app, #app-splash) .tv-big .tv-art { max-height: 128px; border-radius: 7px; }
+:is(#app, #app-splash) .tv-big :is(.tv-art, .tv-back) { max-height: 128px; border-radius: 7px; }
 :is(#app, #app-splash) .tv-big b { font-size: 1.1rem; }
-:is(#app, #app-splash) .tv-big small { font-size: .62rem; }
+:is(#app, #app-splash) .tv-big small { font-size: .66rem; }
 :is(#app, #app-splash) .tv-big .tv-secret { font-size: .95rem; }
-:is(#app, #app-splash) .tv-big .tv-secret i { font-size: .48rem; }
-:is(#app, #app-splash) .tv-big.is-hidden .tv-art::after { width: 24px; height: 24px; font-size: .9rem; }
+:is(#app, #app-splash) .tv-big .tv-secret i { font-size: .52rem; }
 :is(#app, #app-splash) .tv-big.is-in, :is(#app, #app-splash) .is-in > .tv-big { opacity: 1; transform: none; }
+/* Las cartas pequeñas de las mesas con mucho que enseñar. */
+:is(#app, #app-splash) .tv-card.tv-sm { width: 50px; padding: 3px 3px 4px; border-radius: 6px; }
+:is(#app, #app-splash) .tv-sm :is(.tv-art, .tv-back) { max-height: 44px; border-radius: 4px; }
+:is(#app, #app-splash) .tv-sm b { margin-top: 2px; font-size: .62rem; }
+:is(#app, #app-splash) .tv-sm small { font-size: .46rem; }
+:is(#app, #app-splash) .tv-sm .tv-secret { margin-top: 2px; font-size: .62rem; }
+:is(#app, #app-splash) .tv-sm .tv-secret i { font-size: .38rem; }
 
 :is(#app, #app-splash) .tv-center { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 16px; width: 100%; }
 :is(#app, #app-splash) .tv-logo { position: relative; padding-bottom: 10px; color: var(--tv-glow); font: 500 1.8rem/1.1 var(--font-display); letter-spacing: -.02em; text-align: center; }
 :is(#app, #app-splash) .tv-logo::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 44px; height: 1px; transform: translateX(-50%); background: linear-gradient(90deg, transparent, var(--tv-glow), transparent); }
+:is(#app, #app-splash) .tv-stage .tv-menu-art { display: block; object-fit: cover; pointer-events: none; }
 
-/* Entradillas de bloque: la misma ilustración que su puerta en el juego. */
-:is(#app, #app-splash) .tv-chapter-intro {
-  width: min(100%, 370px); overflow: hidden; border: 1px solid #cbb896; border-radius: 15px;
-  background: linear-gradient(155deg, #f7f1e6, #e9dfcc); color: var(--tv-ink);
-  box-shadow: inset 0 1px #fff9, 0 12px 26px -8px #0009;
-}
-:is(#app, #app-splash) .tv-intro-hero { position: relative; isolation: isolate; min-height: 170px; }
-:is(#app, #app-splash) .tv-chapter-intro .tv-intro-hero > .tv-menu-art {
-  position: absolute; z-index: -1; inset: 0 0 0 auto; width: 60%; height: 100%; object-fit: cover; object-position: right center;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 45%);
-  mask-image: linear-gradient(90deg, transparent, #000 45%);
-}
-:is(#app, #app-splash) .tv-intro-copy { position: relative; width: 75%; padding: 22px 18px; text-align: left; }
-:is(#app, #app-splash) .tv-intro-copy p { margin: 0 0 9px; color: #755528; font: 600 .58rem/1.4 var(--ui-font); letter-spacing: .18em; text-transform: uppercase; }
-:is(#app, #app-splash) .tv-intro-copy h3 { margin: 0 0 10px; color: var(--tv-ink); font: 500 clamp(1.7rem, 7vw, 2.35rem)/1.1 var(--font-display); letter-spacing: -.025em; }
-:is(#app, #app-splash) .tv-intro-copy > span { display: block; color: var(--tv-ink-soft); font: 500 .8rem/1.45 var(--ui-font); }
-:is(#app, #app-splash) .tv-chapter-intro > .tv-path { margin: 0; padding: 12px 10px; border-top: 1px solid #cbb89688; color: #755528; }
-:is(#app, #app-splash) .tv-chapter-intro .tv-path span { border-color: #ab8d5955; background: #fff8; }
-
-/* Cada carta, un dato: una de fechas y otra de cifras, juntas. */
+/* La carta: una de fechas y otra de cifras, juntas. */
 :is(#app, #app-splash) .tv-pair { display: flex; justify-content: center; gap: 22px; }
 :is(#app, #app-splash) .tv-kind { display: grid; justify-items: center; gap: 8px; margin: 0; opacity: 0; transform: translateY(14px); transition: opacity .5s, transform .6s var(--tv-ease-out); }
 :is(#app, #app-splash) .tv-kind.is-in { opacity: 1; transform: none; }
 :is(#app, #app-splash) .tv-kind figcaption { max-width: 120px; color: var(--tv-soft); font: 600 .66rem/1.3 var(--ui-font); letter-spacing: .04em; text-align: center; }
 
 /* La línea y sus huecos. */
-:is(#app, #app-splash) .tv-line { display: flex; align-items: center; justify-content: center; width: 100%; min-width: 0; }
-:is(#app, #app-splash) .tv-line .tv-card { flex: 0 1 66px; }
+:is(#app, #app-splash) .tv-line { display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%; min-width: 0; }
+:is(#app, #app-splash) .tv-line:has(.tv-gap) { gap: 0; }
+:is(#app, #app-splash) .tv-line .tv-card { flex: 0 0 auto; }
 :is(#app, #app-splash) .tv-center .tv-line .tv-card { opacity: 0; transform: translateY(12px) rotate(-2deg); }
 :is(#app, #app-splash) .tv-center .tv-line .tv-card.is-in { opacity: 1; transform: none; }
 :is(#app, #app-splash) .tv-gap {
@@ -159,172 +172,297 @@
   border: 1px dashed var(--tv-glow-soft); border-radius: 7px; background: #ffffff08; color: var(--tv-glow); font: 600 .9rem/1 var(--ui-font);
   transition: background .2s, border-color .2s;
 }
-:is(#app, #app-splash) .tv-gap.is-here { position: relative; border-style: solid; border-color: var(--tv-ok); background: #4f916655; box-shadow: 0 0 16px #4f916666; }
-:is(#app, #app-splash) .tv-gap.is-here::after { content: "✦ Aquí"; position: absolute; top: -22px; left: 50%; transform: translateX(-50%); padding: 2px 7px; border-radius: 5px; background: var(--tv-ok); color: #fff; font: 700 .58rem/1.5 var(--ui-font); white-space: nowrap; box-shadow: 0 3px 8px #0006; }
-:is(#app, #app-splash) .tv-axis { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; width: min(100%, 330px); opacity: 0; transition: opacity .6s; color: var(--tv-glow); font: 600 .62rem/1.2 var(--ui-font); letter-spacing: .1em; text-transform: uppercase; }
-:is(#app, #app-splash) .tv-axis i { position: relative; height: 1px; background: linear-gradient(90deg, transparent, var(--tv-glow)); }
+:is(#app, #app-splash) .tv-gap.is-here { position: relative; z-index: 3; border-style: solid; border-color: var(--tv-ok); background: #4f916655; box-shadow: 0 0 16px #4f916666; color: transparent; }
+:is(#app, #app-splash) .tv-gap.is-here::before { content: "✦"; position: absolute; color: #fff; font-size: .8rem; }
+:is(#app, #app-splash) .tv-gap.is-here::after { content: "Aquí"; position: absolute; top: -22px; left: 50%; transform: translateX(-50%); padding: 2px 7px; border-radius: 5px; background: var(--tv-ok); color: #fff; font: 700 .62rem/1.5 var(--ui-font); white-space: nowrap; box-shadow: 0 3px 8px #0006; animation: tv-pop .5s ease; }
+:is(#app, #app-splash) .tv-axis { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; width: min(100%, 330px); opacity: 0; transition: opacity .4s; color: var(--tv-glow); font: 600 .64rem/1.2 var(--ui-font); letter-spacing: .1em; text-transform: uppercase; }
+:is(#app, #app-splash) .tv-axis i { position: relative; height: 1px; background: linear-gradient(90deg, #e9cb8f44, var(--tv-glow)); transform: scaleX(0); transform-origin: left; transition: transform 1.1s var(--tv-ease-out) .1s; }
 :is(#app, #app-splash) .tv-axis i::after { content: ""; position: absolute; right: -2px; top: -4px; border: 4.5px solid transparent; border-left: 8px solid var(--tv-glow); border-right: 0; }
 :is(#app, #app-splash) .tv-axis.is-in { opacity: 1; }
+:is(#app, #app-splash) .tv-axis.is-in i { transform: none; }
 
-/* La mesa: línea arriba, carta por colocar abajo. */
-:is(#app, #app-splash) .tv-table { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: space-between; width: 100%; height: 100%; padding: 22px 0 0; }
-:is(#app, #app-splash) .tv-hand { position: relative; display: grid; place-items: center; width: min(100%, 200px); min-height: 112px; padding: 16px 18px 8px; border: 1px dashed #e9cb8f33; border-radius: 14px; background: #ffffff08; transition: opacity .5s; }
-:is(#app, #app-splash) .tv-hand::before { content: "Tu carta"; position: absolute; top: 5px; left: 0; right: 0; color: #e9cb8fb3; font: 600 .5rem/1.4 var(--ui-font); letter-spacing: .16em; text-align: center; text-transform: uppercase; }
-:is(#app, #app-splash) .tv-hand.is-empty { opacity: 0; }
+/* La mesa: línea arriba y, debajo, la carta por colocar con su confirmación al lado. */
+:is(#app, #app-splash) .tv-table { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: space-evenly; width: 100%; height: 100%; }
+:is(#app, #app-splash) .tv-table .tv-card { width: 58px; }
+:is(#app, #app-splash) .tv-table :is(.tv-art, .tv-back) { max-height: 62px; }
+:is(#app, #app-splash) .tv-table .tv-gap { width: 14px; height: 42px; }
+:is(#app, #app-splash) .tv-hand-row { display: grid; grid-template-columns: auto auto; align-items: center; gap: 14px; }
+:is(#app, #app-splash) .tv-hand { position: relative; display: grid; place-items: center; padding: 18px 14px 8px; border: 1px dashed #e9cb8f33; border-radius: 14px; background: #ffffff08; transition: opacity .5s; }
+:is(#app, #app-splash) .tv-hand::before { content: "Tu carta"; position: absolute; top: 4px; left: 0; right: 0; color: #e9cb8fb3; font: 600 .5rem/1.4 var(--ui-font); letter-spacing: .16em; text-align: center; text-transform: uppercase; }
+:is(#app, #app-splash) .tv-hand.is-empty { opacity: .35; }
 :is(#app, #app-splash) .tv-hand .tv-card { opacity: 0; transform: translateY(18px); }
 :is(#app, #app-splash) .tv-hand .tv-card.is-in { opacity: 1; transform: none; }
-:is(#app, #app-splash) .tv-confirm {
-  position: absolute; right: 8px; bottom: 30px; padding: 10px 14px; border-radius: 999px;
-  background: linear-gradient(180deg, #f3dba6, var(--tv-glow)); color: var(--tv-ink); font: 700 .76rem/1 var(--ui-font); box-shadow: 0 6px 16px #0008, inset 0 1px 0 #fff8;
-  opacity: 0; transform: translateY(8px); transition: opacity .3s, transform .3s;
-}
+:is(#app, #app-splash) .tv-confirm { display: grid; justify-items: center; gap: 6px; opacity: 0; transform: translateY(8px); transition: opacity .3s, transform .3s; }
+:is(#app, #app-splash) .tv-confirm b { padding: 10px 14px; border-radius: 999px; background: linear-gradient(180deg, #f3dba6, var(--tv-glow)); color: var(--tv-ink); font: 700 .76rem/1 var(--ui-font); box-shadow: 0 6px 16px #0008, inset 0 1px 0 #fff8; white-space: nowrap; }
+:is(#app, #app-splash) .tv-confirm small { color: var(--tv-soft); font: 600 .66rem/1 var(--ui-font); opacity: .8; }
 :is(#app, #app-splash) .tv-confirm.is-in { opacity: 1; transform: none; }
+
+/* Vidas, puntos de cada carta, estrellas y marcador. */
 :is(#app, #app-splash) .tv-lives { display: flex; gap: 3px; color: #e7664b; font-size: 1rem; line-height: 1; text-shadow: 0 0 10px #e7664b66; opacity: 0; transition: opacity .4s; }
-:is(#app, #app-splash) .tv-table > .tv-lives { position: absolute; top: 0; right: 4px; }
-:is(#app, #app-splash) .tv-lives.is-in { opacity: 1; }
+:is(#app, #app-splash) .tv-lives.is-in, :is(#app, #app-splash) .is-in .tv-lives { opacity: 1; }
 :is(#app, #app-splash) .tv-lives i { font-style: normal; transition: color .3s; }
 :is(#app, #app-splash) .tv-lives .is-lost { color: #ffffff33; text-shadow: none; animation: tv-shake .45s ease; }
-
-/* Escenas de pantallas del juego: la ruta de botones, fichas y tablas. */
-:is(#app, #app-splash) .tv-board { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: center; gap: 12px; width: 100%; height: 100%; }
-:is(#app, #app-splash) .tv-path { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 6px; color: var(--tv-glow); font: 600 .68rem/1.3 var(--ui-font); }
-:is(#app, #app-splash) .tv-path span { padding: 3px 9px; border: 1px solid #e9cb8f4d; border-radius: 999px; background: #e9cb8f14; }
-:is(#app, #app-splash) .tv-path i { font-style: normal; opacity: .7; }
-:is(#app, #app-splash) .tv-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; width: 100%; }
-:is(#app, #app-splash) .tv-tiles.tv-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-:is(#app, #app-splash) .tv-tile {
-  display: grid; align-items: center; padding: 10px;
-  border: 1px solid #e9cb8f33; border-radius: 12px;
-  opacity: 0; transform: translateY(12px) scale(.96); transition: opacity .45s, transform .5s var(--tv-ease-out), background .3s;
-}
-:is(#app, #app-splash) .tv-tile.is-in { opacity: 1; transform: none; }
-:is(#app, #app-splash) .tv-tile i { grid-row: span 2; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(180deg, #f3dba6, var(--tv-glow)); color: var(--tv-ink); font-style: normal; font-size: .86rem; box-shadow: 0 3px 8px #0006; }
-:is(#app, #app-splash) .tv-tile b { font: 600 .84rem/1.2 var(--ui-font); }
-:is(#app, #app-splash) .tv-tile small { font: .7rem/1.3 var(--ui-font); }
-:is(#app, #app-splash) .tv-three .tv-tile { grid-template-columns: 1fr; justify-items: center; text-align: center; gap: 4px; padding: 10px 6px; }
-:is(#app, #app-splash) .tv-three .tv-tile i { grid-row: auto; }
-:is(#app, #app-splash) .tv-note { margin: 0; max-width: 300px; color: var(--tv-soft); font: .72rem/1.45 var(--ui-font); text-align: center; opacity: 0; transition: opacity .5s; }
-:is(#app, #app-splash) .tv-note.is-in { opacity: 1; }
-
-/* Inicio: la tarjeta «Jugar» se abre en sus tres caminos; debajo, Unirme y el reto del día. */
-:is(#app, #app-splash) .tv-home { display: grid; width: min(100%, 300px); opacity: 0; transition: opacity .4s; }
-:is(#app, #app-splash) .tv-home.is-in { opacity: 1; }
-:is(#app, #app-splash) .tv-door { display: flex; align-items: center; justify-content: space-between; font: 600 .82rem/1.2 var(--ui-font); transition: opacity .45s, transform .5s var(--tv-ease-out), border-color .3s; }
-:is(#app, #app-splash) .tv-door-play { background: linear-gradient(180deg, #f3dba6, var(--tv-glow)); color: var(--tv-ink); border-color: transparent; font-size: .98rem; box-shadow: 0 8px 18px -6px #000a; }
-:is(#app, #app-splash) .tv-door-play b { font: 500 1.15rem/1 var(--font-display); }
-:is(#app, #app-splash) .tv-door-play span { transition: transform .3s; }
-:is(#app, #app-splash) .tv-door-play.is-open span { transform: rotate(180deg); }
-:is(#app, #app-splash) .tv-door-join, :is(#app, #app-splash) .tv-door-daily { opacity: .3; }
-:is(#app, #app-splash) .tv-door-join.is-in, :is(#app, #app-splash) .tv-door-daily.is-in { opacity: 1; border-color: var(--tv-glow); }
-:is(#app, #app-splash) .tv-choices { display: grid; max-height: 0; overflow: hidden; transition: max-height .45s var(--tv-ease-out); }
-:is(#app, #app-splash) .tv-choices span { padding: 9px 14px; border-radius: 12px; background: #ffffff12; color: var(--tv-soft); font: 600 .8rem/1.2 var(--ui-font); opacity: 0; transform: translateY(-6px); transition: opacity .35s, transform .4s var(--tv-ease-out); }
-:is(#app, #app-splash) .tv-choices span.is-in { opacity: 1; transform: none; }
-
-/* Rondas, retos y el reto del día: los puntos de cada carta y el marcador. */
-:is(#app, #app-splash) .tv-round { display: grid; justify-items: center; gap: 10px; width: min(100%, 310px); }
-:is(#app, #app-splash) .tv-round-head { display: flex; align-items: center; justify-content: space-between; width: 100%; color: var(--tv-glow); font: 500 1.05rem/1 var(--font-display); }
-:is(#app, #app-splash) .tv-stars { color: var(--tv-glow); font-size: 1.5rem; letter-spacing: .12em; text-shadow: 0 0 14px #e9cb8f88; opacity: 0; transform: scale(.8); transition: opacity .4s, transform .5s var(--tv-ease-out); }
-:is(#app, #app-splash) .tv-stars i { font-style: normal; color: #ffffff2e; text-shadow: none; }
-:is(#app, #app-splash) .tv-stars.is-in { opacity: 1; transform: none; }
-:is(#app, #app-splash) .tv-dots { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; width: min(100%, 300px); }
-:is(#app, #app-splash) .tv-dots span { display: grid; place-items: center; aspect-ratio: 1; border-radius: 50%; background: #ffffff14; color: transparent; font: 700 .7rem/1 var(--ui-font); transition: background .3s, color .3s, transform .4s var(--tv-ease-out); transform: scale(.6); }
+:is(#app, #app-splash) .tv-lives.is-pulse i:not(.is-lost) { animation: tv-pop .6s ease; }
+:is(#app, #app-splash) .tv-dots { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; width: min(100%, 270px); }
+:is(#app, #app-splash) .tv-dots span { display: grid; place-items: center; aspect-ratio: 1; border-radius: 50%; background: #ffffff14; color: transparent; font: 700 .66rem/1 var(--ui-font); transition: background .3s, color .3s, transform .4s var(--tv-ease-out); transform: scale(.6); }
 :is(#app, #app-splash) .tv-dots span.is-in { transform: none; color: #fff; }
 :is(#app, #app-splash) .tv-dots span.is-in[data-mark="ok"] { background: var(--tv-ok); box-shadow: 0 0 10px #4f916666; }
 :is(#app, #app-splash) .tv-dots span.is-in[data-mark="bad"] { background: var(--tv-bad); }
-:is(#app, #app-splash) .tv-score { color: var(--tv-glow); font: 500 1.8rem/1 var(--font-display); opacity: 0; transform: scale(.8); transition: opacity .4s, transform .5s var(--tv-ease-out); }
+:is(#app, #app-splash) .tv-dots span.is-in[data-mark="none"] { background: transparent; box-shadow: inset 0 0 0 1px #ffffff2e; }
+:is(#app, #app-splash) .tv-score { color: var(--tv-glow); font: 500 1.6rem/1 var(--font-display); opacity: 0; transform: scale(.8); transition: opacity .4s, transform .5s var(--tv-ease-out); }
 :is(#app, #app-splash) .tv-score.is-in { opacity: 1; transform: none; }
-:is(#app, #app-splash) .tv-facts { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
-:is(#app, #app-splash) .tv-facts span { padding: 4px 10px; border: 1px solid #e9cb8f26; border-radius: 999px; background: #ffffff12; color: var(--tv-soft); font: 600 .66rem/1.5 var(--ui-font); opacity: 0; transition: opacity .3s; }
-:is(#app, #app-splash) .tv-facts span.is-in { opacity: 1; }
-:is(#app, #app-splash) .tv-deck { display: grid; gap: 3px; width: min(100%, 290px); padding: 12px 14px; border-left: 3px solid var(--tv-glow); border-radius: 4px 12px 12px 4px; color: var(--tv-ink); box-shadow: 0 10px 22px -8px #000c; opacity: 0; transform: rotate(-1.5deg) translateY(10px); transition: opacity .45s, transform .55s var(--tv-ease-out); }
-:is(#app, #app-splash) .tv-deck.is-in { opacity: 1; transform: rotate(-1.5deg); }
-:is(#app, #app-splash) .tv-deck b { font: 500 1rem/1.2 var(--font-display); }
-:is(#app, #app-splash) .tv-deck small { color: #8a3d1d; font: 700 .7rem/1.3 var(--ui-font); letter-spacing: .02em; }
+:is(#app, #app-splash) .tv-without { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border: 1px solid #e9cb8f33; border-radius: 999px; background: #ffffff10; color: var(--tv-soft); font: 600 .66rem/1.3 var(--ui-font); opacity: 0; transition: opacity .35s; }
+:is(#app, #app-splash) .tv-without i { position: relative; color: #e7664b; font-style: normal; }
+:is(#app, #app-splash) .tv-without i::after { content: ""; position: absolute; left: -2px; right: -2px; top: 50%; height: 1.5px; background: var(--tv-soft); transform: rotate(-35deg); }
+:is(#app, #app-splash) .tv-without.is-in, :is(#app, #app-splash) .is-in > .tv-without { opacity: 1; }
 
-/* La dificultad: una columna por nivel, con la que se nombra resaltada. */
+/* Escenas de pantallas del juego: la ruta de botones, rótulos y notas. */
+:is(#app, #app-splash) .tv-board { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: center; gap: 10px; width: 100%; height: 100%; }
+:is(#app, #app-splash) .tv-path { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 6px; color: var(--tv-glow); font: 600 .66rem/1.3 var(--ui-font); }
+:is(#app, #app-splash) .tv-path span { padding: 3px 9px; border: 1px solid #e9cb8f4d; border-radius: 999px; background: #e9cb8f14; }
+:is(#app, #app-splash) .tv-path i { font-style: normal; opacity: .7; }
+:is(#app, #app-splash) .tv-tag { color: #e9cb8fcc; font: 600 .54rem/1.3 var(--ui-font); letter-spacing: .16em; text-transform: uppercase; }
+:is(#app, #app-splash) .tv-rule { padding: 3px 10px; border-left: 2px solid var(--tv-glow); border-radius: 2px 8px 8px 2px; background: #ffffff10; color: var(--tv-text); font: 600 .7rem/1.3 var(--ui-font); }
+:is(#app, #app-splash) .tv-more { display: grid; place-items: center; min-width: 28px; color: var(--tv-glow); font: 700 .74rem/1 var(--ui-font); }
+:is(#app, #app-splash) .tv-note { margin: 0; max-width: 310px; color: var(--tv-soft); font: .7rem/1.4 var(--ui-font); text-align: center; opacity: 0; transition: opacity .5s; }
+:is(#app, #app-splash) .tv-note.is-in { opacity: 1; }
+
+/* Dos tipos de mazo: Grandes colecciones y Retos rápidos, cada uno con su lámina de Inicio. */
+:is(#app, #app-splash) .tv-families { display: grid; gap: 10px; width: min(100%, 340px); }
+:is(#app, #app-splash) .tv-family { position: relative; isolation: isolate; display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: 10px; padding: 9px 10px; overflow: hidden; border: 1px solid #cbb896; border-radius: 13px; background: linear-gradient(110deg, #f7f1e6, #e9dfcc); color: var(--tv-ink); box-shadow: inset 0 1px #fff9, 0 6px 14px #0003; opacity: 0; transform: translateY(10px); transition: opacity .45s, transform .5s var(--tv-ease-out); }
+:is(#app, #app-splash) .tv-family.is-in { opacity: 1; transform: none; }
+:is(#app, #app-splash) .tv-family > .tv-menu-art { width: 64px; height: 64px; border-radius: 9px; }
+:is(#app, #app-splash) .tv-family > div { display: grid; gap: 4px; min-width: 0; }
+:is(#app, #app-splash) .tv-family > div > b { font: 500 1.02rem/1.15 var(--font-display); }
+:is(#app, #app-splash) .tv-family > div > small { color: var(--tv-ink-soft); font: 600 .66rem/1.3 var(--ui-font); }
+:is(#app, #app-splash) .tv-family .tv-rule { justify-self: start; border-left-color: #a77b38; background: #a77b3818; color: var(--tv-ink); font-size: .64rem; }
+:is(#app, #app-splash) .tv-chips { display: flex; flex-wrap: wrap; gap: 3px; }
+:is(#app, #app-splash) .tv-chips span { padding: 2px 6px; border-radius: 999px; background: #a77b3826; color: #5b4120; font: 600 .56rem/1.4 var(--ui-font); opacity: 0; transition: opacity .3s; }
+:is(#app, #app-splash) .tv-chips span.is-in { opacity: 1; }
+:is(#app, #app-splash) .tv-tokens { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+:is(#app, #app-splash) .tv-tokens span { display: grid; padding: 3px 6px; border-radius: 6px; background: #fffaf0; box-shadow: inset 0 0 0 1px #cbb896; color: var(--tv-ink-soft); font: 600 .56rem/1.25 var(--ui-font); }
+:is(#app, #app-splash) .tv-tokens span b { color: var(--tv-ink); font-size: .62rem; }
+:is(#app, #app-splash) .tv-tokens > * { opacity: 0; transition: opacity .3s; }
+:is(#app, #app-splash) .tv-tokens > .is-in { opacity: 1; }
+:is(#app, #app-splash) .tv-tokens i { color: #8a6b45; font-style: normal; font-size: .7rem; }
+
+/* La ronda: vidas junto a los puntos de cada carta; al final, las vidas son estrellas. */
+:is(#app, #app-splash) .tv-round { display: grid; justify-items: center; gap: 8px; width: min(100%, 330px); }
+:is(#app, #app-splash) .tv-round-head { display: flex; align-items: center; justify-content: space-between; width: 100%; color: var(--tv-glow); font: 500 1rem/1 var(--font-display); }
+:is(#app, #app-splash) .tv-round-head > b { font-weight: 500; }
+:is(#app, #app-splash) .tv-round-row { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
+:is(#app, #app-splash) .tv-round-row .tv-dots { flex: 1 1 auto; }
+:is(#app, #app-splash) .tv-stars { color: var(--tv-glow); font-size: 1.35rem; letter-spacing: .1em; text-shadow: 0 0 14px #e9cb8f88; opacity: 0; transform: scale(.8); transition: opacity .4s, transform .5s var(--tv-ease-out); }
+:is(#app, #app-splash) .tv-stars i { font-style: normal; color: #ffffff2e; text-shadow: none; }
+:is(#app, #app-splash) .tv-stars.is-in { opacity: 1; transform: none; }
+:is(#app, #app-splash) .tv-round-out { padding: 8px 10px; border: 1px dashed #b4532f66; border-radius: 12px; opacity: 0; transition: opacity .4s; }
+:is(#app, #app-splash) .tv-round-out.is-in { opacity: 1; }
+:is(#app, #app-splash) .tv-round-out .tv-lives { opacity: 1; }
+:is(#app, #app-splash) .tv-round-out small { color: #f0a789; font: 700 .66rem/1.2 var(--ui-font); letter-spacing: .04em; }
+
+/* Maratón y competición. */
+:is(#app, #app-splash) .tv-modes { display: grid; gap: 10px; width: min(100%, 340px); }
+:is(#app, #app-splash) .tv-mode { display: grid; justify-items: start; gap: 6px; padding: 10px 12px; border: 1px solid #e9cb8f33; border-radius: 13px; background: #ffffff0c; opacity: 0; transform: translateY(10px); transition: opacity .45s, transform .5s var(--tv-ease-out); }
+:is(#app, #app-splash) .tv-mode.is-in { opacity: 1; transform: none; }
+:is(#app, #app-splash) .tv-mode > b { color: #fff; font: 500 1.05rem/1.1 var(--font-display); }
+:is(#app, #app-splash) .tv-mode > small { color: var(--tv-glow); font: 600 .6rem/1.2 var(--ui-font); letter-spacing: .06em; text-transform: uppercase; }
+:is(#app, #app-splash) .tv-mode .tv-more { justify-self: end; color: var(--tv-soft); font-size: .64rem; }
+:is(#app, #app-splash) .tv-dots-run { grid-template-columns: repeat(12, 1fr); width: 100%; }
+:is(#app, #app-splash) .tv-topics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; width: 100%; }
+:is(#app, #app-splash) .tv-topics > span { display: grid; justify-items: center; gap: 3px; padding: 6px 4px; border-radius: 9px; background: #ffffff10; opacity: 0; transform: translateY(6px); transition: opacity .35s, transform .4s var(--tv-ease-out); }
+:is(#app, #app-splash) .tv-topics > span.is-in { opacity: 1; transform: none; }
+:is(#app, #app-splash) .tv-topics em { color: #fff; font: 600 .66rem/1.2 var(--ui-font); font-style: normal; }
+:is(#app, #app-splash) .tv-topics > span > i { color: var(--tv-soft); font: .58rem/1.2 var(--ui-font); font-style: normal; }
+:is(#app, #app-splash) .tv-topics .tv-lives { font-size: .8rem; }
+
+/* La dificultad: una columna por nivel, con la que se nombra resaltada, y su efecto en la línea. */
 :is(#app, #app-splash) .tv-levels { display: grid; gap: 2px; width: min(100%, 340px); }
-:is(#app, #app-splash) .tv-level-row { display: grid; grid-template-columns: 74px repeat(var(--tv-levels, 4), minmax(0, 1fr)); gap: 3px; align-items: center; opacity: 0; transform: translateY(6px); transition: opacity .35s, transform .4s var(--tv-ease-out); }
+:is(#app, #app-splash) .tv-level-row { display: grid; grid-template-columns: 70px repeat(var(--tv-levels, 4), minmax(0, 1fr)); gap: 3px; align-items: center; opacity: 0; transform: translateY(6px); transition: opacity .35s, transform .4s var(--tv-ease-out); }
 :is(#app, #app-splash) .tv-level-row.is-in { opacity: 1; transform: none; }
-:is(#app, #app-splash) .tv-level-row > span { color: var(--tv-glow); font: 600 .6rem/1.2 var(--ui-font); letter-spacing: .04em; }
-:is(#app, #app-splash) .tv-level-row b { padding: 7px 2px; border-radius: 6px; background: #ffffff0d; color: var(--tv-soft); font: 600 .68rem/1.15 var(--ui-font); text-align: center; transition: background .3s, color .3s; }
-:is(#app, #app-splash) .tv-level-head b { background: none; color: #fff; font: 500 .84rem/1.1 var(--font-display); }
+:is(#app, #app-splash) .tv-level-row > span { color: var(--tv-glow); font: 600 .58rem/1.15 var(--ui-font); }
+:is(#app, #app-splash) .tv-level-row b { display: grid; place-items: center; min-height: 28px; padding: 3px 2px; border-radius: 6px; background: #ffffff0d; color: var(--tv-soft); font: 600 .62rem/1.1 var(--ui-font); text-align: center; transition: background .3s, color .3s; }
+:is(#app, #app-splash) .tv-level-head b { min-height: 0; background: none; color: #fff; font: 500 .82rem/1.1 var(--font-display); }
 :is(#app, #app-splash) .tv-level-row b.is-on { background: #e9cb8f33; color: #fff; }
 :is(#app, #app-splash) .tv-level-head b.is-on { background: var(--tv-glow); color: var(--tv-ink); }
+:is(#app, #app-splash) .tv-diff-demo { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; }
+:is(#app, #app-splash) .tv-diff-demo .tv-line { width: auto; }
+:is(#app, #app-splash) .tv-clock { position: relative; display: grid; place-items: center; flex: 0 0 auto; width: 46px; height: 46px; }
+:is(#app, #app-splash) .tv-clock svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+:is(#app, #app-splash) .tv-clock circle { fill: none; stroke: #ffffff22; stroke-width: 3; }
+:is(#app, #app-splash) .tv-clock .tv-clock-arc { stroke: var(--tv-glow); stroke-dasharray: 94.25; stroke-dashoffset: 94.25; stroke-linecap: round; }
+:is(#app, #app-splash) .tv-clock.is-run .tv-clock-arc { animation: tv-clock 4.6s linear both; }
+:is(#app, #app-splash) .tv-clock b { color: #fff; font: 700 .64rem/1 var(--ui-font); }
 
-/* En grupo: cada asiento con su mano, el mazo y el descarte. */
-:is(#app, #app-splash) .tv-seats { display: grid; gap: 8px; width: min(100%, 300px); }
-:is(#app, #app-splash) .tv-seat { display: grid; grid-template-columns: 54px 1fr auto; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid #e9cb8f26; border-radius: 12px; background: #ffffff0c; opacity: 0; transform: translateX(-12px); transition: opacity .4s, transform .5s var(--tv-ease-out), border-color .3s, background .3s; }
+/* Dos estados de una misma pantalla, uno sobre otro. */
+:is(#app, #app-splash) .tv-phases { display: grid; width: 100%; }
+:is(#app, #app-splash) .tv-phase { grid-area: 1 / 1; display: grid; justify-items: center; align-content: center; gap: 7px; transition: opacity .4s, visibility .4s; }
+:is(#app, #app-splash) .tv-phase:not(.is-on) { opacity: 0; visibility: hidden; }
+
+/* Retos rápidos: los mazos de hoy y la mesa con todas tus cartas a la vista. */
+:is(#app, #app-splash) .tv-deck-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; width: min(100%, 330px); }
+:is(#app, #app-splash) .tv-deck-tile { display: grid; justify-items: center; gap: 4px; padding: 5px 4px 6px; border-radius: 9px; background: linear-gradient(170deg, #fcfaf5, #e8ddc9); color: var(--tv-ink); box-shadow: inset 0 0 0 1px #c9ab7a66, 0 8px 18px -8px #000c; opacity: 0; transform: translateY(10px); transition: opacity .4s, transform .45s var(--tv-ease-out), box-shadow .3s; }
+:is(#app, #app-splash) .tv-deck-tile.is-in { opacity: 1; transform: none; }
+:is(#app, #app-splash) .tv-deck-tile.is-picked:first-child { box-shadow: 0 0 0 3px var(--tv-glow), 0 0 18px #e9cb8f88; }
+:is(#app, #app-splash) .tv-deck-tile img { width: 100%; aspect-ratio: 1; border-radius: 6px; object-fit: cover; }
+:is(#app, #app-splash) .tv-deck-tile small { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font: 600 .54rem/1.2 var(--ui-font); text-align: center; }
+:is(#app, #app-splash) .tv-pool { display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 0; }
+:is(#app, #app-splash) .tv-pool .tv-card.is-out { width: 0; padding-inline: 0; opacity: 0; box-shadow: none; overflow: hidden; }
+:is(#app, #app-splash) .tv-quick .tv-round-row { gap: 8px; }
+:is(#app, #app-splash) .tv-quick .tv-dots { width: min(100%, 220px); }
+
+/* El reto diario: hoy y mañana, y lo que no tiene. */
+:is(#app, #app-splash) .tv-days { display: flex; align-items: center; gap: 8px; }
+:is(#app, #app-splash) .tv-days > i { color: var(--tv-glow); font-style: normal; opacity: 0; transition: opacity .3s; }
+:is(#app, #app-splash) .tv-days > i.is-in { opacity: 1; }
+:is(#app, #app-splash) .tv-day { display: grid; grid-template-columns: 34px auto; grid-template-rows: auto auto; align-items: center; column-gap: 8px; padding: 6px 10px 6px 6px; border-radius: 11px; background: linear-gradient(110deg, #f7f1e6, #e9dfcc); color: var(--tv-ink); box-shadow: inset 0 0 0 1px #cbb896; opacity: 0; transform: translateY(8px); transition: opacity .4s, transform .45s var(--tv-ease-out); }
+:is(#app, #app-splash) .tv-day.is-in { opacity: 1; transform: none; }
+:is(#app, #app-splash) .tv-day > .tv-menu-art { grid-row: span 2; width: 34px; height: 34px; border-radius: 7px; }
+:is(#app, #app-splash) .tv-day b { color: #755528; font: 700 .56rem/1.2 var(--ui-font); letter-spacing: .12em; text-transform: uppercase; }
+:is(#app, #app-splash) .tv-day small { font: 600 .7rem/1.2 var(--ui-font); }
+:is(#app, #app-splash) .tv-facts { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+:is(#app, #app-splash) .tv-facts > span:not(.tv-without) { padding: 4px 10px; border: 1px solid #e9cb8f33; border-radius: 999px; background: #ffffff10; color: var(--tv-soft); font: 600 .66rem/1.3 var(--ui-font); opacity: 0; transition: opacity .35s; }
+:is(#app, #app-splash) .tv-facts > span.is-in { opacity: 1; }
+
+/* Con amigos: un móvil que se pasa, o cada uno con el suyo y su ritmo. */
+:is(#app, #app-splash) .tv-ways { display: grid; gap: 8px; width: min(100%, 330px); }
+:is(#app, #app-splash) .tv-way { display: grid; justify-items: center; gap: 6px; padding: 9px 10px; border: 1px solid #cbb896; border-radius: 13px; background: linear-gradient(155deg, #f7f1e6, #e9dfcc); color: var(--tv-ink); box-shadow: inset 0 1px #fff9, 0 6px 14px #0003; opacity: 0; transform: translateY(10px); transition: opacity .45s, transform .5s var(--tv-ease-out); }
+:is(#app, #app-splash) .tv-way.is-in { opacity: 1; transform: none; }
+:is(#app, #app-splash) .tv-way > b { font: 500 .98rem/1.1 var(--font-display); }
+:is(#app, #app-splash) .tv-way > small { color: var(--tv-ink-soft); font: 600 .64rem/1.3 var(--ui-font); }
+:is(#app, #app-splash) .tv-people { display: flex; gap: 6px; }
+:is(#app, #app-splash) .tv-people b { position: relative; padding: 4px 10px; border-radius: 999px; background: #d7cbb666; color: var(--tv-ink-soft); font: 600 .7rem/1.5 var(--ui-font); transition: background .3s, color .3s, transform .3s var(--tv-ease-out); }
+:is(#app, #app-splash) .tv-people b.is-on { background: #866430; color: #fff7e8; transform: translateY(-3px); box-shadow: 0 6px 14px #0004; }
+/* El móvil viaja con quien juega. */
+:is(#app, #app-splash) .tv-people b.is-on::after { content: ""; position: absolute; left: 50%; bottom: -15px; width: 9px; height: 13px; margin-left: -4.5px; border: 1.6px solid #866430; border-radius: 2.5px; background: #fffaf0; }
+:is(#app, #app-splash) .tv-pass { padding-bottom: 12px; }
+:is(#app, #app-splash) .tv-rhythms { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; width: 100%; }
+:is(#app, #app-splash) .tv-rhythms > span { display: grid; align-content: start; gap: 3px; padding: 6px; border-radius: 10px; background: #d7cbb666; color: var(--tv-ink-soft); font: .62rem/1.25 var(--ui-font); text-align: center; transition: background .3s, box-shadow .3s; }
+:is(#app, #app-splash) .tv-rhythms > span.is-on { background: #fffaf0; box-shadow: 0 0 0 2px #a77b38; }
+:is(#app, #app-splash) .tv-rhythms b { color: #755528; font: 700 .72rem/1.2 var(--ui-font); }
+:is(#app, #app-splash) .tv-join { display: flex; align-items: center; gap: 10px; padding: 6px 12px 6px 14px; border: 1px solid var(--tv-glow); border-radius: 999px; background: #e9cb8f1f; opacity: 0; transform: translateY(8px); transition: opacity .4s, transform .45s var(--tv-ease-out); }
+:is(#app, #app-splash) .tv-join.is-in { opacity: 1; transform: none; }
+:is(#app, #app-splash) .tv-join b { color: #fff; font: 500 .92rem/1.2 var(--font-display); }
+:is(#app, #app-splash) .tv-join small { color: var(--tv-glow); font: 600 .62rem/1.2 var(--ui-font); }
+
+/* Quién empieza: la carta, lo que dice cada uno y su puesto. */
+:is(#app, #app-splash) .tv-starter { gap: 12px; }
+:is(#app, #app-splash) .tv-starter .tv-big { width: 92px; }
+:is(#app, #app-splash) .tv-starter .tv-big :is(.tv-art, .tv-back) { max-height: 104px; }
+:is(#app, #app-splash) .tv-guesses { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+:is(#app, #app-splash) .tv-guesses span { position: relative; display: grid; justify-items: center; gap: 3px; min-width: 76px; padding: 7px 10px; border: 1px solid #e9cb8f33; border-radius: 12px; background: #ffffff10; color: #fff; font: 700 .8rem/1.1 var(--ui-font); opacity: 0; transform: translateY(8px); transition: opacity .4s, transform .45s var(--tv-ease-out), background .3s, border-color .3s; }
+:is(#app, #app-splash) .tv-guesses span b { color: var(--tv-glow); font: 600 .62rem/1 var(--ui-font); letter-spacing: .08em; text-transform: uppercase; }
+:is(#app, #app-splash) .tv-guesses span em { font-style: normal; }
+/* En secreto hasta que la carta se descubre. */
+:is(#app, #app-splash) .tv-guesses:not(.is-shown) span em { color: transparent; text-shadow: 0 0 7px #fffc; }
+:is(#app, #app-splash) .tv-guesses span.is-in { opacity: 1; transform: none; }
+:is(#app, #app-splash) .tv-guesses span.is-ranked::after { content: attr(data-rank); position: absolute; top: -9px; padding: 1px 7px; border-radius: 999px; background: #6b5536; color: #fff; font: 700 .56rem/1.5 var(--ui-font); }
+:is(#app, #app-splash) .tv-guesses span.is-ranked[data-rank="1.º"] { border-color: var(--tv-ok); background: #4f916644; }
+:is(#app, #app-splash) .tv-guesses span.is-ranked[data-rank="1.º"]::after { content: "Empieza"; background: var(--tv-ok); }
+
+/* En grupo: la línea común, cada asiento con su mano, el mazo y el descarte. */
+:is(#app, #app-splash) .tv-group { gap: 6px; }
+:is(#app, #app-splash) .tv-gline-wrap { position: relative; display: grid; justify-items: center; gap: 5px; width: 100%; }
+:is(#app, #app-splash) .tv-vuelta { position: absolute; top: 0; right: 4px; color: var(--tv-soft); font: 600 .6rem/1.3 var(--ui-font); }
+:is(#app, #app-splash) .tv-vuelta b { color: var(--tv-glow); }
+:is(#app, #app-splash) .tv-gline { display: flex; justify-content: center; gap: 4px; min-height: 58px; padding: 4px 8px; border-bottom: 1px solid #e9cb8f44; }
+:is(#app, #app-splash) .tv-mini { display: grid; justify-items: center; gap: 2px; width: 36px; padding: 2px 2px 3px; border-radius: 5px; background: linear-gradient(170deg, #fcfaf5, #e8ddc9); color: var(--tv-ink); box-shadow: inset 0 0 0 1px #c9ab7a66, 0 6px 12px -4px #000c; overflow: hidden; transition: width .5s var(--tv-ease-out), padding .5s var(--tv-ease-out), opacity .4s, box-shadow .3s; }
+:is(#app, #app-splash) .tv-mini .tv-art { max-height: 34px; border-radius: 3px; }
+:is(#app, #app-splash) .tv-mini b { font: 700 .54rem/1.1 var(--ui-font); white-space: nowrap; }
+:is(#app, #app-splash) .tv-mini.is-pending { width: 0; padding-inline: 0; opacity: 0; box-shadow: none; }
+:is(#app, #app-splash) .tv-mini.is-new { box-shadow: 0 0 0 2px var(--tv-ok), 0 0 14px #4f916688; animation: tv-pop .5s ease; }
+:is(#app, #app-splash) .tv-seats { display: grid; gap: 5px; width: min(100%, 300px); }
+:is(#app, #app-splash) .tv-seat { display: grid; grid-template-columns: 48px 1fr auto; align-items: center; gap: 10px; padding: 5px 12px; border: 1px solid #e9cb8f26; border-radius: 11px; background: #ffffff0c; opacity: 0; transform: translateX(-12px); transition: opacity .4s, transform .5s var(--tv-ease-out), border-color .3s, background .3s; }
 :is(#app, #app-splash) .tv-seat.is-in { opacity: 1; transform: none; }
 :is(#app, #app-splash) .tv-seat.is-turn { border-color: var(--tv-glow); background: #e9cb8f1f; }
 :is(#app, #app-splash) .tv-seat.is-winner { border-color: var(--tv-ok); background: #4f916633; }
-:is(#app, #app-splash) .tv-seat > b { color: #fff; font: 600 .8rem/1 var(--ui-font); }
-:is(#app, #app-splash) .tv-seat em { min-width: 22px; color: var(--tv-glow); font: 700 .78rem/1 var(--ui-font); font-style: normal; text-align: right; }
+:is(#app, #app-splash) .tv-seat > b { color: #fff; font: 600 .78rem/1 var(--ui-font); }
+:is(#app, #app-splash) .tv-seat em { color: var(--tv-glow); font: 700 .74rem/1 var(--ui-font); font-style: normal; text-align: right; white-space: nowrap; }
 :is(#app, #app-splash) .tv-seat em[data-mark="ok"] { color: #7fc496; }
 :is(#app, #app-splash) .tv-seat em[data-mark="bad"] { color: #e88a65; }
 :is(#app, #app-splash) .tv-seat em[data-mark="win"] { padding: 3px 8px; border-radius: 999px; background: var(--tv-ok); color: #fff; font-size: .7rem; }
-:is(#app, #app-splash) .tv-minihand { display: flex; min-height: 30px; }
-:is(#app, #app-splash) .tv-minihand i { flex: 0 0 auto; width: 22px; height: 30px; margin-right: -6px; border: 1px solid #c9ab7a; border-radius: 4px; box-shadow: 0 3px 6px #0007; transition: opacity .45s, transform .5s var(--tv-ease-out), width .45s, margin .45s, border-width .45s; }
+:is(#app, #app-splash) .tv-minihand { display: flex; min-height: 26px; }
+:is(#app, #app-splash) .tv-minihand i { flex: 0 0 auto; width: 19px; height: 26px; margin-right: -5px; border: 1px solid #c9ab7a; border-radius: 4px; background: url('../assets/continuum-emblem-800.webp') center / 90% auto no-repeat, var(--tv-cardback); box-shadow: 0 3px 6px #0007; transition: opacity .45s, transform .5s var(--tv-ease-out), width .45s, margin .45s, border-width .45s; }
 :is(#app, #app-splash) .tv-minihand i.is-out { width: 0; margin-right: 0; border-width: 0; opacity: 0; transform: translateY(-14px); }
-:is(#app, #app-splash) .tv-minihand i.is-bad { background: var(--tv-bad); transform: translateX(40px); }
 :is(#app, #app-splash) .tv-minihand i.is-new { animation: tv-draw .5s var(--tv-ease-out); }
-:is(#app, #app-splash) .tv-piles { display: flex; gap: 10px; opacity: 0; transition: opacity .4s; }
+:is(#app, #app-splash) .tv-piles { display: flex; gap: 18px; opacity: 0; transition: opacity .4s; }
 :is(#app, #app-splash) .tv-piles.is-in { opacity: 1; }
-:is(#app, #app-splash) .tv-piles span { padding: 5px 12px; border: 1px dashed #e9cb8f66; border-radius: 8px; color: var(--tv-soft); font: 600 .66rem/1.3 var(--ui-font); }
-:is(#app, #app-splash) .tv-piles span.is-pulse { animation: tv-pile .7s ease; }
+:is(#app, #app-splash) .tv-pile { display: flex; align-items: center; gap: 7px; color: var(--tv-soft); font: 600 .64rem/1.3 var(--ui-font); }
+:is(#app, #app-splash) .tv-stack { position: relative; width: 22px; height: 30px; }
+:is(#app, #app-splash) .tv-stack i { position: absolute; inset: 0; border: 1px solid #c9ab7a; border-radius: 4px; background: url('../assets/continuum-emblem-800.webp') center / 90% auto no-repeat, var(--tv-cardback); box-shadow: 0 2px 4px #0007; }
+:is(#app, #app-splash) .tv-stack i:nth-child(2) { transform: translate(2px, -2px); }
+:is(#app, #app-splash) .tv-stack i:nth-child(3) { transform: translate(4px, -4px); }
+:is(#app, #app-splash) [data-pile="discard"] .tv-stack i { background: #8a6b45; border-color: #6b5536; }
+:is(#app, #app-splash) [data-pile="discard"] .tv-stack i:nth-child(2) { transform: rotate(-8deg); }
+:is(#app, #app-splash) [data-pile="discard"] .tv-stack i:nth-child(3) { transform: rotate(7deg); }
+:is(#app, #app-splash) .tv-pile.is-pulse .tv-stack { animation: tv-pop .6s ease; }
+/* La carta que vuela de un sitio a otro. */
+:is(#app, #app-splash) .tv-flyer { position: absolute; z-index: 6; width: 19px; height: 26px; border: 1px solid #c9ab7a; border-radius: 4px; background: url('../assets/continuum-emblem-800.webp') center / 90% auto no-repeat, var(--tv-cardback); box-shadow: 0 8px 14px #0009; transform: translate(-50%, -50%); transition: transform .62s var(--tv-ease); pointer-events: none; }
+:is(#app, #app-splash) .tv-flyer.is-ok { box-shadow: 0 0 0 2px var(--tv-ok), 0 8px 14px #0009; }
+:is(#app, #app-splash) .tv-flyer.is-bad { box-shadow: 0 0 0 2px var(--tv-bad), 0 8px 14px #0009; }
+:is(#app, #app-splash) .tv-flyer.is-quick { width: 34px; height: 46px; }
 
-/* Quién empieza: lo que dice cada uno y la carta que lo resuelve. */
-:is(#app, #app-splash) .tv-guesses { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-:is(#app, #app-splash) .tv-guesses span { display: grid; justify-items: center; gap: 3px; min-width: 76px; padding: 7px 10px; border: 1px solid #e9cb8f33; border-radius: 12px; background: #ffffff10; color: #fff; font: 700 .8rem/1.1 var(--ui-font); opacity: 0; transform: translateY(8px); transition: opacity .4s, transform .45s var(--tv-ease-out), background .3s, border-color .3s; }
-:is(#app, #app-splash) .tv-guesses span b { color: var(--tv-glow); font: 600 .62rem/1 var(--ui-font); letter-spacing: .08em; text-transform: uppercase; }
-:is(#app, #app-splash) .tv-guesses span.is-in { opacity: 1; transform: none; }
-:is(#app, #app-splash) .tv-guesses span.is-on { position: relative; border-color: var(--tv-ok); background: #4f916644; transform: translateY(-3px); }
-:is(#app, #app-splash) .tv-guesses span.is-on::after { content: "Empieza"; position: absolute; top: -10px; padding: 1px 7px; border-radius: 999px; background: var(--tv-ok); color: #fff; font: 700 .52rem/1.5 var(--ui-font); }
-
-/* Con amigos: un móvil que se pasa, o cada uno con el suyo y su ritmo. */
-:is(#app, #app-splash) .tv-ways { display: grid; gap: 10px; width: min(100%, 330px); }
-:is(#app, #app-splash) .tv-way { display: grid; justify-items: center; gap: 6px; padding: 10px; border: 1px solid #e9cb8f33; border-radius: 14px; opacity: 0; transform: translateY(10px); transition: opacity .45s, transform .5s var(--tv-ease-out); }
-:is(#app, #app-splash) .tv-way.is-in { opacity: 1; transform: none; }
-:is(#app, #app-splash) .tv-way > b { font: 500 .98rem/1.1 var(--font-display); }
-:is(#app, #app-splash) .tv-way > small { font: .7rem/1.3 var(--ui-font); }
-:is(#app, #app-splash) .tv-pass { display: flex; align-items: center; gap: 12px; }
-:is(#app, #app-splash) .tv-phone { display: grid; width: 32px; height: 32px; color: var(--tv-glow); filter: drop-shadow(0 0 8px #e9cb8f55); animation: tv-wiggle 1.8s ease-in-out infinite; }
-:is(#app, #app-splash) .tv-phone svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
-:is(#app, #app-splash) .tv-people { display: flex; gap: 6px; }
-:is(#app, #app-splash) .tv-people b { padding: 4px 10px; border-radius: 999px; background: #ffffff14; font: 600 .7rem/1.5 var(--ui-font); transition: background .3s, color .3s, transform .3s var(--tv-ease-out); }
-:is(#app, #app-splash) .tv-people b.is-on { background: var(--tv-glow); color: var(--tv-ink); transform: translateY(-3px); box-shadow: 0 6px 14px #0006; }
-:is(#app, #app-splash) .tv-rhythms { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; width: 100%; }
-:is(#app, #app-splash) .tv-rhythms > span { display: grid; align-content: start; gap: 3px; padding: 7px 6px; border-radius: 10px; background: #ffffff10; color: var(--tv-soft); font: .64rem/1.25 var(--ui-font); text-align: center; opacity: 0; transition: opacity .4s; }
-:is(#app, #app-splash) .tv-rhythms > span.is-in { opacity: 1; }
-:is(#app, #app-splash) .tv-rhythms b { color: var(--tv-glow); font: 700 .72rem/1.2 var(--ui-font); }
+/* Retos rápidos en grupo: la regla elegida, las cartas comunes y el marcador de cada uno. */
+:is(#app, #app-splash) .tv-quick-group .tv-card.tv-sm { width: 44px; }
+:is(#app, #app-splash) .tv-quick-group .tv-sm :is(.tv-art, .tv-back) { max-height: 38px; }
+:is(#app, #app-splash) .tv-switch { display: flex; gap: 2px; padding: 2px; border-radius: 999px; background: #ffffff14; }
+:is(#app, #app-splash) .tv-switch span { padding: 3px 10px; border-radius: 999px; color: var(--tv-soft); font: 600 .62rem/1.3 var(--ui-font); transition: background .3s, color .3s; }
+:is(#app, #app-splash) .tv-switch span.is-on { background: var(--tv-glow); color: var(--tv-ink); }
+:is(#app, #app-splash) .tv-scores { display: flex; justify-content: center; gap: 8px; }
+:is(#app, #app-splash) .tv-scores span { display: grid; justify-items: center; gap: 2px; min-width: 70px; padding: 5px 8px; border: 1px solid #e9cb8f33; border-radius: 11px; background: #ffffff0c; opacity: 0; transition: opacity .35s, border-color .3s, background .3s; }
+:is(#app, #app-splash) .tv-scores span.is-in { opacity: 1; }
+:is(#app, #app-splash) .tv-scores span.is-turn { border-color: var(--tv-glow); background: #e9cb8f1f; }
+:is(#app, #app-splash) .tv-scores b { color: #fff; font: 600 .7rem/1.1 var(--ui-font); }
+:is(#app, #app-splash) .tv-scores em { min-width: 34px; padding: 1px 8px; border-radius: 999px; color: var(--tv-soft); font: 700 .74rem/1.4 var(--ui-font); font-style: normal; text-align: center; }
+/* Provisional (en juego), asegurado (con candado) o fuera. */
+:is(#app, #app-splash) .tv-scores span.is-open em { border: 1px dashed var(--tv-glow); color: var(--tv-glow); }
+:is(#app, #app-splash) .tv-scores span.is-banked em { background: var(--tv-ok); color: #fff; }
+:is(#app, #app-splash) .tv-scores span.is-banked em::after { content: " 🔒︎"; font-size: .62rem; }
+:is(#app, #app-splash) .tv-scores span.is-out em { color: #e88a65; text-decoration: line-through; }
+:is(#app, #app-splash) .tv-scores span.is-out em::after { content: " · fuera"; text-decoration: none; display: inline-block; font-size: .6rem; }
+:is(#app, #app-splash) .tv-scores span.is-pulse em { animation: tv-pop .5s ease; }
 
 /* Poderes: el Fantasma tapa la línea; el Pulso enfrenta a dos con la misma carta. */
-:is(#app, #app-splash) .tv-powers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; width: min(100%, 330px); }
-:is(#app, #app-splash) .tv-power { display: grid; justify-items: center; gap: 8px; padding: 14px 8px; border: 1px solid #e9cb8f33; border-radius: 14px; background: #ffffff0c; opacity: 0; transform: translateY(10px); transition: opacity .45s, transform .5s var(--tv-ease-out), border-color .3s, background .3s; }
+:is(#app, #app-splash) .tv-powers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; width: min(100%, 340px); }
+:is(#app, #app-splash) .tv-power { display: grid; justify-items: center; align-content: start; gap: 8px; padding: 10px 6px; border: 1px solid #e9cb8f33; border-radius: 14px; background: #ffffff0c; opacity: 0; transform: translateY(10px); transition: opacity .45s, transform .5s var(--tv-ease-out), border-color .3s, background .3s; }
 :is(#app, #app-splash) .tv-power.is-in { opacity: 1; transform: none; }
 :is(#app, #app-splash) .tv-power.is-on { border-color: var(--tv-glow); background: #e9cb8f1f; }
-:is(#app, #app-splash) .tv-power > i { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(180deg, #f3dba6, var(--tv-glow)); color: var(--tv-ink); font-style: normal; font-size: 1rem; box-shadow: 0 3px 8px #0006; }
 :is(#app, #app-splash) .tv-power > b { color: #fff; font: 500 1rem/1.1 var(--font-display); }
-:is(#app, #app-splash) .tv-mini { display: flex; gap: 5px; }
-:is(#app, #app-splash) .tv-mini em { display: grid; place-items: center; width: 22px; height: 30px; border-radius: 4px; background: linear-gradient(180deg, #8a6b45 0 55%, var(--tv-paper) 55%); color: transparent; font: 800 .8rem/1 var(--ui-font); font-style: normal; box-shadow: 0 3px 6px #0007; transition: background .4s, color .4s; }
-:is(#app, #app-splash) .tv-power.is-on .tv-mini em { background: #3a2a1c; color: var(--tv-glow); box-shadow: inset 0 0 0 1px #e9cb8f55, 0 3px 6px #0007; }
-:is(#app, #app-splash) .tv-duel { display: flex; align-items: center; gap: 6px; }
-:is(#app, #app-splash) .tv-duel em { padding: 4px 9px; border-radius: 999px; background: #ffffff14; color: var(--tv-soft); font: 600 .68rem/1.3 var(--ui-font); font-style: normal; transition: background .3s, color .3s; }
-:is(#app, #app-splash) .tv-duel i { color: var(--tv-glow); font-style: normal; }
-:is(#app, #app-splash) .tv-power.is-on .tv-duel em { background: var(--tv-glow); color: var(--tv-ink); }
-:is(#app, #app-splash) .tv-power.is-on .tv-duel i { animation: tv-pop .6s ease infinite alternate; }
+:is(#app, #app-splash) .tv-power > b i { color: var(--tv-glow); font-style: normal; }
+:is(#app, #app-splash) .tv-power > small { color: var(--tv-soft); font: .62rem/1.3 var(--ui-font); text-align: center; }
+:is(#app, #app-splash) .tv-duel { display: grid; gap: 6px; width: 100%; }
+:is(#app, #app-splash) .tv-duel > span { display: grid; grid-template-columns: 34px 1fr 16px; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 9px; background: #ffffff10; transition: background .3s; }
+:is(#app, #app-splash) .tv-duel em { color: #fff; font: 600 .7rem/1.2 var(--ui-font); font-style: normal; }
+:is(#app, #app-splash) .tv-duel u { font: 700 .8rem/1 var(--ui-font); text-decoration: none; }
+:is(#app, #app-splash) .tv-duel .is-ok { background: #4f916640; }
+:is(#app, #app-splash) .tv-duel .is-ok u { color: #7fc496; }
+:is(#app, #app-splash) .tv-duel .is-bad u { color: #e88a65; }
 
-/* Online: la mesa se va llenando. */
-:is(#app, #app-splash) .tv-table-seats { display: flex; gap: 12px; color: var(--tv-glow); font-size: 1.4rem; text-shadow: 0 0 10px #e9cb8f66; opacity: 0; transition: opacity .4s; }
-:is(#app, #app-splash) .tv-table-seats.is-in { opacity: 1; }
-:is(#app, #app-splash) .tv-table-seats span:not(.is-free) { animation: tv-pop .4s ease; }
+/* Online: una mesa de cuatro sillas que se llena y una cuenta atrás alrededor. */
+:is(#app, #app-splash) .tv-mesa { position: relative; display: grid; place-items: center; width: 132px; height: 132px; opacity: 0; transition: opacity .4s; }
+:is(#app, #app-splash) .tv-mesa.is-in { opacity: 1; }
+:is(#app, #app-splash) .tv-mesa svg { width: 100%; height: 100%; overflow: visible; }
+:is(#app, #app-splash) .tv-mesa-table { fill: #6b4b2b; stroke: #e9cb8f66; stroke-width: 1.5; }
+:is(#app, #app-splash) .tv-mesa-ring { fill: none; stroke: var(--tv-glow); stroke-width: 2.5; stroke-dasharray: 238.8; stroke-dashoffset: 238.8; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 60px 60px; }
+:is(#app, #app-splash) .tv-mesa-ring.is-run { animation: tv-ring 2.2s linear both; }
+:is(#app, #app-splash) .tv-mesa.is-go .tv-mesa-ring { stroke-dashoffset: 0; animation: none; }
+:is(#app, #app-splash) .tv-chair circle { fill: transparent; stroke: #e9cb8f99; stroke-width: 1.5; stroke-dasharray: 3 3; transition: fill .3s; }
+:is(#app, #app-splash) .tv-chair text { fill: transparent; font: 700 10px var(--ui-font); text-anchor: middle; }
+:is(#app, #app-splash) .tv-chair.is-taken circle { fill: #f3dba6; stroke: var(--tv-glow); stroke-dasharray: none; }
+:is(#app, #app-splash) .tv-chair.is-taken text { fill: var(--tv-ink); }
+:is(#app, #app-splash) .tv-mesa-go { position: absolute; padding: 3px 9px; border-radius: 999px; background: var(--tv-ok); color: #fff; font: 700 .7rem/1.4 var(--ui-font); opacity: 0; transform: scale(.7); transition: opacity .3s, transform .4s var(--tv-ease-out); }
+:is(#app, #app-splash) .tv-mesa.is-go .tv-mesa-go { opacity: 1; transform: none; }
+:is(#app, #app-splash) .tv-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+:is(#app, #app-splash) .tv-options span { padding: 5px 11px; border-radius: 999px; background: linear-gradient(180deg, #f7f1e6, #e9dfcc); color: var(--tv-ink); font: 600 .7rem/1.3 var(--ui-font); box-shadow: 0 4px 10px #0004; opacity: 0; transform: translateY(6px); transition: opacity .35s, transform .4s var(--tv-ease-out); }
+:is(#app, #app-splash) .tv-options span.is-in { opacity: 1; transform: none; }
 
+/* El cierre: botones propios del vídeo, legibles sobre la pantalla oscura. */
 :is(#app, #app-splash) .tv-end { opacity: 0; transform: scale(.96); transition: opacity .5s, transform .5s var(--tv-ease-out); }
 :is(#app, #app-splash) .tv-end.is-in { opacity: 1; transform: none; }
-:is(#app, #app-splash) .tv-end p { max-width: 280px; margin: 0; color: var(--tv-soft); font: .84rem/1.5 var(--ui-font); text-align: center; }
+:is(#app, #app-splash) .tv-end p { max-width: 290px; margin: 0; color: var(--tv-soft); font: .86rem/1.5 var(--ui-font); text-align: center; text-wrap: balance; }
 :is(#app, #app-splash) .tv-end-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-:is(#app, #app-splash) .tv-end-actions .btn { min-height: 40px; padding: 8px 14px; font-size: .78rem; }
-:is(#app, #app-splash) .tv-end-actions .btn-secondary { background: linear-gradient(180deg, #f3dba6, var(--tv-glow)); border-color: transparent; color: var(--tv-ink); box-shadow: 0 6px 16px #0008; }
-:is(#app, #app-splash) .tv-end-actions .btn-ghost { color: var(--tv-glow); border-color: #e9cb8f66; }
+:is(#app, #app-splash) .tv-end-btn { min-height: 44px; padding: 8px 16px; border: 1px solid #e9cb8f99; border-radius: 999px; background: transparent; color: var(--tv-glow); font: 700 .8rem/1.2 var(--ui-font); cursor: pointer; }
+:is(#app, #app-splash) .tv-end-btn.is-main { border-color: transparent; background: linear-gradient(180deg, #f3dba6, var(--tv-glow)); color: var(--tv-ink); box-shadow: 0 6px 16px #0008; }
+:is(#app, #app-splash) .tv-end-btn:focus-visible { outline: 2px solid var(--tv-text); outline-offset: 2px; }
 
 /* ── El mando ────────────────────────────────────────────────────────────────────────── */
 :is(#app, #app-splash) .tv-controls { display: grid; justify-items: center; gap: 10px; margin-top: 12px; }
@@ -362,97 +500,29 @@
 @keyframes tv-halo { from { opacity: .9; transform: scale(.86); } to { opacity: 0; transform: scale(1.25); } }
 @keyframes tv-ripple { from { opacity: 1; transform: scale(.4); } to { opacity: 0; transform: scale(1.9); } }
 @keyframes tv-pop { 40% { transform: scale(1.1); } }
+@keyframes tv-flip { 50% { transform: scaleX(0); } }
 @keyframes tv-shake { 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
-@keyframes tv-wiggle { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg) translateX(6px); } }
-@keyframes tv-draw { from { opacity: 0; transform: translate(40px, 10px) rotate(8deg); } }
-@keyframes tv-pile { 40% { border-color: var(--tv-glow); background: #e9cb8f33; transform: scale(1.08); } }
+@keyframes tv-draw { from { opacity: 0; transform: translate(30px, -10px) rotate(8deg); } }
+@keyframes tv-clock { to { stroke-dashoffset: 0; } }
+@keyframes tv-ring { to { stroke-dashoffset: 0; } }
 @media (prefers-reduced-motion: reduce) {
   :is(#app, #app-splash) .tv-player *, :is(#app, #app-splash) .tv-player *::before, :is(#app, #app-splash) .tv-player *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
-  :is(#app, #app-splash) .tv-finger, :is(#app, #app-splash) .tv-card { transition-duration: .2s; }
+  :is(#app, #app-splash) .tv-finger, :is(#app, #app-splash) .tv-card, :is(#app, #app-splash) .tv-flyer { transition-duration: .2s; }
 }
 @media (max-width: 360px) {
-  :is(#app, #app-splash) .tv-card { width: 56px; }
-  :is(#app, #app-splash) .tv-line .tv-card { flex-basis: 56px; }
-  :is(#app, #app-splash) .tv-gap { width: 14px; }
+  :is(#app, #app-splash) .tv-card { width: 58px; }
+  :is(#app, #app-splash) .tv-table .tv-card { width: 54px; }
+  :is(#app, #app-splash) .tv-gap { width: 13px; }
   :is(#app, #app-splash) .tv-big { width: 100px; }
   :is(#app, #app-splash) .tv-pair { gap: 14px; }
-  :is(#app, #app-splash) .tv-tiles.tv-three .tv-tile small { display: none; }
-  :is(#app, #app-splash) .tv-level-row { grid-template-columns: 62px repeat(var(--tv-levels, 4), minmax(0, 1fr)); }
+  :is(#app, #app-splash) .tv-level-row { grid-template-columns: 60px repeat(var(--tv-levels, 4), minmax(0, 1fr)); }
+  :is(#app, #app-splash) .tv-quick-group .tv-card.tv-sm { width: 40px; }
 }
-
-/* Las miniaturas del manual comparten papel, tinta, láminas y reverso con el juego.
-   Se limita al reproductor: no modifica los menús ni las cartas de una partida. */
-:is(#app, #app-splash) .tv-player {
-  --tv-cardback: radial-gradient(ellipse at 50% 43%, #fffaf0 0 18%, transparent 55%), repeating-conic-gradient(from 0deg at 50% 43%, #b897600b 0deg 1deg, transparent 1deg 15deg), repeating-linear-gradient(45deg, #a77b380b 0 1px, transparent 1px 10px), repeating-linear-gradient(-45deg, #a77b380b 0 1px, transparent 1px 10px), linear-gradient(145deg, #f9efdb, #e7d0a6);
-  --tv-paper: #f3eee4; --tv-paper-2: #e8ddc9; --tv-ink: #302d27; --tv-ink-soft: #5e584d;
-}
-:is(#app, #app-splash) .tv-stage .tv-menu-art { display: block; object-fit: contain; pointer-events: none; }
-:is(#app, #app-splash) .tv-door,
-:is(#app, #app-splash) .tv-choices > span {
-  position: relative; isolation: isolate; overflow: hidden; min-height: 38px;
-  padding: 7px 86px 7px 14px; border: 1px solid #cbb896; border-radius: 12px;
-  background: linear-gradient(110deg, #f7f1e6, #e9dfcc); color: var(--tv-ink);
-  box-shadow: inset 0 1px #fff9, 0 5px 12px #0003;
-}
-:is(#app, #app-splash) .tv-door > .tv-menu-art,
-:is(#app, #app-splash) .tv-choices > span > .tv-menu-art {
-  position: absolute; z-index: -1; right: 0; top: 0; width: 88px; height: 100%; object-fit: cover;
-  mask-image: linear-gradient(90deg, transparent, #000 30%); -webkit-mask-image: linear-gradient(90deg, transparent, #000 30%);
-}
-:is(#app, #app-splash) .tv-door b { font: 500 .95rem/1.2 var(--font-display); }
-:is(#app, #app-splash) .tv-chevron { position: absolute; right: 9px; bottom: 7px; font-style: normal; transition: transform .3s; }
-:is(#app, #app-splash) .tv-door-play.is-open .tv-chevron { transform: rotate(180deg); }
-:is(#app, #app-splash) .tv-choices { padding-inline: 10px 0; gap: 4px; }
-:is(#app, #app-splash) .tv-choices.is-open { max-height: 155px; }
-:is(#app, #app-splash) .tv-choices > span { min-height: 32px; padding-block: 6px; font-size: .74rem; }
-:is(#app, #app-splash) .tv-choices > span b { font-weight: 600; }
-:is(#app, #app-splash) .tv-tile,
-:is(#app, #app-splash) .tv-way {
-  position: relative; isolation: isolate; overflow: hidden; border-color: #cbb896;
-  background: linear-gradient(155deg, #f7f1e6, #e9dfcc); color: var(--tv-ink);
-  box-shadow: inset 0 1px #fff9, 0 6px 14px #0003;
-}
-:is(#app, #app-splash) .tv-tile > .tv-menu-art { width: 100%; height: 48px; margin: -2px 0 2px; }
-:is(#app, #app-splash) .tv-tile b,
-:is(#app, #app-splash) .tv-way > b { color: var(--tv-ink); }
-:is(#app, #app-splash) .tv-tile small,
-:is(#app, #app-splash) .tv-way > small { color: var(--tv-ink-soft); }
-:is(#app, #app-splash) .tv-way { padding-right: 76px; }
-:is(#app, #app-splash) .tv-way > .tv-menu-art { position: absolute; right: 4px; top: 10%; width: 70px; height: 80%; }
-:is(#app, #app-splash) .tv-way .tv-phone { color: #866430; }
-:is(#app, #app-splash) .tv-way .tv-people b,
-:is(#app, #app-splash) .tv-way .tv-rhythms > span { background: #d7cbb666; color: var(--tv-ink-soft); }
-:is(#app, #app-splash) .tv-way .tv-rhythms b { color: #755528; }
-:is(#app, #app-splash) .tv-way .tv-people b.is-on { background: #866430; color: #fff7e8; }
-:is(#app, #app-splash) .tv-deck { position: relative; min-height: 82px; padding-right: 92px; overflow: hidden; background: linear-gradient(110deg, #f7f1e6, #e9dfcc); }
-:is(#app, #app-splash) .tv-deck > .tv-menu-art { position: absolute; right: 8px; top: 8px; width: 66px; height: calc(100% - 16px); border-radius: 5px; object-fit: cover; }
-:is(#app, #app-splash) .tv-card { background: linear-gradient(170deg, #fcfaf5, #f3eee4 50%, #e8ddc9); border-radius: 7px; }
-:is(#app, #app-splash) .tv-back { display: none; position: relative; width: 100%; aspect-ratio: 2 / 3; max-height: 74px; overflow: hidden; border-radius: 5px; background: var(--tv-cardback); box-shadow: inset 0 0 0 1px #ab804d, inset 0 0 0 3px #fff5e1, inset 0 0 0 4px #bc93575c; }
-:is(#app, #app-splash) .tv-back .carta-reverso { position: absolute; inset: 0; display: grid; place-items: center; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; background: none; box-shadow: none; transform: none; }
-:is(#app, #app-splash) .tv-back .carta-reverso::before,
-:is(#app, #app-splash) .tv-back .carta-reverso::after { content: none; }
-:is(#app, #app-splash) .tv-back .reverso-emblema { position: static; width: 88%; height: auto; max-height: 80%; object-fit: contain; transform: none; filter: drop-shadow(0 2px 2px #734f2938); }
-:is(#app, #app-splash) .tv-card.is-hidden .tv-back { display: block; }
-:is(#app, #app-splash) .tv-card.is-hidden .tv-art { display: none; }
-:is(#app, #app-splash) .tv-big .tv-back { max-height: 128px; }
-:is(#app, #app-splash) .tv-minihand i { background: url('../assets/continuum-emblem-800.webp') center / 90% auto no-repeat, var(--tv-cardback); }
-@media (max-width: 360px) {
-  :is(#app, #app-splash) .tv-way { padding-right: 56px; }
-  :is(#app, #app-splash) .tv-way > .tv-menu-art { width: 50px; }
-  :is(#app, #app-splash) .tv-way .tv-rhythms { gap: 3px; }
-}
-
-:is(#app, #app-splash) .tv-home { gap: 5px; }
-:is(#app, #app-splash) .tv-tiles:not(.tv-three) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-:is(#app, #app-splash) .tv-tile { grid-template-columns: minmax(0, 1fr); gap: 3px; justify-items: center; text-align: center; }
-@media (max-width: 360px) {
-  :is(#app, #app-splash) .tv-board { gap: 8px; }
-  :is(#app, #app-splash) .tv-tile { padding: 8px 6px; }
-  :is(#app, #app-splash) .tv-tile > .tv-menu-art { height: 32px; }
-  :is(#app, #app-splash) .tv-tile b { font-size: .76rem; }
-  :is(#app, #app-splash) .tv-tile small { font-size: .62rem; }
-  :is(#app, #app-splash) .tv-deck { min-height: 70px; padding: 8px 76px 8px 10px; }
-  :is(#app, #app-splash) .tv-deck b { font-size: .9rem; }
-  :is(#app, #app-splash) .tv-deck small { font-size: .62rem; }
-  :is(#app, #app-splash) .tv-deck > .tv-menu-art { width: 54px; }
+@media (max-width: 380px) {
+  :is(#app, #app-splash) .tv-board { gap: 7px; }
+  :is(#app, #app-splash) .tv-ways { gap: 6px; }
+  :is(#app, #app-splash) .tv-way { padding-block: 7px; }
+  :is(#app, #app-splash) .tv-scores span { padding-block: 3px; }
+  :is(#app, #app-splash) .tv-quick-group .tv-sm small { -webkit-line-clamp: 1; }
+  :is(#app, #app-splash) .tv-quick-group .tv-sm :is(.tv-art, .tv-back) { max-height: 32px; }
 }

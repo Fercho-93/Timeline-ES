@@ -127,42 +127,58 @@ console.log("\nLas reglas se adaptan al mazo");
   ok("muestra cartas de verdad con su ilustración", w.document.querySelectorAll('.tv-stage .tv-card img').length >= 1);
   click(w, '.tv-play');
   ok("se puede pausar como un vídeo", !video.tutorial.state().playing && el(w, '.tv-play').getAttribute('aria-label') === 'Reproducir');
+  // El orden es el de quien no conoce el juego: lo que vale siempre, después cada forma de jugar.
+  const titulos = [...w.document.querySelectorAll('.tv-seg')].map(seg => seg.getAttribute('aria-label'));
+  ok("primero lo básico: la carta, la línea, colocar, fallar y los dos tipos de mazo", titulos.slice(0, 5).join(" | ") === "La carta | La línea | Colocar una carta | Si fallas | Dos tipos de mazo");
+  ok("ninguna escena es una entradilla sin contenido", !titulos.some(titulo => /Entradilla/.test(titulo)));
   click(w, '[data-tv-chapter="1"]');
-  ok("Jugar solo se abre con su entradilla desde la barra", el(w, '.tv-scene-title').textContent === 'Jugar solo · Elegir colección' && el(w, '[data-tv-chapter="1"]').classList.contains('is-current'));
-  ok("la entradilla ubica la elección de colección y mazo", /Elige una colección\s*y un mazo/.test(el(w, '.tv-intro-copy').textContent) && el(w, '.tv-stage .tv-path').textContent.includes('Grandes colecciones'));
+  ok("Jugar solo empieza por la ronda, con su ruta", el(w, '.tv-scene-title').textContent === 'Una ronda' && el(w, '[data-tv-chapter="1"]').classList.contains('is-current') && el(w, '.tv-stage .tv-path').textContent.includes('Grandes colecciones'));
   click(w, '[data-tv="prev"]');
-  ok("y se rebobina escena a escena", el(w, '.tv-scene-title').textContent === 'Dónde se juega');
+  ok("y se rebobina escena a escena", el(w, '.tv-scene-title').textContent === 'Dos tipos de mazo');
   click(w, '[data-tv="next"]');
-  ok("tras Dónde se juega aparece la entradilla", el(w, '.tv-stage h3').textContent === 'Jugar solo');
   click(w, '[data-tv="next"]');
-  ok("después continúa la explicación de Rondas", el(w, '.tv-scene-title').textContent === 'Rondas' && el(w, '.tv-round').textContent.includes('Ronda'));
-  for (const [anterior, entrada, siguiente, capitulo] of [
-    ['Dificultad', 'Retos rápidos', 'Retos rápidos', 1],
-    ['Retos rápidos', 'En grupo', 'Tu mano', 2],
-    ['Poderes', 'Jugar online', 'Online', 2],
-    ['Online', 'Reto diario', 'Reto diario', 3]
+  ok("después de la ronda, maratón y competición", el(w, '.tv-scene-title').textContent === 'Maratón y competición');
+  for (const [anterior, siguiente, capitulo] of [
+    ['Retos rápidos', 'Reto diario', 2],
+    ['Reto diario', 'Con amigos', 3],
+    ['Jugar online', 'A jugar', 3]
   ]) {
     click(w, `.tv-seg[aria-label="${anterior}"]`);
     click(w, '[data-tv="next"]');
-    ok(`${anterior} da paso a la entradilla de ${entrada}`, el(w, '.tv-stage h3').textContent === entrada && el(w, `[data-tv-chapter="${capitulo}"]`).classList.contains('is-current'));
-    click(w, '[data-tv="next"]');
-    ok(`la entradilla continúa con ${siguiente}`, el(w, '.tv-scene-title').textContent === siguiente);
-    click(w, '[data-tv="prev"]');
-    ok(`se puede volver a la entradilla de ${entrada}`, el(w, '.tv-stage h3').textContent === entrada);
+    ok(`${anterior} da paso a ${siguiente}`, el(w, '.tv-scene-title').textContent === siguiente && el(w, `[data-tv-chapter="${capitulo}"]`).classList.contains('is-current'));
   }
   click(w, '[data-tv-chapter="2"]');
-  ok("el capítulo En grupo abre desde su entradilla", el(w, '.tv-stage h3').textContent === 'En grupo');
+  ok("el reto diario es un capítulo propio, con su marcador", el(w, '.tv-scene-title').textContent === 'Reto diario' && el(w, '.tv-score').textContent === '7 de 10');
+  // Los días se alternan (CT.RetoDiario.familia): ni «pares» ni «impares», y hoy es lo que dice el juego.
+  const dias = el(w, '.tv-days').textContent;
+  const hoy = w.CONTINUUM.RetoDiario.familia() === "quick" ? "Retos rápidos" : "Grandes colecciones";
+  ok("el reto diario alterna cada día y dice qué toca hoy", !/pares|impares/i.test(el(w, '.tv-stage').textContent) && dias.indexOf(hoy) > -1 && dias.indexOf(hoy) < dias.indexOf("Mañana"));
   click(w, '[data-tv-chapter="3"]');
-  ok("Reto diario abre como capítulo independiente", el(w, '.tv-stage h3').textContent === 'Reto diario' && el(w, '[data-tv-chapter="3"]').classList.contains('is-current'));
-  click(w, '[data-tv="prev"]');
-  ok("el capítulo diario viene después de Online", el(w, '.tv-scene-title').textContent === 'Online');
-  click(w, '[data-tv-chapter="3"]');
-  click(w, '[data-tv="next"]');
-  ok("la explicación diaria sigue dentro de su propio capítulo", el(w, '.tv-score').textContent === '7 de 10' && el(w, '[data-tv-chapter="3"]').classList.contains('is-current'));
-  click(w, '[data-tv="next"]');
-  ok("el cierre del vídeo sigue después del reto diario", el(w, '.tv-scene-title').textContent === 'A jugar');
+  ok("En grupo empieza por cómo os juntáis", el(w, '.tv-scene-title').textContent === 'Con amigos' && /de 2 a 10/.test(el(w, '.tv-stage').textContent) && /Retos rápidos: de 2 a 4/.test(el(w, '.tv-stage').textContent));
+  // Las dos familias se juegan distinto en grupo, y las dos se explican.
+  click(w, '.tv-seg[aria-label="Retos rápidos en grupo"]');
+  ok("Retos rápidos en grupo enseña las dos reglas de «Si alguien falla»", /Arriesgar o plantarse/.test(el(w, '.tv-switch').textContent) && /Seguir hasta el final/.test(el(w, '.tv-switch').textContent));
   video.tutorial.go(2);
   ok("la carta por colocar dice qué dato esconde", /Peso oculto/i.test(el(w, '.tv-hand').textContent));
+  // Breve, pero que se pueda leer: cada frase se ve a 17 caracteres por segundo como mucho, y el
+  // vídeo entero no pasa de tres minutos y medio.
+  {
+    const lista = w.CONTINUUM.Tutorial.scenes("history");
+    const rapidas = [];
+    let total = 0;
+    for (const escena of lista) {
+      const dichas = [];
+      const registra = new Proxy({}, { get: (_, nombre) => nombre === "say" ? texto => dichas.push(texto) : () => {} });
+      const pasos = escena.steps.map(([ms, accion]) => { const antes = dichas.length; accion(registra); return dichas.slice(antes).map(texto => [ms, texto]); }).flat();
+      pasos.forEach(([ms, texto], i) => {
+        const dura = (pasos[i + 1]?.[0] ?? escena.duration) - ms;
+        if (texto.length / (dura / 1000) > 17) rapidas.push(`${escena.title}: «${texto}» (${(texto.length / (dura / 1000)).toFixed(1)} c/s)`);
+      });
+      total += escena.duration;
+    }
+    ok(`cada subtítulo se lee a 17 caracteres por segundo como mucho${rapidas.length ? ` (falla ${rapidas.join("; ")})` : ""}`, !rapidas.length);
+    ok(`el vídeo dura ${Math.round(total / 1000)} s, no más de 210`, total <= 210000);
+  }
   // Ninguna escena espera a quien mira: en la mesa no hay huecos ni botones que pulsar.
   const pideJugada = [];
   for (let i = 0; i < video.tutorial.state().scenes; i++) {
