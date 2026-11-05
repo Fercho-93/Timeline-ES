@@ -107,17 +107,17 @@
 
   // ── Pictogramas de la tabla (cada uno, una regla) ───────────────────────────────
   // La mini línea del fallo jugando solo, como la pantalla de resultado del juego: el intento queda en
-  // rojo con ✕ (a la derecha) y la carta pasa a su sitio, marcado con «✦» (quick-challenges.js:1009).
+  // rojo con ✕ (a la derecha) y la carta pasa a su sitio, marcado «aquí» (quick-challenges.js:1009).
   const missLine = () => `<path class="g-rule" d="M4 39H72"/>${card(4, 18, 14, 20)}${card(40, 18, 14, 20)}
     ${pop(`${card(57, 18, 14, 20, 'ghost-ko')}${badge(70, 18, false, 5)}`)}
     <g class="a-miss" style="--fx:35px">${card(22, 18, 14, 20)}</g>
-    ${pop(`<path class="g-fix" d="M63 14Q47 2 33 9"/>${head(33, 9, 153, 'g-fix')}${emblem(29, 10, 4, 'g-here')}`, 0.8)}${arrow(77, 88, 28)}`;
+    ${pop(`<path class="g-fix" d="M62 14Q52 5 42 7"/>${head(42, 7, 168, 'g-fix')}<text class="g-here-text" x="29" y="13" font-size="9">aquí</text>`, 0.8)}`;
   const PICTS = {
     // Jugar solo
-    soloLives: () => `${card(14, 11, 16, 22, 'new')}${[58, 78, 98].map((x, i) => pop(heart(x, 22, 13), i * 0.12)).join('')}`,
+    soloLives: () => `${card(8, 11, 16, 22, 'new')}${pop('<text class="g-big t-start" x="30" y="31" font-size="14">10</text>')}${[78, 96, 114].map((x, i) => pop(heart(x, 22, 13), 0.15 + i * 0.12)).join('')}`,
     soloTen: () => `${fan(40, 42, 3, { open: true })}${pop('<text class="g-big t-start" x="62" y="31" font-size="14">10</text>', 0.3)}${heart(110, 22, 12, 'none')}`,
-    soloMissLife: () => `${missLine()}${heart(101, 28, 11)}${heart(115, 28, 11)}${heart(129, 28, 11, 'lost', 'a-lose')}`,
-    soloMissGo: () => `${missLine()}<g class="a-in" style="--fx:-8px;--d:.8s">${card(104, 17, 16, 22, 'new')}</g>`,
+    soloMissLife: () => `${missLine()}${arrow(77, 88, 28)}${heart(101, 28, 11)}${heart(115, 28, 11)}${heart(129, 28, 11, 'lost', 'a-lose')}`,
+    soloMissGo: () => `${missLine()}<g class="a-in" style="--fx:-8px;--d:.8s">${arrow(77, 88, 28)}${card(104, 17, 16, 22, 'new')}</g>`,
     soloStars: () => `${heart(14, 22, 10)}${heart(28, 22, 10)}${heart(42, 22, 10, 'lost')}${pop(`${arrow(54, 68, 22)}${[84, 102, 120].map(x => star(x, 22, 15, x < 120)).join('')}`)}`,
     soloAlbum: () => `${card(6, 12, 14, 20, 'ok')}${badge(19, 12, true, 4.5)}${card(24, 12, 14, 20, 'ok')}${badge(37, 12, true, 4.5)}${arrow(46, 60, 22)}
       <rect class="g-album" x="72" y="8" width="50" height="28" rx="3"/><path class="g-album-spine" d="M97 8V36"/>
@@ -131,9 +131,9 @@
       ${deck(48, 12)}<path class="g-arrow" d="M68 14Q85 3 99 17"/>${head(99, 17, 45)}
       ${fan(104, 42, 3)}<g class="a-travel" style="--fx:-47px;--fy:-6px;--d:.4s">${card(97, 20, 13, 18, 'back')}</g>
       ${player(130, 34, 'B')}${disc(128, 12, 3, 'a-pulse')}`,
-    groupBank: () => `${chip(4, 15, 'open', '+2')}<path class="g-arrow" d="M34 19L49 11"/>${head(49, 11, -28)}<path class="g-arrow" d="M34 25L49 33"/>${head(49, 33, 28)}
-      ${pop(`${chip(52, 3, 'banked', '2')}<text class="g-note t-start" x="84" y="14" font-size="10.5">te plantas</text>`, 0.3)}
-      ${pop(`${chip(52, 27, 'out', '0')}<text class="g-note t-start" x="84" y="38" font-size="10.5">fallas</text>`, 0.45)}`,
+    groupBank: () => `${chip(4, 13, 'open', '+2')}<path class="g-arrow" d="M34 16L49 8"/>${head(49, 8, -28)}<path class="g-arrow" d="M34 24L49 29"/>${head(49, 29, 18)}
+      ${pop(`${chip(52, 0, 'banked', '2')}<text class="g-note t-start" x="84" y="9" font-size="10.5">te plantas</text><text class="g-sub t-start" x="84" y="18" font-size="9">y esperas</text>`, 0.3)}
+      ${pop(`${chip(52, 22, 'out', '0')}<text class="g-note t-start" x="84" y="31" font-size="10.5">fallas</text><text class="g-sub t-start" x="84" y="40" font-size="9">y fuera</text>`, 0.45)}`,
     groupEmpty: () => `${player(16, 30, 'A')}${pop(crown(16, 15), 0.3)}${card(30, 20, 13, 18, 'ghost')}${pop(disc(53, 29, 0))}${player(86, 30, 'B')}${fan(110, 42, 2)}${disc(130, 14, 2)}`,
     groupMost: () => `${player(16, 30, 'A')}${pop(crown(16, 15), 0.3)}${chip(30, 23, 'banked', '3')}${player(86, 30, 'B')}${chip(100, 23, 'banked', '2')}`
   };
@@ -141,7 +141,7 @@
   // ── Bloques finales de las láminas en grupo ──────────────────────────────────────
   const WHERE = `<div class="mode-guide-where">
       <p><svg class="g-scene g-pict" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><rect class="g-phone" x="14" y="8" width="12" height="20" rx="3"/><circle class="g-head" cx="5" cy="30" r="4"/><circle class="g-head" cx="35" cy="30" r="4"/><path class="g-arrow" d="M9 36Q20 42 31 36"/>${head(31, 36, -24)}${head(9, 36, 204)}</svg><span><b>Un solo móvil</b><small>os lo pasáis</small></span></p>
-      <p><svg class="g-scene g-pict" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path class="g-link" d="M7.5 9H32.5"/><circle class="g-dot" cx="20" cy="9" r="2"/>${[3, 15.5, 28].map(x => `<rect class="g-phone" x="${x}" y="14" width="9" height="16" rx="2.5"/>`).join('')}</svg><span><b>Cada uno en su móvil</b><small>en directo o por turnos</small></span></p>
+      <p><svg class="g-scene g-pict" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path class="g-link" d="M7.5 9H32.5"/><circle class="g-dot" cx="20" cy="9" r="2"/>${[3, 15.5, 28].map(x => `<rect class="g-phone" x="${x}" y="14" width="9" height="16" rx="2.5"/>`).join('')}</svg><span><b>Cada uno en su móvil</b><small>a la vez o cada uno a su ritmo</small></span></p>
     </div>`;
   const START = `<svg class="g-scene g-start" viewBox="0 0 300 52" role="img" aria-label="${esc('Cómo empieza: creas una mesa, te sientas en una de las mesas abiertas o pides una partida rápida y te sentamos en la primera libre. Jugáis de 2 a 4 personas. La partida empieza al llenarse la mesa o, con al menos dos, cuando pasan 30 segundos sin que entre nadie más. En las mesas públicas no hay poderes.')}" focusable="false">
       <ellipse class="g-table" cx="44" cy="26" rx="24" ry="12"/>
@@ -149,7 +149,7 @@
       ${player(44, 9, 'A')}${player(77, 26, 'B')}
       ${arrow(92, 106, 26)}
       <circle class="g-clock" cx="128" cy="26" r="14"/><circle class="g-clock-arc" cx="128" cy="26" r="14" transform="rotate(-90 128 26)"/><text class="g-big" x="128" y="29.5" font-size="9.5">30 s</text>
-      ${arrow(150, 166, 26)}${pop('<text class="g-go" x="214" y="31" font-size="13">¡Empieza!</text>', 1)}
+      ${pop(`${arrow(150, 166, 26)}<text class="g-go" x="214" y="31" font-size="13">¡Empieza!</text>`, 0.6)}
     </svg>`;
 
   // ── Contenido de cada forma de jugar ──────────────────────────────────────────
@@ -167,8 +167,8 @@
     ['Si fallas', 3.2,
       ['groupDiscard', 'Descartas y robas', `Grandes colecciones ${where}, si fallas: la carta no entra en la línea, va al descarte y robas otra del mazo, así que tu mano no baja. Si el mazo se acaba, se baraja el descarte.`],
       ['groupBank', 'Plántate o lo pierdes', where === 'en grupo'
-        ? 'Retos rápidos en grupo, con «Arriesgar o plantarse»: cada acierto es provisional y en tu turno puedes plantarte para asegurarlo. Si fallas, pierdes los provisionales de ese mazo y quedas fuera hasta el siguiente; la carta fallada pasa a su sitio en la línea. Quien prepara la partida puede elegir «Seguir hasta el final»: un fallo no suma, pero sigues jugando.'
-        : 'Retos rápidos en una mesa: la partida rápida se juega siempre a arriesgar o plantarse. Cada acierto es provisional y en tu turno puedes plantarte para asegurarlo; si fallas, pierdes los provisionales de ese mazo y quedas fuera hasta el siguiente. Quien crea una mesa puede elegir «Seguir hasta el final».']],
+        ? 'Retos rápidos en grupo, con «Arriesgar o plantarse»: cada acierto es provisional. En tu turno puedes plantarte: aseguras tus aciertos y ya no juegas el resto de ese mazo. Si fallas, pierdes los provisionales y quedas fuera hasta el siguiente mazo; la carta fallada pasa a su sitio en la línea. Quien prepara la partida puede elegir «Seguir hasta el final»: un fallo no suma, pero sigues jugando.'
+        : 'Retos rápidos en una mesa: la partida rápida se juega siempre a arriesgar o plantarse. Cada acierto es provisional. En tu turno puedes plantarte: aseguras tus aciertos y ya no juegas el resto de ese mazo. Si fallas, pierdes los provisionales y quedas fuera hasta el siguiente mazo. Quien crea una mesa puede elegir «Seguir hasta el final».']],
     ['Gana', 4.3,
       ['groupEmpty', 'Vacía tu mano', `Grandes colecciones ${where}: gana quien se queda sin cartas. La vuelta se termina siempre, para que todos jueguen los mismos turnos; si acaban varios sin cartas, se juega una final de desempate.`],
       ['groupMost', 'Más aciertos', `Retos rápidos ${where}: al acabar todos los mazos gana quien más aciertos ha asegurado. Al terminar un mazo, lo que sigue en juego se asegura solo. Un empate se comparte.`]]
@@ -179,7 +179,7 @@
       how: [false, 'Adivina dónde va', HOW],
       rows: [
         ['Tienes', 2.3,
-          ['soloLives', '3 vidas', 'Grandes colecciones jugando solo: empiezas con tres vidas y colocas una carta cada vez. Una ronda son 10 cartas y la maratón, el mazo entero; en la competición tienes tres vidas en cada tema.'],
+          ['soloLives', '10 cartas, 3 vidas', 'Grandes colecciones jugando solo: empiezas con tres vidas y colocas una carta cada vez. Una ronda son 10 cartas y la maratón, el mazo entero; en la competición tienes tres vidas en cada tema.'],
           ['soloTen', '10 cartas, sin vidas', 'Retos rápidos jugando solo: juegas 10 cartas del mazo. Las ves todas y eliges cuál colocar. No hay vidas.']],
         ['Si fallas', 2.9,
           ['soloMissLife', 'Pierdes una vida', 'Grandes colecciones jugando solo, si fallas: la línea marca con «Aquí» dónde iba la carta, la carta pasa a ese sitio como referencia y pierdes una de tus tres vidas. Sin vidas se acaba la partida; en la competición, ese tema.'],
@@ -188,7 +188,7 @@
           ['soloStars', 'Ronda: vidas = estrellas', 'Grandes colecciones jugando solo: cuentan tus aciertos. Si terminas una ronda con alguna vida, la superas y cada vida que te queda es una estrella.'],
           ['soloAlbum', 'Aciertos a tu colección', 'Retos rápidos jugando solo: cada carta bien colocada suma un acierto y pasa a tu colección. En cada mazo salen primero las que aún te faltan.']]
       ],
-      choose: [['Mazo y dificultad', 'ronda, maratón o competición'], ['4 mazos al día', 'iguales para todos; eliges uno']],
+      choose: [['Mazo y dificultad', 'ronda, maratón o competición'], ['4 mazos al día', 'cambian cada día; repite cuando quieras']],
       chooseAt: 4.6, end: null
     },
     friends: {
@@ -202,8 +202,8 @@
       screen: 'hub-online', name: 'Jugar online', title: 'Mesas con desconocidos', art: 'menu-online.webp',
       how: [true, 'Uno tras otro', HOW_GROUP],
       rows: groupRows('en una mesa'), chooseAt: 4.9,
-      choose: [['Tu mazo o hasta 3 temas', 'tu mesa: mano de 1 a 6; sin poderes'], ['Mazos sorpresa', 'tu mesa: 1, 3 o 5; partida rápida: 3']],
-      end: { label: 'Cómo empieza', caption: 'Llena o a los 30 s', html: START, at: 5.3 }
+      choose: [['Tu mazo o 3 temas', 'crear mesa: mazo y mano; partida rápida: hasta 3 temas'], ['Mazos sorpresa', 'crear mesa: 1,\u00a03\u00a0o\u00a05; partida rápida: 3']],
+      end: { label: 'Cómo empieza', caption: 'Llena, o 30 s sin nadie nuevo', html: START, at: 5.3 }
     }
   };
 
@@ -234,7 +234,7 @@
       <header class="mode-guide-head"><img class="mode-guide-hero" src="assets/${guide.art}" alt="" aria-hidden="true" decoding="async"><span><span class="eyebrow">${esc(guide.name)}</span><h2 id="mode-guide-title">${esc(guide.title)}</h2></span></header>
       <figure class="mode-guide-how" style="--at:.55s">${howStrip(group, howRule)}<figcaption>${esc(howCaption)}</figcaption></figure>
       <section class="mode-guide-table" aria-label="Grandes colecciones y Retos rápidos">
-        <div class="mode-guide-cols"><p class="mode-guide-colhead"><b>Grandes colecciones</b><small>Mazos por temas</small><small class="mode-guide-axis">por año o por cifra</small></p><p class="mode-guide-colhead"><b>Retos rápidos</b><small>Cada mazo, su regla</small><small class="mode-guide-axis">p. ej. oeste → este</small></p></div>
+        <div class="mode-guide-cols"><p class="mode-guide-colhead"><b>Grandes colecciones</b><small>Mazos por temas</small><small class="mode-guide-axis">por fecha o por número</small></p><p class="mode-guide-colhead"><b>Retos rápidos</b><small>Cada mazo, su regla</small><small class="mode-guide-axis">p. ej. oeste → este</small></p></div>
         ${guide.rows.map(([label, at, collections, quick]) => `<div class="mode-guide-row" style="--at:${at}s">${rowLabel(label)}${figure(collections)}${figure(quick)}</div>`).join('')}
         <div class="mode-guide-row mode-guide-choose" style="--at:${guide.chooseAt}s">${rowLabel('Eliges')}${guide.choose.map(([main, note], i) => `<p><span class="g-sr">${i ? 'Retos rápidos' : 'Grandes colecciones'}, eliges: </span><b>${esc(main)}</b><small>${esc(note)}</small></p>`).join('')}</div>
       </section>
