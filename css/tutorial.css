@@ -44,6 +44,7 @@
 :is(#app, #app-splash) .tv-player.is-waiting .tv-scene-title { right: 118px; }
 :is(#app, #app-splash) .tv-scene-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 /* El bloque de la escena (Lo básico, Jugar solo…), como una pastilla: siempre se sabe dónde se está. */
+:is(#app, #app-splash) .tv-scene-chapter img { width: 16px; height: 16px; margin: -1px 5px -1px -5px; border-radius: 50%; object-fit: cover; vertical-align: -4px; box-shadow: 0 0 0 1px #755528; }
 :is(#app, #app-splash) .tv-scene-chapter { flex: 0 0 auto; padding: 2px 8px; border-radius: 999px; background: var(--tv-glow); color: var(--tv-ink); letter-spacing: .08em; }
 :is(#app, #app-splash) .tv-scene-title.is-in { animation: tv-fade-down .6s var(--tv-ease-out) both; }
 :is(#app, #app-splash) .tv-stage, :is(#app, #app-splash) .tv-fade { position: absolute; inset: 44px 12px 84px; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; }
@@ -559,3 +560,15 @@
 :is(#app, #app-splash) .tv-tiebreak .tv-stack { width: 18px; height: 25px; }
 /* El Pulso: una sola carta para los dos. */
 :is(#app, #app-splash) .tv-pulse-card { display: grid; place-items: center; width: 22px; height: 30px; border: 1px solid #c9ab7a; border-radius: 4px; background: var(--tv-cardback); color: #9b411d; font: 800 .8rem/1 var(--ui-font); box-shadow: 0 3px 6px #0007; }
+
+/* La portada de un bloque: ocupa la mesa un momento al entrar en él y luego se aparta. */
+:is(#app, #app-splash) .tv-opener { position: absolute; z-index: 4; inset: 44px 12px 20px; display: grid; place-items: center; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity .45s, visibility .45s; }
+:is(#app, #app-splash) .tv-opener.is-on { opacity: 1; visibility: visible; }
+:is(#app, #app-splash) .tv-opener::before { content: ""; position: absolute; inset: 0 -12px -20px; background: radial-gradient(120% 90% at 50% 30%, #4a3321, #1f150e 70%); }
+:is(#app, #app-splash) .tv-opener-card { position: relative; display: grid; justify-items: center; gap: 12px; width: min(100%, 300px); text-align: center; }
+:is(#app, #app-splash) .tv-opener.is-on .tv-opener-card { animation: tv-scene-in .6s var(--tv-ease-out) both; }
+:is(#app, #app-splash) .tv-opener-card > img { width: 128px; height: 128px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 3px var(--tv-glow), 0 14px 30px #000a; }
+:is(#app, #app-splash) .tv-opener-card div { display: grid; gap: 6px; }
+:is(#app, #app-splash) .tv-opener-card small { color: var(--tv-glow); font: 600 .62rem/1.3 var(--ui-font); letter-spacing: .2em; text-transform: uppercase; }
+:is(#app, #app-splash) .tv-opener-card b { color: #fff; font: 500 2rem/1.05 var(--font-display); letter-spacing: -.02em; }
+:is(#app, #app-splash) .tv-opener-card span { color: var(--tv-soft); font: 500 .86rem/1.45 var(--ui-font); text-wrap: balance; }

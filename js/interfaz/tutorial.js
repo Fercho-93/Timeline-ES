@@ -414,6 +414,16 @@
   }
 
   const CHAPTERS = ["Lo básico", "Jugar solo", "Reto diario", "En grupo"];
+  // La portada de cada bloque: la misma lámina que su puerta en Inicio y qué hay dentro. Se ve
+  // un momento al entrar en el bloque, antes de su primera escena, y la lámina sigue después en
+  // la pastilla del título («Jugar solo · Una ronda»).
+  const OPENERS = [
+    null,
+    { art: "mode-walk-solo.webp", kicker: "Capítulo 2", text: "Tú contra la línea, a tu ritmo: Grandes colecciones y Retos rápidos" },
+    { art: "menu-daily.webp", kicker: "Capítulo 3", text: "Desde Inicio: uno al día, el mismo para todos" },
+    { art: "mode-walk-multi.webp", kicker: "Capítulo 4", text: "Con amigos, en un móvil o en varios, o con desconocidos online" }
+  ];
+  const PREROLL = 2400;
 
   const ICON = {
     prev: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5.5h2.4v13H6v-13Zm12.6.9v11.2c0 .9-1 1.4-1.7.9L9 13c-.7-.5-.7-1.5 0-2l7.9-5.5c.7-.5 1.7 0 1.7.9Z"/></svg>',
@@ -432,6 +442,7 @@
         <div class="tv-scene-title" aria-hidden="true"></div>
         <div class="tv-fade" aria-hidden="true" inert></div>
         <div class="tv-stage"></div>
+        <div class="tv-opener" aria-hidden="true"></div>
         <span class="tv-finger" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10m0-.5V4a1.5 1.5 0 0 1 3 0v6m0-1a1.5 1.5 0 0 1 3 0v4.5a7 7 0 0 1-7 7h-1a6 6 0 0 1-4.9-2.6L3.6 14a1.5 1.5 0 0 1 2.4-1.8L9 15V11"/></svg></span>
         <p class="tv-caption" aria-live="polite"></p>
         <button type="button" class="tv-next-cue" data-tv="continue" aria-label="Escena siguiente" hidden>Siguiente ${ICON.next}</button>
@@ -452,7 +463,7 @@
     root.dataset.tutorialReady = "1";
     const modeKey = root.dataset.tutorial;
     const list = scenes(modeKey, root.hasAttribute("data-portada"));
-    const stage = root.querySelector(".tv-stage"), finger = root.querySelector(".tv-finger"), fade = root.querySelector(".tv-fade");
+    const stage = root.querySelector(".tv-stage"), openerBox = root.querySelector(".tv-opener"), finger = root.querySelector(".tv-finger"), fade = root.querySelector(".tv-fade");
     const caption = root.querySelector(".tv-caption"), sceneTitle = root.querySelector(".tv-scene-title");
     let index = 0, t = 0, applied = 0, playing = true, ended = false, waiting = false, last = 0, timer = 0;
     const timeouts = new Set();
@@ -640,11 +651,16 @@
       stage.classList.remove("is-enter"); void stage.offsetWidth; stage.classList.add("is-enter");
       stage.dataset.scene = String(index);
       // El bloque al que pertenece la escena, siempre a la vista: «Jugar solo · Una ronda».
-      sceneTitle.innerHTML = `<span class="tv-scene-chapter">${esc(CHAPTERS[scene.chapter])}</span><span class="tv-scene-name">${esc(scene.title)}</span>`;
+      const opener = OPENERS[scene.chapter];
+      sceneTitle.innerHTML = `<span class="tv-scene-chapter">${opener ? `<img src="assets/${opener.art}" alt="" decoding="async">` : ""}${esc(CHAPTERS[scene.chapter])}</span><span class="tv-scene-name">${esc(scene.title)}</span>`;
+      // Al entrar en un bloque (en orden o saltando a él), su portada antes de la primera escena.
+      const enters = opener && list[index - 1]?.chapter !== scene.chapter;
+      openerBox.innerHTML = enters ? `<div class="tv-opener-card"><img src="assets/${opener.art}" alt="" decoding="async"><div><small>${esc(opener.kicker)}</small><b>${esc(CHAPTERS[scene.chapter])}</b><span>${esc(opener.text)}</span></div></div>` : "";
+      openerBox.classList.toggle("is-on", Boolean(enters));
       sceneTitle.classList.remove("is-in"); void sceneTitle.offsetWidth; sceneTitle.classList.add("is-in");
       ctx.fingerHide(); finger.style.transform = "";
       caption.textContent = "";
-      t = 0; applied = 0;
+      t = enters ? -PREROLL : 0; applied = 0;
       if (target > 0) {
         instant = true; root.classList.add("tv-instant");
         advance(target);
@@ -656,6 +672,7 @@
 
     function advance(to) {
       const steps = list[index].steps;
+      if (t < 0 && to >= 0) openerBox.classList.remove("is-on");
       while (applied < steps.length && steps[applied][0] <= to) { steps[applied][1](ctx); applied++; }
       t = to;
     }
@@ -705,7 +722,7 @@
       // Arriba, un tramo por escena: las pasadas llenas, la actual avanzando.
       segments.forEach((bar, i) => {
         const scene = list[i]; if (!scene) return;
-        bar.style.width = i < index || ended ? "100%" : i === index ? `${Math.min(100, Math.round(t / scene.duration * 100))}%` : "0%";
+        bar.style.width = i < index || ended ? "100%" : i === index ? `${Math.max(0, Math.min(100, Math.round(t / scene.duration * 100)))}%` : "0%";
       });
       CHAPTERS.forEach((_, chapter) => {
         const tab = root.querySelector(`[data-tv-chapter="${chapter}"]`); if (!tab) return;
