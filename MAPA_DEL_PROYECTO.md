@@ -97,7 +97,7 @@ cuando hacen falta.
 | `home-modes-v1.js` | Las entradas ilustradas de la pantalla de Inicio y las pantallas de elección («Jugar solo», «Jugar con amigos»…). |
 | `guia-modos.js` | La lámina que sale al entrar en Jugar solo, con amigos u online: la tira de cómo se juega, la tabla Grandes colecciones \| Retos rápidos fila a fila y, en grupo, dónde jugáis o cómo empieza una mesa. |
 | `starter-presentation.js` | La lámina del minijuego de quién empieza, la misma en Grandes colecciones, Retos rápidos y salas de amigos. |
-| `tutorial.js` | La guía en vídeo: escenas que se reproducen solas con subtítulos y un dedo que hace las jugadas. Se abre desde la Guía y desde «Ver el manual». |
+| `tutorial.js` | La guía en vídeo: escenas que se reproducen solas con subtítulos y un dedo que hace las jugadas, en cuatro capítulos (Lo básico, Jugar solo, Reto diario y En grupo). Se abre desde la Guía y desde «Ver cómo se juega», en la portada. |
 | `settings.js` | La pantalla de Ajustes. |
 | `a11y.js` | Pintar cada pantalla sin perder el foco del teclado, anunciar cambios al lector de pantalla, abrir las capas como diálogos, el aviso breve de abajo (`CT.toast`), las animaciones de las cartas y la ficha ampliada de una carta. |
 | `immersion.js` | La cabecera, la barra de navegación, los diálogos de confirmación, la mano en abanico y el ajuste de la mesa al alto de la pantalla. |
