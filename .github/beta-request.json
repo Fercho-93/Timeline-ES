@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 883,
+  "cache": 888,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Láminas con el árbol de opciones de Jugar solo, con amigos y online y con la lógica de cada forma de jugar, y «Salir sin guardar» en los duelos por internet (flecha de atrás y confirmación en el móvil)"
+  "reason": "Vídeo «cómo se juega» rehecho: cuatro capítulos en orden, todas las variantes y datos comprobados contra el código, cada escena espera a «Siguiente» y las portadas de Jugar solo, Reto diario y En grupo"
 }
