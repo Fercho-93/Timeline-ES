@@ -125,8 +125,7 @@ console.log("\nLas reglas se adaptan al mazo");
   const saved = JSON.stringify({...w.localStorage});
   ok("el vídeo arranca solo al abrir la guía", video?.dataset.tutorialReady === "1" && video.tutorial.state().playing && el(w, '.tv-caption').textContent.length > 0);
   ok("muestra cartas de verdad con su ilustración", w.document.querySelectorAll('.tv-stage .tv-card img').length >= 1);
-  click(w, '.tv-play');
-  ok("se puede pausar como un vídeo", !video.tutorial.state().playing && el(w, '.tv-play').getAttribute('aria-label') === 'Reproducir');
+  ok("no hay botón de reproducir ni de pausa: solo anterior y siguiente", !w.document.querySelector('.tv-play, .tv-big-play, [data-tv="toggle"]') && w.document.querySelectorAll('.tv-transport .tv-btn').length === 2);
   // El orden es el de quien no conoce el juego: lo que vale siempre, después cada forma de jugar.
   const titulos = [...w.document.querySelectorAll('.tv-seg')].map(seg => seg.getAttribute('aria-label'));
   ok("primero lo básico: la carta, la línea, colocar, fallar y los dos tipos de mazo", titulos.slice(0, 5).join(" | ") === "La carta | La línea | Colocar una carta | Si fallas | Dos tipos de mazo");
@@ -165,7 +164,7 @@ console.log("\nLas reglas se adaptan al mazo");
     const antes = video.tutorial.state().index;
     for (let i = 0; i < 400 && !video.tutorial.state().waiting; i++) await new Promise(resolve => setTimeout(resolve, 70));
     const estado = video.tutorial.state();
-    ok("al acabar la escena no salta sola: espera con «Siguiente»", estado.waiting && estado.index === antes && !el(w, '.tv-next-cue').hidden && el(w, '.tv-play').getAttribute('aria-label') === 'Escena siguiente');
+    ok("al acabar la escena no salta sola: espera con «Siguiente»", estado.waiting && estado.index === antes && !el(w, '.tv-next-cue').hidden);
     click(w, '.tv-next-cue');
     ok("y «Siguiente» pasa a la escena siguiente", video.tutorial.state().index === antes + 1 && video.tutorial.state().playing && el(w, '.tv-next-cue').hidden);
   }

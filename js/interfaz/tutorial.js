@@ -1,6 +1,6 @@
 // La guía en vídeo: el juego se explica mostrándolo. Cada escena se reproduce sola, con un
 // subtítulo corto y un dedo que hace las jugadas, y al acabar espera a que quien mira pase a la
-// siguiente («Siguiente», o tocar la pantalla). Se pausa, se avanza y se rebobina como un
+// siguiente («Siguiente», o tocar la pantalla). No hay botón de reproducir ni de pausa. Se pausa, se avanza y se rebobina como un
 // vídeo; no es un vídeo de verdad, sino la misma mesa dibujada con cartas reales de los mazos, así
 // que nunca enseña algo que luego el tablero contradiga. Solo se mira: no pide ninguna jugada,
 // no gasta vidas ni cambia el progreso.
@@ -416,9 +416,6 @@
   const CHAPTERS = ["Lo básico", "Jugar solo", "Reto diario", "En grupo"];
 
   const ICON = {
-    play: '<svg class="tv-ico-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.6v14.8c0 .9 1 1.4 1.7.9l11-7.4c.7-.4.7-1.4 0-1.8l-11-7.4C8 3.2 7 3.7 7 4.6Z"/></svg>',
-    pause: '<svg class="tv-ico-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="5.5" y="4" width="4.5" height="16" rx="1.3"/><rect x="14" y="4" width="4.5" height="16" rx="1.3"/></svg>',
-    replay: '<svg class="tv-ico-replay" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5a7 7 0 1 1-6.3 4h2.2A5 5 0 1 0 12 7v3L7.5 6 12 2v3Z"/></svg>',
     prev: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5.5h2.4v13H6v-13Zm12.6.9v11.2c0 .9-1 1.4-1.7.9L9 13c-.7-.5-.7-1.5 0-2l7.9-5.5c.7-.5 1.7 0 1.7.9Z"/></svg>',
     next: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.6 5.5H18v13h-2.4v-13ZM5.4 6.4v11.2c0 .9 1 1.4 1.7.9L15 13c.7-.5.7-1.5 0-2L7.1 5.5c-.7-.5-1.7 0-1.7.9Z"/></svg>'
   };
@@ -437,13 +434,11 @@
         <div class="tv-stage"></div>
         <span class="tv-finger" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10m0-.5V4a1.5 1.5 0 0 1 3 0v6m0-1a1.5 1.5 0 0 1 3 0v4.5a7 7 0 0 1-7 7h-1a6 6 0 0 1-4.9-2.6L3.6 14a1.5 1.5 0 0 1 2.4-1.8L9 15V11"/></svg></span>
         <p class="tv-caption" aria-live="polite"></p>
-        <button type="button" class="tv-big-play" data-tv="toggle" aria-label="Reproducir" hidden>${ICON.play}</button>
         <button type="button" class="tv-next-cue" data-tv="continue" aria-label="Escena siguiente" hidden>Siguiente ${ICON.next}</button>
       </div>
       <div class="tv-controls">
         <div class="tv-transport">
           <button type="button" class="tv-btn" data-tv="prev" aria-label="Escena anterior">${ICON.prev}</button>
-          <button type="button" class="tv-btn tv-play" data-tv="toggle" data-state="playing" aria-label="Pausar">${ICON.play}${ICON.pause}${ICON.replay}${ICON.next.replace("<svg", '<svg class="tv-ico-next"')}</button>
           <button type="button" class="tv-btn" data-tv="next" aria-label="Escena siguiente">${ICON.next}</button>
         </div>
         <div class="tv-chapters">${CHAPTERS.map((name, index) => `<button type="button" class="tv-chapter" data-tv-chapter="${index}"><b aria-hidden="true">${index + 1}</b><small>${name}</small></button>`).join("")}</div>
@@ -719,10 +714,6 @@
       });
     }
     function paint() {
-      const play = root.querySelector(".tv-play"), big = root.querySelector(".tv-big-play");
-      play.dataset.state = playing ? "playing" : ended ? "ended" : waiting ? "next" : "paused";
-      play.setAttribute("aria-label", playing ? "Pausar" : ended ? "Ver otra vez" : waiting ? "Escena siguiente" : "Reproducir");
-      big.hidden = playing || ended || waiting;
       root.querySelector(".tv-next-cue").hidden = !waiting;
       root.classList.toggle("is-waiting", waiting);
       root.classList.toggle("is-paused", !playing);
@@ -736,20 +727,25 @@
       if (chapter) { go(list.findIndex(scene => scene.chapter === Number(chapter.dataset.tvChapter))); return; }
       if (!control) return;
       const action = control.dataset.tv;
-      if (action === "toggle") setPlaying(!playing);
-      else if (action === "prev") go(t > 1500 ? index : index - 1);
+      if (action === "prev") go(t > 1500 ? index : index - 1);
       else if (action === "next" || action === "continue") go(index + 1);
       else if (action === "replay") go(0);
       else if (action === "manual") root.closest(".guide-handbook")?.querySelector(".guide-manual")?.scrollIntoView?.({ behavior: "smooth", block: "start" });
     });
-    // Tocar la pantalla pausa o reanuda, como en un vídeo; al final de una escena, pasa a la siguiente.
+    // No hay botón de reproducir ni de pausa: cada escena se reproduce sola y espera. Tocar la
+    // pantalla al final de una escena pasa a la siguiente.
     root.querySelector(".tv-screen").addEventListener("click", event => {
-      if (event.target.closest("button")) return;
-      setPlaying(!playing);
+      if (event.target.closest("button") || !waiting) return;
+      go(index + 1);
     });
 
-    // Al salir de la aplicación el vídeo se queda en pausa, como cualquier reproductor.
-    const onHidden = () => { if (!root.isConnected) document.removeEventListener("visibilitychange", onHidden); else if (document.hidden && playing) setPlaying(false); };
+    // Al salir de la aplicación la escena se detiene, y sigue donde estaba al volver.
+    let hiddenStop = false;
+    const onHidden = () => {
+      if (!root.isConnected) { document.removeEventListener("visibilitychange", onHidden); return; }
+      if (document.hidden && playing) { hiddenStop = true; setPlaying(false); }
+      else if (!document.hidden && hiddenStop) { hiddenStop = false; setPlaying(true); }
+    };
     document.addEventListener("visibilitychange", onHidden);
     build();
     setPlaying(true);
