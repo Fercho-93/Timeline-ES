@@ -41,7 +41,6 @@
   color: var(--tv-glow); font: 600 .62rem/1.4 var(--ui-font); letter-spacing: .18em; text-transform: uppercase;
 }
 :is(#app, #app-splash) .tv-scene-title { gap: 7px; top: 19px; white-space: nowrap; }
-:is(#app, #app-splash) .tv-player.is-waiting .tv-scene-title { right: 118px; }
 :is(#app, #app-splash) .tv-scene-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 /* El bloque de la escena (Lo básico, Jugar solo…), como una pastilla: siempre se sabe dónde se está. */
 :is(#app, #app-splash) .tv-scene-chapter img { width: 16px; height: 16px; margin: -1px 5px -1px -5px; border-radius: 50%; object-fit: cover; vertical-align: -4px; box-shadow: 0 0 0 1px #755528; }
@@ -71,15 +70,6 @@
 :is(#app, #app-splash) .tv-caption.is-say { animation: tv-say .45s var(--tv-ease-out) both; }
 :is(#app, #app-splash) .tv-caption:empty { visibility: hidden; }
 
-:is(#app, #app-splash) .tv-next-cue[hidden] { display: none; }
-/* Al acabar una escena: el aviso para pasar a la siguiente, arriba a la derecha. */
-:is(#app, #app-splash) .tv-next-cue {
-  position: absolute; z-index: 5; top: 11px; right: 12px; display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 5px 11px 5px 13px;
-  border: 0; border-radius: 999px; background: linear-gradient(180deg, #f3dba6, var(--tv-glow)); color: var(--tv-ink); font: 700 .78rem/1 var(--ui-font); cursor: pointer;
-  box-shadow: 0 6px 16px #0009; animation: tv-big-in .35s var(--tv-ease-out) both, tv-nudge 1.6s ease-in-out .6s infinite;
-}
-:is(#app, #app-splash) .tv-next-cue svg { width: 14px; height: 14px; fill: currentColor; }
-:is(#app, #app-splash) .tv-next-cue:focus-visible { outline: 2px solid var(--tv-text); outline-offset: 2px; }
 
 /* El dedo que hace las jugadas. */
 :is(#app, #app-splash) .tv-finger {
@@ -485,10 +475,17 @@
 
 /* ── El mando ────────────────────────────────────────────────────────────────────────── */
 :is(#app, #app-splash) .tv-controls { display: grid; justify-items: center; gap: 10px; margin-top: 12px; }
-:is(#app, #app-splash) .tv-transport { display: flex; align-items: center; gap: 2px; padding: 4px; border: 1px solid var(--edition-line); border-radius: 999px; background: var(--edition-surface); box-shadow: 0 6px 18px -8px #1c140c66; }
-:is(#app, #app-splash) .tv-btn { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--edition-ink); cursor: pointer; transition: background .2s, transform .15s; }
-:is(#app, #app-splash) .tv-btn svg { width: 20px; height: 20px; fill: currentColor; }
-:is(#app, #app-splash) .tv-btn:active { transform: scale(.94); }
+/* Pasar de escena: «Anterior» discreto y «Siguiente» grande, que se enciende al acabar la escena. */
+:is(#app, #app-splash) .tv-nav { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; width: 100%; }
+:is(#app, #app-splash) .tv-nav button { min-height: 48px; padding: 10px 16px; border-radius: 999px; font: 700 .9rem/1.2 var(--ui-font); cursor: pointer; transition: background .25s, color .25s, box-shadow .25s, opacity .2s, transform .15s; }
+:is(#app, #app-splash) .tv-nav button:active:not(:disabled) { transform: scale(.97); }
+:is(#app, #app-splash) .tv-nav button:disabled { opacity: .4; cursor: default; }
+:is(#app, #app-splash) .tv-nav button:focus-visible { outline: 2px solid var(--edition-brass); outline-offset: 2px; }
+:is(#app, #app-splash) .tv-nav-prev { border: 1px solid var(--edition-line); background: var(--edition-surface); color: var(--edition-ink); }
+:is(#app, #app-splash) .tv-nav-next { border: 1px solid var(--edition-brass); background: var(--edition-surface); color: var(--edition-ink); }
+:is(#app, #app-splash) .tv-nav-next.is-ready { border-color: transparent; background: var(--edition-brass); color: var(--edition-surface); box-shadow: 0 8px 18px -6px #1c140c99; animation: tv-ready 1.8s ease-in-out infinite; }
+:is(#app, #app-splash) .tv-nav-next span { display: inline-block; }
+:is(#app, #app-splash) .tv-nav-next.is-ready span { animation: tv-nudge 1.6s ease-in-out infinite; }
 :is(#app, #app-splash) .tv-chapters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; width: 100%; }
 :is(#app, #app-splash) .tv-chapter { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-items: center; gap: 5px; min-width: 0; padding: 8px 6px 10px; border: 0; background: none; color: var(--edition-muted); text-align: center; cursor: pointer; }
 :is(#app, #app-splash) .tv-chapter b { display: grid; place-items: center; width: 20px; height: 20px; border: 1px solid currentColor; border-radius: 50%; font: 700 .58rem/1 var(--ui-font); transition: background .3s, color .3s; }
@@ -499,7 +496,6 @@
 :is(#app, #app-splash) .tv-chapter.is-current::after { background: var(--edition-brass); }
 :is(#app, #app-splash) .tv-chapter.is-done b { background: var(--edition-brass); border-color: var(--edition-brass); color: var(--edition-surface); opacity: .55; }
 @media (min-width: 560px) {
-  :is(#app, #app-splash) .tv-controls { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 14px; }
   :is(#app, #app-splash) .tv-chapters { gap: 8px; }
 }
 
@@ -513,6 +509,7 @@
 @keyframes tv-say { from { opacity: 0; transform: translateY(8px); } }
 @keyframes tv-big-in { from { opacity: 0; transform: scale(.8); } }
 @keyframes tv-ripple { from { opacity: 1; transform: scale(.4); } to { opacity: 0; transform: scale(1.9); } }
+@keyframes tv-ready { 50% { box-shadow: 0 8px 18px -6px #1c140c99, 0 0 0 5px #a77b3833; } }
 @keyframes tv-nudge { 50% { transform: translateX(3px); } }
 @keyframes tv-pop { 40% { transform: scale(1.1); } }
 @keyframes tv-flip { 50% { transform: scaleX(0); } }

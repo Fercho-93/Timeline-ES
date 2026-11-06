@@ -425,10 +425,6 @@
   ];
   const PREROLL = 2400;
 
-  const ICON = {
-    prev: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5.5h2.4v13H6v-13Zm12.6.9v11.2c0 .9-1 1.4-1.7.9L9 13c-.7-.5-.7-1.5 0-2l7.9-5.5c.7-.5 1.7 0 1.7.9Z"/></svg>',
-    next: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.6 5.5H18v13h-2.4v-13ZM5.4 6.4v11.2c0 .9 1 1.4 1.7.9L15 13c.7-.5.7-1.5 0-2L7.1 5.5c-.7-.5-1.7 0-1.7.9Z"/></svg>'
-  };
 
   function markup(modeKey, { portada = false } = {}) {
     if (!sample(modeKey)) return "";
@@ -445,12 +441,11 @@
         <div class="tv-opener" aria-hidden="true"></div>
         <span class="tv-finger" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10m0-.5V4a1.5 1.5 0 0 1 3 0v6m0-1a1.5 1.5 0 0 1 3 0v4.5a7 7 0 0 1-7 7h-1a6 6 0 0 1-4.9-2.6L3.6 14a1.5 1.5 0 0 1 2.4-1.8L9 15V11"/></svg></span>
         <p class="tv-caption" aria-live="polite"></p>
-        <button type="button" class="tv-next-cue" data-tv="continue" aria-label="Escena siguiente" hidden>Siguiente ${ICON.next}</button>
       </div>
       <div class="tv-controls">
-        <div class="tv-transport">
-          <button type="button" class="tv-btn" data-tv="prev" aria-label="Escena anterior">${ICON.prev}</button>
-          <button type="button" class="tv-btn" data-tv="next" aria-label="Escena siguiente">${ICON.next}</button>
+        <div class="tv-nav">
+          <button type="button" class="tv-nav-prev" data-tv="prev"><span aria-hidden="true">←</span> Anterior</button>
+          <button type="button" class="tv-nav-next" data-tv="next">Siguiente <span aria-hidden="true">→</span></button>
         </div>
         <div class="tv-chapters">${CHAPTERS.map((name, index) => `<button type="button" class="tv-chapter" data-tv-chapter="${index}"><b aria-hidden="true">${index + 1}</b><small>${name}</small></button>`).join("")}</div>
       </div>
@@ -731,7 +726,10 @@
       });
     }
     function paint() {
-      root.querySelector(".tv-next-cue").hidden = !waiting;
+      // «Siguiente» siempre se puede pulsar; al acabar la escena se enciende para avisar.
+      root.querySelector(".tv-nav-prev").disabled = index === 0;
+      root.querySelector(".tv-nav-next").disabled = index >= list.length - 1;
+      root.querySelector(".tv-nav-next").classList.toggle("is-ready", waiting);
       root.classList.toggle("is-waiting", waiting);
       root.classList.toggle("is-paused", !playing);
       root.classList.toggle("is-ended", ended);
@@ -745,7 +743,7 @@
       if (!control) return;
       const action = control.dataset.tv;
       if (action === "prev") go(t > 1500 ? index : index - 1);
-      else if (action === "next" || action === "continue") go(index + 1);
+      else if (action === "next") go(index + 1);
       else if (action === "replay") go(0);
       else if (action === "manual") root.closest(".guide-handbook")?.querySelector(".guide-manual")?.scrollIntoView?.({ behavior: "smooth", block: "start" });
     });

@@ -445,8 +445,8 @@ html.splash-active #app-splash .splash-masthead {
 }
 #app-splash .splash-video > .tv-player { width: min(100%, 520px); margin: 0; }
 /* El mando, sobre el velo oscuro: cristal y latón claro. */
-#app-splash .splash-video .tv-transport { border-color: #e7c98f55; background: #2a1d12e6; box-shadow: 0 10px 24px -10px #000a; }
-#app-splash .splash-video .tv-btn { color: #fff5df; }
+#app-splash .splash-video :is(.tv-nav-prev, .tv-nav-next) { border-color: #e7c98f55; background: #2a1d12e6; color: #fff5df; }
+#app-splash .splash-video .tv-nav-next.is-ready { border-color: transparent; background: linear-gradient(180deg, #a04c32, #87351f); color: #fff5df; }
 #app-splash .splash-video .tv-chapter { color: #e9dcc3b3; }
 #app-splash .splash-video .tv-chapter.is-current { color: #fff5df; }
 #app-splash .splash-video .tv-chapter::after { background: #ffffff2e; }
