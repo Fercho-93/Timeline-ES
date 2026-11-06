@@ -132,12 +132,12 @@ console.log("\nLas reglas se adaptan al mazo");
   ok("primero lo básico: la carta, la línea, colocar, fallar y los dos tipos de mazo", titulos.slice(0, 5).join(" | ") === "La carta | La línea | Colocar una carta | Si fallas | Dos tipos de mazo");
   ok("ninguna escena es una entradilla sin contenido", !titulos.some(titulo => /Entradilla/.test(titulo)));
   click(w, '[data-tv-chapter="1"]');
-  ok("Jugar solo empieza por la ronda, con su ruta", el(w, '.tv-scene-title').textContent === 'Una ronda' && el(w, '[data-tv-chapter="1"]').classList.contains('is-current') && el(w, '.tv-stage .tv-path').textContent.includes('Grandes colecciones'));
+  ok("Jugar solo empieza por la ronda, con su ruta", el(w, '.tv-scene-name').textContent === 'Una ronda' && el(w, '[data-tv-chapter="1"]').classList.contains('is-current') && el(w, '.tv-stage .tv-path').textContent.includes('Grandes colecciones'));
   click(w, '[data-tv="prev"]');
-  ok("y se rebobina escena a escena", el(w, '.tv-scene-title').textContent === 'Dos tipos de mazo');
+  ok("y se rebobina escena a escena", el(w, '.tv-scene-name').textContent === 'Dos tipos de mazo');
   click(w, '[data-tv="next"]');
   click(w, '[data-tv="next"]');
-  ok("después de la ronda, maratón y competición", el(w, '.tv-scene-title').textContent === 'Maratón y competición');
+  ok("después de la ronda, maratón y competición", el(w, '.tv-scene-name').textContent === 'Maratón y competición');
   for (const [anterior, siguiente, capitulo] of [
     ['Retos rápidos', 'Reto diario', 2],
     ['Reto diario', 'Con amigos', 3],
@@ -145,19 +145,30 @@ console.log("\nLas reglas se adaptan al mazo");
   ]) {
     click(w, `.tv-seg[aria-label="${anterior}"]`);
     click(w, '[data-tv="next"]');
-    ok(`${anterior} da paso a ${siguiente}`, el(w, '.tv-scene-title').textContent === siguiente && el(w, `[data-tv-chapter="${capitulo}"]`).classList.contains('is-current'));
+    ok(`${anterior} da paso a ${siguiente}`, el(w, '.tv-scene-name').textContent === siguiente && el(w, `[data-tv-chapter="${capitulo}"]`).classList.contains('is-current'));
   }
   click(w, '[data-tv-chapter="2"]');
-  ok("el reto diario es un capítulo propio, con su marcador", el(w, '.tv-scene-title').textContent === 'Reto diario' && el(w, '.tv-score').textContent === '7 de 10');
+  ok("el reto diario es un capítulo propio, con su marcador", el(w, '.tv-scene-name').textContent === 'Reto diario' && el(w, '.tv-score').textContent === '7 de 10');
   // Los días se alternan (CT.RetoDiario.familia): ni «pares» ni «impares», y hoy es lo que dice el juego.
   const dias = el(w, '.tv-days').textContent;
   const hoy = w.CONTINUUM.RetoDiario.familia() === "quick" ? "Retos rápidos" : "Grandes colecciones";
   ok("el reto diario alterna cada día y dice qué toca hoy", !/pares|impares/i.test(el(w, '.tv-stage').textContent) && dias.indexOf(hoy) > -1 && dias.indexOf(hoy) < dias.indexOf("Mañana"));
   click(w, '[data-tv-chapter="3"]');
-  ok("En grupo empieza por cómo os juntáis", el(w, '.tv-scene-title').textContent === 'Con amigos' && /de 2 a 10/.test(el(w, '.tv-stage').textContent) && /Retos rápidos: de 2 a 4/.test(el(w, '.tv-stage').textContent));
+  ok("En grupo empieza por cómo os juntáis", el(w, '.tv-scene-name').textContent === 'Con amigos' && /de 2 a 10/.test(el(w, '.tv-stage').textContent) && /Retos rápidos: de 2 a 4/.test(el(w, '.tv-stage').textContent));
   // Las dos familias se juegan distinto en grupo, y las dos se explican.
-  click(w, '.tv-seg[aria-label="Retos rápidos en grupo"]');
+  click(w, '.tv-seg[aria-label="Con Retos rápidos"]');
   ok("Retos rápidos en grupo enseña las dos reglas de «Si alguien falla»", /Arriesgar o plantarse/.test(el(w, '.tv-switch').textContent) && /Seguir hasta el final/.test(el(w, '.tv-switch').textContent));
+  // Cada escena dice a qué bloque pertenece y, al acabar, espera a que se pase a la siguiente.
+  click(w, '.tv-seg[aria-label="Una ronda"]');
+  ok("la escena dice su bloque: «Jugar solo · Una ronda»", el(w, '.tv-scene-chapter').textContent === 'Jugar solo' && el(w, '.tv-scene-name').textContent === 'Una ronda');
+  {
+    const antes = video.tutorial.state().index;
+    for (let i = 0; i < 400 && !video.tutorial.state().waiting; i++) await new Promise(resolve => setTimeout(resolve, 70));
+    const estado = video.tutorial.state();
+    ok("al acabar la escena no salta sola: espera con «Siguiente»", estado.waiting && estado.index === antes && !el(w, '.tv-next-cue').hidden && el(w, '.tv-play').getAttribute('aria-label') === 'Escena siguiente');
+    click(w, '.tv-next-cue');
+    ok("y «Siguiente» pasa a la escena siguiente", video.tutorial.state().index === antes + 1 && video.tutorial.state().playing && el(w, '.tv-next-cue').hidden);
+  }
   video.tutorial.go(2);
   ok("la carta por colocar dice qué dato esconde", /Peso oculto/i.test(el(w, '.tv-hand').textContent));
   // Breve, pero que se pueda leer: cada frase se ve a 17 caracteres por segundo como mucho, y el

@@ -1,5 +1,6 @@
 // La guía en vídeo: el juego se explica mostrándolo. Cada escena se reproduce sola, con un
-// subtítulo corto y un dedo que hace las jugadas. Se pausa, se avanza y se rebobina como un
+// subtítulo corto y un dedo que hace las jugadas, y al acabar espera a que quien mira pase a la
+// siguiente («Siguiente», o tocar la pantalla). Se pausa, se avanza y se rebobina como un
 // vídeo; no es un vídeo de verdad, sino la misma mesa dibujada con cartas reales de los mazos, así
 // que nunca enseña algo que luego el tablero contradiga. Solo se mira: no pide ninguna jugada,
 // no gasta vidas ni cambia el progreso.
@@ -220,7 +221,7 @@
             <div class="tv-round-row">${hearts()}${dots("✓✓✓✗✓✓✓✓✓✓")}</div></div>
           <div class="tv-round tv-round-out" data-round="out"><span class="tv-tag">Otra ronda</span><div class="tv-round-row">${hearts(3)}${dots("✓✗✓✗✗·····")}</div><small>Se acabaron las vidas</small></div></div>`,
         steps: [
-          [0, c => { c.say("Con Grandes colecciones, una ronda son 10 cartas y 3 vidas."); c.add('[data-round="main"] .tv-lives', "is-in"); }],
+          [0, c => { c.say("Jugando solo con Grandes colecciones, una ronda son 10 cartas y 3 vidas."); c.add('[data-round="main"] .tv-lives', "is-in"); }],
           [500, c => c.stagger('[data-round="main"] .tv-dots span', 330)],
           [1550, c => c.lose('[data-round="main"] .tv-lives')],
           [4300, c => { c.say("Cada fallo cuesta una vida, y sin vidas se acaba."); c.add('[data-round="out"]', "is-in"); c.stagger('[data-round="out"] .tv-dots span', 260); }],
@@ -327,7 +328,7 @@
       // común; acierto, una carta menos; fallo, al descarte y se roba en la misma jugada; la
       // victoria se mira al cerrar la vuelta; si acaban varios, final de desempate. La carta del
       // minijuego no vuelve a salir (js/juego/app.js, js/juego/engine.js y js/juego/final.js).
-      { chapter: 3, title: "Grandes colecciones en grupo", duration: 18800,
+      { chapter: 3, title: "Con Grandes colecciones", duration: 18800,
         html: `<div class="tv-board tv-group"><div class="tv-gline-wrap"><span class="tv-tag">Línea común</span><span class="tv-vuelta">Vuelta <b>1</b></span>
           <div class="tv-gline">${[s[1], s[3], s[4], s[7], s[9]].map((c, i) => miniMarkup(modeKey, c, i === 1 ? "" : "is-pending")).join("")}</div></div>
           <div class="tv-seats">${seatOrder.map(seat).join("")}</div>
@@ -369,7 +370,7 @@
       // (aciertos provisionales; plantarse es la jugada de tu turno; un fallo los pierde y deja
       // fuera hasta el siguiente mazo; la carta fallada entra corregida) o «Seguir hasta el
       // final»; gana quien más aciertos suma (js/retos/quick-challenges-engine.js).
-      { chapter: 3, title: "Retos rápidos en grupo", duration: 19400,
+      { chapter: 3, title: "Con Retos rápidos", duration: 19400,
         html: `<div class="tv-board tv-group tv-quick-group"><div class="tv-switch"><span class="is-on">Arriesgar o plantarse</span><span>Seguir hasta el final</span></div>
           ${rivers ? `<span class="tv-rule">${esc(rivers.deck.rule)}<i>Mazo 1 de 3</i></span>${lineMarkup([R[0], R[1], R[3], R[4], R[6], R[7]].map(c => c === R[3] ? qcard(c, { extra: "tv-sm" }) : qcard(c, { hidden: true, extra: "tv-sm tv-extra" })), { gaps: false })}
           <span class="tv-tag">Cartas comunes</span><div class="tv-pool">${[R[6], R[1], R[4], R[7], R[0]].map(c => qcard(c, { hidden: true, extra: "tv-sm" })).join("")}<span class="tv-more">+4</span></div>` : ""}
@@ -437,11 +438,12 @@
         <span class="tv-finger" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10m0-.5V4a1.5 1.5 0 0 1 3 0v6m0-1a1.5 1.5 0 0 1 3 0v4.5a7 7 0 0 1-7 7h-1a6 6 0 0 1-4.9-2.6L3.6 14a1.5 1.5 0 0 1 2.4-1.8L9 15V11"/></svg></span>
         <p class="tv-caption" aria-live="polite"></p>
         <button type="button" class="tv-big-play" data-tv="toggle" aria-label="Reproducir" hidden>${ICON.play}</button>
+        <button type="button" class="tv-next-cue" data-tv="continue" aria-label="Escena siguiente" hidden>Siguiente ${ICON.next}</button>
       </div>
       <div class="tv-controls">
         <div class="tv-transport">
           <button type="button" class="tv-btn" data-tv="prev" aria-label="Escena anterior">${ICON.prev}</button>
-          <button type="button" class="tv-btn tv-play" data-tv="toggle" data-state="playing" aria-label="Pausar">${ICON.play}${ICON.pause}${ICON.replay}</button>
+          <button type="button" class="tv-btn tv-play" data-tv="toggle" data-state="playing" aria-label="Pausar">${ICON.play}${ICON.pause}${ICON.replay}${ICON.next.replace("<svg", '<svg class="tv-ico-next"')}</button>
           <button type="button" class="tv-btn" data-tv="next" aria-label="Escena siguiente">${ICON.next}</button>
         </div>
         <div class="tv-chapters">${CHAPTERS.map((name, index) => `<button type="button" class="tv-chapter" data-tv-chapter="${index}"><b aria-hidden="true">${index + 1}</b><small>${name}</small></button>`).join("")}</div>
@@ -457,7 +459,7 @@
     const list = scenes(modeKey, root.hasAttribute("data-portada"));
     const stage = root.querySelector(".tv-stage"), finger = root.querySelector(".tv-finger"), fade = root.querySelector(".tv-fade");
     const caption = root.querySelector(".tv-caption"), sceneTitle = root.querySelector(".tv-scene-title");
-    let index = 0, t = 0, applied = 0, playing = true, ended = false, last = 0, timer = 0;
+    let index = 0, t = 0, applied = 0, playing = true, ended = false, waiting = false, last = 0, timer = 0;
     const timeouts = new Set();
 
     const $ = sel => typeof sel === "string" ? stage.querySelector(sel) : sel;
@@ -642,7 +644,8 @@
       stage.innerHTML = scene.html;
       stage.classList.remove("is-enter"); void stage.offsetWidth; stage.classList.add("is-enter");
       stage.dataset.scene = String(index);
-      sceneTitle.textContent = scene.title;
+      // El bloque al que pertenece la escena, siempre a la vista: «Jugar solo · Una ronda».
+      sceneTitle.innerHTML = `<span class="tv-scene-chapter">${esc(CHAPTERS[scene.chapter])}</span><span class="tv-scene-name">${esc(scene.title)}</span>`;
       sceneTitle.classList.remove("is-in"); void sceneTitle.offsetWidth; sceneTitle.classList.add("is-in");
       ctx.fingerHide(); finger.style.transform = "";
       caption.textContent = "";
@@ -664,12 +667,14 @@
 
     function go(next, { play = true } = {}) {
       index = Math.max(0, Math.min(list.length - 1, next));
-      ended = false; build();
+      ended = false; waiting = false; build();
       if (play) setPlaying(true);
     }
 
     function setPlaying(on) {
       if (ended && on) { index = 0; ended = false; build(); }
+      // Al final de una escena, «reproducir» es pasar a la siguiente.
+      if (waiting && on) { go(index + 1); return; }
       playing = on;
       last = now();
       if (playing) loop();
@@ -691,7 +696,9 @@
           root.dispatchEvent(new CustomEvent("tutorial-end", { bubbles: true }));
           return;
         }
-        index++; build();
+        // No salta sola: espera a que quien mira pase a la siguiente, con todo el tiempo que quiera.
+        t = scene.duration; waiting = true; playing = false; paint();
+        return;
       }
       paintProgress();
       timer = setTimeout(loop, 60);
@@ -713,9 +720,11 @@
     }
     function paint() {
       const play = root.querySelector(".tv-play"), big = root.querySelector(".tv-big-play");
-      play.dataset.state = playing ? "playing" : ended ? "ended" : "paused";
-      play.setAttribute("aria-label", playing ? "Pausar" : ended ? "Ver otra vez" : "Reproducir");
-      big.hidden = playing || ended;
+      play.dataset.state = playing ? "playing" : ended ? "ended" : waiting ? "next" : "paused";
+      play.setAttribute("aria-label", playing ? "Pausar" : ended ? "Ver otra vez" : waiting ? "Escena siguiente" : "Reproducir");
+      big.hidden = playing || ended || waiting;
+      root.querySelector(".tv-next-cue").hidden = !waiting;
+      root.classList.toggle("is-waiting", waiting);
       root.classList.toggle("is-paused", !playing);
       root.classList.toggle("is-ended", ended);
       paintProgress();
@@ -729,11 +738,11 @@
       const action = control.dataset.tv;
       if (action === "toggle") setPlaying(!playing);
       else if (action === "prev") go(t > 1500 ? index : index - 1);
-      else if (action === "next") go(index + 1);
+      else if (action === "next" || action === "continue") go(index + 1);
       else if (action === "replay") go(0);
       else if (action === "manual") root.closest(".guide-handbook")?.querySelector(".guide-manual")?.scrollIntoView?.({ behavior: "smooth", block: "start" });
     });
-    // Tocar la pantalla pausa o reanuda, como en un vídeo.
+    // Tocar la pantalla pausa o reanuda, como en un vídeo; al final de una escena, pasa a la siguiente.
     root.querySelector(".tv-screen").addEventListener("click", event => {
       if (event.target.closest("button")) return;
       setPlaying(!playing);
@@ -744,7 +753,7 @@
     document.addEventListener("visibilitychange", onHidden);
     build();
     setPlaying(true);
-    root.tutorial = { go, setPlaying, state: () => ({ index, t, playing, ended, scenes: list.length, title: list[index].title, duration: list[index].duration }), stop };
+    root.tutorial = { go, setPlaying, state: () => ({ index, t, playing, ended, waiting, scenes: list.length, title: list[index].title, duration: list[index].duration }), stop };
   }
 
   // La guía se inserta como texto desde varios sitios (la partida, las salas); el
