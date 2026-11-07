@@ -234,7 +234,7 @@ try {
    await duelPage.locator('[data-action="accept-duel"]').click();
    await duelPage.locator('[data-action="duel-play"]').click();
    // La carta del turno va arriba, sobre la línea; se ve entera y sin el pliegue dorado.
-   const selectedStyle=await duelPage.locator('.hand-solo .hand-card.selected').evaluate(el=>({
+   const selectedStyle=await duelPage.locator('.atlas-hand-section .hand-card.selected').evaluate(el=>({
      fold:getComputedStyle(el,'::before').display,
      width:el.getBoundingClientRect().width,
      height:el.getBoundingClientRect().height
@@ -245,7 +245,7 @@ try {
    await duelPage.locator('[data-action="solo-place"]').first().click();
    const dockBox=await duelPage.locator('.placement-dock').boundingBox();
    const timelineBox=await duelPage.locator('.timeline-wrap').boundingBox();
-   const focusBox=await duelPage.locator('.board-focus-card').boundingBox();
+   const focusBox=await duelPage.locator('.atlas-hand-section').boundingBox();
    assert.ok(focusBox.y+focusBox.height<=timelineBox.y+1,'la carta queda encima de la línea');
    assert.ok(dockBox.y>=timelineBox.y+timelineBox.height-1,'la confirmación queda debajo de la línea');
    assert.equal(await duelPage.locator('.placement-dock').evaluate(el=>getComputedStyle(el).position),'static','la confirmación no flota sobre el contenido');

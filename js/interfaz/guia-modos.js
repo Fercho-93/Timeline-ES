@@ -179,7 +179,7 @@
       how: [false, 'Adivina dónde va', HOW],
       rows: [
         ['Tienes', 2.3,
-          ['soloLives', '10 cartas, 3 vidas', 'Grandes colecciones jugando solo: empiezas con tres vidas y colocas una carta cada vez. Una ronda son 10 cartas y la maratón, el mazo entero; en la competición tienes tres vidas en cada tema.'],
+          ['soloLives', '10 cartas, 3 vidas', 'Grandes colecciones jugando solo: empiezas con tres vidas y tienes en la mano todas las cartas de la ronda, como en Retos rápidos; eliges cuál colocar en cada jugada. Una ronda son 10 cartas y la maratón, el mazo entero (con una mano de 10); en la competición tienes tres vidas en cada tema.'],
           ['soloTen', '10 cartas, sin vidas', 'Retos rápidos jugando solo: juegas 10 cartas del mazo. Las ves todas y eliges cuál colocar. No hay vidas.']],
         ['Si fallas', 2.9,
           ['soloMissLife', 'Pierdes una vida', 'Grandes colecciones jugando solo, si fallas: la línea marca con «Aquí» dónde iba la carta, la carta pasa a ese sitio como referencia y pierdes una de tus tres vidas. Sin vidas se acaba la partida; en la competición, ese tema.'],

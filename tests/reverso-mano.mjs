@@ -58,8 +58,17 @@ assert.match(read('css/edition.css'), /\.hand\.hand-fan:not\(\.hand-placement-pe
     click(document, '[data-mode="history"]');
     (document.CONTINUUM||document.defaultView.CONTINUUM).openDeckAs('collections');
     click(document, '[data-action="start-free"]');
-    checkBoard(document, 1);
-    assert.ok(document.querySelector('.hand-card.selected'), 'la carta única destaca');
+    // Como en Retos rápidos, la ronda entera está en la mano y se puede elegir cuál jugar.
+    checkBoard(document, 10);
+    assert.equal(document.querySelectorAll('.hand-card.selected').length, 1, 'una carta de la mano está elegida');
+    const otra = document.querySelectorAll('.hand-card')[3];
+    otra.click();
+    assert.ok(document.querySelector(`.hand-card[data-id="${otra.dataset.id}"]`).classList.contains('selected'), 'tocar otra carta la elige');
+    click(document, '[data-action="solo-place"]');
+    click(document, '[data-action="confirm-place"]');
+    click(document, '[data-action="solo-next"]');
+    checkBoard(document, 9);
+    assert.equal(document.querySelector(`.hand-card[data-id="${otra.dataset.id}"]`), null, 'la carta jugada sale de la mano');
   } finally { window.close(); }
 }
 {

@@ -39,7 +39,7 @@ try {
           const app = document.getElementById('app'), box = el => { if (!el) return null; const r = el.getBoundingClientRect(); return {left: Math.round(r.left), right: Math.round(r.right), top: Math.round(r.top), bottom: Math.round(r.bottom), width: Math.round(r.width), height: Math.round(r.height)}; };
           return {
             tablet: document.documentElement.getAttribute('data-tablet'), mesa: app.classList.contains('mesa-escena'),
-            focus: box(app.querySelector('.board-focus-card, .hand-solo')), line: box(app.querySelector('.board-timeline-section')), card: box(app.querySelector('.timeline-card')),
+            focus: box(app.querySelector('.atlas-hand-section')), line: box(app.querySelector('.board-timeline-section')), card: box(app.querySelector('.timeline-card')),
             result: box(app.querySelector('.board-result-layer .modal.board-result')),
             doc: document.documentElement.scrollHeight, inner: innerHeight, innerWidth, docWidth: document.documentElement.scrollWidth
           };

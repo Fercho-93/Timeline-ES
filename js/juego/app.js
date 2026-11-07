@@ -2964,6 +2964,7 @@
       empezadoEn: kind === "daily" ? Date.now() : null
     };
     pendingIndex = null;
+    selectedCardId = null;
     result = null;
     saveSolo();
     soloView();
@@ -2984,16 +2985,44 @@
   }
   function enDueloConReloj() { return plazoDuelo() > 0; }
 
+  // La mano de la partida en solitario: todas las cartas que aún te tocan, como en Retos
+  // rápidos, y no solo la siguiente. La maratón, que no tiene un total, enseña una mano del
+  // tamaño de una ronda. Detrás de la mano siguen en `solo.deck` las cartas que el tablero
+  // coloca solo tras un acierto (en la competición salen del mismo mazo).
+  function manoSolo() {
+    const enJuego = solo.pendingResult ? null : solo.current;
+    const quedan = (solo.total ? solo.total - solo.played : SOLO_ROUND_CARDS) - (enJuego === null ? 0 : 1);
+    return [...(enJuego === null ? [] : [enJuego]), ...solo.deck.slice(0, Math.max(0, quedan))];
+  }
+  // La carta elegida de la mano; sin elegir, la primera, para que tocar un hueco baste.
+  function cartaElegidaSolo() {
+    const mano = manoSolo();
+    return mano.includes(selectedCardId) ? selectedCardId : mano[0];
+  }
+  // Jugar otra carta de la mano la convierte en la carta en juego. La que estaba pasa al
+  // principio del mazo: la mano conserva su orden y el resto de la partida (vidas, reloj,
+  // fantasma, cuadrícula) sigue funcionando sobre `solo.current`.
+  function juegaCartaSolo(id) {
+    if (id === solo.current) return;
+    const at = solo.deck.indexOf(id);
+    if (at < 0 || !manoSolo().includes(id)) return;
+    solo.deck.splice(at, 1);
+    solo.deck.unshift(solo.current);
+    solo.current = id;
+  }
+
   function soloView() {
     screen = "solo";
-    const card = cardsById.get(solo.current);
+    const mano = manoSolo();
+    const elegida = solo.pendingResult ? null : cartaElegidaSolo();
+    const card = cardsById.get(elegida ?? solo.current);
     const timelineCards = solo.timeline.map(id => cardsById.get(id));
     const failIndex = result && !result.correct ? CT.correctIndex(selectedModeKey, timelineCards, result.card) : null;
     const slots = [];
     for (let i = 0; i <= timelineCards.length; i++) {
       slots.push(pendingIndex === i
         ? confirmSlot(card)
-        : slotMarkup(i, timelineCards.length, "solo-place", true, i === failIndex));
+        : slotMarkup(i, timelineCards.length, "solo-place", elegida !== null, i === failIndex));
       if (i < timelineCards.length) slots.push(timelineCardMarkup(timelineCards[i], soloHidden(), true));
     }
     // Sin un total fijo, lo que queda por colocar son las cartas del mazo (las juegues tú o las
@@ -3007,7 +3036,7 @@
  ${sinVidas() ? "" : vidasMarkup()}
       ${enDueloConReloj() && solo.cartaEmpezadaEn && !solo.pendingResult ? relojMarkup(Math.min(plazoDuelo(), Math.max(0, plazoDuelo() - (Date.now() - solo.cartaEmpezadaEn))), plazoDuelo()) : ""}
       ${soloHidden() ? `<div class="ghost-banner" role="status"><span aria-hidden="true">◌</span><div><b>Fantasma ${solo.difficulty === "expert" ? "permanente" : "· esta jugada"}</b><small>${CT.mode(selectedModeKey).axis === "time" ? "Fechas" : "Cifras"} ocultas ${solo.difficulty === "expert" ? "toda la partida. Guíate por las ilustraciones." : "solo esta jugada."}</small></div></div>` : ""}
-      <section class="board-focus-card"><div class="hand-title"><h3>Tu carta</h3></div>${pendingIndex === null ? `<div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}">${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong></div></div>` : `<p class="hint provisional-hand-note">La carta está en la línea como vista previa.</p>`}<p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Toca el hueco donde quieres colocar la carta, o mantén pulsada la carta y arrástrala hasta él"}</p></section>
+      <section><div class="hand-title"><h3>Tus cartas</h3><small>${mano.length} en mano</small></div><div class="hand">${mano.filter(id => !(pendingIndex !== null && id === elegida)).map(id => cardsById.get(id)).map(c => `<button class="hand-card ${pendingIndex === null && elegida === c.id ? "selected" : ""}" data-action="select-card" data-id="${c.id}" aria-pressed="${pendingIndex === null && elegida === c.id}">${categoryBadge(c)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(c.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : mano.length > 1 ? "Toca una carta y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco" : "Toca el hueco donde quieres colocar la carta, o mantén pulsada la carta y arrástrala hasta él"}</p></section>
       <section class="board-timeline-section"><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3></div>${CT.timelineEnds(selectedModeKey)}${CT.timelineMap(selectedModeKey, timelineCards, { hidden: soloHidden() })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
       ${solo.autoAdded?.length ? `<p class="auto-cards" role="status">Por tu acierto, el tablero se complica: ${solo.autoAdded.length === 1 ? "entra 1 carta" : `entran ${solo.autoAdded.length} cartas`} bien colocada${solo.autoAdded.length === 1 ? "" : "s"} (${solo.autoAdded.map(id => escapeHtml(cardsById.get(id).title)).join(" · ")}). ${solo.autoAdded.length === 1 ? "No suma" : "No suman"} aciertos.</p>` : ""}
     </div>`);
@@ -3036,7 +3065,8 @@
     CT.enableDrag({
       cardSelector: ".hand-card", slotSelector: ".slot",
       onDrop: (id, index) => {
-        if (solo.pendingResult) return;
+        if (solo.pendingResult || !manoSolo().includes(id)) return;
+        selectedCardId = id;
         pendingIndex = index;
         if (index !== null) anunciaHueco(index, solo.timeline.length);
         soloView();
@@ -3047,6 +3077,8 @@
 
   function soloPlace(index) {
     if (solo.pendingResult || !Number.isInteger(index) || index < 0 || index > solo.timeline.length) return;
+    juegaCartaSolo(cartaElegidaSolo());
+    selectedCardId = null;
     const card = cardsById.get(solo.current);
     const previous = index > 0 ? cardsById.get(solo.timeline[index - 1]) : null;
     const next = index < solo.timeline.length ? cardsById.get(solo.timeline[index]) : null;
@@ -3064,6 +3096,8 @@
   // respuesta a otra parte, que es lo que el plazo viene a cerrar.
   function cierraCartaDuelo(motivo) {
     if (!enDueloConReloj() || !solo.cartaEmpezadaEn || solo.pendingResult) return;
+    juegaCartaSolo(cartaElegidaSolo());
+    selectedCardId = null;
     resuelveCartaSolo(cardsById.get(solo.current), false, null, motivo);
   }
 
@@ -3131,14 +3165,16 @@
     // Primero se reserva la siguiente carta del jugador. Nunca se duplica ni se
     // consume por la inserción automática, que no modifica aciertos ni vidas.
     solo.current = solo.deck.shift();
+    selectedCardId = null;
     solo.autoAdded = [];
     // Las cartas automáticas solo llegan tras un acierto: cuando vas bien, el tablero se
     // complica (la línea se estrecha). Tras un fallo ya pierdes una vida y la carta fallada
     // entra en la línea; sumarle más sería castigar dos veces.
     const extra = jugada.correct ? CT.Ghost.level(solo.difficulty).extra : 0;
+    // Sin reserva salen del final del mazo, que está barajado: las del principio son tu mano.
     const fuente = solo.reserve || solo.deck;
     for (let n = 0; n < extra && fuente.length; n++) {
-      const id = fuente.shift();
+      const id = solo.reserve ? fuente.shift() : fuente.pop();
       const at = CT.correctIndex(selectedModeKey, solo.timeline.map(id => cardsById.get(id)), cardsById.get(id));
       solo.timeline.splice(at, 0, id); solo.autoAdded.push(id);
     }
@@ -4056,6 +4092,7 @@
       total: count, finished: false, failed: []
     };
     pendingIndex = null;
+    selectedCardId = null;
     result = null;
     saveCompetition();
     soloView();
@@ -4644,10 +4681,11 @@
     }
     else if (action === "ghost-use") useGhost();
     else if (action === "select-card") {
+      if (screen === "solo" && (solo?.pendingResult || !manoSolo().includes(Number(target.dataset.id)))) return;
       selectedCardId = Number(target.dataset.id);
       pendingIndex = null;
       announce(`Elegida la carta ${cardsById.get(selectedCardId).title}. Ahora elige un hueco.`);
-      gameView();
+      screen === "solo" ? soloView() : gameView();
     }
     else if (action === "place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, game.timeline.length); gameView(); }
     else if (action === "confirm-place") { screen === "solo" ? soloPlace(pendingIndex) : game.pulseTurn ? (pulseStage() === PULSE_DEFENSA ? placePulseDefense(pendingIndex) : placePulse(pendingIndex)) : placeCard(pendingIndex); }
