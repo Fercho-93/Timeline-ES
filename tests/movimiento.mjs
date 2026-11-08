@@ -232,6 +232,40 @@ console.log("\nRespuesta a selección y confirmación, sin reinicios");
   w.close();
 }
 
+console.log("\nSonido de cada gesto con la mano");
+{
+  // Cada mesa elige sola la carta del centro: elegir otra suena «select», volver de la vista
+  // previa solo «return» y la carta que llega tras jugar la anterior, «deal».
+  const w = boot();
+  game(w);
+  const sonidos = [];
+  const original = w.CONTINUUM.Effects.transition;
+  w.CONTINUUM.Effects.transition = (kind, info) => { sonidos.push(kind); return original?.(kind, info); };
+  w.document.querySelectorAll(".hand-card")[1].click();
+  ok("elegir otra carta suena a elegir", sonidos.join() === "select");
+  sonidos.length = 0;
+  click(w, '.slot[data-index="0"]');
+  click(w, '[data-action="cancel-place"]');
+  ok("volver de la vista previa suena una sola vez", sonidos.join() === "place,return");
+  w.close();
+}
+{
+  const w = boot();
+  abreMazo(w, "historia", "history");
+  click(w, '[data-action="start-free"]');
+  const sonidos = [];
+  const original = w.CONTINUUM.Effects.transition;
+  w.CONTINUUM.Effects.transition = (kind, info) => { sonidos.push(kind); return original?.(kind, info); };
+  w.document.querySelectorAll(".hand-card")[1].click();
+  ok("en Jugar solo, cambiar de carta suena a elegir, no a repartir", sonidos.join() === "select");
+  click(w, '.slot[data-index="0"]');
+  click(w, '[data-action="confirm-place"]');
+  sonidos.length = 0;
+  click(w, '[data-action="solo-next"]');
+  ok("y la carta que llega tras jugar suena a repartir", sonidos.includes("deal") && !sonidos.includes("select"));
+  w.close();
+}
+
 console.log("\nCierres animados, interrupciones y movimiento reducido");
 {
   const w = boot({ reduce: true });

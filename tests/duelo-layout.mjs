@@ -41,6 +41,14 @@ try {
     };
     await page.evaluate(() => showDuel());
     await fits('first card');
+    // Elegir una carta de la mano la deja entera a la vista, aunque la fila se desplace.
+    await page.locator('.turn-duel-hand .hand-card').nth(width < 600 ? 2 : 4).click();
+    const visible = await page.evaluate(() => { const row = document.querySelector('.turn-duel-cards'), card = row.querySelector('.hand-card.selected'); const a = card.getBoundingClientRect(), b = row.getBoundingClientRect(); return a.left >= b.left - 1 && a.right <= b.right + 1; });
+    assert.ok(visible, `${width}px: la carta elegida se ve entera`);
+    // La vista previa del hueco lleva sus líneas separadas, como en la mesa.
+    await page.locator('[data-turn-action="select-slot"]').last().click();
+    assert.equal(await page.locator('.turn-duel-board .slot-confirm-card').evaluate(el => getComputedStyle(el).flexDirection), 'column');
+    await page.locator('[data-turn-action="cancel-place"]').click();
     await page.evaluate(() => showDuel({ timeline: Array.from({length: 12}, (_, i) => i + 1), turnIndex: 12 }));
     await fits('long board');
     if (process.env.DUEL_SCREENSHOT && width === 390) await page.screenshot({ path: process.env.DUEL_SCREENSHOT, fullPage: true });

@@ -442,6 +442,8 @@
     if (cambioDePantalla && screen === "enciclopedia") encyclopediaOrigin = { screen: paint.screen, top: previousWindowTop };
     const cartaElegida = container.querySelector(".hand-card.selected")?.dataset.id || null;
     const confirmacionAnterior = container.querySelector(".slot-confirm")?.dataset.index ?? null;
+    // Tras el aviso de resultado, la carta elegida de la mano es la siguiente que se reparte.
+    const habiaResultado = !!container.querySelector("[data-result-card], [data-quick-result]");
     const oldFinal = container.querySelector('.final-results')?.textContent;
     const oldQuestion = container.querySelector('.final-card')?.textContent;
     const hadFinalForm = !!container.querySelector('.final-form');
@@ -479,11 +481,19 @@
     // toque con el mismo efecto.
     if (!cambioDePantalla) {
       const nuevaCarta = container.querySelector(".hand-card.selected");
-      if (nuevaCarta && nuevaCarta.dataset.id !== cartaElegida) {
-        nuevaCarta.classList.add("selection-enter");
-        window.CONTINUUM.Effects?.transition?.(screen === 'solo' && cartaElegida ? 'deal' : 'select');
-      }
       const nuevaConfirmacion = container.querySelector(".slot-confirm");
+      if (nuevaCarta && nuevaCarta.dataset.id !== cartaElegida) {
+        // Cada mesa elige sola la carta del centro. Suena «elegir» cuando quien juega cambia
+        // de carta (la anterior sigue en la mano) y «repartir» cuando la anterior se ha jugado
+        // y llega otra. Al volver de la vista previa ya suena «volver», y al empezar el turno,
+        // el aviso de turno: ahí la elección automática no añade otro sonido.
+        const anteriorSigue = cartaElegida !== null && [...container.querySelectorAll(".hand-card")].some(card => card.dataset.id === cartaElegida);
+        const repartida = (cartaElegida !== null && !anteriorSigue) || (cartaElegida === null && habiaResultado);
+        const vuelveDeLaLinea = cartaElegida === null && confirmacionAnterior !== null && !nuevaConfirmacion;
+        if (anteriorSigue || repartida || vuelveDeLaLinea) nuevaCarta.classList.add("selection-enter");
+        if (anteriorSigue) window.CONTINUUM.Effects?.transition?.('select');
+        else if (repartida) window.CONTINUUM.Effects?.transition?.('deal');
+      }
       if (nuevaConfirmacion && nuevaConfirmacion.dataset.index !== confirmacionAnterior) {
         nuevaConfirmacion.classList.add("placement-enter");
         window.CONTINUUM.Effects?.transition?.('place');

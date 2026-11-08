@@ -5675,8 +5675,13 @@ html body #app .table-seat .kick-btn::before { content: ""; position: absolute; 
    de lado. La elegida se distingue por el borde, sin la marca ✓. */
 #app[data-screen="turn-duel"] .turn-duel-hand .hand.turn-duel-cards:not(.hand-solo) {
   display: flex; grid-template-columns: none; justify-content: flex-start; gap: 10px;
-  overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; padding: 6px 2px 8px; margin-inline: 0;
+  overflow-x: auto; overscroll-behavior-x: contain; padding: 6px 2px 8px; margin-inline: 0;
 }
+/* La vista previa del hueco, con las mismas tres líneas que en la mesa (aviso, carta y valor oculto). */
+#app[data-screen="turn-duel"] .slot-confirm-card { display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px; padding: 6px; border: 1px dashed color-mix(in srgb, var(--atlas-selection, #9b452b) 55%, transparent); border-radius: 5px; text-align: center; }
+#app[data-screen="turn-duel"] .slot-confirm-card small { font: 700 .625rem/1.15 var(--ui-font); letter-spacing: .06em; text-transform: uppercase; }
+#app[data-screen="turn-duel"] .slot-confirm-card strong { overflow-wrap: anywhere; font-size: .74rem; line-height: 1.15; }
+#app[data-screen="turn-duel"] .slot-confirm-card span { font: .625rem var(--ui-font); color: var(--edition-muted); }
 #app[data-screen="turn-duel"] .turn-duel-hand .hand.turn-duel-cards:not(.hand-solo) > .hand-card {
-  flex: 0 0 clamp(96px, 28vw, 140px); width: auto; max-width: none; scroll-snap-align: start;
+  flex: 0 0 clamp(96px, 28vw, 140px); width: auto; max-width: none;
 }

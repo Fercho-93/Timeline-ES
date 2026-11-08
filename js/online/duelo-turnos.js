@@ -185,6 +185,7 @@ function render() {
   const sameGame = app.querySelector('.turn-duel-shell')?.dataset.duelId === current.id;
   const oldWrap = app.querySelector('.timeline-wrap');
   const oldLeft = sameGame ? oldWrap?.scrollLeft || 0 : 0;
+  const oldHandLeft = sameGame ? app.querySelector('.turn-duel-cards')?.scrollLeft || 0 : 0;
   const oldTop = sameGame ? window.scrollY : 0;
   const focused = document.activeElement;
   const oldInput = app.querySelector('#turn-cifra-input');
@@ -247,6 +248,17 @@ function render() {
   CT.applyTimelineZoom?.(app);
   const wrap = app.querySelector('.timeline-wrap');
   if (wrap) wrap.scrollLeft = oldLeft;
+  // La fila de la mano conserva su desplazamiento al repintar y enseña entera la carta elegida.
+  const row = app.querySelector('.turn-duel-cards');
+  if (row) {
+    row.scrollLeft = oldHandLeft;
+    const chosen = row.querySelector('.hand-card.selected');
+    if (chosen) {
+      const box = chosen.getBoundingClientRect(), frame = row.getBoundingClientRect();
+      if (box.left < frame.left) row.scrollLeft -= frame.left - box.left + 4;
+      else if (box.right > frame.right) row.scrollLeft += box.right - frame.right + 4;
+    }
+  }
   const input = app.querySelector('#turn-cifra-input');
   if (sameTurn && input && inputValue !== undefined) {
     input.value = inputValue;
