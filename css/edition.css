@@ -5671,3 +5671,12 @@ html body #app .table-seat .kick-btn::before { content: ""; position: absolute; 
 #app[data-screen="turn-duel"] .timeline-ends { display: flex; justify-content: space-between; gap: 8px; margin: 4px 2px 2px; color: var(--edition-rust); font: 700 .66rem/1.5 var(--font-display); letter-spacing: .06em; text-transform: uppercase; }
 #app[data-screen="turn-duel"] .timeline-ends > span { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 :root[data-theme="dark"] #app[data-screen="turn-duel"] .timeline-ends { color: #e9b48f; }
+/* La mano de la competición por turnos: todas las cartas del tema en una fila que se desplaza
+   de lado. La elegida se distingue por el borde, sin la marca ✓. */
+#app[data-screen="turn-duel"] .turn-duel-hand .hand.turn-duel-cards:not(.hand-solo) {
+  display: flex; grid-template-columns: none; justify-content: flex-start; gap: 10px;
+  overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; padding: 6px 2px 8px; margin-inline: 0;
+}
+#app[data-screen="turn-duel"] .turn-duel-hand .hand.turn-duel-cards:not(.hand-solo) > .hand-card {
+  flex: 0 0 clamp(96px, 28vw, 140px); width: auto; max-width: none; scroll-snap-align: start;
+}

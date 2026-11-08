@@ -214,7 +214,8 @@ console.log("\nRespuesta a selección y confirmación, sin reinicios");
 {
   const w = boot();
   game(w);
-  click(w, ".hand-card");
+  // La primera ya viene elegida: se elige otra.
+  w.document.querySelectorAll(".hand-card")[1].click();
   ok("elegir una carta anima solo esa carta", !!w.document.querySelector(".selection-enter") && !w.document.querySelector(".screen-enter"));
   for (let turn = 0; turn < 8; turn++) {
     click(w, '.slot[data-index="0"]');
@@ -243,7 +244,8 @@ console.log("\nCierres animados, interrupciones y movimiento reducido");
   game(w);
   // La colección se alinea arriba al abrirla; aquí medimos solo la mesa de juego.
   scrolls.length = 0;
-  click(w, '.hand-card');
+  // La primera carta ya viene elegida: se elige otra.
+  w.document.querySelectorAll('.hand-card')[1].click();
   await sleep(10);
   ok("acercar una línea fuera de vista respeta movimiento reducido", scrolls.length === 1 && scrolls[0].behavior === 'auto');
   click(w, '.slot[data-index="0"]');
@@ -315,7 +317,10 @@ function pointer(w, type, target, x, y, pointerType = "touch") {
   game(w);
   const card = el(w, ".hand-card");
   const slots = [...w.document.querySelectorAll(".slot")];
-  assert.ok(slots.every(slot => slot.disabled));
+  // La primera carta ya viene elegida, así que los huecos están activos; para comprobar que el
+  // arrastre devuelve los huecos a su estado, se parte de unos huecos deshabilitados.
+  assert.ok(slots.every(slot => !slot.disabled), "con la carta del centro elegida, los huecos están activos");
+  slots.forEach(slot => { slot.disabled = true; });
   w.document.elementFromPoint = () => slots[0];
   card.getBoundingClientRect = () => ({width:240,height:320,left:0,top:0,right:240,bottom:320});
   pointer(w, "pointerdown", card, 100, 400, "mouse");

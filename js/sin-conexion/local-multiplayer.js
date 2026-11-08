@@ -963,6 +963,8 @@ function starterPanelMarkupContent(isHost) {
     const currentPlayer = roomState.players[currentUid];
     const me = roomState.players[myPlayerId];
     const myTurn = currentUid === myPlayerId && roomState.phase === "turn";
+    // Como en el resto de mesas, la carta del centro de la mano ya viene elegida: basta tocar un hueco.
+    if (myTurn && me?.hand?.length && !me.hand.includes(selectedCardId)) selectedCardId = me.hand[0];
     const pulsing = roomState.phase === "pulse" && roomState.pulseTurn;
     const defensa = pulsing && roomState.pulseTurn.stage === "defensa";
     const myPulse = pulsing && (defensa ? roomState.pulseTurn.targetId === myPlayerId : currentUid === myPlayerId);
@@ -978,10 +980,10 @@ function starterPanelMarkupContent(isHost) {
       slots.push(confirmable && pendingIndex === index
         ? `<div class="slot-confirm" data-index="${index}"><small>Colocar aquí</small><strong>${escapeHtml(confirmable.title)}</strong><button class="btn btn-primary btn-block" data-local-action="${myPulse ? (defensa ? "confirm-defense" : "confirm-pulse") : "confirm-place"}" data-autofocus>Colocar carta →</button><button class="btn btn-ghost btn-block" data-local-action="cancel-place">Cambiar</button></div>`
         : myPulse
-          ? `<button class="slot" data-local-action="pulse-place" data-index="${index}" aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>${index === 0 ? "−" : "+"}</span></button>`
+          ? `<button class="slot" data-local-action="pulse-place" data-index="${index}" aria-label="${escapeHtml(CT.slotLabel(timelineCards, index))}"><span>${index === 0 ? "−" : "+"}</span></button>`
         : index === failIndex
           ? `<button class="slot slot-correct" data-local-action="place" data-index="${index}" disabled aria-label="Aquí iba la carta que se acaba de fallar"><span>✦</span><small>Aquí</small></button>`
-          : `<button class="slot" data-local-action="place" data-index="${index}" ${myTurn && selectedCardId ? "" : "disabled"} aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>${index === 0 ? "−" : "+"}</span></button>`);
+          : `<button class="slot" data-local-action="place" data-index="${index}" ${myTurn && selectedCardId ? "" : "disabled"} aria-label="${escapeHtml(CT.slotLabel(timelineCards, index))}"><span>${index === 0 ? "−" : "+"}</span></button>`);
       if (index < timelineCards.length) slots.push(timelineCardMarkup(timelineCards[index]));
     }
     const msLeft = turnRemainingMs();
@@ -1034,7 +1036,7 @@ function starterPanelMarkupContent(isHost) {
     const era = eraForCard(card);
     const canContinue = myPlayerId === currentUid || role === "host";
     const hint = reveal.correct || reveal.duel ? "" : `<p>${CT.placementHint(modeKey, roomState.timeline.map(id => getCard(id)), card)}</p>`;
-    const seguir = canContinue ? '<button class="btn btn-primary btn-block" data-dialog-focus data-local-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`;
+    const seguir = canContinue ? '<button class="btn btn-primary btn-block" data-dialog-focus data-local-action="finish-turn">Siguiente turno <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`;
     const fichaCarta = `<div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art?.button ? CT.Art.button(modeKey, card) : ""}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>`;
     if (reveal.duel) {
       const implicado = myPlayerId === reveal.playerId || myPlayerId === reveal.targetId;

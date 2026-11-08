@@ -257,7 +257,8 @@ console.log("\nEstado de los controles");
   click(w, ".hand-card");
   ok("y la elegida lo refleja", el(w, ".hand-card").getAttribute("aria-pressed") === "true");
   ok("el marcador señala a quién le toca", w.document.querySelectorAll('.score[aria-current="true"]').length === 1);
-  ok("los huecos se describen por su posición", [...w.document.querySelectorAll(".slot")].every(s => /Colocar en la posición \d+ de \d+/.test(s.getAttribute("aria-label") || "")));
+  // Igual en todas las mesas: entre qué cartas cae cada hueco, no un número sin contexto.
+  ok("los huecos dicen entre qué cartas caen", [...w.document.querySelectorAll(".slot")].every(s => /^Colocar (antes de|después de|entre) «.+»/.test(s.getAttribute("aria-label") || "")));
 }
 
 console.log("\nEl perfil");

@@ -1174,6 +1174,8 @@ function renderGame() {
   const currentUid = roomState.playerOrder[roomState.current];
   const currentPlayer = roomState.players[currentUid];
   const myTurn = currentUid === user.uid && roomState.phase === "turn";
+  // Como en el resto de mesas, la carta del centro de la mano ya viene elegida: basta tocar un hueco.
+  if (myTurn && me?.hand?.length && !me.hand.includes(selectedCardId)) selectedCardId = me.hand[0];
   // Mientras se resuelve un Pulso la mano no se toca: la única carta jugable es la que
   // sacó el mazo, y solo quien lo lanzó puede colocarla.
   const pulsing = roomState.phase === "pulse" && roomState.pulseTurn;
@@ -1196,10 +1198,10 @@ function renderGame() {
     slots.push(confirmable && pendingIndex === index
       ? `<div class="slot-confirm" data-index="${index}"><small>Colocar aquí</small><strong>${escapeHtml(confirmable.title)}</strong><button class="btn btn-primary btn-block" data-online-action="${myPulse ? (defensa ? "confirm-defense" : "confirm-pulse") : "confirm-place"}" data-autofocus>Colocar carta →</button><button class="btn btn-ghost btn-block" data-online-action="cancel-place">Cambiar</button></div>`
       : myPulse
-        ? `<button class="slot" data-online-action="pulse-place" data-index="${index}" aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>${index === 0 ? "−" : "+"}</span></button>`
+        ? `<button class="slot" data-online-action="pulse-place" data-index="${index}" aria-label="${escapeHtml(CT.slotLabel(timelineCards, index))}"><span>${index === 0 ? "−" : "+"}</span></button>`
       : index === failIndex
         ? `<button class="slot slot-correct" data-online-action="place" data-index="${index}" disabled aria-label="Aquí iba la carta que se acaba de fallar"><span>✦</span><small>Aquí</small></button>`
-        : `<button class="slot" data-online-action="place" data-index="${index}" ${myTurn && selectedCardId ? "" : "disabled"} aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>${index === 0 ? "−" : "+"}</span></button>`);
+        : `<button class="slot" data-online-action="place" data-index="${index}" ${myTurn && selectedCardId ? "" : "disabled"} aria-label="${escapeHtml(CT.slotLabel(timelineCards, index))}"><span>${index === 0 ? "−" : "+"}</span></button>`);
     if (index < timelineCards.length) {
       const card = timelineCards[index];
       const era = eraForCard(card);
@@ -1269,7 +1271,7 @@ function revealOverlay(currentUid) {
   // El título de la carta que cambia de mano solo lo ven las dos personas implicadas: el
   // resto de la sala se entera de que hubo trasvase, pero no de cuál era la carta.
   const implicado = reveal.pulse && (user.uid === reveal.playerUid || user.uid === reveal.targetUid);
-  const seguir = canContinue ? '<button class="btn btn-primary btn-block" data-dialog-focus data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`;
+  const seguir = canContinue ? '<button class="btn btn-primary btn-block" data-dialog-focus data-online-action="finish-turn">Siguiente turno <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`;
   const fichaCarta = `<div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(modeKey(), card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>`;
   // Un duelo no lo gana ni lo pierde una sola persona, así que no lleva la marca grande de
   // acierto: cada jugada trae la suya y debajo se cuenta el desenlace.

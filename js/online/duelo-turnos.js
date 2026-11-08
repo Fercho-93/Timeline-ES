@@ -68,6 +68,30 @@ function localCard(game) {
   if (compModes(game)) return themeDeal(game, themeAt(game))[game.turnIndex - themeAt(game) * perTheme(game) + 1];
   const cards = deckCards(game); return cards[game.turnIndex + (game.kind === 'orden' ? 1 : 0)];
 }
+// Quién juega el turno `turn`: los dos se alternan desde `starter`.
+const ownerOf = (game, turn) => game.playersOrder?.[(turn + (game.starter || 0)) % 2];
+function cardAt(game, turn) {
+  if (compModes(game)) { const theme = themeAt(game, turn); return themeDeal(game, theme)[turn - theme * perTheme(game) + 1]; }
+  return deckCards(game)[turn + (game.kind === 'orden' ? 1 : 0)];
+}
+// La mano de cada jugador, como en el resto de partidas de colecciones: las cartas de sus
+// turnos (en una competición, las del tema en juego) que todavía no ha colocado. Cada turno
+// se juega una, la que se elija; la de cifras sigue siendo una carta por turno.
+function handOf(game, player = uid()) {
+  if (game.kind !== 'orden') { const card = localCard(game); return card ? [card] : []; }
+  const themed = !!compModes(game), from = themed ? themeAt(game) * perTheme(game) : 0, to = themed ? from + perTheme(game) : game.total;
+  const played = new Set((game.plays || []).filter((_, turn) => turn >= from && turn < to).map(play => String(play.cardId)));
+  const hand = [];
+  for (let turn = from; turn < to; turn++) {
+    const card = ownerOf(game, turn) === player ? cardAt(game, turn) : null;
+    if (card && !played.has(String(card.id))) hand.push(card);
+  }
+  if (!hand.length) { const card = localCard(game); if (card) hand.push(card); }
+  return hand;
+}
+// La carta elegida de la mano; sin elegir, la primera.
+let selectedId = null;
+const chosenCard = (hand, id = selectedId) => hand.find(card => String(card.id) === String(id)) || hand[0] || null;
 // La línea de un tema de la competición: su carta de salida y, en orden, cada acierto de ese tema.
 function themeLine(game, theme) {
   const deal = themeDeal(game, theme), byId = new Map(CT.cards(compModes(game)[theme]).map(card => [String(card.id), card]));
@@ -117,15 +141,16 @@ function timelineCardMarkup(game, card) {
   const visual = art || `<span>${era.symbol}</span><small>${safe(era.name)}</small>`;
   return `<article class="timeline-card ${art ? 'animal-timeline-card card-flippable' : ''}" data-id="${card.id}" ${art ? `role="button" tabindex="0" aria-label="${safe(card.title)}. Toca para ver la lámina y los datos."` : ''}><div class="card-visual era-${era.key}">${visual}</div><div class="card-content">${CT.categoryBadge(modeAt(game), card)}<h3>${safe(card.title)}</h3>${art ? `<p>${safe(card.detail || '')}</p>` : ''}<div class="year">${safe(CT.formatValue(modeAt(game), card))}</div></div></article>`;
 }
-function orderBoard(game, card) {
+function orderBoard(game, card, cards = card ? [card] : []) {
   const line = timelineCards(game), slots = [];
   for (let index = 0; index <= line.length; index++) {
     if (card) slots.push(pendingIndex === index
-      ? `<div class="slot-confirm"><small>Colocar aquí</small><strong>${safe(card.title)}</strong><button class="btn btn-primary btn-block" data-turn-action="confirm-place">Colocar carta →</button><button class="btn btn-ghost btn-block" data-turn-action="cancel-place">Cambiar</button></div>`
-      : `<button class="slot" data-turn-action="select-slot" data-index="${index}" aria-label="Colocar en la posición ${index + 1} de ${line.length + 1}"><span>${index === 0 ? "−" : "+"}</span></button>`);
+      ? `<div class="slot-confirm provisional-placement" data-index="${index}"><div class="slot-confirm-card"><small>Vista previa · sin confirmar</small><strong>${safe(card.title)}</strong><span aria-hidden="true">${safe(CT.hiddenLabel(modeAt(game)))}</span></div><button class="btn btn-primary btn-block" data-turn-action="confirm-place">Colocar carta →</button><button class="btn btn-ghost btn-block" data-turn-action="cancel-place">Cambiar</button></div>`
+      : `<button class="slot" data-turn-action="select-slot" data-index="${index}" aria-label="${safe(CT.slotLabel(line, index))}"><span>${index === 0 ? "−" : "+"}</span></button>`);
     if (index < line.length) slots.push(timelineCardMarkup(game, line[index]));
   }
-  const hand = card ? `<section class="turn-duel-hand"><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}">${CT.categoryBadge(modeAt(game), card)}<span class="hidden-date">${safe(CT.hiddenLabel(modeAt(game)))}</span>${CT.cardBack(modeAt(game))}<strong>${safe(card.title)}</strong></div></div></section>` : '';
+  const shown = cards.filter(c => !(pendingIndex !== null && c.id === card.id));
+  const hand = card ? `<section class="turn-duel-hand"><div class="hand-title"><h3>Tus cartas</h3><small class="solo-lectores">${cards.length} en mano</small></div>${shown.length ? `<div class="hand turn-duel-cards${cards.length === 1 ? ' hand-solo' : ''}">${shown.map(c => { const on = pendingIndex === null && c.id === card.id; return `<button class="hand-card${on ? ' selected' : ''}" data-turn-action="select-card" data-id="${safe(c.id)}" aria-pressed="${on}">${CT.categoryBadge(modeAt(game), c)}<span class="hidden-date">${safe(CT.hiddenLabel(modeAt(game)))}</span>${CT.cardBack(modeAt(game))}<strong>${safe(c.title)}</strong></button>`; }).join('')}</div>` : '<p class="hint provisional-hand-note">La carta está en la línea como vista previa.</p>'}</section>` : '';
   return `${hand}<section class="turn-duel-board"><div class="hand-title"><h3>${safe(CT.timelineTitle(modeAt(game)))}</h3></div>${CT.timelineEnds(modeAt(game))}${CT.timelineMap?.(modeAt(game), line) || ''}<div class="timeline-wrap" tabindex="0" role="region" aria-label="Mesa de cartas, desplaza para ver más"><div class="timeline">${slots.join('')}</div></div></section>`;
 }
 function cifraBoard(game, card) {
@@ -168,7 +193,8 @@ function render() {
   const firstTurn = firstTurnOf(current);
   const mine = current.turnUid === uid() || firstTurn;
   const pending = pendingMove(current.id);
-  const card = mine && !current.timeout && !pending ? localCard(current) : null;
+  const hand = mine && !current.timeout && !pending ? handOf(current) : [];
+  const card = chosenCard(hand);
   const waiting = current.status === 'waiting';
   const showInvite = waiting && !firstTurn, showBoard = !waiting || firstTurn || current.turnIndex > 0;
   const themes = compModes(current);
@@ -202,14 +228,14 @@ function render() {
     <section class="turn-duel-screen">
       ${note ? `<header class="turn-duel-state"><h2>${safe(heading)}</h2><p>${note}</p></header>` : ''}
       ${outsider ? `<div class="panel turn-duel-share turn-duel-preview"><h2>${rival ? `${safe(shownAlias(rival))} te reta` : 'Te retan a un duelo'}</h2><p>${safe(kindLabel)} · ${current.total} ${current.total === 1 ? 'carta' : 'cartas'} · ${seconds ? `${seconds} s por carta` : 'sin tiempo por carta'}. Cada uno juega su carta cuando puede; caduca a los 7 días sin actividad.</p><button class="btn btn-primary btn-block" data-turn-action="accept">Aceptar y jugar</button><button class="btn btn-ghost btn-block" data-turn-action="refuse">Rechazar</button></div>` : ''}
-      ${gate ? `<div class="panel turn-duel-gate"><h2>${firstTurn ? 'Tu primera carta' : 'Te toca'}</h2><p>${cardOf()}. Tienes ${seconds} s para ${current.kind === 'cifras' ? 'escribir la cifra' : 'colocarla'}: el tiempo empieza al pulsar «Ver la carta».</p><button class="btn btn-primary btn-block" data-turn-action="start-turn">Ver la carta</button>${firstTurn ? '<button class="btn btn-ghost btn-block" data-turn-action="decline-own">Cancelar el duelo</button>' : ''}</div>` : ''}
+      ${gate ? `<div class="panel turn-duel-gate"><h2>${firstTurn ? 'Tu primera carta' : 'Te toca'}</h2><p>${cardOf()}. Tienes ${seconds} s para ${current.kind === 'cifras' ? 'escribir la cifra' : hand.length > 1 ? 'colocar una de tus cartas' : 'colocarla'}: el tiempo empieza al pulsar «${hand.length > 1 ? 'Ver tus cartas' : 'Ver la carta'}».</p><button class="btn btn-primary btn-block" data-turn-action="start-turn">${hand.length > 1 ? 'Ver tus cartas' : 'Ver la carta'}</button>${firstTurn ? '<button class="btn btn-ghost btn-block" data-turn-action="decline-own">Cancelar el duelo</button>' : ''}</div>` : ''}
       ${showInvite && !outsider ? current.invitedUid ? `<div class="panel turn-duel-share"><h2>${current.invitedUid === uid() ? 'Te han retado' : `Reto enviado a ${safe(current.invitedAlias || 'tu rival')}`}</h2><p>${current.invitedUid === uid() ? (compModes(current) ? 'Mismos temas. Cartas nuevas para otra partida.' : 'Mismo mazo y modalidad. Cartas nuevas para otra partida.') : 'La invitación ya le aparece en «Tus duelos». No necesitas enviar otro enlace.'}</p>${current.invitedUid === uid() ? '<button class="btn btn-primary" data-turn-action="accept">Aceptar el duelo</button><button class="btn btn-ghost" data-turn-action="decline">Rechazar</button>' : ''}</div>` : `<div class="panel turn-duel-share"><span class="turn-duel-share-icon" aria-hidden="true">↗</span><h2>Una partida, dos móviles</h2><p>Envía la invitación por WhatsApp, mensaje o la aplicación que prefieras.</p><button class="btn btn-primary btn-block" data-turn-action="share">Compartir el duelo</button><details><summary>Ver enlace de invitación</summary><code>${safe(link)}</code></details><small>Tu rival empieza su turno cuando abra el enlace.</small></div>` : ''}
       ${lastMove(current)}
       ${solution(current)}
       ${pending ? `<div class="turn-duel-status" role="status"><b>${sending.has(pending.operationId) ? 'Enviando jugada…' : 'Jugada guardada en este móvil, pendiente de confirmar'}</b><p>No vuelvas a jugar esta carta. Se enviará al recuperar la conexión, sin cambiar tu respuesta ni tu tiempo.</p>${delivery ? `<p>${safe(delivery)}</p>` : ''}<button class="btn btn-secondary" data-turn-action="retry">Comprobar y reintentar</button></div>` : delivery ? `<p class="turn-duel-status" role="status">${safe(delivery)}</p>` : ''}
       ${!waiting && !finished && !mine ? '<p class="turn-duel-status" role="status">Tu rival está jugando. La partida se actualizará sola.</p>' : ''}
       ${turnClockMarkup(active && !!card && !gate)}
-      ${showBoard && !outsider && current.kind === 'orden' ? orderBoard(current, active && !gate ? card : null) : ''}
+      ${showBoard && !outsider && current.kind === 'orden' ? orderBoard(current, active && !gate ? card : null, hand) : ''}
       ${active && !gate && current.kind === 'cifras' && card ? cifraBoard(current, card) : ''}
       ${active && !card ? '<p role="alert">No se pudo cargar la carta. Actualiza Continuum en los dos móviles.</p>' : ''}
       ${finished ? `<p class="turn-duel-status">${safe(current.resultText || 'Gracias por jugar.')}</p>` : ''}
@@ -229,6 +255,14 @@ function render() {
   if (focused?.dataset.turnAction === 'select-slot') app.querySelector('[data-turn-action="confirm-place"]')?.focus({ preventScroll: true });
   window.scrollTo({ left: 0, top: oldTop, behavior: 'instant' });
   startTurnClock(active && !!card && !gate);
+  // Arrastrar una carta hasta un hueco lleva, como en el resto de mesas, a la confirmación.
+  if (active && card && !gate && current.kind === 'orden') CT.enableDrag?.({
+    cardSelector: '.turn-duel-hand .hand-card', slotSelector: '.turn-duel-board .slot', parseCardId: id => id,
+    onDrop: (dropped, index) => {
+      if (!current || !handOf(current).some(c => String(c.id) === String(dropped))) return;
+      selectedId = dropped; pendingIndex = index; render();
+    }
+  });
   // Al abrir el duelo, la portada de lo que se juega, como en el resto de modalidades (una vez por duelo y sesión).
   if (!sameGame && !ended(current)) {
     const key = `turn:${current.id}`;
@@ -237,7 +271,7 @@ function render() {
 }
 async function place(index) {
   if (!Number.isInteger(index) || index < 0 || !current || index > timelineCards(current).length) return;
-  return queueMove({ index });
+  return queueMove({ index, cardId: chosenCard(handOf(current))?.id });
 }
 async function submitCifra() {
   if (!current || current.kind !== 'cifras') return;
@@ -288,7 +322,9 @@ async function sendPending(move) {
       if (game?.plays?.[move.turnIndex]?.operationId === move.operationId) return 'confirmed';
       const first = firstTurnOf(game) && game.playersOrder[0] === move.uid;
       if (!game || ended(game) || inactive(game) || game.turnIndex !== move.turnIndex || (game.turnUid !== move.uid && !first)) return 'superseded';
-      const card = localCard(game);
+      // La carta elegida tiene que seguir en la mano de quien juega; una jugada guardada por una
+      // versión anterior (sin `cardId`) juega la primera, que es la de su turno.
+      const card = game.kind === 'orden' ? chosenCard(handOf(game, move.uid), move.cardId) : localCard(game);
       if (!card) throw Error('No se pudo cargar la carta.');
       const nextIndex = game.turnIndex + 1, finished = nextIndex >= game.total;
       const play = { uid: move.uid, cardId: card.id, operationId: move.operationId, ms: move.ms, timeout: move.timeout, at: Timestamp.now() };
@@ -409,7 +445,7 @@ function startTurnClock(active) {
   const turn = current.turnIndex, gameId = current.id;
   turnClock = CT.Tiempo.clock({ empezadoEn: enteredAt, ms: seconds * 1000, root: document.getElementById('app'), onTimeout: () => {
     if (current?.id !== gameId || current.turnIndex !== turn || pendingMove(gameId)) return;
-    queueMove(current.kind === 'cifras' ? { respuesta: 0, timeout: true } : { index: -1, timeout: true });
+    queueMove(current.kind === 'cifras' ? { respuesta: 0, timeout: true } : { index: -1, timeout: true, cardId: chosenCard(handOf(current))?.id });
   } });
 }
 // Devuelve si alguna jugada propia ha dejado una lámina nueva en el álbum.
@@ -446,7 +482,7 @@ function subscribe(gameId) {
       const logros = CT.Progreso?.finishCompetition?.({ clave: `turnos:${gameId}` }) || [];
       if (logros.length) { CT.Effects?.achievement?.(); notify(`Logro: ${logros[0].name}`); }
     }
-    if (previousTurn !== current.turnIndex) { pendingIndex = null; delivery = ''; }
+    if (previousTurn !== current.turnIndex) { pendingIndex = null; selectedId = null; delivery = ''; }
     prepareTurn();
     if (wasPlayingAway && current.turnUid === uid() && !ended(current)) { CT.Effects?.transition?.('turn'); notify('Tu rival ya ha jugado. Te toca.'); }
     render();
@@ -640,10 +676,10 @@ async function next(back = onBack) {
   if (!target) return notify('No tienes más duelos pendientes de jugar.');
   open({ gameId: target.id, back });
 }
-function open({ mode = 'history', kind = 'orden', gameId = '', back, competition = null } = {}) { stop?.(); current = null; preparingTurn = null; enteredAt = 0; turnStarted = true; delivery = ''; pendingIndex = null; onBack = back; shareLink = ''; retryPending(); if (gameId) openExisting(gameId, back).catch(() => notify('No se pudo abrir este duelo.')); else create(mode, kind, back, competition).catch(() => notify('No se pudo crear el duelo.')); }
+function open({ mode = 'history', kind = 'orden', gameId = '', back, competition = null } = {}) { stop?.(); current = null; preparingTurn = null; enteredAt = 0; turnStarted = true; delivery = ''; pendingIndex = null; selectedId = null; onBack = back; shareLink = ''; retryPending(); if (gameId) openExisting(gameId, back).catch(() => notify('No se pudo abrir este duelo.')); else create(mode, kind, back, competition).catch(() => notify('No se pudo crear el duelo.')); }
 function leave() { stop?.(); stop = null; turnClock?.stop(); turnClock = null; current = null; }
 function close() { leave(); onBack?.(); }
-document.addEventListener('click', e => { const target = e.target.closest('[data-turn-action]'), action = target?.dataset.turnAction; if (action === 'select-slot') { CT.Effects?.tap(); pendingIndex = Number(target.dataset.index); render(); } if (action === 'confirm-place') { CT.Effects?.stamp(); place(pendingIndex); } if (action === 'cancel-place') { pendingIndex = null; render(); } if (action === 'submit-cifra') submitCifra(); if (action === 'share') share(); if (action === 'back') close(); });
+document.addEventListener('click', e => { const target = e.target.closest('[data-turn-action]'), action = target?.dataset.turnAction; if (action === 'select-card') { CT.Effects?.tap(); selectedId = target.dataset.id; pendingIndex = null; render(); } if (action === 'select-slot') { CT.Effects?.tap(); pendingIndex = Number(target.dataset.index); render(); } if (action === 'confirm-place') { CT.Effects?.stamp(); place(pendingIndex); } if (action === 'cancel-place') { pendingIndex = null; render(); } if (action === 'submit-cifra') submitCifra(); if (action === 'share') share(); if (action === 'back') close(); });
 CT.TurnDuel = { open, close, leave, list, cancel, standings };
 // Los duelos que esperan algo de quien juega: los suyos en los que le toca y los retos
 // que le han mandado. Es lo que la portada avisa; lo demás se ve en la lista completa.

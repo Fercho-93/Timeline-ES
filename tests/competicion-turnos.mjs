@@ -25,7 +25,7 @@ w.CONTINUUM = {
   has: key => key in decks, cards: key => decks[key], mode: key => ({ name: key === 'alfa' ? 'Alfa' : 'Beta' }),
   eraForCard: () => ({ key: 'modern', name: 'Era', symbol: '✦' }), categoryBadge: () => '', animalArt: () => '', cardBack: () => '',
   sortValue: (_, c) => c.year, formatValue: (_, c) => String(c.year), hiddenLabel: () => 'Oculto', timelineTitle: () => 'Línea',
-  placementHint: () => '', timelineEnds: () => '', timelineMap: () => '',
+  placementHint: () => '', slotLabel: (_, i) => `Hueco ${i}`, timelineEnds: () => '', timelineMap: () => '',
   Accounts: { get user() { return { uid: me }; }, profile: { alias: 'Yo' } },
   // Como CT.Storage en el juego: los duelos guardan por él (separado por cuenta).
   Storage: { getItem: k => w.localStorage.getItem(k), setItem: (k, v) => (w.localStorage.setItem(k, v), true), removeItem: k => w.localStorage.removeItem(k) },
@@ -50,7 +50,7 @@ w.__deps = {
 };
 w.navigator.clipboard = { writeText: async () => {} };
 w.eval(`const {auth,db,doc,Timestamp,serverTimestamp,runTransaction,onSnapshot}=window.__deps;\n${source}\nwindow.testComp={
-  create, localCard, timelineCards, gameLabel, modeAt, themeAt, compTotal, TOTAL, perTheme, subscribe,
+  create, localCard, handOf, timelineCards, gameLabel, modeAt, themeAt, compTotal, TOTAL, perTheme, subscribe,
   show: game=>{current=game;prepareTurn();render();}, queueMove
 };`);
 const t = w.testComp;
@@ -141,6 +141,31 @@ assert.ok(w.CONTINUUM.Progreso.cerradas.includes(`turnos:${id}`), 'la competici�
   const tope = (texto, nombre) => Number(texto.match(new RegExp(`\\b${nombre} = (\\d+)`))?.[1]);
   assert.ok(tope(source, 'MAX_CARDS') > 0 && tope(app, 'COMP_TURN_CARDS') === tope(source, 'MAX_CARDS'), 'el tope de cartas del formulario es el de las reglas');
   assert.ok(tope(source, 'MAX_THEMES') > 0 && tope(app, 'COMP_TURN_THEMES') === tope(source, 'MAX_THEMES'), 'y el de temas también');
+}
+
+// Cada jugador tiene en la mano las cartas de sus turnos del tema, como en el resto de
+// partidas de colecciones, y elige cuál colocar.
+{
+  me = 'ana'; created.length = 0;
+  await t.create('history', 'orden', null, { rounds: 1, cards: 2 });
+  const handId = created.find(key => key !== me && key !== id);
+  const start = games.get(handId);
+  assert.equal(start.total, 4, 'un tema, dos cartas por persona');
+  assert.deepEqual(clone(t.handOf(start, 'ana').map(c => c.id)), [2, 4], 'quien empieza tiene las cartas de sus turnos');
+  t.show({ ...clone(start), id: handId });
+  assert.equal(w.document.querySelectorAll('.turn-duel-hand .hand-card').length, 2, 'la mesa enseña la mano entera');
+  assert.equal(w.document.querySelectorAll('.turn-duel-hand .hand-card.selected').length, 1, 'con la primera elegida');
+  assert.match(w.document.querySelector('.turn-duel-board .slot').getAttribute('aria-label'), /^Hueco 0$/, 'los huecos usan la etiqueta común');
+  await t.queueMove({ index: 1, cardId: 4 });
+  const after = games.get(handId);
+  assert.equal(after.plays[0].cardId, 4, 'se juega la carta elegida, no la del turno');
+  assert.deepEqual(clone(t.handOf(after, 'ana').map(c => c.id)), [2], 'y sale de la mano');
+  // Una jugada guardada por una versión anterior, sin carta, juega la primera de la mano.
+  games.set(handId, { ...after, playersOrder: ['ana', 'bea'], players: { ana: { alias: 'Ana' }, bea: { alias: 'Bea' } }, scores: { ana: 1, bea: 0 }, status: 'playing', turnUid: 'bea' });
+  me = 'bea'; t.show({ ...clone(games.get(handId)), id: handId });
+  assert.deepEqual(clone(t.handOf(games.get(handId), 'bea').map(c => c.id)), [3], 'la rival tiene la carta de su turno');
+  await t.queueMove({ index: 0 });
+  assert.equal(games.get(handId).plays[1].cardId, 3);
 }
 
 console.log('Competición por turnos: temas al azar, reparto por tema, líneas propias y documento válido para las reglas: OK');

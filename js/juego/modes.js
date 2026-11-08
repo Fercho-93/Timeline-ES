@@ -1040,13 +1040,26 @@
   // La frase que explica dónde iba, para el aviso de fallo: quien juega con lector de
   // pantalla no puede simplemente «ver» el hueco resaltado en la línea.
   function placementHint(modeKey, timelineCards, card) {
-    const index = correctIndex(modeKey, timelineCards, card);
+    return placementHintAt(timelineCards, correctIndex(modeKey, timelineCards, card));
+  }
+  // La misma frase a partir del hueco: Retos rápidos ya sabe en qué hueco iba la carta.
+  function placementHintAt(timelineCards, index) {
     const before = timelineCards[index - 1];
     const after = timelineCards[index];
     if (!before && !after) return "Era la única carta de la línea.";
     if (!before) return `Iba al principio, antes de «${escapeHtml(after.title)}».`;
     if (!after) return `Iba al final, después de «${escapeHtml(before.title)}».`;
     return `Iba entre «${escapeHtml(before.title)}» y «${escapeHtml(after.title)}».`;
+  }
+
+  // Lo que lee un lector de pantalla en cada hueco de la línea: entre qué cartas cae,
+  // igual en todas las mesas. Texto plano: quien lo pone en un atributo lo escapa.
+  function slotLabel(timelineCards, index) {
+    const before = timelineCards[index - 1], after = timelineCards[index];
+    if (!before && !after) return "Colocar en la línea";
+    if (!before) return `Colocar antes de «${after.title}»`;
+    if (!after) return `Colocar después de «${before.title}»`;
+    return `Colocar entre «${before.title}» y «${after.title}»`;
   }
 
   function guideCard(icono, titulo, estado, texto) {
@@ -1253,7 +1266,7 @@
     usesAnimalArt, cardArt, animalArt, cardBack, deckFingerprint, categoryFor, categoryBadge,
     hasBlock, block, blockOf, blockGames,
     formatValue, shortValue, sortValue, hiddenLabel, starterNoun, timelineTitle, timelineEnds, uniqueValueIds, question, eraForCard,
-    correctIndex, placementHint, guideMarkup,
+    correctIndex, placementHint, placementHintAt, slotLabel, guideMarkup,
     escapeHtml, shuffle, seedFrom, seededRandom, shuffleWith
   };
 })();

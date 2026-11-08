@@ -20,7 +20,7 @@ try {
       window.CONTINUUM = {
         escapeHtml: text => String(text).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('"', '&quot;'),
         axis: () => ({cifra:{pregunta:'¿En qué año fue?', unidad:'año', negativos:true}}), cards: () => cards, categoryBadge: () => '', animalArt: () => '', cardBack: () => '<span class="carta-reverso">✦</span>',
-        eraForCard: () => ({ key: 'modern', symbol: '✦', name: 'Historia' }), formatValue: (_, c) => String(c.year), sortValue: (_, c) => c.year, mode: () => ({name:'Historia'}), placementHint: () => 'Debía ir después de la carta anterior.',
+        eraForCard: () => ({ key: 'modern', symbol: '✦', name: 'Historia' }), formatValue: (_, c) => String(c.year), sortValue: (_, c) => c.year, mode: () => ({name:'Historia'}), placementHint: () => 'Debía ir después de la carta anterior.', slotLabel: (_, i) => `Hueco ${i}`,
         hiddenLabel: () => 'Fecha oculta', timelineTitle: () => 'Línea temporal', Accounts: { user: { uid: 'me' } },
         Storage: { getItem: k => localStorage.getItem(k), setItem: (k, v) => (localStorage.setItem(k, v), true), removeItem: k => localStorage.removeItem(k) },
         Links: { invitation: () => 'https://continuum.test/#turn-duel=layout' }, Avatares: { markup: () => '', forUser: () => '' }, timelineEnds: () => '', has: () => true,
@@ -70,7 +70,9 @@ try {
     await page.addScriptTag({ content: `window.previewTurn=()=>{preparingTurn=null;prepareTurn();render();return enteredAt;};window.reenterTurn=()=>{prepareTurn();render();return enteredAt;};` });
     await page.evaluate(() => showDuel());
     const entered = await page.evaluate(() => previewTurn());
-    assert.equal(await page.locator('.hand-card').count(), 1);
+    // La mano entera: las cartas de los turnos propios (8 de 15, empezando yo).
+    assert.equal(await page.locator('.turn-duel-hand .hand-card').count(), 8);
+    assert.equal(await page.locator('.turn-duel-hand .hand-card.selected').count(), 1, 'con la primera elegida');
     assert.equal(await page.locator('[data-turn-action="ready"]').count(), 0);
     assert.equal(await page.evaluate(() => reenterTurn()), entered, 'volver a entrar no reinicia la hora de entrada');
     await fits('turn without clock');

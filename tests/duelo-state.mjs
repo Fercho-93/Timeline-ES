@@ -17,7 +17,7 @@ w.CONTINUUM = {
   mode: () => ({ name: 'Historia' }), eraForCard: () => ({ key: 'modern', name: 'Historia', symbol: '✦' }),
   categoryBadge: () => '', animalArt: () => '', cardBack: () => '', sortValue: (_, c) => c.year,
   formatValue: (_, c) => String(c.year), hiddenLabel: () => 'Año oculto', timelineTitle: () => 'Cronología',
-  placementHint: () => 'Debía ir después de Primera.',
+  placementHint: () => 'Debía ir después de Primera.', slotLabel: (_, i) => `Hueco ${i}`,
   timelineEnds: () => '', timelineMap: () => '', axis: () => ({ cifra: { negativos: true } }),
   Accounts: { user: { uid: 'me' }, profile: { alias: 'Yo' } },
   // Como CT.Storage en el juego: los duelos guardan por él (separado por cuenta).

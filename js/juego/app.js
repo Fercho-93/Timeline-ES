@@ -1191,6 +1191,9 @@
     // Durante la defensa de un Pulso el móvil lo tiene quien ha sido retado, no quien
     // tiene el turno: es su jugada la que se está haciendo.
     const player = actingPlayer();
+    // Como en el resto de mesas, la carta del centro de la mano ya viene elegida: basta tocar un hueco.
+    // Esa elección automática no acerca la línea: solo la acerca elegir otra carta.
+    if (!game.pulseTurn && player.hand.length && !player.hand.includes(selectedCardId)) { selectedCardId = player.hand[0]; lastApproachedCard = selectedCardId; }
     const defending = pulseStage() === PULSE_DEFENSA;
     const timelineCards = game.timeline.map(id => cardsById.get(id));
     const handCards = player.hand.map(id => cardsById.get(id)).filter(card => !(pendingIndex !== null && selectedCardId === card.id));
@@ -1205,14 +1208,14 @@
     const nuevaSeleccion = activeCard && lastApproachedCard !== activeCard.id;
     lastApproachedCard = activeCard ? activeCard.id : null;
     // Tras un fallo, `result` sigue apuntando a la carta que se acaba de fallar (todavía
-    // no se ha pulsado «Terminar turno»): se aprovecha para señalar en la propia línea el
+    // no se ha pulsado «Siguiente turno»): se aprovecha para señalar en la propia línea el
     // hueco donde iba de verdad, justo debajo del aviso que ya lo cuenta con palabras.
     const failIndex = result?.card && !result.correct ? CT.correctIndex(selectedModeKey, timelineCards, result.card) : null;
     const slots = [];
     for (let i = 0; i <= timelineCards.length; i++) {
       slots.push(pendingIndex === i && activeCard
         ? confirmSlot(activeCard)
-        : slotMarkup(i, timelineCards.length, pulseCard ? "pulse-place" : "place", pulseCard ? true : !!selectedCardId, i === failIndex));
+        : slotMarkup(i, timelineCards, pulseCard ? "pulse-place" : "place", pulseCard ? true : !!selectedCardId, i === failIndex));
       if (i < timelineCards.length) {
         slots.push(timelineCardMarkup(timelineCards[i], !!game.ghost?.pending.length));
       }
@@ -1313,11 +1316,11 @@
 
   // El hueco «+» normal, o el mismo hueco resaltado como el sitio donde iba de verdad la
   // carta que se acaba de fallar. Lo usan tanto la partida como el solitario.
-  function slotMarkup(index, total, actionName, enabled, isCorrectSlot) {
+  function slotMarkup(index, cards, actionName, enabled, isCorrectSlot) {
     if (isCorrectSlot) {
       return `<button class="slot slot-correct" data-action="${actionName}" data-index="${index}" ${enabled ? "" : "disabled"} aria-label="Aquí iba la carta que acabas de fallar"><span>✦</span><small>Aquí</small></button>`;
     }
-    return `<button class="slot" data-action="${actionName}" data-index="${index}" ${enabled ? "" : "disabled"} aria-label="Colocar en la posición ${index + 1} de ${total + 1}"><span>${index === 0 ? "−" : "+"}</span></button>`;
+    return `<button class="slot" data-action="${actionName}" data-index="${index}" ${enabled ? "" : "disabled"} aria-label="${escapeHtml(CT.slotLabel(cards, index))}"><span>${index === 0 ? "−" : "+"}</span></button>`;
   }
 
   function confirmSlot(card) {
@@ -1547,7 +1550,7 @@
     saveGame();
     gameView();
     if (result.skipped) {
-      overlay(`<div class="overlay"><div class="modal failure"><div class="result-mark" aria-hidden="true">◷</div><div class="eyebrow" aria-hidden="true">Se acabó el tiempo</div><h2><span class="solo-lectores">Se acabó el tiempo: </span>${escapeHtml(result.playerName)} pierde el turno</h2><p>No se ha colocado ninguna carta y la mano sigue igual.</p><button class="btn btn-primary btn-block" data-dialog-focus data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
+      overlay(`<div class="overlay"><div class="modal failure"><div class="result-mark" aria-hidden="true">◷</div><div class="eyebrow" aria-hidden="true">Se acabó el tiempo</div><h2><span class="solo-lectores">Se acabó el tiempo: </span>${escapeHtml(result.playerName)} pierde el turno</h2><p>No se ha colocado ninguna carta y la mano sigue igual.</p><button class="btn btn-primary btn-block" data-dialog-focus data-action="finish-turn">Siguiente turno <span>→</span></button></div></div>`);
       return;
     }
     const { correct, returned, card } = result;
@@ -1568,12 +1571,12 @@
           ${marcador({ name: result.targetName, ok: result.targetOk, donde: result.posiciones.target })}
         </div>
         ${duelOutcome(result)}
-        <button class="btn btn-primary btn-block" data-dialog-focus data-action="finish-turn">Terminar turno <span>→</span></button>
+        <button class="btn btn-primary btn-block" data-dialog-focus data-action="finish-turn">Siguiente turno <span>→</span></button>
       </div></div>`);
       return;
     }
     const desenlace = `<p>${correct ? "La carta se queda en la línea." : returned ? "No quedan cartas que robar, así que esta vuelve a tu mano." : "La carta va al descarte y has robado una nueva."}</p>`;
-    overlay(`<div class="overlay" data-result-card="${correct ? card.id : ''}"${correct ? '' : ` data-correction-card="${card.id}" data-attempted-slot="${result.attemptedIndex}" data-correct-slot="${result.correctIndex}"`}><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}${desenlace}<button class="btn btn-primary btn-block" data-dialog-focus data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
+    overlay(`<div class="overlay" data-result-card="${correct ? card.id : ''}"${correct ? '' : ` data-correction-card="${card.id}" data-attempted-slot="${result.attemptedIndex}" data-correct-slot="${result.correctIndex}"`}><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}${desenlace}<button class="btn btn-primary btn-block" data-dialog-focus data-action="finish-turn">Siguiente turno <span>→</span></button></div></div>`);
   }
 
   // Las cuatro salidas del duelo, contadas desde la mesa y no desde nadie en concreto.
@@ -3022,7 +3025,7 @@
     for (let i = 0; i <= timelineCards.length; i++) {
       slots.push(pendingIndex === i
         ? confirmSlot(card)
-        : slotMarkup(i, timelineCards.length, "solo-place", elegida !== null, i === failIndex));
+        : slotMarkup(i, timelineCards, "solo-place", elegida !== null, i === failIndex));
       if (i < timelineCards.length) slots.push(timelineCardMarkup(timelineCards[i], soloHidden(), true));
     }
     // Sin un total fijo, lo que queda por colocar son las cartas del mazo (las juegues tú o las
@@ -3032,7 +3035,7 @@
     paint(`<div class="shell">${header()}
       <h1 class="solo-lectores" data-focus tabindex="-1">${etiqueta}: ${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}${sinVidas() ? "" : `, ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}`}</h1>
       ${solo.kind === "comp" ? `<div class="comp-topic">${escapeHtml(CT.mode(solo.mode).name)}</div>` : ""}
-      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${etiqueta}</div><div class="turn-name" aria-hidden="true">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
+      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${solo.kind === "comp" ? etiqueta : `${escapeHtml(CT.mode(solo.mode).name)} · ${etiqueta}`}</div><div class="turn-name" aria-hidden="true">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
  ${sinVidas() ? "" : vidasMarkup()}
       ${enDueloConReloj() && solo.cartaEmpezadaEn && !solo.pendingResult ? relojMarkup(Math.min(plazoDuelo(), Math.max(0, plazoDuelo() - (Date.now() - solo.cartaEmpezadaEn))), plazoDuelo()) : ""}
       ${soloHidden() ? `<div class="ghost-banner" role="status"><span aria-hidden="true">◌</span><div><b>Fantasma ${solo.difficulty === "expert" ? "permanente" : "· esta jugada"}</b><small>${CT.mode(selectedModeKey).axis === "time" ? "Fechas" : "Cifras"} ocultas ${solo.difficulty === "expert" ? "toda la partida. Guíate por las ilustraciones." : "solo esta jugada."}</small></div></div>` : ""}
