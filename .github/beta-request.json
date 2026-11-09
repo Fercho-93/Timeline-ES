@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 888,
+  "cache": 893,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Vídeo «cómo se juega» rehecho: cuatro capítulos en orden, todas las variantes y datos comprobados contra el código, cada escena espera a «Siguiente» y las portadas de Jugar solo, Reto diario y En grupo"
+  "reason": "Reglas coherentes entre modalidades: la final de desempate no repite cartas vistas y usa botones de unidad, el duelo por turnos de colecciones sortea la carta de la final, pierde el turno al agotar el tiempo y reserva cartas al repartir, Guía y política de privacidad alineadas con el juego"
 }
