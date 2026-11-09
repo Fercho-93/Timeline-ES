@@ -143,7 +143,8 @@ assert.equal(E.SOLO_CARDS, 10); assert.equal(E.MAX_HAND, 6);
 assert.match(shown('solo'), new RegExp(`${E.SOLO_CARDS} cartas`));
 assert.match(shown('friends'), new RegExp(`1 a ${E.MAX_HAND}`));
 assert.match(G.online.end.html, /30 s/); assert.match(G.online.end.html, /2 a 4/);
-assert.match(rules('friends'), /7 días/);
+// Los duelos por turnos no caducan todos a los 7 días (solo la competición por turnos): la lámina no lo promete.
+assert.doesNotMatch(rules('friends'), /7 días/);
 // Los años del ejemplo son los del mazo de inventos.
 const inventos = w.CONTINUUM.cards('inventions').map(c => c.year);
 for (const year of [1450, 1804, 1903, 1973]) assert.ok(inventos.includes(year), `el mazo de inventos tiene ${year}`);

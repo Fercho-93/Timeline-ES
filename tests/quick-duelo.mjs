@@ -327,6 +327,62 @@ assert.equal(w.location.origin, 'https://continuum.test');
   assert.match(fila.marcador, /^Tú 1 carta · Bea 2 cartas · Jugador 3 2 cartas$/, 'Tus duelos cuenta las cartas que le quedan a cada uno');
   assert.equal(fila.collection, 'history');
 }
+const plain = value => JSON.parse(JSON.stringify(value));
+// Los duelos de colección creados con esta versión siguen las reglas del resto de partidas en grupo de colecciones
+// (`QuickEngine.REGLAS`, por la huella de la sala); los anteriores terminan con las suyas.
+{
+  const R = CT.QuickRoom, deck = E.colDeck('history'), c = E.challenge('col:history');
+  const base = {names: ['Ana', 'Bea'], rounds: [{id: 'col:history', order: deck}], kind: 'duel', hand: 1, historyId: 'r', seconds: 15};
+  const nuevo = {...base, reglas: E.REGLAS};
+  const bien = (st, id) => { for (let i = 0; i <= st.timeline.length; i++) if (E.step(st, {type: 'place', cardId: id, index: i}).result.correct) return i; };
+  const mal = (st, id) => { for (let i = 0; i <= st.timeline.length; i++) if (!E.step(st, {type: 'place', cardId: id, index: i}).result.correct) return i; };
+  const jugar = (st, ok) => { const id = st.players[st.current].hand[0]; return E.step(E.step(st, {type: 'place', cardId: id, index: ok ? bien(st, id) : mal(st, id)}), {type: 'ack'}); };
+  // Agotar el tiempo pierde el turno: no se coloca nada y la mano no cambia.
+  let s = E.create(nuevo);
+  const antes = plain(s);
+  assert.deepEqual(plain(E.timeoutPlacement(s)), {type: 'bank'}, 'sin colocar ninguna carta a propósito');
+  s = E.step(s, E.timeoutPlacement(s));
+  assert.equal(s.phase, 'turn'); assert.equal(s.current, 1, 'el turno pasa a la siguiente persona');
+  assert.deepEqual(plain(s.players[0].hand), antes.players[0].hand, 'la mano sigue igual');
+  assert.deepEqual(plain(s.timeline), antes.timeline); assert.deepEqual(plain(s.discard), [], 'nada al descarte');
+  assert.throws(() => E.step(E.create(base), {type: 'bank'}), /INVALID/, 'un duelo anterior no entiende el turno perdido');
+  assert.equal(E.timeoutPlacement(E.create(base)).type, 'place', 'y sigue jugando el fallo de entonces');
+  // Perder el turno al cerrar la vuelta también la cierra: gana quien se quedó sin cartas.
+  let w = jugar(E.create(nuevo), true);
+  w = E.step(w, {type: 'bank'});
+  assert.equal(w.phase, 'round-end'); assert.deepEqual(plain(w.winners), [0]);
+  // Al repartir quedan fuera la carta de la línea y una para robar.
+  const justo = deck.slice(0, 2 * 2 + 1);
+  assert.doesNotThrow(() => E.create({...base, hand: 2, rounds: [{id: 'col:history', order: justo}]}), 'antes bastaba con la de la línea');
+  assert.throws(() => E.create({...nuevo, hand: 2, rounds: [{id: 'col:history', order: justo}]}), /INVALID_CONFIG/, 'ahora hace falta una para robar');
+  assert.doesNotThrow(() => E.create({...nuevo, hand: 2, rounds: [{id: 'col:history', order: deck.slice(0, 6)}]}));
+  // La carta de la final se sortea (igual en todos los móviles) y no repite una del descarte.
+  const empatan = (cfg, fallo) => { let t = E.create(cfg); if (fallo) { t = jugar(t, false); t = jugar(t, false); } t = jugar(t, true); t = jugar(t, true); return t; };
+  const conFallo = empatan({...nuevo, hand: 1}, true);
+  assert.ok(conFallo.final && conFallo.discard.length === 2, 'hay final y dos cartas en el descarte');
+  assert.ok(!conFallo.discard.includes(conFallo.final.cardId) && !conFallo.timeline.includes(conFallo.final.cardId), 'la final no repite una carta ya vista');
+  assert.deepEqual(plain(empatan({...nuevo, hand: 1}, true).final), plain(conFallo.final), 'todos los móviles sacan la misma');
+  const cartas = new Set();
+  for (let i = 0; i < 12; i++) cartas.add(empatan({...nuevo, rounds: [{id: 'col:history', order: E.colDeck('history')}]}).final.cardId);
+  assert.ok(cartas.size > 1, 'no es siempre la misma carta');
+  const primeraNoVista = t => c.cards.find(x => !t.timeline.includes(x.id) && !t.players.some(p => p.hand.includes(x.id))).id;
+  const antigua = empatan(base);
+  assert.equal(antigua.final.cardId, primeraNoVista(antigua), 'los duelos anteriores sacan la de siempre');
+  // La sala aplica las reglas nuevas solo con la huella de esta versión.
+  let room = R.create('ana', 'Ana', 2);
+  room.catalog = CT.QuickNetwork.collectionFingerprint();
+  room = R.reduce(room, 'ana', {type: 'start', rounds: [{id: 'col:history', order: deck}], kind: 'duel', hand: 1, historyId: 'sala', seconds: 15});
+  assert.equal(room.config.reglas, undefined, 'la configuración guardada no cambia (las reglas de Firestore la limitan)');
+  assert.equal(R.record(room).config.reglas, E.REGLAS);
+  room = R.reduce(room, 'ana', {type: 'bank'});
+  assert.equal(room.actor, room.host, 'el turno perdido pasa al amigo, que aún no ha entrado');
+  assert.equal(R.state(room).current, 1);
+  const vieja = {...R.create('ana', 'Ana', 2), catalog: (CT.QuickNetwork.fingerprint() ^ 0x2c01ec7) >>> 0};
+  const viejaEmpezada = R.reduce(vieja, 'ana', {type: 'start', rounds: [{id: 'col:history', order: deck}], kind: 'duel', hand: 1, historyId: 'sala', seconds: 15});
+  assert.equal(R.record(viejaEmpezada).config.reglas, undefined, 'un duelo con la huella anterior sigue con sus reglas');
+  assert.throws(() => R.reduce(viejaEmpezada, 'ana', {type: 'bank'}), /INVALID/);
+  assert.ok(CT.QuickNetwork.compatible(vieja.catalog), 'y esta versión puede terminarlo');
+}
 // Grandes colecciones por turnos: el mazo elegido se juega con estas reglas, en rondas de 9 cartas más la de salida.
 {
   const R = CT.QuickRoom, c = E.challenge('col:history');

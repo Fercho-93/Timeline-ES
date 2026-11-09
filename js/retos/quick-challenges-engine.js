@@ -51,6 +51,16 @@
   // `config.hand` lo distingue de los duelos de colección anteriores (mismo mazo para todos, como Retos rápidos).
   const isColDuel = config => !!config && config.kind === 'duel' && Number.isInteger(config.hand) && isCollection(config.rounds?.[0]?.id);
   const MAX_HAND = 6;
+  // Las reglas de los duelos de colección creados desde la versión 892, iguales a las del resto de partidas en
+  // grupo de colecciones: se reservan dos cartas al repartir (la de la línea y una para robar), agotar el tiempo
+  // pierde el turno sin colocar nada y la carta de la final se sortea entre las que no se han visto. No viajan en
+  // la configuración guardada (las reglas de Firestore no la admiten): las añade `QuickRoom.record` cuando la sala
+  // lleva la huella de esta versión, y los duelos anteriores terminan con sus reglas de siempre, para que dos
+  // móviles con versiones distintas no reconstruyan dos partidas distintas.
+  const REGLAS = 2;
+  const nuevas = config => config?.reglas === REGLAS;
+  // Cuántas cartas quedan fuera de las manos al repartir: la de la línea y, con las reglas de ahora, una para robar.
+  const colReserve = config => nuevas(config) ? 2 : 1;
   // Para barajar el descarte al agotarse el mazo: el mismo resultado en todos los móviles.
   const reshuffle = list => [...list].reverse();
   function create(config) {
@@ -137,7 +147,7 @@
   }
   function colCreate(config) {
     const round = config.rounds[0], n = config.names.length;
-    if (config.rounds.length !== 1 || n < 2 || config.hand < 1 || config.hand > MAX_HAND || round.order.length < n * config.hand + 1) throw Error('INVALID_CONFIG');
+    if (config.rounds.length !== 1 || n < 2 || config.hand < 1 || config.hand > MAX_HAND || round.order.length < n * config.hand + colReserve(config)) throw Error('INVALID_CONFIG');
     const deck = round.order.slice();
     const players = config.names.map(name => ({name: name.trim(), hand: deck.splice(0, config.hand), score: 0, points: 0, hits: 0, status: 'active', roundScore: 0}));
     const s = {config: clone(config), index: 0, players, timeline: [deck.shift()], deck, discard: [], current: Number.isInteger(config.first) ? config.first : 0,
@@ -145,16 +155,20 @@
     s.remaining = s.players[s.current].hand.slice();
     return s;
   }
-  // Qué carta sale en la final: de las que no están en la mesa ni en ninguna mano (determinista, sin azar).
+  // Qué carta sale en la final: una que no esté en la mesa, en ninguna mano ni (con las reglas de ahora) en el
+  // descarte, cuyo valor se vio al fallarla. Se sortea con una semilla sacada del propio reparto, así todos los
+  // móviles que reconstruyen la partida sacan la misma; los duelos anteriores toman la primera del mazo.
   function colFinalCard(s, players, previous) {
-    const key = c => c.id, used = previous?.used || [];
-    const exposed = new Set([...s.timeline, ...s.players.flatMap(p => p.hand)]);
+    const key = c => c.id, used = previous?.used || [], sorteo = nuevas(s.config);
+    const exposed = new Set([...s.timeline, ...s.players.flatMap(p => p.hand), ...(sorteo ? s.discard : [])]);
     const cards = challenge(s.config.rounds[0].id).cards;
     let pool = cards.filter(c => !exposed.has(key(c)) && !used.includes(c.id));
     if (!pool.length) pool = cards.filter(c => !used.includes(c.id));
     if (!pool.length) pool = cards;
-    const card = pool[0], mode = challenge(s.config.rounds[0].id).collection;
-    return {round: (previous?.round || 0) + 1, players: [...players], cardId: card.id, target: Math.round(card.value * CT.Final.factor(mode)), guesses: {}, used: [...used, card.id]};
+    const round = (previous?.round || 0) + 1;
+    const at = sorteo ? Math.floor(CT.seededRandom(CT.seedFrom(`${s.config.rounds[0].order.join(',')}|final|${round}`))() * pool.length) : 0;
+    const card = pool[at], mode = challenge(s.config.rounds[0].id).collection;
+    return {round, players: [...players], cardId: card.id, target: Math.round(card.value * CT.Final.factor(mode)), guesses: {}, used: [...used, card.id]};
   }
   function colEnd(s, winners) {
     s.phase = 'round-end'; s.winners = winners; s.winner = winners[0]; s.final = s.final ? {...s.final, done: true} : null;
@@ -183,6 +197,10 @@
       s.phase = 'result';
     } else if (command?.type === 'ack' && s.phase === 'result') {
       s.result = null; s.phase = 'turn'; colAdvance(s);
+    } else if (command?.type === 'bank' && s.phase === 'turn' && !s.final && nuevas(s.config)) {
+      // Se acabó el tiempo: se pierde el turno, sin colocar nada y con la mano como estaba (comando `bank`, que las
+      // reglas de Firestore ya aceptan en el turno de cada cual).
+      s.result = null; colAdvance(s);
     } else if (command?.type === 'guess' && s.phase === 'turn' && s.final && !s.final.done && s.final.players.includes(s.current) && Number.isSafeInteger(command.value) && !(s.current in s.final.guesses)) {
       s.final.guesses[s.current] = command.value;
       const waiting = s.final.players.filter(i => !(i in s.final.guesses));
@@ -200,9 +218,11 @@
     if (!record || record.version !== catalog.version || !Array.isArray(record.commands) || record.commands.length > 2000) throw Error('INVALID_SAVE');
     return record.commands.reduce(step, create(record.config));
   }
-  // La jugada que se hace sola cuando se agota el tiempo: la primera carta pendiente en un hueco
-  // donde no encaja, así cuenta como fallo con un comando normal (vale igual en salas y enlaces).
+  // La jugada que se hace sola cuando se agota el tiempo. En un duelo de colección de ahora se pierde el turno
+  // (`bank`), como en el resto de partidas en grupo de colecciones. En Retos rápidos (y en los duelos de colección
+  // anteriores) cuenta como fallo: la primera carta pendiente en un hueco donde no encaja, con un comando normal.
   function timeoutPlacement(s) {
+    if (isColDuel(s.config) && nuevas(s.config)) return {type: 'bank'};
     const c = challenge(s.config.rounds[s.index].id), cardId = s.remaining[0];
     const value = id => c.cards.find(card => card.id === id).value * c.direction;
     for (let index = 0; index <= s.timeline.length; index++) if (!CT.Engine.fits(s.timeline, cardId, index, value)) return {type: 'place', cardId, index};
@@ -213,5 +233,5 @@
   // Jugando solo (los mazos de hoy y el reto diario): 10 cartas que colocar en cada reto, como una ronda de
   // Grandes colecciones, más la que abre la línea. Un mazo más pequeño se juega entero.
   const SOLO_CARDS = 10;
-  CT.QuickEngine = {create, step, restore, challenge, keepPlaying, timeoutPlacement, MULTI_CARDS, SOLO_CARDS, isCollection, collectionRounds, COLLECTION, isColDuel, colDeck, MAX_HAND};
+  CT.QuickEngine = {create, step, restore, challenge, keepPlaying, timeoutPlacement, MULTI_CARDS, SOLO_CARDS, isCollection, collectionRounds, COLLECTION, isColDuel, colDeck, MAX_HAND, REGLAS};
 })();

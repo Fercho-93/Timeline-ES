@@ -8,7 +8,13 @@
     if (!id || typeof name !== 'string' || !name.trim() || name.trim().length > 24) throw Error('Escribe tu nombre.');
     return {version:1, capacity, host:id, members:[id], names:[name.trim()], config:null, commands:[], revision:0, phase:'lobby', actor:id};
   }
-  function record(room) {return {version:CT.QuickCatalog.version, config:room.config, commands:room.commands};}
+  // La configuración con la que se juega la sala. Un duelo de colección creado desde la versión 892 lleva la huella
+  // nueva (`QuickNetwork.collectionFingerprint`) y se juega con las reglas de ahora (`QuickEngine.REGLAS`).
+  function config(room) {
+    const c = room.config;
+    return c && E.isColDuel(c) && room.catalog != null && room.catalog === CT.QuickNetwork?.collectionFingerprint?.() ? {...c, reglas: E.REGLAS} : c;
+  }
+  function record(room) {return {version:CT.QuickCatalog.version, config:config(room), commands:room.commands};}
   function state(room) {return room.config ? E.restore(record(room)) : null;}
   function metadata(room) {
     // Quien se rinde cierra el duelo: la partida queda como terminada y el otro gana.
@@ -25,7 +31,7 @@
   const sign = (action, id) => ({...copy(action), by: id});
   const sameCommand = (command, action, id) => JSON.stringify(command) === JSON.stringify(sign(action, id)) || JSON.stringify(command) === JSON.stringify(action);
   function authors(room) {
-    let s = E.create(room.config);
+    let s = E.create(config(room));
     for (const command of room.commands) {
       // Pasar de reto y sacar a alguien de la partida los hace quien lleva la sala.
       const expected = command?.type === 'next' || command?.type === 'drop' ? room.host : room.members[s.current];
@@ -130,7 +136,7 @@
       // Un duelo por turnos lo empieza quien lo crea, sin esperar al amigo: su sitio queda reservado hasta que abra el enlace.
       const alone = r.capacity <= DUEL_MAX && r.members.length === 1 && action.kind === 'duel' && r.matchmaking !== 'public';
       if (id !== r.host || r.phase !== 'lobby' || (r.members.length < 2 && !alone)) throw Error('Solo quien crea la sala puede empezar, con al menos dos personas.');
-      r.config = {names:alone ? [...r.names, ...Array.from({length: r.capacity - 1}, (_, i) => seatName(r.capacity, i + 1))] : r.names, rounds:action.rounds, kind: action.kind || (r.capacity === 2 ? 'duel' : 'network'), historyId: action.historyId || null, ...(typeof action.keep === 'boolean' ? {keep: action.keep} : {}), ...(Number.isInteger(action.hand) ? {hand: action.hand} : {}), ...([15, 20, 30].includes(action.seconds) ? {seconds: action.seconds} : {}), ...(alone ? (Number.isInteger(action.first) && action.first >= 0 && action.first < r.capacity ? {first: action.first} : {}) : (Number.isInteger(action.first) && action.first >= 0 && action.first < r.members.length ? {first: action.first} : {}))}; E.create(r.config); metadata(r);
+      r.config = {names:alone ? [...r.names, ...Array.from({length: r.capacity - 1}, (_, i) => seatName(r.capacity, i + 1))] : r.names, rounds:action.rounds, kind: action.kind || (r.capacity === 2 ? 'duel' : 'network'), historyId: action.historyId || null, ...(typeof action.keep === 'boolean' ? {keep: action.keep} : {}), ...(Number.isInteger(action.hand) ? {hand: action.hand} : {}), ...([15, 20, 30].includes(action.seconds) ? {seconds: action.seconds} : {}), ...(alone ? (Number.isInteger(action.first) && action.first >= 0 && action.first < r.capacity ? {first: action.first} : {}) : (Number.isInteger(action.first) && action.first >= 0 && action.first < r.members.length ? {first: action.first} : {}))}; E.create(config(r)); metadata(r);
     } else {
       if (!r.config || r.phase === 'finished' || id !== r.actor) throw Error('Espera tu turno.');
       const now = state(r);

@@ -180,7 +180,18 @@ console.log('\nFantasma: reparto, jugadas y dificultades');
   assert.equal(w.document.querySelectorAll('.ghost-card').length,5);
   play(w,true,true);assert.equal(w.document.querySelectorAll('.ghost-card').length,6);
   click(w,'solo-next');assert.equal(w.document.querySelectorAll('.ghost-card').length,0);
-  assert.equal(state(w,soloKey).autoAdded.length,2);w.close();
+  // Las seis cartas del mazo caben en la mano: el tablero no se lleva ninguna de las que estás viendo.
+  assert.equal(state(w,soloKey).autoAdded.length,0,'no salen cartas de la mano visible');
+  assert.equal(w.document.querySelectorAll('.hand-card').length,6);w.close();
+}
+{
+  // Con más mazo que mano, las automáticas salen de detrás de la mano.
+  const initial={kind:'free',mode:'history',difficulty:'hard',ghostTurns:[],day:'2026-08-31',deck:[7,8,9,10,11,12,13,14,15,16,17,18,19,20],timeline:[1,2,3,4,5],current:6,lives:3,hits:3,played:3,total:null,finished:false};
+  const w=boot({[soloKey]:initial});abreMazo(w);w.CONTINUUM.openDeckAs('collections');click(w,'resume-solo');
+  play(w,true,true);click(w,'solo-next');
+  const s=state(w,soloKey), mano=[...w.document.querySelectorAll('.hand-card')].map(b=>Number(b.dataset.id));
+  assert.equal(s.autoAdded.length,2);
+  assert.ok(s.autoAdded.every(id=>!mano.includes(id)),'las automáticas no estaban en la mano');w.close();
 }
 // La maratón: el mazo entero, con las cartas automáticas saliendo del propio mazo.
 for (const difficulty of ['easy','normal','hard','expert']) {

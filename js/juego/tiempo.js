@@ -111,7 +111,7 @@
   // Qué hace cada uno, con las mismas palabras en un solo móvil y en las salas.
   const PODERES = {
     ghost: "Quien encuentra una puede esconder las cifras de la línea durante una vuelta. Hay de 1 a 3 según los jugadores, y puede que no salga ninguna.",
-    pulse: "Quien encuentra una puede retar a otro jugador: los dos colocan la misma carta y, si solo acierta quien reta, le pasa una carta suya. Hay de 1 a 3 según los jugadores."
+    pulse: "Quien encuentra una puede retar a otro jugador: los dos colocan la misma carta y, si solo acierta quien reta, le pasa una carta suya. Hay de 1 a 3 según los jugadores, y puede que no salga ninguna."
   };
   const CLAVE_PODERES = "continuum-live-powers-v1";
   function poderes() {
@@ -133,7 +133,7 @@
   });
   // Texto para la sala de espera, que solo enseña lo elegido.
   const poderesTexto = (p = poderes()) => p.pulse && p.ghost ? "Pulso y Fantasma" : p.pulse ? "Pulso" : p.ghost ? "Fantasma" : "sin poderes";
-  // Máximo de personas de la sala (2–9): se elige antes de crearla.
+  // Máximo de personas de la sala (2–10): se elige antes de crearla.
   const CLAVE_MAX = "continuum-live-max-v1", MAXIMOS = [2, 3, 4, 5, 6, 7, 8, 9, 10];
   function maximo() {
     try { const v = Number(CT.Storage.getItem(CLAVE_MAX)); if (MAXIMOS.includes(v)) return v; } catch { /* sin almacenamiento */ }

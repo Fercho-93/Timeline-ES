@@ -10,11 +10,15 @@ const plain = x => JSON.parse(JSON.stringify(x));
 assert.deepEqual(plain(CT.Engine.draw([1,2],[3])),{cardId:1,deck:[2],discard:[3]});
 assert.deepEqual(plain(CT.Engine.draw([],[3,4])),{cardId:4,deck:[3],discard:[]});
 assert.equal(CT.Engine.draw([],[]).cardId,undefined);
+// Al cerrar la vuelta: una persona sin cartas gana; varias van a la final, queden o no cartas en el mazo.
 for(let count=2;count<=9;count++) {
   const order=Array.from({length:count},(_,i)=>String(i)), players=Object.fromEntries(order.map(id=>[id,{hand:[]}])) ;
-  assert.equal(CT.Engine.roundOutcome(order,players,count-1).ended,true);
-  assert.equal(CT.Engine.roundOutcome(order,players,count).ended,false);
+  assert.deepEqual(plain(CT.Engine.roundOutcome(order,players)),{empty:order,ended:false,final:true});
+  players['0'].hand=[7];
+  assert.equal(CT.Engine.roundOutcome(order,players).final,count>2);
+  assert.equal(CT.Engine.roundOutcome(order,players).ended,count===2);
 }
+assert.deepEqual(plain(CT.Engine.roundOutcome(['a','b'],{a:{hand:[1]},b:{hand:[2]}})),{empty:[],ended:false,final:false});
 context.window.Capacitor={isNativePlatform:()=>true};
 assert.equal(CT.Links.base(),'https://continuumjuego.es/');
 // El dominio propio se acepta igual que la dirección de GitHub, con y sin www; otras rutas no.

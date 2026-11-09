@@ -571,6 +571,9 @@
     // El número de jugadores va por aquí y no por el desplegable (que solo llega a 4): en colecciones pueden ser hasta 10.
     duelPlayers=Math.min(Math.max(Number(players)||2,2),seatsMax());
     duelHand=Math.min(Math.max(Number(hand)||4,1),E.MAX_HAND);
+    // Como en el resto de partidas en grupo de colecciones, al repartir quedan fuera la carta de la línea y al menos
+    // una para robar: con un mazo pequeño para tanta gente, se reparten menos cartas por persona.
+    if(duelDeck)duelHand=Math.max(1,Math.min(duelHand,Math.floor((E.colDeck(duelDeck).length-2)/duelPlayers)));
     CT.Storage.setItem(DUEL_PACE,'turnos');CT.Storage.setItem(DUEL_KEEP,keep?'seguir':'fuera');
     pendingInvite=invite||null;
     await connectRoom(true,{name:name||CT.Identidad?.propio?.()||'',length:length||3});
@@ -1082,8 +1085,9 @@
   function lastNote() {
     if(!room||!record||state.phase!=='turn')return '';
     let s=E.create(record.config),last=null;
-    for(const c of record.commands){const before=s.current,round=s.index;s=E.step(s,c);if(c.type==='place')last={by:before,cardId:c.cardId,correct:s.result.correct,round};}
+    for(const c of record.commands){const before=s.current,round=s.index;s=E.step(s,c);if(c.type==='place')last={by:before,cardId:c.cardId,correct:s.result.correct,round};else if(c.type==='bank'&&E.isColDuel(record.config))last={by:before,timeout:true};}
     if(!last||last.by===room.members.indexOf(myId))return '';
+    if(last.timeout)return `<aside class="turn-duel-last" aria-label="Última jugada"><b>Última jugada</b><p>A ${esc(state.players[last.by].name)} se le acabó el tiempo y perdió el turno, sin colocar ninguna carta.</p></aside>`;
     const item=E.challenge(record.config.rounds[last.round].id).cards.find(x=>x.id===last.cardId);
     if(!item)return '';
     return `<aside class="turn-duel-last" aria-label="Última jugada"><b>Última jugada</b><p>${esc(state.players[last.by].name)} ${last.correct?'acertó':'falló'} con «${esc(item.title)}» (${esc(item.label)}).</p></aside>`;
@@ -1244,8 +1248,11 @@
     }});
     if(timed&&!covered){const key=turnKey();quickClock=CT.Tiempo.clock({empezadoEn:startedAt,ms,root:app(),onTimeout:()=>{
       if(!state||!timedTurn()||turnKey()!==key)return;
-      // Se acabó el tiempo: la jugada cuenta como fallo.
-      selected=null;slot=null;dispatch(E.timeoutPlacement(state));
+      // Se acabó el tiempo. En un duelo de colección se pierde el turno sin colocar nada (como en el resto de
+      // partidas en grupo de colecciones); en Retos rápidos, la jugada cuenta como fallo.
+      const command=E.timeoutPlacement(state);
+      if(command.type==='bank'){CT.toast?.('Se acabó el tiempo: pierdes el turno y tu mano sigue igual.',3200);CT.announce('Se acabó el tiempo: pierdes el turno y tu mano sigue igual.');}
+      selected=null;slot=null;dispatch(command);
     }});}
   }
   function focusPlacement() {

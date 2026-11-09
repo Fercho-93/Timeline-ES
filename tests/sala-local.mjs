@@ -70,6 +70,7 @@ sala = act(sala, "start", { requesterId: "host", handSize: 4, turnSeconds: 20, o
 ok("la mesa se sienta por orden de cercanía", sala.playerOrder.join(",") === orden.join(","));
 ok("empieza quien más se acercó", sala.playerOrder[sala.current] === "leo" && sala.starter === "leo");
 ok("reparte cuatro cartas por jugador y una a la línea", Object.values(sala.players).every(p => p.hand.length === 4) && sala.timeline.length === 1);
+ok("la partida recuerda la carta del minijuego", sala.starterCardId === "c-99" && sala.starterDraw === null);
 ok("una partida ya empezada no admite a nadie nuevo", intenta(() => act(sala, "join", { playerId: "tarde", name: "Tarde", now: 2001 })) === "ALREADY_STARTED");
 
 console.log("\nColocar cartas y pasar turno");
@@ -97,6 +98,10 @@ ok("gana quien se queda sin cartas si nadie más se queda igual en la misma rond
 
 console.log("\nVarias personas sin cartas a la vez: final secreta, como en el resto del juego");
 const empatan = { ...casiGanada, playerOrder: ["a", "b", "c"], players: { a: { name: "A", hand: [] }, b: { name: "B", hand: [] }, c: { name: "C", hand: ["x"] } }, current: 2, turnsInRound: 2, timeline: ["t-1"] };
+let vistas = null;
+const espia = (players, previous, exposed) => { vistas = exposed; return makeFinal(players, previous); };
+act({ ...empatan, discard: ["d-1"], starterCardId: "c-99" }, "finish-turn", { requesterId: "a", now: 3100, makeFinal: espia });
+ok("la final aparta las cartas ya vistas: línea, descarte y la del minijuego", vistas.join(",") === "t-1,d-1,c-99");
 let final = act(empatan, "finish-turn", { requesterId: "a", now: 3100 });
 ok("no hay ganador todavía: se juega la final entre quienes empataron", final.phase === "final" && final.status === "playing" && final.final.players.join(",") === "a,b");
 ok("quien no es finalista no responde", intenta(() => act(final, "final-answer", { playerId: "c", value: 5, now: 3101 })) === "NOT_ALLOWED");

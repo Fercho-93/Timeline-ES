@@ -517,7 +517,7 @@
     const roster = players.map(p=>({id:p.id,name:p.name,hand:deck.splice(0,handSize),pulseUsed:false,shieldRound:0}));
     const timeline=[deck.shift()];
     roster.forEach(p=>p.hand.forEach(id=>CT.Powers.claim(powers,id,p.id,deck)));
-    game={mode:selectedModeKey,tournament:t,pulse:false,...powers,players:roster,deck,discard:[],timeline,current:starter,starter,turnsInRound:0,round:1,winner:null,winners:null,tournamentIntro:true,pulseTurn:null,pulseGift:null,turnSeconds:CT.Tiempo.get("local")};
+    game={mode:selectedModeKey,tournament:t,pulse:false,...powers,players:roster,deck,discard:[],timeline,starterCardIds:excludedCardId==null?[]:[excludedCardId],current:starter,starter,turnsInRound:0,round:1,winner:null,winners:null,tournamentIntro:true,pulseTurn:null,pulseGift:null,turnSeconds:CT.Tiempo.get("local")};
     selectedCardId=null;pendingIndex=null;result=null;saveGame();renderTournamentIntro();
   }
   function nextTournamentRound() {
@@ -1154,7 +1154,7 @@
     const players = names.map((name, i) => ({ id: i + 1, name, hand: shuffled.splice(0, handSize), pulseUsed: false, shieldRound: 0 }));
     const timeline = [shuffled.shift()];
     players.forEach(p => p.hand.forEach(id => CT.Powers.claim(powers, id, p.id, shuffled)));
-    game = { mode: selectedModeKey, pulse, ...powers, players, deck: shuffled, discard: [], timeline, current: starter, starter, turnsInRound: 0, round: 1, winner: null, winners: null, pulseTurn: null, pulseGift: null, turnSeconds: CT.Tiempo.chosen("local") };
+    game = { mode: selectedModeKey, pulse, ...powers, players, deck: shuffled, discard: [], timeline, starterCardIds: [...drawnIds], current: starter, starter, turnsInRound: 0, round: 1, winner: null, winners: null, pulseTurn: null, pulseGift: null, turnSeconds: CT.Tiempo.chosen("local") };
     selectedCardId = null;
     result = null;
     saveGame();
@@ -1365,7 +1365,7 @@
   // a la vez:
   //
   //   los dos aciertan     → nada, defensa perfecta
-  //   solo quien reta      → le endosa una carta al azar de su mano
+  //   solo quien reta      → le pasa la carta de su mano que eligió al lanzarlo
   //   solo quien defiende  → quien reta roba una
   //   ninguno de los dos   → quien reta roba una
   //
@@ -1378,9 +1378,11 @@
   //   aposta para acercar a nadie a la victoria. Es la misma razón por la que se puede
   //   retar a quien está a cero cartas esperando el final de la ronda, que sigue siendo
   //   la jugada más tensa del mecanismo.
-  // - La carta que se entrega va al azar y se aparta al lanzar el Pulso, antes de que
-  //   nadie coloque nada. Si pudieras elegirla soltarías siempre la que no sabes colocar,
-  //   y el Pulso dejaría de ser una apuesta para ser un vertedero.
+  // - La carta que se entregaría la elige quien reta al lanzar el Pulso, antes de que salga
+  //   la carta del duelo y antes de que nadie coloque nada, y ya no puede cambiarla. Soltar
+  //   la que peor sabe colocar es parte de la apuesta: la paga gastando su turno y el poder,
+  //   y si falla roba en vez de soltar. (Antes iba al azar; la Guía y las tres mesas
+  //   —un solo móvil, online y Wi-Fi— dejan elegirla.)
   // - Hacen falta dos cartas para lanzarlo. Con una sola, ganar el duelo te dejaría a cero
   //   regalándola, sin haberla colocado nunca en la línea: se saltaría la condición de
   //   victoria del juego.
@@ -1616,10 +1618,10 @@
   // Devuelve true si se abandona la ronda normal para ganar o pasar a la final.
   function resolveRound() {
     const players = Object.fromEntries(game.players.map(player => [player.id, player]));
-    const outcome = CT.Engine.roundOutcome(game.players.map(player => player.id), players, game.deck.length + game.discard.length);
+    const outcome = CT.Engine.roundOutcome(game.players.map(player => player.id), players);
     const empty = outcome.empty.map(id => players[id]);
-    if (empty.length > 1) {
-      game.final = CT.Final.create(selectedModeKey, empty.map(player => player.id), null, game.timeline);
+    if (outcome.final) {
+      game.final = CT.Final.create(selectedModeKey, empty.map(player => player.id), null, cartasVistas());
       game.finalAnswers = {};
       result = null;
       saveGame(); renderFinalPass();
@@ -1630,6 +1632,9 @@
     game.turnsInRound = 0;
     return false;
   }
+
+  // Las cartas cuyo valor ya se ha visto: la final de desempate no las repite (`CT.Final.create`).
+  function cartasVistas() { return [...game.timeline, ...game.discard, ...(game.starterCardIds || [])]; }
 
   function endGame(winners) {
     vuelcaCartas(game);
@@ -1673,7 +1678,7 @@
   function nextLocalFinal() {
     const ranking = CT.Final.rank(game.final, game.finalAnswers);
     if (ranking.winners.length === 1) return endGame(game.players.filter(player => ranking.winners.includes(player.id)));
-    game.final = CT.Final.create(selectedModeKey, ranking.winners, game.final, game.timeline);
+    game.final = CT.Final.create(selectedModeKey, ranking.winners, game.final, cartasVistas());
     game.finalAnswers = {};
     saveGame(); renderFinalPass();
   }
@@ -3174,9 +3179,11 @@
     // complica (la línea se estrecha). Tras un fallo ya pierdes una vida y la carta fallada
     // entra en la línea; sumarle más sería castigar dos veces.
     const extra = jugada.correct ? CT.Ghost.level(solo.difficulty).extra : 0;
-    // Sin reserva salen del final del mazo, que está barajado: las del principio son tu mano.
+    // Sin reserva salen del final del mazo, que está barajado: las del principio son tu mano. Cuando el mazo ya
+    // cabe entero en la mano (al final de la maratón), no se toca: el tablero no se lleva cartas que estás viendo.
     const fuente = solo.reserve || solo.deck;
-    for (let n = 0; n < extra && fuente.length; n++) {
+    const enMano = solo.reserve ? 0 : manoSolo().length - 1;
+    for (let n = 0; n < extra && fuente.length > enMano; n++) {
       const id = solo.reserve ? fuente.shift() : fuente.pop();
       const at = CT.correctIndex(selectedModeKey, solo.timeline.map(id => cardsById.get(id)), cardsById.get(id));
       solo.timeline.splice(at, 0, id); solo.autoAdded.push(id);

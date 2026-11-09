@@ -6,7 +6,7 @@
   const modes = () => Object.keys(CT.MODES).filter(key => key !== 'mixed' && CT.Cartera.tiene(key));
   function create(rounds, cards) {
     const queue = CT.shuffle(modes()).slice(0, Math.max(1, Math.min(modes().length, Number(rounds) || modes().length)));
-    return {queue, index:0, history:[], handSize:Math.max(1, Math.min(6, Number(cards) || 5))};
+    return {queue, index:0, history:[], handSize:Math.max(1, Math.min(6, Number(cards) || 4))};
   }
   function handsOf(players) {
     const entries = Array.isArray(players) ? players.map(p=>[p.id,p.hand.length]) : Object.entries(players).map(([id,p])=>[id,p.hand.length]);

@@ -49,9 +49,11 @@
       return {timeline, deck, discard, byHand, targetHand, byOk, targetOk, giftId, drawnCardId,
         penaltySkipped: !byOk && drawnCardId == null};
     },
-    roundOutcome(order, players, available) {
+    // Al cerrar la vuelta: quién se ha quedado sin cartas. Una sola persona gana (`ended`); varias pasan a la final
+    // de desempate (`final`), haya o no cartas en el mazo, porque la final usa una carta aparte.
+    roundOutcome(order, players) {
       const empty = order.filter(id => players[id].hand.length === 0);
-      return {empty, ended:empty.length === 1 || (empty.length > 1 && available < empty.length)};
+      return {empty, ended:empty.length === 1, final:empty.length > 1};
     }
   });
   if (CT) CT.Engine = Engine;

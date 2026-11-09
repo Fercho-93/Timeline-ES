@@ -44,8 +44,12 @@
   function fingerprint(){return CT.seedFrom(JSON.stringify({version:CT.QuickCatalog.version,challenges:CT.QuickCatalog.challenges.map(c=>({id:c.id,direction:c.direction,cards:c.cards.map(x=>({id:x.id,value:x.value}))}))}));}
   // Los duelos de Grandes colecciones juegan con este motor mazos que las versiones anteriores no conocen: llevan
   // otra huella para que una de esas versiones pida actualizar en vez de abrir una partida que no sabe jugar.
-  function collectionFingerprint(){return (fingerprint()^0x2c01ec7)>>>0;}
-  function compatible(value){return value===fingerprint()||value===collectionFingerprint();}
+  // Desde la versión 892 la huella cambia otra vez, porque esos duelos siguen las reglas del resto de partidas en
+  // grupo (`QuickEngine.REGLAS`): una versión anterior no puede entrar en ellos, y los duelos que ya llevaban la
+  // huella antigua se terminan con sus reglas de entonces.
+  function collectionFingerprint(){return (fingerprint()^0x2c01ec8)>>>0;}
+  function legacyCollectionFingerprint(){return (fingerprint()^0x2c01ec7)>>>0;}
+  function compatible(value){return value===fingerprint()||value===collectionFingerprint()||value===legacyCollectionFingerprint();}
   async function internet(options) {return (await import('./quick-online.js')).connect(options);}
   async function mine() {return (await import('./quick-online.js')).mine();}
   async function actOnce(code, action, expected) {return (await import('./quick-online.js')).actOnce(code, action, expected);}

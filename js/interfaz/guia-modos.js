@@ -196,7 +196,7 @@
       how: [true, 'Uno tras otro', HOW_GROUP],
       rows: groupRows('en grupo'), chooseAt: 4.9,
       choose: [['2 a 10 jugadores', 'mano de 1 a 6, poderes y tiempo'], ['2 a 4 jugadores', 'qué pasa al fallar y cuántos mazos']],
-      end: { label: 'Dónde jugáis', html: WHERE, rule: 'Dónde jugáis: en un solo móvil, que os vais pasando sin mirar las cartas de los demás, o cada uno en su móvil. Cada uno en su móvil puede ser en directo, en una sala con todos conectados por internet o en la misma Wi-Fi, o por turnos: un duelo en el que cada uno juega cuando puede y que caduca a los 7 días sin jugar. Si te invitan, entra con «Unirme a una partida».', at: 5.3 }
+      end: { label: 'Dónde jugáis', html: WHERE, rule: 'Dónde jugáis: en un solo móvil, que os vais pasando sin mirar las cartas de los demás, o cada uno en su móvil. Cada uno en su móvil puede ser en directo, en una sala con todos conectados por internet o en la misma Wi-Fi, o por turnos: un duelo en el que cada uno juega cuando puede. Si te invitan, entra con «Unirme a una partida».', at: 5.3 }
     },
     online: {
       screen: 'hub-online', name: 'Jugar online', title: 'Mesas con desconocidos', art: 'menu-online.webp',

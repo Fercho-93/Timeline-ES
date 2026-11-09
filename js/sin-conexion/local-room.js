@@ -119,7 +119,8 @@
       ...state, playerOrder: [...order], handSize: actualHand, turnSeconds: turnSeconds ?? state.turnSeconds,
       players, deck, timeline, discard: [], status: "playing", phase: "turn",
       ghost: powers.ghost, pulsePower: powers.pulsePower, pulse: !!pulse, pulseTurn: null,
-      current: 0, starter: order[0], starterDraw: null, final: null, finalAnswers: null,
+      // La carta del minijuego ya se vio: la final de desempate no la repite.
+      current: 0, starter: order[0], starterDraw: null, starterCardId: laterRound(state) ? null : state.starterDraw?.cardId ?? null, final: null, finalAnswers: null,
       turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null,
       turnStartedAt: now, version: state.version + 1, updatedAt: now
     };
@@ -230,6 +231,8 @@
   // Pasar de turno. Al cerrar la ronda se mira quién se ha quedado sin cartas: una sola
   // persona gana; varias pasan a la final secreta. Quien está desconectado no juega: su
   // turno se salta solo, igual que si se le hubiera agotado el tiempo.
+  // Las cartas cuyo valor ya se ha visto (línea, descarte y la del minijuego): la final no las repite.
+  const seenCards = state => [...state.timeline, ...state.discard, ...(state.starterCardId == null ? [] : [state.starterCardId])];
   function advance(state, now, makeFinal) {
     let next = state;
     for (let guard = 0; guard <= next.playerOrder.length; guard++) {
@@ -237,13 +240,13 @@
       CT.Ghost?.advance(ghost, next.playerOrder[next.current], next.playerOrder);
       let turnsInRound = next.turnsInRound + 1, round = next.round;
       if (turnsInRound >= next.playerOrder.length) {
-        const { empty } = CT.Engine.roundOutcome(next.playerOrder, next.players, next.deck.length + next.discard.length);
+        const { empty } = CT.Engine.roundOutcome(next.playerOrder, next.players);
         if (empty.length === 1) {
           return { ...next, ghost, status: "ended", phase: "finished", winner: empty[0], winners: empty, reveal: null, pulseTurn: null, version: state.version + 1, updatedAt: now };
         }
         if (empty.length > 1) {
           if (typeof makeFinal !== "function") throw new Error("NOT_ALLOWED");
-          return { ...next, ghost, phase: "final", final: makeFinal(empty, null, next.timeline), finalAnswers: {}, reveal: null, pulseTurn: null, version: state.version + 1, updatedAt: now };
+          return { ...next, ghost, phase: "final", final: makeFinal(empty, null, seenCards(next)), finalAnswers: {}, reveal: null, pulseTurn: null, version: state.version + 1, updatedAt: now };
         }
         turnsInRound = 0; round += 1;
       }
@@ -284,7 +287,7 @@
     if (winners.length === 1) {
       return { ...state, status: "ended", phase: "finished", winner: winners[0], winners, version: state.version + 1, updatedAt: now };
     }
-    return { ...state, final: makeFinal(winners, state.final, state.timeline), finalAnswers: {}, version: state.version + 1, updatedAt: now };
+    return { ...state, final: makeFinal(winners, state.final, seenCards(state)), finalAnswers: {}, version: state.version + 1, updatedAt: now };
   }
 
   // ---------------------------------------------------------------------------

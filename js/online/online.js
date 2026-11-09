@@ -1090,7 +1090,8 @@ async function startRoom(withGhost = true) {
   const starterCard = laterRound ? null : starterCardId();
   const ranking = laterRound ? null : starterRanking(isPublic);
   const rotated = laterRound ? roomState.playerOrder[roomState.tournament.index % roomState.playerOrder.length] : null;
-  // Sin minijuego (se empezó sin jugarlo), alguien al azar, igual que en un solo móvil.
+  // En una mesa pública la partida puede arrancar con respuestas pendientes (quien no respondió va al final del
+  // orden); si nadie llegó a responder, empieza alguien al azar. En una sala de amigos el minijuego es obligatorio.
   const starterUid = rotated || ranking?.[0] || roomState.playerOrder[Math.floor(Math.random() * roomState.playerOrder.length)];
   // La competición se juega sin poderes, como dice la Guía.
   const pulse = !roomState.tournament && !!document.getElementById("online-pulse")?.checked;
@@ -1123,7 +1124,7 @@ async function startRoom(withGhost = true) {
       const startUid = order.includes(starterUid) ? starterUid : order[0];
       transaction.update(roomRef, {
         ...(reorder ? { playerOrder: order } : {}),
-        handSize: actualHand, turnSeconds: Number(document.getElementById("online-turn-seconds")?.value ?? lobbySettings.turnSeconds ?? 30), pulse, ...(powers.ghost ? { ghost: powers.ghost } : {}), ...(powers.pulsePower ? { pulsePower: powers.pulsePower } : {}), players, deck, timeline, discard: [], status: "playing", phase: "turn",
+        handSize: actualHand, turnSeconds: Number(document.getElementById("online-turn-seconds")?.value ?? lobbySettings.turnSeconds ?? 15), pulse, ...(powers.ghost ? { ghost: powers.ghost } : {}), ...(powers.pulsePower ? { pulsePower: powers.pulsePower } : {}), players, deck, timeline, discard: [], status: "playing", phase: "turn",
         current: order.indexOf(startUid), starter: startUid,
         turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null, pulseTurn: null,
         turnStartedAt: serverTimestamp(),
@@ -1528,6 +1529,17 @@ function takeCard(deckInput, discardInput) {
 }
 
 // ── Fin de turno, desempate y final secreta ──────────────────────────────────────────────────────
+// Las cartas cuyo valor ya se ha visto, que la final de desempate no repite: la línea, el descarte
+// y la del minijuego de quién empieza, que el anfitrión dejó en su documento de `starter` (se lee
+// dentro de la transacción, antes de escribir nada). Si no se puede leer, la final sigue sin ella.
+async function seenCards(transaction, data, discard, code = roomCode) {
+  let starter = [];
+  try {
+    const snap = await transaction.get(doc(db, "rooms", code, "starter", data.hostUid));
+    if (snap.exists() && Number.isInteger(snap.data().cardId)) starter = [snap.data().cardId];
+  } catch { /* sin la carta del minijuego, se apartan las demás */ }
+  return [...data.timeline, ...discard, ...starter];
+}
 async function finishTurn() {
   if (busy || roomState?.phase !== "reveal") return;
   busy = true;
@@ -1546,14 +1558,15 @@ async function finishTurn() {
       let deck = [...data.deck];
       let discard = [...data.discard];
       if (turnsInRound >= data.playerOrder.length) {
-        const {empty} = CT.Engine.roundOutcome(data.playerOrder, players, deck.length + discard.length);
+        const {empty} = CT.Engine.roundOutcome(data.playerOrder, players);
         // Varios jugadores sin cartas disputan una final numérica secreta.
         if (empty.length === 1) {
           transaction.update(roomRef, { status: "ended", phase: "finished", winner: empty[0], winners: empty, reveal: null, version: data.version + 1, updatedAt: serverTimestamp() });
           return;
         }
         if (empty.length > 1) {
-          transaction.update(roomRef, {phase:'final',final:CT.Final.create(data.mode, empty, data.finalRoundOffset ? {round:data.finalRoundOffset,used:[]} : null, data.timeline),reveal:null,version:data.version+1,updatedAt:serverTimestamp()});
+          const seen = await seenCards(transaction, data, discard);
+          transaction.update(roomRef, {phase:'final',final:CT.Final.create(data.mode, empty, data.finalRoundOffset ? {round:data.finalRoundOffset,used:[]} : null, seen),reveal:null,version:data.version+1,updatedAt:serverTimestamp()});
           return;
         }
         turnsInRound = 0;
@@ -1683,9 +1696,10 @@ async function nextOnlineFinal() {
       if (!CT.Final.valid(data.mode, final)) throw Error('FINAL_TAMPERED');
       const answers = Object.fromEntries(await Promise.all(final.players.map(async uid => [uid, (await tx.get(finalAnswerRef(code, final.round, uid))).data().value])));
       const ranking = CT.Final.rank(final, answers);
+      const seen = ranking.winners.length === 1 ? [] : await seenCards(tx, data, data.discard, code);
       tx.update(reference, ranking.winners.length === 1
         ? {status:'ended', phase:'finished', winner:ranking.winners[0], winners:ranking.winners, version:data.version + 1, updatedAt:serverTimestamp()}
-        : {final:CT.Final.create(data.mode, ranking.winners, final, data.timeline), version:data.version + 1, updatedAt:serverTimestamp()});
+        : {final:CT.Final.create(data.mode, ranking.winners, final, seen), version:data.version + 1, updatedAt:serverTimestamp()});
     });
   } catch (error) { console.error(error); showToast('No se pudo continuar la final. Puedes reintentarlo.'); }
   finally { busy = false; }
@@ -1819,13 +1833,14 @@ async function skipTurn(expectedVersion = null) {
       // Saltar el último turno de la vuelta también la cierra: quien se haya quedado sin
       // cartas gana, o se va a la final, igual que en `finishTurn`.
       if (roundEnds) {
-        const {empty} = CT.Engine.roundOutcome(data.playerOrder, data.players, data.deck.length + (cleanup.discard || data.discard).length);
+        const {empty} = CT.Engine.roundOutcome(data.playerOrder, data.players);
         if (empty.length === 1) {
           transaction.update(roomRef, { ...cleanup, status: "ended", phase: "finished", winner: empty[0], winners: empty, reveal: null, version: data.version + 1, updatedAt: serverTimestamp() });
           return;
         }
         if (empty.length > 1) {
-          transaction.update(roomRef, { ...cleanup, phase: 'final', final: CT.Final.create(data.mode, empty, data.finalRoundOffset ? {round:data.finalRoundOffset,used:[]} : null, data.timeline), reveal: null, version: data.version + 1, updatedAt: serverTimestamp() });
+          const seen = await seenCards(transaction, data, cleanup.discard || data.discard);
+          transaction.update(roomRef, { ...cleanup, phase: 'final', final: CT.Final.create(data.mode, empty, data.finalRoundOffset ? {round:data.finalRoundOffset,used:[]} : null, seen), reveal: null, version: data.version + 1, updatedAt: serverTimestamp() });
           return;
         }
       }

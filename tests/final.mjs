@@ -18,6 +18,23 @@ let w = boot();
 const F = w.CONTINUUM.Final;
 assert.equal(F.parse('animals','0,3'),300000000);
 assert.equal(F.parse('history','218',true),-218);
+// La cifra se escribe como en el minijuego de quién empieza: con la unidad detrás y, en fechas, «a. C.» (el menos).
+assert.equal(F.parse('population','47 millones'),47000000);
+assert.equal(F.parse('population','47,5 millones'),47500000);
+assert.equal(F.parse('animals','300 g'),300000000);
+assert.equal(F.parse('history','-218'),-218);
+assert.throws(()=>F.parse('population','47 lunas'),/cifra/);
+assert.throws(()=>F.parse('population','47,5'),/decimales/, 'no hay medio habitante');
+assert.match(F.form('population','data-x'), /cifra-chip[^>]*data-cifra-unidad="millones"/, 'la final lleva los botones de unidad');
+assert.match(F.form('history','data-x'), /data-cifra-signo="a\. C\."/, 'y el de a. C. en las fechas');
+assert.doesNotMatch(F.form('history','data-x'), /final-era/, 'sin el selector de era de antes');
+// La final no repite una carta cuyo valor ya se vio (línea, descarte, minijuego) mientras quede otra.
+{
+  const ids = w.CONTINUUM.cards('history').map(card => card.id);
+  for (let i = 0; i < 20; i++) assert.equal(F.create('history', ['a','b'], null, ids.slice(1)).cardId, ids[0]);
+  const visto = ids.slice(0, -1), segunda = F.create('history', ['a','b'], F.create('history', ['a','b'], null, visto), visto);
+  assert.notEqual(segunda.cardId, ids.at(-1), 'el desempate siguiente no repite la carta de la ronda anterior');
+}
 // La cifra correcta de una final se comprueba contra la carta: una sala online no puede
 // traer otra (la escribe quien abre la final y las reglas no la recalculan).
 {
@@ -63,6 +80,8 @@ for(let i=0;i<2;i++) {
 let state=JSON.parse(w.localStorage.getItem(key));
 assert.equal(state.final.players.length,2);
 assert.ok(state.players.every(p=>p.hand.length===0));
+assert.equal(state.starterCardIds.length,1,'la partida recuerda la carta del minijuego');
+assert.ok(![...state.starterCardIds,...state.timeline,...state.discard].includes(state.final.cardId),'la final no repite la carta del minijuego ni otra ya vista');
 assert.equal(w.document.querySelector('[data-final-local]'),null,'pantalla de pase oculta el formulario');
 // Ambos dan la misma cifra: segunda carta y conservación de respuestas al recargar.
 for(let i=0;i<2;i++) {

@@ -11,21 +11,29 @@
     const axis = CT.mode(mode).axis;
     return ['time','population'].includes(axis) ? 1 : axis === 'mass' ? 1e9 : 1e6;
   }
+  // La cifra se escribe igual que en el minijuego de quién empieza (`CT.Duelo.Cifras`): con la unidad
+  // detrás («47 millones», «300 g») y, en las fechas, el botón «a. C.», que pone el menos delante.
+  // `bc` es el selector de era de las versiones anteriores del formulario.
   function parse(mode, raw, bc = false) {
-    const text = String(raw).trim().replace(',', '.');
-    if (!/^-?\d+(?:\.\d+)?$/.test(text)) throw Error('Escribe una cifra sin separadores de miles. Puedes usar coma decimal.');
-    let value = Number(text);
-    if (bc) value = -Math.abs(value);
-    if (CT.mode(mode).axis !== 'time' && value < 0) throw Error('La cifra no puede ser negativa.');
-    const scaled = value * factor(mode), rounded = Math.round(scaled);
+    const value = CT.Duelo.Cifras.leer(mode, raw);
+    if (value === null) throw Error(CT.mode(mode).axis === 'time'
+      ? 'Escribe el año. Para los anteriores a Cristo, toca «a. C.».'
+      : 'Escribe una cifra. Puedes tocar la unidad para no escribir tantos ceros.');
+    const signed = bc ? -Math.abs(value) : value;
+    if (CT.mode(mode).axis !== 'time' && signed < 0) throw Error('La cifra no puede ser negativa.');
+    const scaled = signed * factor(mode), rounded = Math.round(scaled);
     if (!Number.isSafeInteger(rounded) || Math.abs(rounded) > 4e15 || Math.abs(scaled - rounded) > 1e-6) throw Error('La cifra es demasiado grande o tiene demasiados decimales.');
     return rounded;
   }
+  // `exposed` son las cartas cuyo valor ya se ha visto en la partida: la línea, el descarte (una carta
+  // fallada se enseña al fallarla) y la del minijuego de quién empieza. La final no repite ninguna
+  // mientras quede otra carta; si el mazo no da para más, se aparta al menos la de la ronda anterior.
   function create(mode, players, previous = null, exposed = []) {
     const cards = CT.cards(mode);
     const used = previous?.used || [];
-    let pool = cards.filter(card => !used.includes(card.id) && !exposed.includes(card.id));
-    if (!pool.length) pool = cards.filter(card => !used.includes(card.id));
+    const seen = new Set(exposed.map(String));
+    let pool = cards.filter(card => !used.includes(card.id) && !seen.has(String(card.id)));
+    if (!pool.length) pool = cards.filter(card => !seen.has(String(card.id)) && card.id !== previous?.cardId);
     if (!pool.length) pool = cards.filter(card => card.id !== previous?.cardId);
     if (!pool.length) pool = cards;
     if (!pool.length) throw Error('No hay cartas para la final.');
@@ -59,10 +67,13 @@
     const card = CT.cards(mode).find(card => card.id === final.cardId);
     return `<article class="panel final-card starter-presentation cifra-presentation">${CT.StarterPresentation.plate(mode, card, false, {heading: true, kicker: `Carta neutral · Final ${final.round}`, question: `¿Cuál es su cifra en ${unit(mode)}?`})}</article>`;
   }
+  // El mismo campo que el minijuego de quién empieza, con sus botones de unidad (y «a. C.» en las
+  // fechas), dentro de un formulario que se envía una sola vez.
   function form(mode, attribute) {
-    return `<form ${attribute} class="panel final-form starter-presentation cifra-presentation"><div class="field starter-answer" data-starter-mode="${CT.escapeHtml(mode)}"><label for="final-guess">Tu cifra secreta (${unit(mode)})</label><input id="final-guess" name="guess" placeholder="Escribe tu cifra" inputmode="decimal" type="text" autocomplete="off" required aria-describedby="final-number-hint"></div>
-      ${CT.mode(mode).axis === 'time' ? '<div class="field"><label for="final-era">Era</label><select id="final-era" name="era"><option value="ad">d. C.</option><option value="bc">a. C.</option></select></div>' : ''}
-      <p id="final-number-hint" class="hint">Sin separadores de miles. Admite coma decimal. Tras enviarla no podrás cambiarla.</p><button class="btn btn-primary btn-block" type="submit">Guardar respuesta secreta</button></form>`;
+    const field = CT.StarterPresentation.answer(mode, 'final-guess', {attrs: 'name="guess" required', hintId: 'final-number-hint', describedBy: 'final-number-hint final-lock-hint'})
+      .replace(/<label for="final-guess">[\s\S]*?<\/label>/, `<label for="final-guess">Tu cifra secreta (${unit(mode)})</label>`);
+    return `<form ${attribute} class="panel final-form starter-presentation cifra-presentation">${field}
+      <p id="final-lock-hint" class="hint">Tras enviarla no podrás cambiarla.</p><button class="btn btn-primary btn-block" type="submit">Guardar respuesta secreta</button></form>`;
   }
   function results(mode, final, answers, name) {
     const ranked = rank(final, answers);
