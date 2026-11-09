@@ -1,6 +1,6 @@
 # Privacidad de Continuum
 
-Versión 2 · Actualizada el 17 de octubre de 2026.
+Versión 2 · Actualizada el 9 de noviembre de 2026.
 
 Esta página explica qué datos trata Continuum, para qué, con quién se comparten, cuánto tiempo se guardan y cómo puedes decidir sobre ellos. Continuum no tiene publicidad, no usa analítica de terceros y no vende ni cede datos a nadie con fines comerciales.
 
@@ -113,7 +113,7 @@ Los datos de Firestore se almacenan en servidores de la Unión Europea. Aun así
 - Tu perfil y tu progreso: mientras exista tu cuenta. Un invitado sin vincular que lleve **un año** sin abrir el juego se borra.
 - Las filas del ranking del reto diario: **90 días**. La de cartas descubiertas, mientras sigas en el ranking y exista tu cuenta.
 - Las salas online, con su presencia y sus respuestas: **siete días** sin actividad.
-- Los duelos por turnos y las salas de Retos rápidos: **30 días** sin actividad (un duelo sin jugar caduca a los siete días).
+- Los duelos por turnos y las salas de Retos rápidos: **30 días** sin actividad. Un duelo de la competición por turnos (o de los duelos por turnos entre dos de un solo mazo, de versiones anteriores) caduca antes, a los **siete días** sin jugar; los duelos por turnos de Grandes colecciones y de Retos rápidos no caducan y se borran con esos 30 días.
 - Las mesas del tablón público y las colas de partida rápida: un día.
 - Las denuncias de nombres: **90 días**.
 - Los registros del límite de altas: siete días; los registros técnicos de los avisos: 30 días.
