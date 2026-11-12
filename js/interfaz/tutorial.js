@@ -10,7 +10,8 @@
 // (solo, el reto diario y en grupo) y al final por dónde empezar. Lo que cambia de una forma a
 // otra —qué cuesta un fallo, cómo se gana— se cuenta en su sitio, no como regla general.
 // Cada dato sale del código que lo decide (las referencias van junto a cada escena): si una regla
-// cambia allí, hay que cambiarla aquí. Los subtítulos se leen a unos 15 caracteres por segundo.
+// cambia allí, hay que cambiarla aquí. Mientras se lee hay que mirar la mesa, así que cada frase
+// que da paso a otra se ve a 15 caracteres por segundo como mucho, sin contar su entrada (0,45 s).
 (() => {
   const CT = window.CONTINUUM;
   const esc = value => CT.escapeHtml(value);
@@ -142,41 +143,43 @@
     return [
       // ── 1 · Lo básico ─────────────────────────────────────────────────────────────────
       // En la mano se ve el título; el dato y la lámina, no (js/juego/app.js, mano de la mesa).
-      { chapter: 0, title: "La carta", duration: 7600,
+      { chapter: 0, title: "La carta", duration: 8000,
         html: `<div class="tv-center"><div class="tv-pair">${pair}</div></div>`,
         steps: [
           [0, c => { c.say("Cada carta te dice qué es…"); c.stagger(".tv-kind", 300); }],
           [900, c => c.add(".tv-kind .tv-card", "is-mark-title")],
-          [2100, c => { c.remove(".tv-kind .tv-card", "is-mark-title"); c.add(".tv-kind .tv-card", "is-mark-secret"); c.say("…pero esconde un dato: una fecha o una cifra."); }],
-          [5300, c => { c.remove(".tv-kind .tv-card", "is-mark-secret"); c.flip(".tv-kind .tv-card"); c.say("Lo descubres al colocarla."); }]
+          [2200, c => { c.remove(".tv-kind .tv-card", "is-mark-title"); c.add(".tv-kind .tv-card", "is-mark-secret"); c.say("…pero esconde un dato: una fecha o una cifra."); }],
+          [5700, c => { c.remove(".tv-kind .tv-card", "is-mark-secret"); c.flip(".tv-kind .tv-card"); c.say("Lo descubres al colocarla."); }]
         ] },
       // Toda partida empieza con una carta descubierta; la línea va siempre de izquierda a
       // derecha, de menor a mayor (js/juego/engine.js).
-      { chapter: 0, title: "La línea", duration: 8400,
+      { chapter: 0, title: "La línea", duration: 8900,
         html: `<div class="tv-center">${lineMarkup([s[1], s[4], s[7], s[10]].map((c, i) => card(c, { extra: i === 1 ? "is-ref" : "" })), { gaps: false })}
           <div class="tv-axis"><span>${esc(less)}</span><i></i><span>${esc(more)}</span></div></div>`,
         steps: [
           [0, c => { c.say("La partida empieza con una carta descubierta."); c.add(".tv-line .is-ref", "is-in"); }],
-          [3000, c => { c.say("Las que aciertas se ordenan con ella: de antes a después, o de menor a mayor."); c.stagger(".tv-line .tv-card:not(.is-ref)", 420); }],
-          [4300, c => c.add(".tv-axis", "is-in")],
-          [5500, c => c.stagger(".tv-line .tv-card", 260, "is-tick")]
+          [3500, c => { c.say("Las que aciertas se ordenan con ella: de antes a después, o de menor a mayor."); c.stagger(".tv-line .tv-card:not(.is-ref)", 420); }],
+          [4800, c => c.add(".tv-axis", "is-in")],
+          [6000, c => c.stagger(".tv-line .tv-card", 260, "is-tick")]
         ] },
       // Arrastrar pide mantener pulsada la carta (js/interfaz/drag.js); el hueco elegido se
       // confirma con «Colocar carta →» (js/juego/app.js). Acierta si queda entre sus vecinas.
-      { chapter: 0, title: "Colocar una carta", duration: 9300,
+      // El dedo espera a que la frase lleve un rato a la vista: leer y seguir el arrastre a la vez
+      // es lo más difícil del vídeo.
+      { chapter: 0, title: "Colocar una carta", duration: 10800,
         html: `<div class="tv-table">${lineMarkup([card(s[2]), card(s[8])])}
           <div class="tv-hand-row"><div class="tv-hand">${card(s[5], { hidden: true })}</div>
           <span class="tv-confirm" aria-hidden="true"><b>Colocar carta →</b><small>Cambiar</small></span></div></div>`,
         steps: [
           [0, c => { c.add(".tv-hand .tv-card", "is-in"); c.say("Mantén pulsada tu carta y llévala al hueco donde crees que va."); }],
-          [600, c => c.fingerTo(".tv-hand .tv-card")],
-          [1100, c => { c.press(true); c.add(".tv-hand .tv-card", "is-held"); }],
-          [1700, c => c.dragTo(".tv-hand .tv-card", '.tv-gap[data-gap="1"]')],
-          [2800, c => { c.press(false); c.drop(".tv-hand .tv-card", '.tv-gap[data-gap="1"]'); }],
-          [3800, c => { c.add(".tv-confirm", "is-in"); c.say("Y confírmalo con «Colocar carta»."); }],
-          [4500, c => c.fingerTo(".tv-confirm b")],
-          [5100, c => c.tap()],
-          [6000, c => { c.flip(".tv-line .is-placed", true); c.remove(".tv-confirm", "is-in"); c.fingerHide(); c.say("Si encaja entre sus vecinas, aciertas y se queda."); }]
+          [1200, c => c.fingerTo(".tv-hand .tv-card")],
+          [1700, c => { c.press(true); c.add(".tv-hand .tv-card", "is-held"); }],
+          [2300, c => c.dragTo(".tv-hand .tv-card", '.tv-gap[data-gap="1"]')],
+          [3400, c => { c.press(false); c.drop(".tv-hand .tv-card", '.tv-gap[data-gap="1"]'); }],
+          [4700, c => { c.add(".tv-confirm", "is-in"); c.say("Y confírmalo con «Colocar carta»."); }],
+          [5800, c => c.fingerTo(".tv-confirm b")],
+          [6600, c => c.tap()],
+          [7400, c => { c.flip(".tv-line .is-placed", true); c.remove(".tv-confirm", "is-in"); c.fingerHide(); c.say("Si encaja entre sus vecinas, aciertas y se queda."); }]
         ] },
       // Tocar la carta y luego el hueco vale en todas las mesas (jugando solo, la carta ya está
       // elegida). Al fallar, la mesa marca «✦ Aquí» y lleva la carta hasta allí
@@ -199,7 +202,7 @@
         ] },
       // Los dos catálogos: Grandes colecciones (bloques de js/juego/modes.js, por fecha o por
       // cifra) y Retos rápidos (mazos/quick-challenges-data.js, cada uno con su regla).
-      { chapter: 0, title: "Dos tipos de mazo", duration: 8800,
+      { chapter: 0, title: "Dos tipos de mazo", duration: 9000,
         html: `<div class="tv-families">
           <div class="tv-family" data-family="collections">${art("menu-collections.webp")}<div><b>Grandes colecciones</b><small>Por temas: ${esc(blocks)}…</small><span class="tv-rule">${esc(CT.mode(modeKey).name)}</span>
             ${tokens([s[0], s[6], s[10]].map(c => token(c.title, CT.shortValue(modeKey, c))))}</div></div>
@@ -208,29 +211,29 @@
         steps: [
           [0, c => { c.add('[data-family="collections"]', "is-in"); c.say("Grandes colecciones: mazos por temas, de fechas o de cifras."); }],
           [700, c => c.stagger('[data-family="collections"] .tv-tokens > *', 220)],
-          [4300, c => { c.add('[data-family="quick"]', "is-in"); c.say("Retos rápidos: mazos cortos, cada uno con su regla de orden."); }],
-          [5000, c => c.stagger('[data-family="quick"] .tv-tokens > *', 220)]
+          [4500, c => { c.add('[data-family="quick"]', "is-in"); c.say("Retos rápidos: mazos cortos, cada uno con su regla de orden."); }],
+          [5200, c => c.stagger('[data-family="quick"] .tv-tokens > *', 220)]
         ] },
 
       // ── 2 · Jugar solo ────────────────────────────────────────────────────────────────
       // Ronda: 10 cartas y 3 vidas; con 0 vidas, «Se acabaron las vidas»; al final, una estrella
       // por vida (js/juego/app.js, SOLO_ROUND_CARDS y SOLO_LIVES).
-      { chapter: 1, title: "Una ronda", duration: 11400,
+      { chapter: 1, title: "Una ronda", duration: 11900,
         html: `<div class="tv-board">${path(["Jugar", "Jugar solo", "Grandes colecciones", "un mazo"])}
           <div class="tv-round" data-round="main"><div class="tv-round-head"><b>Ronda · 10 cartas</b><span class="tv-stars">★★<i>★</i></span></div>
             <div class="tv-round-row">${hearts()}${dots("✓✓✓✗✓✓✓✓✓✓")}</div></div>
           <div class="tv-round tv-round-out" data-round="out"><span class="tv-tag">Otra ronda</span><div class="tv-round-row">${hearts(3)}${dots("✓✗✓✗✗·····")}</div><small>Se acabaron las vidas</small></div></div>`,
         steps: [
-          [0, c => { c.say("Jugando solo con Grandes colecciones, una ronda son 10 cartas y 3 vidas."); c.add('[data-round="main"] .tv-lives', "is-in"); }],
+          [0, c => { c.say("Una ronda son 10 cartas y 3 vidas."); c.add('[data-round="main"] .tv-lives', "is-in"); }],
           [500, c => c.stagger('[data-round="main"] .tv-dots span', 330)],
           [1550, c => c.lose('[data-round="main"] .tv-lives')],
           [4300, c => { c.say("Cada fallo cuesta una vida, y sin vidas se acaba."); c.add('[data-round="out"]', "is-in"); c.stagger('[data-round="out"] .tv-dots span', 260); }],
-          [7600, c => { c.say("Si llegas al final, cada vida que te queda es una estrella."); c.add(".tv-stars", "is-in"); c.pulse('[data-round="main"] .tv-lives'); }]
+          [8100, c => { c.say("Si llegas al final, cada vida que te queda es una estrella."); c.add(".tv-stars", "is-in"); c.pulse('[data-round="main"] .tv-lives'); }]
         ] },
       // Maratón: en la pantalla del mazo («Empezar maratón»), el mazo entero hasta acabarlo o
       // perder las 3 vidas. Competición: el último panel de Grandes colecciones; 10 cartas y
       // 3 vidas por tema; también se juega con amigos (js/juego/app.js).
-      { chapter: 1, title: "Maratón y competición", duration: 8300,
+      { chapter: 1, title: "Maratón y competición", duration: 8700,
         html: `<div class="tv-board"><div class="tv-modes">
           <div class="tv-mode" data-mode="marathon"><b>Maratón</b>${path(["un mazo", "Empezar maratón"])}<span class="tv-mode-row">${hearts(0, "is-in")}${dots("✓✓✓✓✗✓✓✓✓✓✓✗", "tv-dots-run")}</span><small>Tu marca: los aciertos</small></div>
           <div class="tv-mode" data-mode="competition"><b>Competición</b>${path(["Grandes colecciones", "Competición"])}
@@ -240,12 +243,12 @@
           [400, c => c.stagger('[data-mode="marathon"] .tv-dots span', 210)],
           [1300, c => c.lose('[data-mode="marathon"] .tv-lives')],
           [2750, c => c.lose('[data-mode="marathon"] .tv-lives')],
-          [4000, c => { c.add('[data-mode="competition"]', "is-in"); c.say("Competición: varios temas al azar, como una ronda en cada uno."); }],
-          [4500, c => c.stagger(".tv-topics > span", 350)]
+          [4400, c => { c.add('[data-mode="competition"]', "is-in"); c.say("Competición: varios temas al azar, como una ronda en cada uno."); }],
+          [4900, c => c.stagger(".tv-topics > span", 350)]
         ] },
       // La dificultad solo existe jugando solo en Grandes colecciones: ronda, maratón y
       // competición (js/juego/ghost.js). Agotar el reloj cuenta como fallo (js/juego/app.js).
-      { chapter: 1, title: "Dificultad", duration: 16200,
+      { chapter: 1, title: "Dificultad", duration: 17000,
         html: `<div class="tv-board"><p class="tv-note is-in">Ronda, maratón y competición</p>${levelsTable()}<div class="tv-diff-demo">
           <span class="tv-clock" aria-hidden="true"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15"/><circle class="tv-clock-arc" cx="18" cy="18" r="15"/></svg><b>No</b></span>
           ${lineMarkup([card(s[1], { extra: "tv-sm" }), card(s[4], { extra: "tv-sm tv-extra" }), card(s[6], { extra: "tv-sm" }), card(s[9], { extra: "tv-sm" })], { gaps: false })}</div></div>`,
@@ -253,15 +256,15 @@
           [0, c => { c.say("Eliges dificultad: en Fácil no hay reloj."); c.stagger(".tv-level-row", 240); }],
           [600, c => c.focus(".tv-levels", 0)],
           [3200, c => { c.focus(".tv-levels", 1); c.clock(`${LEVELS()[1]?.seconds || 30} s`); c.say("Desde Normal hay reloj por carta: si se acaba, es un fallo."); }],
-          [7200, c => c.say("Y cada acierto mete más cartas en la línea: los huecos se estrechan.")],
-          [7800, c => c.add(".tv-extra", "is-in")],
-          [11800, c => { c.focus(".tv-levels", 2); c.clock(`${LEVELS()[2]?.seconds || 20} s`); c.say("En Difícil a veces, y en Experto siempre, la línea oculta sus datos."); c.add(".tv-diff-demo .tv-card", "is-ghost"); }],
-          [13500, c => c.remove(".tv-diff-demo .tv-card", "is-ghost")],
-          [14200, c => { c.focus(".tv-levels", 3); c.clock(`${LEVELS()[3]?.seconds || 15} s`); c.add(".tv-diff-demo .tv-card", "is-ghost"); }]
+          [7600, c => c.say("Y cada acierto mete más cartas en la línea: los huecos se estrechan.")],
+          [8200, c => c.add(".tv-extra", "is-in")],
+          [12600, c => { c.focus(".tv-levels", 2); c.clock(`${LEVELS()[2]?.seconds || 20} s`); c.say("En Difícil a veces, y en Experto siempre, la línea oculta sus datos."); c.add(".tv-diff-demo .tv-card", "is-ghost"); }],
+          [14300, c => c.remove(".tv-diff-demo .tv-card", "is-ghost")],
+          [15000, c => { c.focus(".tv-levels", 3); c.clock(`${LEVELS()[3]?.seconds || 15} s`); c.add(".tv-diff-demo .tv-card", "is-ghost"); }]
         ] },
       // Retos rápidos en solitario: 4 mazos al día, iguales para todos y repetibles; las 10
       // cartas a la vista y sin vidas (js/retos/quick-challenges.js y quick-challenges-engine.js).
-      { chapter: 1, title: "Retos rápidos", duration: 12600,
+      { chapter: 1, title: "Retos rápidos", duration: 13400,
         html: `<div class="tv-board">${path(["Jugar", "Jugar solo", "Retos rápidos"])}<div class="tv-phases">
           <div class="tv-phase is-on" data-phase="1"><span class="tv-tag">Mazos de hoy</span><div class="tv-deck-tiles">${todayDecks.map(deckTile).join("")}</div></div>
           <div class="tv-phase tv-quick" data-phase="2">${quick ? `<span class="tv-rule">${esc(quick.deck.rule)}</span>
@@ -272,33 +275,33 @@
           [0, c => { c.say("Retos rápidos: 4 mazos al día, los mismos para todos; repítelos cuando quieras."); c.stagger(".tv-deck-tile", 260); }],
           [2900, c => c.fingerTo(".tv-deck-tile")],
           [3400, c => { c.tap(); c.add(".tv-deck-tile:first-child", "is-picked"); }],
-          [5300, c => { c.fingerHide(); c.phase(2); c.say("Ves tus 10 cartas a la vez y eliges cuál colocar."); }],
-          [6100, c => c.fingerTo(".tv-pool .tv-card")],
-          [6600, c => { c.tap(); c.add(".tv-pool .tv-card:first-child", "is-out"); c.add(".tv-quick .tv-extra", "is-in"); }],
-          [7200, c => { c.fingerHide(); c.flip(".tv-quick .tv-extra", true); }],
-          [8800, c => { c.say("Sin vidas: un fallo no suma, pero sigues hasta el final."); c.add(".tv-quick .tv-later", "is-in"); c.stagger(".tv-quick .tv-dots span", 220); }]
+          [5800, c => { c.fingerHide(); c.phase(2); c.say("Ves tus 10 cartas a la vez y eliges cuál colocar."); }],
+          [6600, c => c.fingerTo(".tv-pool .tv-card")],
+          [7100, c => { c.tap(); c.add(".tv-pool .tv-card:first-child", "is-out"); c.add(".tv-quick .tv-extra", "is-in"); }],
+          [7700, c => { c.fingerHide(); c.flip(".tv-quick .tv-extra", true); }],
+          [9600, c => { c.say("Sin vidas: un fallo no suma, pero sigues hasta el final."); c.add(".tv-quick .tv-later", "is-in"); c.stagger(".tv-quick .tv-dots span", 220); }]
         ] },
 
       // ── 3 · Reto diario ───────────────────────────────────────────────────────────────
       // Un intento al día, las mismas 10 cartas para todos; un día Grandes colecciones (en
       // Fácil) y al siguiente Retos rápidos; sin vidas ni reloj; ranking solo si se acepta
       // (js/jugador/reto-diario.js, js/juego/app.js y js/nube/accounts.js).
-      { chapter: 2, title: "Reto diario", duration: 12400,
+      { chapter: 2, title: "Reto diario", duration: 13200,
         html: `<div class="tv-board">${path(["Inicio", "Reto diario"])}${dots("✓✓✗✓✓✓✗✓✓✗")}<div class="tv-score">7 de 10</div>
           <div class="tv-days">${day("Hoy", today)}<i aria-hidden="true">→</i>${day("Mañana", today === "quick" ? "collections" : "quick")}</div>
           <div class="tv-facts"><span>1 intento al día</span>${without("heart", "Sin vidas")}${without("clock", "Sin reloj")}<span>Ranking, si quieres</span></div></div>`,
         steps: [
           [0, c => { c.say("El reto diario: 10 cartas, las mismas para todos, y un solo intento."); c.stagger(".tv-dots span", 260); }],
           [2800, c => { c.add(".tv-score", "is-in"); c.add(".tv-facts > :first-child", "is-in"); }],
-          [4600, c => { c.say("Alterna cada día entre Grandes colecciones y Retos rápidos."); c.stagger(".tv-day, .tv-days > i", 350); }],
-          [8600, c => { c.say("Sin vidas ni reloj. Y, si quieres, sales en el ranking."); c.stagger(".tv-facts > :not(:first-child)", 400); }]
+          [5000, c => { c.say("Alterna cada día entre Grandes colecciones y Retos rápidos."); c.stagger(".tv-day, .tv-days > i", 350); }],
+          [9400, c => { c.say("Sin vidas ni reloj. Y, si quieres, sales en el ranking."); c.stagger(".tv-facts > :not(:first-child)", 400); }]
         ] },
 
       // ── 4 · En grupo ──────────────────────────────────────────────────────────────────
       // Un solo móvil, sin conexión; cada uno en el suyo, en directo (internet o la misma Wi-Fi)
       // o por turnos (con internet). Grandes colecciones de 2 a 10, Retos rápidos de 2 a 4
       // (js/juego/app.js y js/retos/quick-challenges.js).
-      { chapter: 3, title: "Con amigos", duration: 13600,
+      { chapter: 3, title: "Con amigos", duration: 14300,
         html: `<div class="tv-board">${path(["Jugar", "Jugar con amigos"])}<div class="tv-ways">
           <div class="tv-way tv-way-one"><b>Un solo móvil</b><span class="tv-pass"><span class="tv-people"><b>Ana</b><b>Luis</b><b>Sara</b></span></span><small>Os lo pasáis · sin conexión</small></div>
           <div class="tv-way tv-way-many"><b>Cada uno en su móvil</b><span class="tv-rhythms"><span><b>En directo</b>Todos a la vez · internet o la misma Wi-Fi</span><span><b>Por turnos</b>Cada uno cuando pueda · con internet</span></span></div></div>
@@ -308,12 +311,12 @@
           [0, c => { c.say("Con amigos, os pasáis un móvil o jugáis cada uno en el suyo."); c.add(".tv-way-one", "is-in"); }],
           [500, c => c.cycle(".tv-people b", 700, 3)],
           [2100, c => { c.add(".tv-way-many", "is-in"); c.add(".tv-note", "is-in"); }],
-          [4200, c => { c.say("Cada uno en el suyo: en directo, a la vez, o por turnos, cuando podáis."); c.stagger(".tv-rhythms > span", 1500, "is-on"); }],
-          [9000, c => { c.say("Quien crea la partida os invita, y entráis con «Unirme a una partida»."); c.add(".tv-join", "is-in"); }]
+          [4500, c => { c.say("Cada uno en el suyo: en directo, a la vez, o por turnos, cuando podáis."); c.stagger(".tv-rhythms > span", 1500, "is-on"); }],
+          [9700, c => { c.say("Quien crea la partida os invita, y entráis con «Unirme a una partida»."); c.add(".tv-join", "is-in"); }]
         ] },
       // El minijuego de salida (js/juego/final.js): cifra secreta de la misma carta, y empieza
       // quien más se acerca; por turnos no se juega y empieza quien crea la partida.
-      { chapter: 3, title: "Quién empieza", duration: 8800,
+      { chapter: 3, title: "Quién empieza", duration: 9400,
         html: `<div class="tv-center tv-starter">${card(s[5], { hidden: true, extra: "tv-big tv-guess-card" })}
           <div class="tv-guesses">${guesses.map((g, i) => `<span data-guess="${i}"${ranks[i] === 0 ? " data-first" : ""}><b>${esc(g.name)}</b><em>${esc(g.value)}</em></span>`).join("")}</div>
           <p class="tv-note">Por turnos: empieza quien crea la partida.</p></div>`,
@@ -321,14 +324,14 @@
           [0, c => { c.say("Para ver quién empieza, cada uno escribe en secreto el dato de una carta."); c.add(".tv-guess-card", "is-in"); }],
           [800, c => c.stagger(".tv-guesses span", 420)],
           [4200, c => { c.flip(".tv-guess-card"); c.add(".tv-guesses", "is-shown"); }],
-          [4800, c => { c.say("Empieza quien más se acerca."); c.add(".tv-guesses [data-first]", "is-first"); }],
-          [5200, c => c.add(".tv-note", "is-in")]
+          [5400, c => { c.say("Empieza quien más se acerca."); c.add(".tv-guesses [data-first]", "is-first"); }],
+          [5800, c => c.add(".tv-note", "is-in")]
         ] },
       // Grandes colecciones en grupo: cada uno su mano (de 1 a 6, igual para todos) y una línea
       // común; acierto, una carta menos; fallo, al descarte y se roba en la misma jugada; la
       // victoria se mira al cerrar la vuelta; si acaban varios, final de desempate. La carta del
       // minijuego no vuelve a salir (js/juego/app.js, js/juego/engine.js y js/juego/final.js).
-      { chapter: 3, title: "Con Grandes colecciones", duration: 18800,
+      { chapter: 3, title: "Con Grandes colecciones", duration: 19900,
         html: `<div class="tv-board tv-group"><div class="tv-gline-wrap"><span class="tv-tag">Línea común</span><span class="tv-vuelta">Vuelta <b>1</b></span>
           <div class="tv-gline">${[s[1], s[3], s[4], s[7], s[9]].map((c, i) => miniMarkup(modeKey, c, i === 1 ? "" : "is-pending")).join("")}</div></div>
           <div class="tv-seats">${seatOrder.map(seat).join("")}</div>
@@ -341,36 +344,36 @@
           [1700, c => c.play(0, ".tv-gline > :nth-child(3)")],
           [3000, c => c.turn(1)],
           [3700, c => c.play(1, ".tv-gline > :nth-child(1)")],
-          [5000, c => { c.say("Si aciertas, una carta menos; si fallas, va al descarte y robas otra."); c.turn(2); }],
-          [5700, c => c.miss(2)],
-          [7300, c => { c.text(".tv-vuelta b", "2"); c.turn(0); }],
-          [8000, c => c.play(0, ".tv-gline > :nth-child(4)")],
-          [9800, c => { c.say("Gana quien se queda sin cartas al acabar la vuelta, cuando todos han jugado."); c.turn(1); }],
-          [10500, c => c.miss(1)],
-          [12000, c => c.turn(2)],
-          [12700, c => c.play(2, ".tv-gline > :nth-child(5)")],
-          [13700, c => { c.turn(-1); c.win(0); }],
-          [14800, c => { c.say("Si son varios, desempatan como al empezar, con otra carta."); c.phase(2); }]
+          [5200, c => { c.say("Si aciertas, una carta menos; si fallas, va al descarte y robas otra."); c.turn(2); }],
+          [5900, c => c.miss(2)],
+          [7500, c => { c.text(".tv-vuelta b", "2"); c.turn(0); }],
+          [8200, c => c.play(0, ".tv-gline > :nth-child(4)")],
+          [10300, c => { c.say("Gana quien se queda sin cartas al acabar la vuelta, cuando todos han jugado."); c.turn(1); }],
+          [11000, c => c.miss(1)],
+          [12500, c => c.turn(2)],
+          [13200, c => c.play(2, ".tv-gline > :nth-child(5)")],
+          [14200, c => { c.turn(-1); c.win(0); }],
+          [15900, c => { c.say("Si son varios, desempatan como al empezar, con otra carta."); c.phase(2); }]
         ] },
       // Los poderes (js/juego/ghost.js y engine.js): opcionales, de un solo uso, solo con Grandes
       // colecciones en un solo móvil o en directo, y nunca en la competición.
-      { chapter: 3, title: "Poderes", duration: 14200,
+      { chapter: 3, title: "Poderes", duration: 15200,
         html: `<div class="tv-board"><p class="tv-note is-in">Opcionales · Grandes colecciones en un móvil o en directo (no en la competición)</p><div class="tv-powers">
           <div class="tv-power" data-power="ghost"><b><i aria-hidden="true">◌</i> Fantasma</b>${lineMarkup([card(s[2], { extra: "tv-sm" }), card(s[6], { extra: "tv-sm" })], { gaps: false })}<small>Una vuelta, para todos</small></div>
           <div class="tv-power" data-power="pulse"><b><i aria-hidden="true">ϟ</i> Pulso</b><span class="tv-pulse-card" aria-hidden="true">?</span><span class="tv-duel"><span data-duel="you"><em>Tú</em><span class="tv-minihand"><i></i><i></i><i></i></span><u></u></span><span data-duel="rival"><em>Luis</em><span class="tv-minihand"><i></i><i></i></span><u></u></span></span><small>La misma carta, a ciegas</small></div></div></div>`,
         steps: [
           [0, c => { c.say("Si activáis los poderes, algunas cartas traen uno, de un solo uso."); c.stagger(".tv-power", 400); }],
-          [4400, c => { c.add('[data-power="ghost"]', "is-on"); c.say("Fantasma: durante una vuelta, la línea oculta sus datos y dibujos."); }],
-          [5100, c => c.add('[data-power="ghost"] .tv-card', "is-ghost-full")],
-          [8800, c => { c.remove('[data-power="ghost"]', "is-on"); c.add('[data-power="pulse"]', "is-on"); c.say("Pulso: retas a alguien con la misma carta. Si solo aciertas tú, le das una tuya."); }],
-          [10200, c => { c.text('[data-duel="you"] u', "✓"); c.text('[data-duel="rival"] u', "✗"); c.add('[data-duel="you"]', "is-ok"); c.add('[data-duel="rival"]', "is-bad"); }],
-          [11300, c => c.give('[data-duel="you"] .tv-minihand', '[data-duel="rival"] .tv-minihand')]
+          [4900, c => { c.add('[data-power="ghost"]', "is-on"); c.say("Fantasma: durante una vuelta, la línea oculta sus datos y dibujos."); }],
+          [5600, c => c.add('[data-power="ghost"] .tv-card', "is-ghost-full")],
+          [9800, c => { c.remove('[data-power="ghost"]', "is-on"); c.add('[data-power="pulse"]', "is-on"); c.say("Pulso: retas a alguien con la misma carta. Si solo aciertas tú, le das una tuya."); }],
+          [11200, c => { c.text('[data-duel="you"] u', "✓"); c.text('[data-duel="rival"] u', "✗"); c.add('[data-duel="you"]', "is-ok"); c.add('[data-duel="rival"]', "is-bad"); }],
+          [12300, c => c.give('[data-duel="you"] .tv-minihand', '[data-duel="rival"] .tv-minihand')]
         ] },
       // Retos rápidos en grupo: cartas comunes; varios mazos seguidos; «Arriesgar o plantarse»
       // (aciertos provisionales; plantarse es la jugada de tu turno; un fallo los pierde y deja
       // fuera hasta el siguiente mazo; la carta fallada entra corregida) o «Seguir hasta el
       // final»; gana quien más aciertos suma (js/retos/quick-challenges-engine.js).
-      { chapter: 3, title: "Con Retos rápidos", duration: 19400,
+      { chapter: 3, title: "Con Retos rápidos", duration: 20700,
         html: `<div class="tv-board tv-group tv-quick-group"><div class="tv-switch"><span class="is-on">Arriesgar o plantarse</span><span>Seguir hasta el final</span></div>
           ${rivers ? `<span class="tv-rule">${esc(rivers.deck.rule)}<i>Mazo 1 de 3</i></span>${lineMarkup([R[0], R[1], R[3], R[4], R[6], R[7]].map(c => c === R[3] ? qcard(c, { extra: "tv-sm" }) : qcard(c, { hidden: true, extra: "tv-sm tv-extra" })), { gaps: false })}
           <span class="tv-tag">Cartas comunes</span><div class="tv-pool">${[R[6], R[1], R[4], R[7], R[0]].map(c => qcard(c, { hidden: true, extra: "tv-sm" })).join("")}<span class="tv-more">+4</span></div>` : ""}
@@ -379,18 +382,18 @@
           [0, c => { c.say("Con Retos rápidos, las cartas son comunes: en tu turno eliges una."); c.stagger(".tv-scores span", 200); }],
           [900, c => c.qplay("Ana", 1, 4, "+1")],
           [2500, c => c.qplay("Luis", 1, 1, "+1")],
-          [4500, c => c.say("Con «Arriesgar o plantarse», aseguras tus aciertos al plantarte en tu turno.")],
-          [4900, c => c.qplay("Sara", 1, 3, "+1")],
-          [6500, c => { c.ask("Ana"); c.fingerTo('[data-player="Ana"] .tv-plant'); }],
-          [7100, c => { c.tap(); c.bank("Ana", "1"); }],
-          [7700, c => c.fingerHide()],
-          [8200, c => c.qplay("Luis", 1, 5, "+2")],
-          [9600, c => { c.say("Si fallas antes, los pierdes y quedas fuera hasta el siguiente mazo."); c.qplay("Sara", 1, 0, "0", false); }],
-          [14200, c => { c.say("Con «Seguir hasta el final», un fallo no suma. Gana quien más aciertos sume."); c.remove(".tv-switch span", "is-on"); c.add(".tv-switch span:last-child", "is-on"); c.scores({ Ana: "1", Luis: "2", Sara: "1" }); }]
+          [4900, c => c.say("Con «Arriesgar o plantarse», aseguras tus aciertos al plantarte en tu turno.")],
+          [5300, c => c.qplay("Sara", 1, 3, "+1")],
+          [6900, c => { c.ask("Ana"); c.fingerTo('[data-player="Ana"] .tv-plant'); }],
+          [7500, c => { c.tap(); c.bank("Ana", "1"); }],
+          [8100, c => c.fingerHide()],
+          [8600, c => c.qplay("Luis", 1, 5, "+2")],
+          [10500, c => { c.say("Si fallas antes, los pierdes y quedas fuera hasta el siguiente mazo."); c.qplay("Sara", 1, 0, "0", false); }],
+          [15500, c => { c.say("Con «Seguir hasta el final», un fallo no suma. Gana quien más aciertos sume."); c.remove(".tv-switch span", "is-on"); c.add(".tv-switch span:last-child", "is-on"); c.scores({ Ana: "1", Luis: "2", Sara: "1" }); }]
         ] },
       // Mesas públicas: con desconocidos, de 2 a 4, sin poderes; empieza al llenarse o a los
       // 30 s sin que entre nadie (js/online/online.js y js/interfaz/home-modes-v1.js).
-      { chapter: 3, title: "Jugar online", duration: 11800,
+      { chapter: 3, title: "Jugar online", duration: 12600,
         html: `<div class="tv-board">${path(["Jugar", "Jugar online"])}
           <div class="tv-mesa"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="tv-mesa-table" cx="60" cy="60" r="30"/><circle class="tv-mesa-ring" cx="60" cy="60" r="38"/><text class="tv-mesa-time" x="60" y="64">30 s</text>
             ${[[60, 12, "A", 1], [108, 60, "B", 1], [60, 108, "C", 0], [12, 60, "D", 0]].map(([x, y, letter, taken]) => `<g class="tv-chair${taken ? " is-taken" : ""}" data-chair="${letter}"><circle cx="${x}" cy="${y}" r="10"/><text x="${x}" y="${y + 3.6}">${letter}</text></g>`).join("")}</svg>
@@ -400,10 +403,10 @@
         steps: [
           [0, c => { c.say("En «Jugar online» te sientas con desconocidos, de 2 a 4."); c.add(".tv-mesa", "is-in"); }],
           [1400, c => { c.stagger(".tv-options span", 300); c.add(".tv-note", "is-in"); }],
-          [3900, c => c.say("Crea una mesa, elige una abierta o pide una partida rápida.")],
-          [7800, c => { c.say("Empieza al llenarse o a los 30 s sin que entre nadie más."); c.add(".tv-mesa-ring", "is-run"); }],
-          [8700, c => { c.add('[data-chair="C"]', "is-taken"); c.restart(".tv-mesa-ring", "is-run"); }],
-          [10900, c => c.add(".tv-mesa", "is-go")]
+          [4200, c => c.say("Crea una mesa, elige una abierta o pide una partida rápida.")],
+          [8600, c => { c.say("Empieza al llenarse o a los 30 s sin que entre nadie más."); c.add(".tv-mesa-ring", "is-run"); }],
+          [9500, c => { c.add('[data-chair="C"]', "is-taken"); c.restart(".tv-mesa-ring", "is-run"); }],
+          [11700, c => c.add(".tv-mesa", "is-go")]
         ] },
       { chapter: 3, title: "A jugar", duration: 5000, last: true,
         html: `<div class="tv-center tv-end"><div class="tv-logo">A jugar</div>${path(["Jugar", "Jugar solo", "Grandes colecciones", "un mazo", "Fácil"])}<div class="tv-end-actions"><button type="button" class="tv-end-btn is-main" data-tv="replay">Ver otra vez</button>${portada ? "" : '<button type="button" class="tv-end-btn" data-tv="manual">Ver la Guía completa</button>'}</div></div>`,
@@ -419,11 +422,12 @@
   // la pastilla del título («Jugar solo · Una ronda»).
   const OPENERS = [
     null,
-    { art: "mode-walk-solo.webp", kicker: "Capítulo 2", text: "Tú contra la línea, a tu ritmo: Grandes colecciones y Retos rápidos" },
-    { art: "menu-daily.webp", kicker: "Capítulo 3", text: "Desde Inicio: uno al día, el mismo para todos" },
-    { art: "mode-walk-multi.webp", kicker: "Capítulo 4", text: "Con amigos, en un móvil o en varios, o con desconocidos online" }
+    { art: "mode-walk-solo.webp", kicker: "Capítulo 2", text: "Tú contra la línea, a tu ritmo" },
+    { art: "menu-daily.webp", kicker: "Capítulo 3", text: "Uno al día, el mismo para todos" },
+    { art: "mode-walk-multi.webp", kicker: "Capítulo 4", text: "Con amigos o con desconocidos online" }
   ];
-  const PREROLL = 2400;
+  // Lo que dura la portada: lo justo para leerla con calma (lo comprueba tests/accesibilidad.mjs).
+  const PREROLL = 3800;
 
 
   function markup(modeKey, { portada = false } = {}) {
@@ -775,6 +779,6 @@
     new MutationObserver(() => mountAll()).observe(page.documentElement, { childList: true, subtree: true });
   }
 
-  // `scenes` queda a la vista para las pruebas (velocidad de lectura y duración total).
-  CT.Tutorial = { markup, mount, mountAll, scenes };
+  // `scenes` y las portadas quedan a la vista para las pruebas (velocidad de lectura y duración total).
+  CT.Tutorial = { markup, mount, mountAll, scenes, openers: { list: OPENERS, chapters: CHAPTERS, preroll: PREROLL } };
 })();

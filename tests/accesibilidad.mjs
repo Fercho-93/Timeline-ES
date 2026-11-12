@@ -170,9 +170,13 @@ console.log("\nLas reglas se adaptan al mazo");
   }
   video.tutorial.go(2);
   ok("la carta por colocar dice qué dato esconde", /Peso oculto/i.test(el(w, '.tv-hand').textContent));
-  // Breve, pero que se pueda leer: cada frase se ve a 17 caracteres por segundo como mucho, y el
-  // vídeo entero no pasa de tres minutos y medio.
+  // Breve, pero que se pueda leer mientras se mira la mesa. Una frase que da paso a otra se ve a
+  // 15 caracteres por segundo como mucho, descontando los 0,45 s en que entra; la última de cada
+  // escena se queda mientras la escena espera a «Siguiente», así que basta con 17. Las portadas de
+  // capítulo (título y texto; «Capítulo N» es un rótulo) también a 15. Y el vídeo entero no pasa
+  // de tres minutos y medio.
   {
+    const ENTRADA = 450;
     const lista = w.CONTINUUM.Tutorial.scenes("history");
     const rapidas = [];
     let total = 0;
@@ -181,12 +185,19 @@ console.log("\nLas reglas se adaptan al mazo");
       const registra = new Proxy({}, { get: (_, nombre) => nombre === "say" ? texto => dichas.push(texto) : () => {} });
       const pasos = escena.steps.map(([ms, accion]) => { const antes = dichas.length; accion(registra); return dichas.slice(antes).map(texto => [ms, texto]); }).flat();
       pasos.forEach(([ms, texto], i) => {
-        const dura = (pasos[i + 1]?.[0] ?? escena.duration) - ms;
-        if (texto.length / (dura / 1000) > 17) rapidas.push(`${escena.title}: «${texto}» (${(texto.length / (dura / 1000)).toFixed(1)} c/s)`);
+        const siguiente = pasos[i + 1]?.[0];
+        const velocidad = siguiente === undefined ? texto.length / ((escena.duration - ms) / 1000) : texto.length / ((siguiente - ms - ENTRADA) / 1000);
+        if (velocidad > (siguiente === undefined ? 17 : 15)) rapidas.push(`${escena.title}: «${texto}» (${velocidad.toFixed(1)} c/s)`);
       });
       total += escena.duration;
     }
-    ok(`cada subtítulo se lee a 17 caracteres por segundo como mucho${rapidas.length ? ` (falla ${rapidas.join("; ")})` : ""}`, !rapidas.length);
+    const { list: portadas, chapters, preroll } = w.CONTINUUM.Tutorial.openers;
+    portadas.forEach((portada, capitulo) => {
+      if (!portada) return;
+      const velocidad = (chapters[capitulo].length + portada.text.length) / ((preroll - ENTRADA) / 1000);
+      if (velocidad > 15) rapidas.push(`portada «${chapters[capitulo]}» (${velocidad.toFixed(1)} c/s)`);
+    });
+    ok(`cada subtítulo y cada portada se leen con calma${rapidas.length ? ` (falla ${rapidas.join("; ")})` : ""}`, !rapidas.length);
     ok(`el vídeo dura ${Math.round(total / 1000)} s, no más de 210`, total <= 210000);
   }
   // Ninguna escena espera a quien mira: en la mesa no hay huecos ni botones que pulsar.
