@@ -183,7 +183,8 @@ html #app .public-create-segmented .segmented-option::after { content: none !imp
 /* Colecciones desplegadas dentro de «Jugar solo»: tarjetas más compactas. */
 #app .mode-inline-drawer .gallery-panel,
 #app .mode-inline-drawer .gallery-panel.active { height: 116px; min-height: 116px; }
-#app .mode-inline-drawer .gallery-panel .panel-label strong { font-size: 1.25rem; }
+/* El título deja libre la columna del botón «+»: con la descripción en dos líneas sube hasta su altura. */
+#app .mode-inline-drawer .gallery-panel .panel-label strong { font-size: 1.25rem; padding-inline-end: 34px; }
 #app .mode-inline-drawer .gallery-panel .panel-label small { font-size: .75rem; }
 #app .mode-inline-drawer .gallery-panel .collection-index { top: 9px; left: 12px; min-height: 22px; padding: 2px 9px; font-size: .7rem; }
 #app .mode-inline-drawer .gallery-panel .collection-open { width: 28px; height: 28px; right: 12px; }
