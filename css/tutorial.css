@@ -120,6 +120,8 @@
 /* Qué se ve (el título) y qué se adivina (el dato), señalados por turnos. */
 :is(#app, #app-splash) .tv-card.is-mark-title small, :is(#app, #app-splash) .tv-card.is-mark-secret .tv-secret { border-radius: 4px; background: #f3d79a; box-shadow: 0 0 0 3px #f3d79a, 0 0 0 5px #a77b38; transition: background .3s, box-shadow .3s; }
 :is(#app, #app-splash) .tv-card.is-mark-title small { color: var(--tv-ink); }
+/* El anillo del resalte (5 px) es más ancho que el hueco entre el sello y el título (2 px): el texto vecino va encima para seguir leyéndose. */
+:is(#app, #app-splash) .tv-card.is-mark-secret small, :is(#app, #app-splash) .tv-card.is-mark-title .tv-secret { position: relative; z-index: 1; }
 /* Datos ocultos por la dificultad (la lámina sigue) y por el poder Fantasma (también la lámina). */
 :is(#app, #app-splash) .tv-card.is-ghost .tv-value, :is(#app, #app-splash) .tv-card.is-ghost-full .tv-value { color: transparent; }
 :is(#app, #app-splash) .tv-card.is-ghost .tv-value::after, :is(#app, #app-splash) .tv-card.is-ghost-full .tv-value::after { content: "— —"; position: absolute; inset: 0; color: var(--tv-ink-soft); text-align: center; }
@@ -132,7 +134,7 @@
 :is(#app, #app-splash) .tv-big :is(.tv-art, .tv-back) { max-height: 128px; border-radius: 7px; }
 :is(#app, #app-splash) .tv-big b { font-size: 1.1rem; }
 :is(#app, #app-splash) .tv-big small { font-size: .66rem; }
-:is(#app, #app-splash) .tv-big .tv-secret { font-size: .95rem; }
+:is(#app, #app-splash) .tv-big .tv-secret { margin-bottom: 4px; font-size: .95rem; }
 :is(#app, #app-splash) .tv-big .tv-secret i { font-size: .58rem; }
 :is(#app, #app-splash) .tv-big.is-in, :is(#app, #app-splash) .is-in > .tv-big { opacity: 1; transform: none; }
 /* Las cartas pequeñas de las mesas con mucho que enseñar. */
