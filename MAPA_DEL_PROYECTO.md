@@ -240,7 +240,7 @@ No se edita a mano.
 | `borrar-todo.mjs` | Borra todas las cuentas y todos los datos de Firestore (menos `appConfig`) para empezar de cero el día del lanzamiento; lo lanza el workflow «Borrar todos los datos (lanzamiento)», con simulacro previo. |
 | `domain-associations.mjs` | Genera los archivos que permiten abrir los enlaces del juego directamente en la app. |
 | `render-intro.mjs` | Graba el vídeo promocional de la intro. |
-| `carga.mjs` | Prueba de carga del online con bots (`npm run carga`): ráfagas de búsquedas, gente mirando el tablón y jugadores que desaparecen a mitad de partida, contra el emulador o un proyecto de pruebas. Mide cuánto se tarda en sentarse, los errores, las mesas de una persona, las lecturas del tablón y las salas paradas. |
+| `carga.mjs` | Prueba de carga del online con bots (`npm run carga`): ráfagas de búsquedas, gente mirando el tablón y jugadores que desaparecen a mitad de partida, contra el emulador o un proyecto de pruebas. Mide cuánto se tarda en sentarse, los errores, las mesas de una persona, las lecturas del tablón y las salas paradas. `tests/carga-online.mjs` (`npm run test:carga`) la usa con límites que hacen fallar la prueba. |
 
 ### `functions/` (tareas en la nube)
 

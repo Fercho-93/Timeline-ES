@@ -12,6 +12,7 @@
     "version:bump": "node scripts/bump-version.mjs",
     "test:reglas": "firebase emulators:exec --project demo-hilo --only firestore \"node scripts/run-tests.mjs --grupo reglas --serie\"",
     "test:todo": "npm test && npm run test:reglas",
+    "test:carga": "firebase emulators:exec --project demo-hilo --only firestore \"node scripts/run-tests.mjs --grupo carga --serie\"",
     "test:online-e2e": "firebase emulators:exec --project demo-continuum-e2e --only auth,firestore --config firebase-e2e.json \"node scripts/run-tests.mjs --grupo e2e --serie\"",
     "test:navegador": "node scripts/run-tests.mjs --grupo navegador --serie",
     "carga": "firebase emulators:exec --project demo-hilo --only firestore \"node scripts/carga.mjs\"",

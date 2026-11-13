@@ -50,20 +50,23 @@ const quickSource = strip('js/retos/quick-online.js');
 const tablesSource = strip('js/online/public-tables.js');
 
 // ── Una conexión por bot ──
+// Cada ejecución con sus propios nombres: otra anterior contra el mismo emulador ya gastó la cuota de crear sala de
+// `bot1`, `bot2`…
 let n = 0;
+const TANDA = Math.random().toString(36).slice(2, 7);
 async function bot() {
   const app = initializeApp(CONFIG || { projectId: 'demo-hilo', apiKey: 'demo' }, `bot-${++n}`);
   const db = getFirestore(app);
   let uid;
   if (CONFIG) uid = (await signInAnonymously(getAuth(app))).user.uid;
-  else { connectFirestoreEmulator(db, '127.0.0.1', 8080); uid = `bot${n}`; }
+  else { connectFirestoreEmulator(db, '127.0.0.1', 8080); uid = `bot${TANDA}${n}`; }
   return { app, db, uid };
 }
 // Sin servidor de autenticación (emulador solo de Firestore), cada bot se presenta con su uid en el token.
 async function botEmulador() {
   const { initializeTestEnvironment } = await import('@firebase/rules-unit-testing');
   const env = globalThis.__env ??= await initializeTestEnvironment({ projectId: 'demo-hilo', firestore: { rules: fs.readFileSync(process.env.CARGA_REGLAS || path.join(REPO, 'firestore.rules'), 'utf8'), host: '127.0.0.1', port: 8080 } });
-  const uid = `bot${++n}`;
+  const uid = `bot${TANDA}${++n}`;
   return { db: env.authenticatedContext(uid).firestore(), uid };
 }
 const nuevoBot = () => CONFIG ? bot() : botEmulador();
@@ -117,10 +120,11 @@ async function rafaga() {
 
 async function tablon() {
   // Mesas abiertas: cada una la abre un bot con su sala, su cuota y su ficha en la misma operación, como el juego.
-  const ALFABETO = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  // Los códigos parten de un número al azar: otra ejecución contra el mismo emulador no choca con mesas ajenas.
+  const ALFABETO = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', BASE = Math.floor(Math.random() * 32 ** 6) * 1024;
   await Promise.all(Array.from({ length: MESAS }, async (_, i) => {
     const { db, uid } = await nuevoBot();
-    const code = 'T' + Array.from({ length: 9 }, (_, k) => ALFABETO[Math.floor(i / 32 ** k) % 32]).join('');
+    const code = 'T' + Array.from({ length: 9 }, (_, k) => ALFABETO[Math.floor((BASE + i) / 32 ** k) % 32]).join('');
     const b = writeBatch(db);
     b.set(doc(db, 'quickRooms', code), { ...R.create(uid, 'Bot', 4), catalog: 1, matchmaking: 'public', updatedAt: serverTimestamp() });
     b.set(doc(db, 'creationQuota', uid), { lastCreatedAt: serverTimestamp(), kind: 'quickRoom', target: code });

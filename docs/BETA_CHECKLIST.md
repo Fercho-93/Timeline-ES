@@ -137,6 +137,9 @@ contra el emulador o contra un proyecto de Firebase de pruebas (nunca el de prod
 - `CARGA="--escenario fantasmas --bots 12 --fantasmas 0.25" npm run carga`: un cuarto de los
   jugadores cierra la app a mitad de partida.
 
+La ráfaga y el tablón se comprueban solos en cada subida (`npm run test:carga`,
+`tests/carga-online.mjs`), con un límite de tiempo holgado porque el emulador no mide la red.
+
 Se da por bueno con: sentarse en menos de 5 s en el 95 % de las búsquedas, menos del 1 % de
 errores, ninguna sala parada y lecturas del tablón que no crezcan con el número de mesas. El
 emulador sirve para lo funcional y para los choques entre transacciones, pero no reproduce la red

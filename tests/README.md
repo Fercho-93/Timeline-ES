@@ -23,20 +23,23 @@ npm run test:todo
 # Pruebas con navegador de verdad (Playwright).
 npm run test:navegador
 
+# Muchos jugadores online a la vez: bots contra el emulador de Firestore (necesita Java).
+npm run test:carga
+
 # «Jugar online» de extremo a extremo, en Chromium contra los emuladores de Auth y Firestore.
 npm run test:online-e2e
 ```
 
 La lista de suites está en un solo sitio, [`suites.mjs`](suites.mjs), repartida en grupos
-(`juego`, `reglas`, `navegador`, `e2e` y `functions`); todas las órdenes de arriba y los
+(`juego`, `reglas`, `carga`, `navegador`, `e2e` y `functions`); todas las órdenes de arriba y los
 workflows la recorren con `scripts/run-tests.mjs`. Una suite nueva se añade a su grupo y a la
 tabla de abajo: `readme-pruebas.mjs` falla si falta en cualquiera de los dos.
 
 Dónde se ejecutan solas:
 
 - `.github/workflows/pruebas.yml`, en cada propuesta de cambio y cada subida a `main`, sobre un
-  clon limpio: `npm test`, `npm run test:reglas`, el build móvil con `npx cap sync` y la
-  compilación de Android y de iPhone sin firma.
+  clon limpio: `npm test`, `npm run test:reglas` y `npm run test:carga`, el build móvil con
+  `npx cap sync` y la compilación de Android y de iPhone sin firma.
 - `.github/workflows/reglas-firestore.yml`: `npm run test:reglas` antes de publicar las reglas.
 - `.github/workflows/zoom-visual.yml`: el grupo `navegador` (Chromium y WebKit) cuando cambian
   los archivos de interfaz, y `test:online-e2e`.
@@ -51,6 +54,7 @@ WebKit).
 ## Qué comprueba cada archivo
 
 Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (emulador);
+**`test:carga`** = `npm run test:carga` (emulador);
 **navegador** = Playwright, en `zoom-visual.yml` o con `npm run test:navegador`
 
 | Archivo | Dónde | Qué comprueba |
@@ -69,6 +73,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `build-movil.mjs` | test | `npm run build` deja un `dist/` completo y sincronizado con `capacitor.config.json`. |
 | `camera-permissions.mjs` | test | Las declaraciones de cámara de iOS y Android que necesita leer un QR. |
 | `card-text.mjs` | test | El texto de las cartas se ajusta sin partir palabras y recupera su tamaño. |
+| `carga-online.mjs` | `test:carga` | Muchos jugadores online a la vez con los bots de `scripts/carga.mjs`: 60 personas buscan partida a la vez y todas se sientan, sin errores, sin mesas de una persona ni por encima de su capacidad y a tiempo; con 60 o 150 mesas abiertas, el tablón no lee más de 50 por consulta. |
 | `cartera.mjs` | test | La cartera: un mazo cerrado a mano se respeta en todos los rincones del juego. |
 | `cifras.mjs` | test | Duelo de cifras: puntos por cercanía y rapidez, carga útil recalculada y reloj que no se para. |
 | `compartir-local.mjs` | test | La señal de la sala Wi-Fi viaja por «compartir» del sistema o por el portapapeles. |
@@ -165,6 +170,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `referencias-poblacion.mjs` | test | Referencias y láminas del mazo de población. |
 | `reglas-firestore.mjs` | reglas | Quién puede escribir en una sala y qué: entrar, empezar, colocar, saltar, expulsar y trampas. |
 | `reglas-superficie.mjs` | test | Lee `firestore.rules` sin emulador: nada público, ningún `write` abierto, ninguna escritura sin sesión y la lista exacta de borrados que un cliente puede hacer. |
+| `rendimiento-browser.mjs` | navegador | Con la CPU 4× más lenta (Chromium): el Inicio sale a tiempo, cada toque de una partida se ve en el fotograma siguiente sin pasar de su límite, apenas se pierden fotogramas, una mesa de 10 jugadores no cuesta mucho más que una de 2 y la memoria y los nodos no crecen al encadenar partidas. Guarda sus cifras en `test-results/rendimiento/`. |
 | `result-preview.mjs` | test | La pantalla de resultado: acierto, corrección del fallo, foco y movimiento reducido. |
 | `reto-diario.mjs` | test | La marca del reto diario compartida por colecciones y Retos rápidos: racha, día repetido, saltos de día, recorte a 60 días y cruce de medianoche. |
 | `retencion.mjs` | test | Los plazos de `functions/retention.js` coinciden con la política, y `PRIVACIDAD.md` y `privacidad.html` tienen las mismas secciones. |

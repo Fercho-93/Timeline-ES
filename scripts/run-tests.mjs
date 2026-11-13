@@ -4,7 +4,7 @@
 //   npm run test:rapido                 grupo `juego` en paralelo, con tantos procesos como núcleos (máximo 6),
 //                                       contando todos los fallos de una vez
 //   npm run test:rapido -- duelo cuentas   solo las suites cuya ruta contiene alguna de estas palabras
-//   node scripts/run-tests.mjs --grupo reglas --serie   otro grupo (reglas, navegador, e2e, functions)
+//   node scripts/run-tests.mjs --grupo reglas --serie   otro grupo (reglas, carga, navegador, e2e, functions)
 //   TEST_JOBS=2 npm run test:rapido     fija el número de procesos
 import { spawn } from 'node:child_process';
 import os from 'node:os';

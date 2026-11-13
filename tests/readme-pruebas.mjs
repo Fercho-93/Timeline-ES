@@ -21,8 +21,8 @@ assert.deepEqual(orphans, [], `Suites que no están en ningún grupo de tests/su
 const absent = listed.filter(file => !existsSync(new URL(`../${file}`, import.meta.url)));
 assert.deepEqual(absent, [], `tests/suites.mjs cita archivos que no existen: ${absent.join(', ')}`);
 
-// «Dónde» en el README: test → juego, reglas, navegador, `test:online-e2e` → e2e, (auxiliar).
-const GROUP = { test: 'juego', reglas: 'reglas', navegador: 'navegador', '`test:online-e2e`': 'e2e' };
+// «Dónde» en el README: test → juego, reglas, navegador, `test:carga` → carga, `test:online-e2e` → e2e, (auxiliar).
+const GROUP = { test: 'juego', reglas: 'reglas', navegador: 'navegador', '`test:carga`': 'carga', '`test:online-e2e`': 'e2e' };
 for (const { name, where } of rows) {
   const key = Object.keys(GROUP).find(k => where === k || where.startsWith(`${k} `));
   if (!key) { assert.ok(AUXILIARES.includes(name), `${name}: «${where}» no es un grupo conocido ni un auxiliar`); continue; }

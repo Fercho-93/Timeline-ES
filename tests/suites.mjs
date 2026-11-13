@@ -146,6 +146,11 @@ export const SUITES = {
     "tests/quick-formats-browser.mjs",
     "tests/tablet-browser.mjs",
     "tests/mano-carrusel-browser.mjs",
+    "tests/rendimiento-browser.mjs",
+  ],
+  // `npm run test:carga`: muchos jugadores online a la vez (bots) contra el emulador de Firestore.
+  carga: [
+    "tests/carga-online.mjs",
   ],
   // `npm run test:online-e2e`: «Jugar online» en Chromium contra los emuladores de Auth y Firestore.
   e2e: [
