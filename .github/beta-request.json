@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 893,
+  "cache": 896,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Reglas coherentes entre modalidades: la final de desempate no repite cartas vistas y usa botones de unidad, el duelo por turnos de colecciones sortea la carta de la final, pierde el turno al agotar el tiempo y reserva cartas al repartir, Guía y política de privacidad alineadas con el juego"
+  "reason": "Repaso visual: sin solapes en las colecciones de Jugar solo ni en el vídeo de la Guía, rótulos de 11 px como mínimo, zonas táctiles de 44 px en las flechas de la mano y el zoom, bordes de la mesa difuminados en pantallas anchas y más papel bajo el texto de las láminas en móviles estrechos"
 }
