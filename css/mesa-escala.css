@@ -13,6 +13,12 @@ html #app.atlas-board.mesa-escena {
      entre la mesa y las franjas laterales de los móviles más anchos o del ordenador. */
   background: none;
 }
+/* Con papel a los lados de la mesa (ordenador, móviles bajos), las cartas del abanico se
+   cortaban en seco en su borde: el contenido se funde con el papel en los 12 px de cada lado. */
+:root[data-mesa-holgura] #app.mesa-escena > .shell {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12px, #000 calc(100% - 12px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12px, #000 calc(100% - 12px), transparent);
+}
 /* Las capas (menú, reglas, avisos) cubren la mesa visible, aunque esté desplazada. */
 html #app.mesa-escena > .overlay:not(.board-result-layer) {
   position: absolute; inset: auto; left: 0; top: var(--mesa-desplazada, 0px); width: 100%; height: 874px;

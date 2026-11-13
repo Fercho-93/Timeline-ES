@@ -4,7 +4,7 @@
    La pantalla reserva tres franjas fijas: título arriba, mesa en medio y subtítulo abajo; cada
    escena cabe en la mesa de un móvil de 360 px (unos 336 × 270 px). */
 #app .guide-handbook > .guide-masthead { margin: 4px 0 14px; text-align: center; }
-#app .guide-handbook > .guide-masthead .eyebrow { justify-content: center; color: var(--edition-brass); font: 600 .625rem/1.5 var(--ui-font); letter-spacing: .2em; }
+#app .guide-handbook > .guide-masthead .eyebrow { justify-content: center; color: var(--edition-brass); font: 600 .6875rem/1.5 var(--ui-font); letter-spacing: .2em; }
 #app .guide-handbook > .guide-masthead h1 { margin: 6px auto 8px; color: var(--journal-ink); font: 400 clamp(2.2rem, 9vw, 3.2rem)/1.05 var(--font-display); letter-spacing: -.045em; }
 #app .guide-handbook > .guide-masthead p { max-width: 36ch; margin: 0 auto; color: var(--edition-muted); font: .82rem/1.6 var(--ui-font); text-wrap: balance; }
 
@@ -133,9 +133,9 @@
 :is(#app, #app-splash) .tv-big { width: 112px; padding: 6px 6px 9px; border-radius: 12px; opacity: 0; transform: translateY(22px) rotate(-4deg); }
 :is(#app, #app-splash) .tv-big :is(.tv-art, .tv-back) { max-height: 128px; border-radius: 7px; }
 :is(#app, #app-splash) .tv-big b { font-size: 1.1rem; }
-:is(#app, #app-splash) .tv-big small { font-size: .66rem; }
+:is(#app, #app-splash) .tv-big small { font-size: .6875rem; }
 :is(#app, #app-splash) .tv-big .tv-secret { margin-bottom: 4px; font-size: .95rem; }
-:is(#app, #app-splash) .tv-big .tv-secret i { font-size: .58rem; }
+:is(#app, #app-splash) .tv-big .tv-secret i { font-size: .6875rem; letter-spacing: .02em; }
 :is(#app, #app-splash) .tv-big.is-in, :is(#app, #app-splash) .is-in > .tv-big { opacity: 1; transform: none; }
 /* Las cartas pequeñas de las mesas con mucho que enseñar. */
 :is(#app, #app-splash) .tv-card.tv-sm { width: 50px; padding: 3px 3px 4px; border-radius: 6px; }
@@ -154,7 +154,7 @@
 :is(#app, #app-splash) .tv-pair { display: flex; justify-content: center; gap: 22px; }
 :is(#app, #app-splash) .tv-kind { display: grid; justify-items: center; gap: 8px; margin: 0; opacity: 0; transform: translateY(14px); transition: opacity .5s, transform .6s var(--tv-ease-out); }
 :is(#app, #app-splash) .tv-kind.is-in { opacity: 1; transform: none; }
-:is(#app, #app-splash) .tv-kind figcaption { max-width: 120px; color: var(--tv-soft); font: 600 .66rem/1.3 var(--ui-font); letter-spacing: .04em; text-align: center; }
+:is(#app, #app-splash) .tv-kind figcaption { max-width: 120px; color: var(--tv-soft); font: 600 .6875rem/1.3 var(--ui-font); letter-spacing: .04em; text-align: center; }
 
 /* La línea y sus huecos. */
 :is(#app, #app-splash) .tv-line { display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%; min-width: 0; }
@@ -491,7 +491,7 @@
 :is(#app, #app-splash) .tv-chapters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; width: 100%; }
 :is(#app, #app-splash) .tv-chapter { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-items: center; gap: 5px; min-width: 0; padding: 8px 6px 10px; border: 0; background: none; color: var(--edition-muted); text-align: center; cursor: pointer; }
 :is(#app, #app-splash) .tv-chapter b { display: grid; place-items: center; width: 20px; height: 20px; border: 1px solid currentColor; border-radius: 50%; font: 700 .58rem/1 var(--ui-font); transition: background .3s, color .3s; }
-:is(#app, #app-splash) .tv-chapter small { overflow: hidden; font: 600 .64rem/1.2 var(--ui-font); white-space: nowrap; text-overflow: ellipsis; }
+:is(#app, #app-splash) .tv-chapter small { overflow: hidden; font: 600 .6875rem/1.2 var(--ui-font); white-space: nowrap; text-overflow: ellipsis; }
 :is(#app, #app-splash) .tv-chapter::after { content: ""; position: absolute; left: 6px; right: 6px; bottom: 2px; height: 2px; border-radius: 2px; background: var(--edition-line); transition: background .3s; }
 :is(#app, #app-splash) .tv-chapter.is-current { color: var(--edition-ink); }
 :is(#app, #app-splash) .tv-chapter.is-current b { background: var(--edition-brass); border-color: var(--edition-brass); color: var(--edition-surface); }

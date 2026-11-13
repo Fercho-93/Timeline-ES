@@ -117,7 +117,7 @@ html #app[data-screen] .quick-free-setup .quick-mode-head::after {
   pointer-events: none;
 }
 html #app[data-screen] .quick-free-setup .quick-mode-head h3 { margin: 5px 0 0; text-wrap: balance; }
-html #app[data-screen] .quick-free-setup .quick-mode-head .quick-setup-kicker { font-size: .625rem; letter-spacing: .17em; }
+html #app[data-screen] .quick-free-setup .quick-mode-head .quick-setup-kicker { font-size: .6875rem; letter-spacing: .17em; }
 /* La lámina pertenece al estuche: llega al borde y se pierde hacia la lectura. */
 html #app[data-screen] .quick-free-setup .quick-day-panel { --quick-frame-inset: clamp(18px, 4vw, 28px); }
 html #app[data-screen] .quick-free-setup .quick-mode-head {

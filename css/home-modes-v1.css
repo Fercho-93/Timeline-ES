@@ -6,6 +6,9 @@
 #app .mode-daily-zone::before { content: "EL RETO DE HOY"; }
 #app .mode-entry-grid::before { content: "ELIGE TU CAMINO"; grid-column: 1 / -1; }
 #app .mode-daily-family { margin: -2px 4px 2px; color: #665442; font: .8rem/1.4 var(--ui-font); }
+/* El pie del reto diario iba suelto sobre el dibujo del fondo: una banda de papel lo separa de él. */
+#app .mode-daily-family { width: fit-content; max-width: calc(100% - 8px); box-sizing: border-box; padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, #fbf4e4 86%, transparent); }
+:root[data-theme="dark"] #app .mode-daily-family { background: color-mix(in srgb, #1e1610 82%, transparent); }
 /* «El reto de hoy», su pie y el recuento de temas de la mesa pública se leen sobre el mapa del
    fondo (en el ordenador, sobre el globo azul): tinta más oscura y un halo de papel en las propias
    letras, como el lema de la portada. */
@@ -153,6 +156,8 @@ html #app .public-create-segmented .segmented-option::after { content: none !imp
   #app .mode-entry-copy { width: 78%; padding: 13px 17px; gap: 4px; }
   #app .mode-entry-copy b { font-size: 1.48rem; }
   #app .mode-entry-copy small { font-size: .86rem; }
+  /* El texto ocupa el 78 % del ancho: sin más papel debajo, la descripción se leía sobre el dibujo. */
+  #app .mode-entry::after { background: linear-gradient(90deg, var(--mode-paper) 0 44%, #f8f0dfe0 62%, #f8f0df66 84%, transparent 100%); }
   #app .mode-hub-head { padding: 14px; gap: 10px; min-height: 142px; }
   #app .mode-hub-title h1 { font-size: 1.72rem; }
   #app .mode-topic-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -164,6 +169,9 @@ html #app .public-create-segmented .segmented-option::after { content: none !imp
 :root[data-theme="dark"] #app .mode-hub-head { --mode-paper: #332a20; background: var(--noche-relieve); border-color: #8c6f45; box-shadow: 0 12px 26px #0006; }
 :root[data-theme="dark"] #app .mode-entry-grid { border-left-color: #8c6f45; }
 :root[data-theme="dark"] #app .mode-entry::after { background: linear-gradient(90deg, #332a20 0 26%, #332a20e8 44%, #332a207a 70%, transparent 100%); }
+@media (max-width: 420px) {
+  :root[data-theme="dark"] #app .mode-entry::after { background: linear-gradient(90deg, #332a20 0 44%, #332a20e0 62%, #332a2066 84%, transparent 100%); }
+}
 :root[data-theme="dark"] #app .mode-entry-copy b,
 :root[data-theme="dark"] #app .mode-hub-title h1 { color: #f1e1bf; }
 :root[data-theme="dark"] #app .mode-entry-copy small { color: #e9dcc3; }

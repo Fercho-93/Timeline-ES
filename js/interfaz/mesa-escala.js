@@ -115,6 +115,9 @@
     raiz.setProperty('--mesa-escala', String(escala));
     raiz.setProperty('--mesa-x', `${x}px`);
     raiz.setProperty('--mesa-y', `${y}px`);
+    // Con papel a los lados (ordenador, móviles bajos), el borde de la mesa no es el de la
+    // pantalla: mesa-escala.css lo difumina para que las cartas no se corten en seco.
+    document.documentElement.toggleAttribute('data-mesa-holgura', x >= 4);
   }
   function plataforma(app, iphone) {
     const raiz = document.documentElement;
@@ -176,6 +179,7 @@
       app.classList.remove('mesa-escena');
       document.documentElement.classList.remove('mesa-escalada');
       ['--mesa-escala', '--mesa-x', '--mesa-y'].forEach(nombre => document.documentElement.style.removeProperty(nombre));
+      document.documentElement.removeAttribute('data-mesa-holgura');
       app.style.removeProperty('--mesa-desplazada');
       fondo?.remove();
       plataforma(app, false);
