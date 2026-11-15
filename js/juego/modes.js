@@ -1073,7 +1073,9 @@
       modes: '<rect x="18" y="14" width="50" height="82" rx="8"/><path d="M36 86h14"/><circle cx="128" cy="36" r="14"/><circle cx="168" cy="43" r="11"/><path d="M101 89v-9a27 27 0 0 1 54 0v9m2-27q24 0 24 27"/>',
       powers: '<path d="M38 82V44a26 26 0 0 1 52 0v38l-13-9-13 9-13-9-13 9m18-41v7m16-7v7M143 14l-26 44h23l-7 35 39-53h-26l8-26Z"/>',
       chapters: '<path d="M24 55h152"/><circle cx="30" cy="55" r="17"/><circle cx="100" cy="55" r="17"/><circle cx="170" cy="55" r="17"/><path d="m21 55 6 6 12-13M95 48l10 7-10 7m-83 23h36m34 0h36m34 0h36"/>',
-      atlas: '<path d="M100 26Q59 8 20 22v70q39-14 80 4 41-18 80-4V22q-39-14-80 4v70M36 38h44m-44 14h44m-44 14h30"/><rect x="118" y="38" width="44" height="34" rx="3"/><path d="m124 66 12-15 10 10 8-7"/>'
+      atlas: '<path d="M100 26Q59 8 20 22v70q39-14 80 4 41-18 80-4V22q-39-14-80 4v70M36 38h44m-44 14h44m-44 14h30"/><rect x="118" y="38" width="44" height="34" rx="3"/><path d="m124 66 12-15 10 10 8-7"/>',
+      daily: '<rect x="58" y="18" width="84" height="80" rx="6"/><path d="M58 38h84M80 12v12m40-12v12"/><circle cx="100" cy="68" r="10"/><path d="M100 49v6m0 26v6M81 68h6m26 0h6M87 55l4 4m22-4-4 4M87 81l4-4m22 4-4-4"/>',
+      words: '<rect x="28" y="14" width="96" height="82" rx="6"/><path d="M42 34h30M42 46h66M42 58h54M42 74h30M42 86h48"/><circle cx="146" cy="58" r="20"/><path d="m160 72 20 20"/>'
     };
     return '<svg class="guide-drawing" viewBox="0 0 200 110" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+paths[kind]+'</svg>';
   }
@@ -1184,12 +1186,12 @@
       '<div class="atlas-section-heading guide-manual"><h2>La Guía, por temas</h2><p class="guide-index-hint">'+(here ? here+' · ' : '')+'Abre el tema que quieras consultar.</p></div>'+
       guideChapter('01','Aciertos, fallos y cómo se gana','Qué pasa al confirmar y quién gana','result',result)+
       guideChapter('02','Elige cómo jugar','Solo, con amigos u online','modes',formats)+
-      guideChapter('03','Reto diario','Un intento al día · Desde Inicio','chapters',daily)+
+      guideChapter('03','Reto diario','Un intento al día · Desde Inicio','daily',daily)+
       guideChapter('04','Poderes: Fantasma y Pulso','Solo en partidas en grupo','powers',powers)+
       guideChapter('05','Competición','Varios temas seguidos','chapters',chapters)+
       guideChapter('06','Muévete por el tablero','Gestos, zoom, menú y salida','line',controls)+
       guideChapter('07','Tu Atlas y tu progreso','Láminas, logros, ranking, ajustes y cuenta','atlas',progress)+
-      guideChapter('08','Palabras del juego','Qué significa cada término','line',words)+'</div>';
+      guideChapter('08','Palabras del juego','Qué significa cada término','words',words)+'</div>';
   }
 
   function escapeHtml(value) {
