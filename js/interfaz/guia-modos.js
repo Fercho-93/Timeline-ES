@@ -158,17 +158,17 @@
   //   choose  [[principal, nota] de Grandes colecciones, ídem de Retos rápidos]; chooseAt, su momento
   //   end     null | {label, caption, html, at}
   // Los momentos van en orden, una fila detrás de otra: la primera, al aterrizar la carta de la tira.
-  const HOW = 'Cómo se juega: te sale una carta con su título, pero con el dato oculto. Colócala en el hueco de la línea donde creas que va, de más antiguo a más reciente, o de menor a mayor según el mazo. Al confirmar se revelan el dato y su dibujo y, si encaja, la carta se queda en la línea. Por ejemplo, el primer vuelo de los hermanos Wright, de 1903, va entre la primera locomotora, de 1804, y la primera llamada desde un móvil, de 1973.';
+  const HOW = 'Cómo se juega: te sale una carta con su título, pero con el dato oculto. Colócala en el hueco de la línea donde creas que va: en Grandes colecciones, de más antiguo a más reciente o de menor a mayor, según el mazo; en Retos rápidos, con la regla de cada mazo (por ejemplo, de oeste a este). Al confirmar se revelan el dato y su dibujo y, si encaja, la carta se queda en la línea. Por ejemplo, el primer vuelo de los hermanos Wright, de 1903, va entre la primera locomotora, de 1804, y la primera llamada desde un móvil, de 1973.';
   const HOW_GROUP = `${HOW} En grupo jugáis uno tras otro sobre la misma línea: cuando A coloca su carta, le toca a B.`;
   const groupRows = where => [
     ['Tienes', 2.6,
       ['groupHands', 'Cada uno, su mano', `Grandes colecciones ${where}: cada persona tiene su propia mano${where === 'en grupo' ? ', de 1 a 6 cartas,' : ''} y solo ella la ve. En tu turno colocas una de tus cartas en la línea común; si aciertas, tienes una menos.`],
       ['groupCommon', 'Cartas comunes', `Retos rápidos ${where}: nadie tiene mano. Las cartas del reto están a la vista y son las mismas para todos; en tu turno eliges una y la colocas en la línea.`]],
     ['Si fallas', 3.2,
-      ['groupDiscard', 'Descartas y robas', `Grandes colecciones ${where}, si fallas: la carta no entra en la línea, va al descarte y robas otra del mazo, así que tu mano no baja. Si el mazo se acaba, se baraja el descarte.`],
+      ['groupDiscard', 'Descartas y robas', `Grandes colecciones ${where}, si fallas: la carta no entra en la línea, va al descarte y robas otra del mazo, así que tu mano no baja. Si el mazo se acaba, se baraja el descarte; si tampoco queda descarte, te quedas con la carta que tenías.`],
       ['groupBank', 'Plántate o lo pierdes', where === 'en grupo'
-        ? 'Retos rápidos en grupo, con «Arriesgar o plantarse»: cada acierto es provisional. En tu turno puedes plantarte: aseguras tus aciertos y ya no juegas el resto de ese mazo. Si fallas, pierdes los provisionales y quedas fuera hasta el siguiente mazo; la carta fallada pasa a su sitio en la línea. Quien prepara la partida puede elegir «Seguir hasta el final»: un fallo no suma, pero sigues jugando.'
-        : 'Retos rápidos en una mesa: la partida rápida se juega siempre a arriesgar o plantarse. Cada acierto es provisional. En tu turno puedes plantarte: aseguras tus aciertos y ya no juegas el resto de ese mazo. Si fallas, pierdes los provisionales y quedas fuera hasta el siguiente mazo. Quien crea una mesa puede elegir «Seguir hasta el final».']],
+        ? 'Retos rápidos en grupo, con «Arriesgar o plantarse»: cada acierto es provisional. En tu turno, antes de jugar, puedes plantarte: aseguras tus aciertos y ya no juegas el resto de ese mazo. Si fallas, pierdes los provisionales y quedas fuera hasta el siguiente mazo; la carta fallada pasa a su sitio en la línea. Quien prepara la partida puede elegir «Seguir hasta el final»: un fallo no suma, pero sigues jugando.'
+        : 'Retos rápidos en una mesa: la partida rápida se juega siempre a arriesgar o plantarse. Cada acierto es provisional. En tu turno, antes de jugar, puedes plantarte: aseguras tus aciertos y ya no juegas el resto de ese mazo. Si fallas, pierdes los provisionales y quedas fuera hasta el siguiente mazo; la carta fallada pasa a su sitio en la línea. Quien crea una mesa puede elegir «Seguir hasta el final».']],
     ['Gana', 4.3,
       ['groupEmpty', 'Vacía tu mano', `Grandes colecciones ${where}: gana quien se queda sin cartas. La vuelta se termina siempre, para que todos jueguen los mismos turnos; si acaban varios sin cartas, se juega una final de desempate.`],
       ['groupMost', 'Más aciertos', `Retos rápidos ${where}: al acabar todos los mazos gana quien más aciertos ha asegurado. Al terminar un mazo, lo que sigue en juego se asegura solo. Un empate se comparte.`]]
@@ -195,14 +195,14 @@
       screen: 'hub-friends', name: 'Jugar con amigos', title: 'Un móvil o varios', art: 'mode-walk-multi.webp',
       how: [true, 'Uno tras otro', HOW_GROUP],
       rows: groupRows('en grupo'), chooseAt: 4.9,
-      choose: [['2 a 10 jugadores', 'mano de 1 a 6, poderes y tiempo'], ['2 a 4 jugadores', 'qué pasa al fallar y cuántos mazos']],
+      choose: [['2 a 10 jugadores', 'mano de 1 a 6, poderes y tiempo'], ['2 a 4 jugadores', 'cuántos mazos, qué pasa al fallar y tiempo']],
       end: { label: 'Dónde jugáis', html: WHERE, rule: 'Dónde jugáis: en un solo móvil, que os vais pasando sin mirar las cartas de los demás, o cada uno en su móvil. Cada uno en su móvil puede ser en directo, en una sala con todos conectados por internet o en la misma Wi-Fi, o por turnos: un duelo en el que cada uno juega cuando puede. Si te invitan, entra con «Unirme a una partida».', at: 5.3 }
     },
     online: {
       screen: 'hub-online', name: 'Jugar online', title: 'Mesas con desconocidos', art: 'menu-online.webp',
       how: [true, 'Uno tras otro', HOW_GROUP],
       rows: groupRows('en una mesa'), chooseAt: 4.9,
-      choose: [['Tu mazo o 3 temas', 'crear mesa: mazo y mano; partida rápida: hasta 3 temas'], ['Mazos sorpresa', 'crear mesa: 1,\u00a03\u00a0o\u00a05; partida rápida: 3']],
+      choose: [['Tu mazo o tus temas', 'crear mesa: mazo y mano; partida rápida: hasta 3 temas o ninguno'], ['Mazos sorpresa', 'crear mesa: 1,\u00a03\u00a0o\u00a05; partida rápida: 3']],
       end: { label: 'Cómo empieza', caption: 'Llena, o 30 s sin nadie nuevo', html: START, at: 5.3 }
     }
   };
