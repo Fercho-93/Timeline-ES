@@ -82,7 +82,7 @@ cuando hacen falta.
 | Archivo | Qué es |
 | --- | --- |
 | `app.js` | El corazón del juego en un solo móvil: dibuja cada pantalla y responde a cada toque. Empieza con un índice de sus secciones. |
-| `modes.js` | La lista de modalidades (mazos y formas de jugar), sus ejes y unidades, y ayudantes comunes como `CT.escapeHtml`. La leen tanto el juego local como el online. |
+| `modes.js` | La lista de modalidades (mazos y formas de jugar), sus ejes y unidades, las colecciones publicadas (`PUBLISHED_BLOCKS`: hoy Historia, Naturaleza y Geografía; las demás están ocultas para una segunda fase) y ayudantes comunes como `CT.escapeHtml`. La leen tanto el juego local como el online. |
 | `engine.js` | Reglas puras de una partida: robar cartas, comprobar si un hueco es correcto. |
 | `final.js` | Cómo se decide el ganador cuando hay empate o final numérica, y quién empieza (`CT.Starter`). |
 | `ghost.js` | El modo «Fantasma» (cartas con poderes) y los niveles de dificultad. |

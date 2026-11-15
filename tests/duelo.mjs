@@ -21,7 +21,7 @@ function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.
 function boot({ url = "https://hilo.test/", almacen = {} } = {}) {
   const reloj = { ahora: Date.now() };
   let oculto = false;
-  const window = arrancarJuego({ url, almacen, antes:
+  const window = arrancarJuego({ todas: true, url, almacen, antes:
     w => {
       w.Element.prototype.scrollIntoView = function () {};
       w.Date.now = () => reloj.ahora;

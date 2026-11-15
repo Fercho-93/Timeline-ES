@@ -134,7 +134,13 @@ diseño (y el prototipo retirado que sigue en el historial de git) está en
 ## 8. Lanzamiento
 
 Por el momento se lanza **solo en iPhone** (App Store, sin versión de iPad: `TARGETED_DEVICE_FAMILY = 1`).
-Google Play y la versión de iPad quedan para después.
+Google Play y la versión de iPad quedan para después. De Grandes colecciones salen solo Historia,
+Naturaleza y Geografía; Entretenimiento, Ciencia y Gran mezcla temporal están ocultas
+(`PUBLISHED_BLOCKS` en `js/juego/modes.js`).
+
+- [ ] Segunda fase: publicar Entretenimiento, Ciencia y Gran mezcla temporal según la acogida.
+      Al hacerlo, revisar la ficha, las capturas, la descripción de `index.html` y
+      `manifest.webmanifest`, y la ilustración de Grandes colecciones (`assets/menu-collections.webp`).
 
 
 - [ ] Comprobar la disponibilidad de Continuum en OEPM/EUIPO y tiendas.

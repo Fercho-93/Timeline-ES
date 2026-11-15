@@ -21,7 +21,7 @@ function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.
 
 
 function boot() {
-  return arrancarJuego();
+  return arrancarJuego({ todas: true });
 }
 const click = (w, sel) => {
   const el = w.document.querySelector(sel);

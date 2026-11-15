@@ -19,7 +19,7 @@ function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.
 
 
 function boot(almacen = {}) {
-  return arrancarJuego({ almacen, antes: w => { if (DESFASE) w.Date = relojDesfasado(w.Date); } });
+  return arrancarJuego({ todas: true, almacen, antes: w => { if (DESFASE) w.Date = relojDesfasado(w.Date); } });
 }
 const click = (w, sel) => {
   const el = w.document.querySelector(sel);

@@ -3956,7 +3956,7 @@
   // calcula al empezar cada competición y no una vez al cargar: entre una y otra puede
   // haber cambiado lo que tiene abierto.
   const compModes = () => Object.keys(CT.MODES).filter(key => key !== "mixed" && CT.Cartera.tiene(key));
-  const COMP_MODES = Object.keys(CT.MODES).filter(key => key !== "mixed");
+  const COMP_MODES = CT.Cartera.publicados().filter(key => key !== "mixed");
   const TOTAL_TEMAS = COMP_MODES.length;
   let comp = null;
   let previousModeKey = null;

@@ -12,7 +12,7 @@ function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.
 
 
 // La lista de scripts sale de index.html, para no repetirla en cada prueba.
-const boot = () => arrancarJuego();
+const boot = () => arrancarJuego({ todas: true });
 const fire = (w, el) => el.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
 let problems = 0, games = 0, sharedWins = 0, returns = 0;
 

@@ -13,6 +13,7 @@ const tick = () => new Promise(resolve => setTimeout(resolve, 0));
 const w = new JSDOM(html.replace(/<script (type="module" )?src="[^"]*"><\/script>/g, ''), { runScripts: 'outside-only', url: 'https://continuum.test/' }).window;
 w.scrollTo = () => {}; w.Element.prototype.scrollIntoView = () => {};
 w.matchMedia = () => ({ matches: true, addEventListener() {}, removeEventListener() {} });
+w.CONTINUUM_PUBLICAR_TODO = true;
 for (const m of html.matchAll(/<script src="([^"]+)"><\/script>/g)) w.eval(read(m[1]));
 await tick();
 

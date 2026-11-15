@@ -17,7 +17,7 @@ function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.
 
 
 function boot() {
-  return arrancarJuego({ antes: w => { w.Element.prototype.scrollIntoView = () => {}; } });
+  return arrancarJuego({ todas: true, antes: w => { w.Element.prototype.scrollIntoView = () => {}; } });
 }
 const click = (w, sel) => { const el = w.document.querySelector(sel); if (!el) throw new Error(`no existe ${sel}`); el.dispatchEvent(new w.MouseEvent("click", { bubbles: true })); };
 

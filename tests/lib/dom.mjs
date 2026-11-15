@@ -11,9 +11,12 @@ export const guiones = ({ bienvenida = false } = {}) =>
 // Abre el juego y devuelve su ventana. Orden: crear la ventana, `antes(window)` (parches de jsdom, reloj…),
 // localStorage (`almacen`), sessionStorage (`sesion`) y, por último, ejecutar los scripts.
 // `transformar(archivo, texto)` deja cambiar el código de un script antes de ejecutarlo.
-export function arrancarJuego({ url = "https://hilo.test/", bienvenida = false, almacen = {}, sesion = {}, antes, transformar } = {}) {
+// `todas: true` publica también las colecciones guardadas para una segunda fase (ver
+// `PUBLISHED_BLOCKS` en js/juego/modes.js); sin él se prueba el catálogo que sale a la tienda.
+export function arrancarJuego({ url = "https://hilo.test/", bienvenida = false, almacen = {}, sesion = {}, antes, transformar, todas = false } = {}) {
   const html = gameHtml(read("index.html"), { bienvenida }).replace(/<script src="[^"]*"><\/script>/g, "");
   const { window } = new JSDOM(html, { runScripts: "outside-only", url });
+  if (todas) window.CONTINUUM_PUBLICAR_TODO = true;
   antes?.(window);
   Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));
   Object.entries(sesion).forEach(([clave, valor]) => window.sessionStorage.setItem(clave, valor));

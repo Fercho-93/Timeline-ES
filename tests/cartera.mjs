@@ -29,7 +29,7 @@ const conSimulacion = (archivo, codigo) => archivo === "js/jugador/cartera.js"
   : codigo;
 
 function boot({ url = "https://hilo.test/", almacen = {}, sesion = {}, simulacion = true } = {}) {
-  return arrancarJuego({ url, almacen, sesion, antes: w => { w.Element.prototype.scrollIntoView = function () {}; }, transformar: simulacion ? conSimulacion : undefined });
+  return arrancarJuego({ todas: true, url, almacen, sesion, antes: w => { w.Element.prototype.scrollIntoView = function () {}; }, transformar: simulacion ? conSimulacion : undefined });
 }
 const click = (w, sel) => {
   const el = w.document.querySelector(sel);

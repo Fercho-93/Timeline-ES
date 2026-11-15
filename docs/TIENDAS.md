@@ -15,6 +15,11 @@ enviarla.
 - Identificador: `com.continuum.game` (estable: cambiarlo equivale a publicar otra app).
 - Versión de la beta: `0.1.1` (`versionName` en `android/app/build.gradle` y
   `MARKETING_VERSION` en el proyecto de Xcode).
+- Colecciones del lanzamiento: de Grandes colecciones, **solo Historia, Naturaleza y Geografía**
+  (decisión del titular, 15 de noviembre de 2026). Entretenimiento, Ciencia y Gran mezcla temporal
+  siguen en el código, ocultas, para sacarlas en una segunda fase según la acogida: se publican
+  añadiéndolas a `PUBLISHED_BLOCKS` en `js/juego/modes.js` (y revisando entonces ficha, capturas y
+  textos). Los Retos rápidos salen todos.
 - Plataforma del lanzamiento: **solo iPhone**, por el momento (decisión del titular, 15 de noviembre de 2026).
   El proyecto de Xcode declara `TARGETED_DEVICE_FAMILY = 1`: no se publica como app de iPad (en un iPad
   se puede instalar igualmente, en el modo de compatibilidad de las apps de iPhone). Google Play queda
@@ -122,8 +127,7 @@ la ciencia y la naturaleza que hay detrás.
 > sala privada, por la misma Wi-Fi sin internet, o en duelos por turnos que se juegan cuando
 > cada uno puede. En Jugar online te sientas en una mesa pública de 2 a 4 personas.
 >
-> Incluye grandes colecciones de Historia, Entretenimiento, Ciencia, Naturaleza y Geografía,
-> Retos rápidos de temas cortos, un reto diario igual para todo el mundo y poderes opcionales
+> Incluye grandes colecciones de Historia, Naturaleza y Geografía, Retos rápidos de temas cortos, un reto diario igual para todo el mundo y poderes opcionales
 > como Pulso y Fantasma.
 >
 > Sin registro: al abrir el juego se crea un invitado con un alias. En iPhone puedes, si
@@ -132,8 +136,8 @@ la ciencia y la naturaleza que hay detrás.
 >
 > Sin anuncios, sin compras y sin seguimiento.
 
-**Palabras clave:** cartas, trivia, historia, ciencia, geografía, animales, cultura, juego,
-aprender, amigos, cronología, reto diario.
+**Palabras clave:** cartas, trivia, historia, geografía, naturaleza, animales, países, cultura,
+juego, aprender, amigos, cronología, reto diario.
 
 No anunciar: competición pública arbitrada, protección completa contra trampas, avisos en el
 móvil (aún no activos) ni cifras «totalmente verificadas».

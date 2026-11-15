@@ -19,7 +19,7 @@ const files = fs.readdirSync(path.join(root, 'assets'), { recursive: true }).map
 const exactPaths = new Set(files);
 const artFiles = files.filter(file => /^assets\/[^/]+-cards\/.*\.(webp|png|jpe?g)$/i.test(file));
 const used = new Set(), uniqueCards = new Map();
-const groups = Object.values(ct.BLOCKS).flatMap(block => Array.from(block.games));
+const groups = Object.values(ct.ALL_BLOCKS).flatMap(block => Array.from(block.games));
 assert.equal(new Set(groups).size, groups.length, 'Mazo repetido entre colecciones');
 assert.deepEqual([...groups].sort(), Object.keys(ct.MODES).sort(), 'Mazos fuera de las colecciones');
 const source = read('js/juego/modes.js');

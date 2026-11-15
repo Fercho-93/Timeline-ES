@@ -1,7 +1,7 @@
 {
   "name": "Continuum",
   "short_name": "Continuum",
-  "description": "Juego de ordenar: historia, entretenimiento, ciencia, geografía y naturaleza.",
+  "description": "Juego de ordenar: historia, naturaleza y geografía.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f6f1e8",

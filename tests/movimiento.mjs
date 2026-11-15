@@ -38,6 +38,7 @@ function boot({ reduce = false, animated = false } = {}) {
   w.matchMedia = () => ({ matches: reduce });
   w.Element.prototype.scrollIntoView = function () {};
   if (animated) w.Element.prototype.getAnimations = () => [];
+  w.CONTINUUM_PUBLICAR_TODO = true;
   scripts.forEach(script => w.eval(read(script)));
   return w;
 }

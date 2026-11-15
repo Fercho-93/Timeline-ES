@@ -493,13 +493,31 @@
   const DEFAULT_MODE = "history";
   const DEFAULT_BLOCK = "historia";
 
+  // Las colecciones publicadas. Para el lanzamiento solo salen Historia, Naturaleza y
+  // Geografía (decisión del titular, 15 de noviembre de 2026); Entretenimiento, Ciencia y
+  // Gran mezcla temporal se guardan para una segunda fase, según cómo se reciba el juego.
+  // Publicar una es añadir aquí su clave: sus mazos siguen en el juego, con sus cartas y
+  // su arte, y aparecen solos en la portada, el Atlas, la competición, el reto diario, las
+  // mesas y los duelos, que solo ofrecen lo publicado (`published`, `CT.BLOCKS`,
+  // `CT.Cartera.tiene`). Los Retos rápidos no dependen de esta lista.
+  // `CONTINUUM_PUBLICAR_TODO` solo lo ponen las pruebas, para seguir probando las colecciones
+  // guardadas y tenerlas listas el día que se publiquen.
+  const PUBLISHED_BLOCKS = window.CONTINUUM_PUBLICAR_TODO === true ? Object.keys(BLOCKS) : ["historia", "naturaleza", "geografia"];
+  const VISIBLE_BLOCKS = Object.fromEntries(Object.entries(BLOCKS).filter(([key]) => PUBLISHED_BLOCKS.includes(key)));
+  const PUBLISHED_MODES = Object.values(VISIBLE_BLOCKS).flatMap(item => item.games);
+
   function has(modeKey) { return Object.prototype.hasOwnProperty.call(MODES, modeKey); }
 
-  function hasBlock(blockKey) { return Object.prototype.hasOwnProperty.call(BLOCKS, blockKey); }
+  // ¿Está publicado este mazo? Uno sin publicar existe (sus cartas, su arte y las partidas
+  // guardadas se leen igual), pero ninguna pantalla lo ofrece.
+  function published(modeKey) { return PUBLISHED_MODES.includes(modeKey); }
 
-  function block(blockKey) { return hasBlock(blockKey) ? BLOCKS[blockKey] : BLOCKS[DEFAULT_BLOCK]; }
+  function hasBlock(blockKey) { return Object.prototype.hasOwnProperty.call(VISIBLE_BLOCKS, blockKey); }
 
-  // De un juego a su bloque, para saber qué carátula toca desde una partida guardada.
+  function block(blockKey) { return hasBlock(blockKey) ? VISIBLE_BLOCKS[blockKey] : VISIBLE_BLOCKS[DEFAULT_BLOCK]; }
+
+  // De un juego a su bloque, para saber qué carátula toca desde una partida guardada. Mira
+  // también las colecciones sin publicar: una partida guardada conserva su lámina.
   function blockOf(modeKey) {
     return Object.values(BLOCKS).find(item => item.games.includes(modeKey)) || BLOCKS[DEFAULT_BLOCK];
   }
@@ -1121,7 +1139,7 @@
     const daily = '<p>Encontrarás «Reto diario» en Inicio. Es independiente de las partidas que elijas en «Jugar solo».</p><div class="guide-cards">'+
       guideCard('☼','Reto diario','Un único intento al día','Cada día juegas las mismas 10 cartas que el resto de jugadores. Un día toca un mazo de Grandes colecciones, en Fácil, y al siguiente uno de Retos rápidos, siempre alternando. No hay vidas ni límite de tiempo: aunque falles, sigues hasta el final. Tu resultado (por ejemplo, 7 de 10) cuenta para el ranking diario y semanal. Las demás partidas no suman puntos en ese ranking.')+
       dailyToday+'</div>';
-    const formats = '<p>En Inicio, abre «Jugar» y elige si quieres jugar solo, con amigos u online. En <b>Grandes colecciones</b> encontrarás mazos de historia, cine, ciencia, naturaleza y geografía. Los <b>Retos rápidos</b> son mazos más cortos, cada uno con su propia regla de orden. La verás antes de empezar.</p>'+
+    const formats = '<p>En Inicio, abre «Jugar» y elige si quieres jugar solo, con amigos u online. En <b>Grandes colecciones</b> encontrarás mazos de historia, naturaleza y geografía. Los <b>Retos rápidos</b> son mazos más cortos, cada uno con su propia regla de orden. La verás antes de empezar.</p>'+
       '<p class="guide-first-game"><b>Primera partida:</b> prueba «Jugar solo» con un mazo de Grandes colecciones en Fácil. Cuando le cojas el truco, juega con alguien en «Un solo móvil».</p>'+
       '<h4>Jugar solo</h4><div class="guide-cards">'+
       guideCard('∞','Rondas de Grandes colecciones','10 cartas · 3 vidas','Elige un mazo y una dificultad. Cada ronda reparte 10 cartas, primero las que aún no has acertado nunca. Las tienes todas en la mano y eliges en qué orden colocarlas. Si la terminas con alguna vida, la ronda queda superada y cada vida que te quede es una estrella.')+
@@ -1265,8 +1283,9 @@
   }
 
   window.CONTINUUM = {
-    MODES, BLOCKS, DEFAULT_MODE, DEFAULT_BLOCK, MIXED_DUPLICATE_INVENTION_IDS, MIXED_DUPLICATE_WORLD_IDS,
-    has, mode, axis, cards,
+    MODES, BLOCKS: VISIBLE_BLOCKS, ALL_BLOCKS: BLOCKS, PUBLISHED_BLOCKS, PUBLISHED_MODES,
+    DEFAULT_MODE, DEFAULT_BLOCK, MIXED_DUPLICATE_INVENTION_IDS, MIXED_DUPLICATE_WORLD_IDS,
+    has, published, mode, axis, cards,
     pulseRules: PULSE_RULES,
     usesAnimalArt, cardArt, animalArt, cardBack, deckFingerprint, categoryFor, categoryBadge,
     hasBlock, block, blockOf, blockGames,

@@ -92,9 +92,14 @@
   // «todo el catálogo»; una lista, exactamente esos.
   let concesion = { origen: "beta", mazos: null };
 
+  // Los mazos de las colecciones publicadas (`CT.PUBLISHED_BLOCKS`, en modes.js). Los demás
+  // existen pero no se ofrecen en ninguna parte: ni abiertos, ni con candado, ni a la venta.
+  const publicados = () => Object.keys(CT.MODES).filter(publicado);
+  function publicado(modeKey) { return CT.has(modeKey) && (!CT.published || CT.published(modeKey)); }
+
   // El paquete de un mazo suelto.
   function paqueteDeMazo(modeKey) {
-    if (!CT.has(modeKey)) return null;
+    if (!publicado(modeKey)) return null;
     return {
       clave: MAZO + modeKey, tipo: "mazo", nombre: CT.mode(modeKey).name,
       mazos: [modeKey], precio: euros(PRECIO_MAZO)
@@ -115,7 +120,7 @@
   function paquetes() {
     const bloques = Object.values(CT.BLOCKS);
     return [
-      ...Object.keys(CT.MODES).map(paqueteDeMazo),
+      ...publicados().map(paqueteDeMazo),
       ...bloques.map(bloque => paqueteDeColeccion(bloque.key)).filter(Boolean),
       {
         clave: PAQUETE_TODO, tipo: "todo", nombre: "Todos los mazos",
@@ -146,7 +151,7 @@
   }
 
   function tiene(modeKey) {
-    if (!CT.has(modeKey)) return false;
+    if (!publicado(modeKey)) return false;
     if (LIBRES.includes(modeKey)) return true;
     return concesion.mazos === null || concesion.mazos.includes(modeKey);
   }
@@ -158,12 +163,12 @@
   }
 
   function cerrados(blockKey) {
-    const mazos = CT.hasBlock(blockKey) ? CT.block(blockKey).games : Object.keys(CT.MODES);
+    const mazos = CT.hasBlock(blockKey) ? CT.block(blockKey).games : publicados();
     return mazos.filter(modeKey => !tiene(modeKey));
   }
 
   function abiertos() {
-    return Object.keys(CT.MODES).filter(tiene);
+    return publicados().filter(tiene);
   }
 
   // Por qué no se puede jugar a un mazo, dicho de manera que se pueda enseñar. Devuelve
@@ -205,7 +210,7 @@
     if (!cerradosPorSimulacion.length) return concede({ origen: "beta", mazos: null });
     return concede({
       origen: "simulacion",
-      mazos: Object.keys(CT.MODES).filter(modeKey => !cerradosPorSimulacion.includes(modeKey))
+      mazos: publicados().filter(modeKey => !cerradosPorSimulacion.includes(modeKey))
     });
   }
 
@@ -227,15 +232,15 @@
   // mismo reto—, así que no mira la concesión sino los mazos gratis para siempre. Mientras
   // esa lista esté sin decidir, la beta los trata todos como gratis.
   function diarios() {
-    const libres = LIBRES.filter(CT.has);
-    return libres.length ? libres : Object.keys(CT.MODES);
+    const libres = LIBRES.filter(publicado);
+    return libres.length ? libres : publicados();
   }
 
   function origen() { return concesion.origen; }
   function todoAbierto() { return cerrados().length === 0; }
 
   CT.Cartera = {
-    PAQUETE_TODO, LIBRES, SIMULACION,
+    PAQUETE_TODO, LIBRES, SIMULACION, publicado, publicados,
     tiene, tieneBloque, cerrados, abiertos, motivo, opciones, paquete, paquetes,
     concede, arranque, compraSimulada, origen, todoAbierto, diarios
   };

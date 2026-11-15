@@ -75,6 +75,7 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `card-text.mjs` | test | El texto de las cartas se ajusta sin partir palabras y recupera su tamaño. |
 | `carga-online.mjs` | `test:carga` | Muchos jugadores online a la vez con los bots de `scripts/carga.mjs`: 60 personas buscan partida a la vez y todas se sientan, sin errores, sin mesas de una persona ni por encima de su capacidad y a tiempo; con 60 o 150 mesas abiertas, el tablón no lee más de 50 por consulta. |
 | `cartera.mjs` | test | La cartera: un mazo cerrado a mano se respeta en todos los rincones del juego. |
+| `colecciones-publicadas.mjs` | test | El catálogo de la tienda: de Grandes colecciones solo Historia, Naturaleza y Geografía; Entretenimiento, Ciencia y Gran mezcla no aparecen en ninguna pantalla, ni con candado ni a la venta, y vuelven al publicarlas. |
 | `cifras.mjs` | test | Duelo de cifras: puntos por cercanía y rapidez, carga útil recalculada y reloj que no se para. |
 | `compartir-local.mjs` | test | La señal de la sala Wi-Fi viaja por «compartir» del sistema o por el portapapeles. |
 | `compatibilidad-version-anterior.mjs` | reglas | Las reglas nuevas aceptan las salas y escrituras de la versión anterior de la app. |

@@ -132,7 +132,8 @@
     const familyArt = key => key === "quick" ? "menu-quick.webp" : "menu-collections.webp";
     const day = (label, key) => `<span class="tv-day">${art(familyArt(key))}<b>${label}</b><small>${familyName(key)}</small></span>`;
 
-    const blocks = Object.values(CT.BLOCKS || {}).slice(0, 3).map(block => block.name).join(", ");
+    const allBlocks = Object.values(CT.BLOCKS || {});
+    const blocks = allBlocks.slice(0, 3).map(block => block.name).join(", ") + (allBlocks.length > 3 ? "…" : "");
     const token = (title, value) => `<span><b>${esc(title)}</b>${esc(value)}</span>`;
     const tokens = list => `<span class="tv-tokens">${list.join('<i aria-hidden="true">→</i>')}</span>`;
     const todayDecks = ["cities-east-west", "sports-players", "foods-kcal", "buildings"].map(id => quickDecks().find(d => d.id === id)).filter(Boolean)
@@ -204,7 +205,7 @@
       // cifra) y Retos rápidos (mazos/quick-challenges-data.js, cada uno con su regla).
       { chapter: 0, title: "Dos tipos de mazo", duration: 9000,
         html: `<div class="tv-families">
-          <div class="tv-family" data-family="collections">${art("menu-collections.webp")}<div><b>Grandes colecciones</b><small>Por temas: ${esc(blocks)}…</small><span class="tv-rule">${esc(CT.mode(modeKey).name)}</span>
+          <div class="tv-family" data-family="collections">${art("menu-collections.webp")}<div><b>Grandes colecciones</b><small>Por temas: ${esc(blocks)}</small><span class="tv-rule">${esc(CT.mode(modeKey).name)}</span>
             ${tokens([s[0], s[6], s[10]].map(c => token(c.title, CT.shortValue(modeKey, c))))}</div></div>
           <div class="tv-family" data-family="quick">${art("menu-quick.webp")}<div><b>Retos rápidos</b><small>Mazos cortos, cada uno con su regla</small>${quick ? `<span class="tv-rule">${esc(quick.deck.title)}</span>
             ${tokens([Q[1], Q[4], Q[7]].map(c => token(c.title, c.label)))}` : ""}</div></div></div>`,

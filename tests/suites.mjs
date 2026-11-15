@@ -73,6 +73,7 @@ export const SUITES = {
     "tests/camera-permissions.mjs",
     "tests/cifras.mjs",
     "tests/cartera.mjs",
+    "tests/colecciones-publicadas.mjs",
     "tests/actualizar.mjs",
     "tests/diagnostico.mjs",
     "tests/build-movil.mjs",
