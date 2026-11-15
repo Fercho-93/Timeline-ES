@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 896,
+  "cache": 902,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Repaso visual: sin solapes en las colecciones de Jugar solo ni en el vídeo de la Guía, rótulos de 11 px como mínimo, zonas táctiles de 44 px en las flechas de la mano y el zoom, bordes de la mesa difuminados en pantallas anchas y más papel bajo el texto de las láminas en móviles estrechos"
+  "reason": "Primera versión de tienda: solo iPhone (sin iPad), de Grandes colecciones solo Historia, Naturaleza y Geografía, declaración de cifrado exento (ITSAppUsesNonExemptEncryption) y aviso legal y condiciones con descripción genérica"
 }
