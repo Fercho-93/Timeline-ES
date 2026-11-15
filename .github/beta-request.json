@@ -5,5 +5,5 @@
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Primera versión de tienda: solo iPhone (sin iPad), de Grandes colecciones solo Historia, Naturaleza y Geografía, declaración de cifrado exento (ITSAppUsesNonExemptEncryption) y aviso legal y condiciones con descripción genérica"
+  "reason": "Primera versión de tienda: solo iPhone (sin iPad), de Grandes colecciones solo Historia, Naturaleza y Geografía, declaración de cifrado exento (ITSAppUsesNonExemptEncryption) y aviso legal y condiciones con descripción genérica (reintento tras aceptar el contrato de Apple)"
 }
