@@ -133,6 +133,10 @@ diseño (y el prototipo retirado que sigue en el historial de git) está en
 
 ## 8. Lanzamiento
 
+Por el momento se lanza **solo en iPhone** (App Store, sin versión de iPad: `TARGETED_DEVICE_FAMILY = 1`).
+Google Play y la versión de iPad quedan para después.
+
+
 - [ ] Comprobar la disponibilidad de Continuum en OEPM/EUIPO y tiendas.
 - [ ] Decidir la licencia definitiva del proyecto.
 - [x] App Store Connect: declarado «no comerciante» el 21 de octubre de 2026 (juego gratuito, sin ingresos; ver

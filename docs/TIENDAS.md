@@ -15,6 +15,10 @@ enviarla.
 - Identificador: `com.continuum.game` (estable: cambiarlo equivale a publicar otra app).
 - Versión de la beta: `0.1.1` (`versionName` en `android/app/build.gradle` y
   `MARKETING_VERSION` en el proyecto de Xcode).
+- Plataforma del lanzamiento: **solo iPhone**, por el momento (decisión del titular, 15 de noviembre de 2026).
+  El proyecto de Xcode declara `TARGETED_DEVICE_FAMILY = 1`: no se publica como app de iPad (en un iPad
+  se puede instalar igualmente, en el modo de compatibilidad de las apps de iPhone). Google Play queda
+  para después (ver [ROADMAP.md](ROADMAP.md#8-lanzamiento)).
 - Categoría propuesta: Juegos / Trivia. Secundaria posible: Educación o Juegos de mesa.
 - Público: jóvenes y adultos, también para jugar en familia o con amigos (no dirigido a niños pequeños; ver «Clasificación por edades»).
 - Modelo: gratuita, **sin compras, sin publicidad y sin seguimiento**.
@@ -147,7 +151,7 @@ tienda, sin nombres ni salas reales y sin simular funciones que la versión no t
 6. Sala con amigos o mesa pública.
 7. Ajustes con el texto ampliado.
 
-La app se declara para iPhone y iPad (`TARGETED_DEVICE_FAMILY = "1,2"`): App Store Connect exige además capturas de iPad de 13" (y las de iPhone de 6,9"), y Google Play pide capturas de tableta si se publica para tabletas. En iPad, la partida en horizontal usa dos columnas (`css/tablet.css`) y en vertical la mesa a escala; hacer capturas de las dos orientaciones desde un iPad real o el simulador, no desde el navegador.
+Por el momento la app se declara solo para iPhone (`TARGETED_DEVICE_FAMILY = 1`): App Store Connect pide solo capturas de iPhone (las de 6,9"). Si más adelante se publica también para iPad (`"1,2"`), hará falta probarla en un iPad real y añadir capturas de iPad de 13" en las dos orientaciones (en horizontal la partida usa dos columnas, `css/tablet.css`; en vertical, la mesa a escala); Google Play pide capturas de tableta si se publica para tabletas.
 
 Las imágenes del navegador durante el desarrollo no valen como capturas aprobadas. El icono
 actual es el candidato, sujeto a la elección del titular.
@@ -170,6 +174,7 @@ actual es el candidato, sujeto a la elección del titular.
 - La cámara solo se usa para leer códigos QR. Al crear o unirse a una sala por Wi-Fi en iPhone, antes del aviso del sistema, el juego explica que abre la cámara unos segundos para que los móviles se encuentren (sin grabar ni enviar imágenes; entre iPhones no hace falta) y deja elegir «Permitir» o «Ahora no».
 - «Jugar online» necesita otros jugadores: con un solo dispositivo se ve «Buscando jugadores». Para revisar las mesas hacen falta dos dispositivos o el vídeo adjunto.
 - Los efectos de sonido respetan el interruptor de silencio del iPhone.
+- La app es solo para iPhone; en iPad funciona en el modo de compatibilidad de las apps de iPhone.
 - Al abrirse, el juego pregunta si se tienen 14 años o más. Para revisar todo, responder «Sí»: con
   menos de 14 y sin permiso de los padres, el juego funciona solo sin conexión.
 - Sin publicidad, sin compras, sin seguimiento ni analítica de terceros.
@@ -230,6 +235,11 @@ las respuestas.
 - *Ubicación, salud, finanzas, contactos, historial, compras, datos sensibles*: no se recogen.
 - *Uso de la app*: no hay analítica. La presencia en una sala se declara como contenido de juego.
 - App Attest (App Check) lo gestiona Apple y no entrega datos personales al juego.
+
+**Cumplimiento de exportación (cifrado):** el juego solo cifra con el sistema (HTTPS de Firebase y las
+conexiones de Apple), que está exento. `Info.plist` declara `ITSAppUsesNonExemptEncryption = false`, así que
+App Store Connect no pregunta por el cifrado en cada compilación. Si algún día se añade cifrado propio,
+cambiarlo y revisar la documentación de exportación.
 
 **Rastreo:** sin SDK publicitario ni identificador de publicidad: no hace falta el aviso de
 App Tracking Transparency.
