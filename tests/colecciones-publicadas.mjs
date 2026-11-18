@@ -69,6 +69,20 @@ console.log("\nEnlaces de duelo de un mazo oculto");
   ok("ni ofrece comprar el mazo", !rival.document.querySelector('[data-action="mazo-desbloquear"]'));
 }
 
+console.log("\nLo que llega de otro móvil (de antes del lanzamiento)");
+{
+  const w = boot();
+  const CT = w.CONTINUUM;
+  let rechazo = "";
+  await CT.Quick.openCollectionDuel(() => {}, { deck: "movies", name: "Ana", length: 1, keep: true }).catch(e => { rechazo = e.message; });
+  ok("no se crea un duelo de colección con un mazo oculto", /no está disponible/.test(rechazo));
+  CT.UI.chooseRematchDeck({ current: "movies" });
+  const dialogo = w.document.querySelector("[data-rematch-deck]");
+  ok("la revancha de una partida de un mazo oculto no ofrece «Mismo mazo» con él", !!dialogo && !NOMBRES_OCULTOS.test(dialogo.textContent) && !!dialogo.querySelector('[data-rematch-pick="history"]'));
+  dialogo.querySelector("[data-rematch-other]").click();
+  ok("ni lo ofrece entre los demás mazos", !NOMBRES_OCULTOS.test(dialogo.textContent));
+}
+
 console.log("\nCon todo publicado (segunda fase), las colecciones guardadas vuelven");
 {
   const w = irAJugar(boot({ todas: true }));

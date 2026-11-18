@@ -172,6 +172,7 @@
       ROOM_FULL: "La sala ya tiene el máximo de jugadores",
       ALREADY_STARTED: "La partida ya ha comenzado",
       DECK_MISMATCH: "Alguien lleva una versión distinta del juego. Actualizad todos los móviles y cread una sala nueva.",
+      DECK_HIDDEN: "Esa sala juega un mazo que aún no está disponible. Actualizad la aplicación y cread otra sala.",
       NOT_TURN: "Todavía no es tu turno",
       NOT_ALLOWED: "Esa acción no se puede hacer ahora",
       HOST: "El anfitrión no puede salir: cierra la sala",
@@ -240,7 +241,7 @@
     const previous = roomState;
     roomState = room;
     // En una competición el mazo cambia de una ronda a otra: se juega siempre el de la sala.
-    if (room?.mode && room.mode !== modeKey && CT.has(room.mode)) modeKey = room.mode;
+    if (room?.mode && room.mode !== modeKey && CT.published(room.mode)) modeKey = room.mode;
     // El último tema de una competición la cierra entera (logro «Vuelta completa»).
     const t = room.tournament;
     if (room.status === "ended" && previous?.status !== "ended" && t && t.index + 1 >= t.queue.length) {
@@ -307,7 +308,7 @@
   function open(options = {}) {
     stopCamera();
     onBackToMenu = typeof options.onBack === "function" ? options.onBack : null;
-    modeKey = CT.has(options.modeKey) ? options.modeKey : CT.DEFAULT_MODE;
+    modeKey = CT.published(options.modeKey) ? options.modeKey : CT.DEFAULT_MODE;
     competition = options.competition || null;
     createOnly = !!options.createOnly;
     lobbySettings.handSize = String(CT.ManoInicial?.get?.() ?? 4);
@@ -405,6 +406,8 @@
     busy = true;
     try {
       const invite = decodeInvite(offerText);
+      // Una sala de una colección sin publicar solo puede venir de un móvil de antes del lanzamiento.
+      if (CT.has(invite.modeKey) && !CT.published(invite.modeKey)) throw new Error("DECK_HIDDEN");
       role = "guest";
       myName = name;
       // Quien vuelve a la misma sala recupera su plaza con su mismo identificador.
@@ -443,7 +446,7 @@
     if (nearbyPending) return nearbyPinMarkup(nearbyPending);
     if (!nearbyRooms.length) return `<div class="status status-waiting"><div class="spinner" aria-hidden="true"></div><span>Buscando salas cercanas… Que el anfitrión haya creado ya la sala, y que los dos tengáis Bluetooth y Wi-Fi activados (no hace falta estar conectados a ninguna red).</span></div>`;
     return `<div class="nearby-list">${nearbyRooms.map(room => {
-      const known = CT.has(room.mode), sameDeck = !room.fp || !known || room.fp === CT.deckFingerprint(room.mode);
+      const known = CT.published(room.mode), sameDeck = !room.fp || !known || room.fp === CT.deckFingerprint(room.mode);
       const usable = known && sameDeck;
       return `<button type="button" class="btn btn-secondary btn-block" data-local-action="nearby-join" data-id="${escapeHtml(room.id)}"${usable ? "" : " disabled"}><b>${escapeHtml(room.host || "Sala")}</b> · ${escapeHtml(known ? CT.mode(room.mode).name : "Mazo desconocido")}${usable ? "" : ` · ${known ? "otra versión del juego" : "actualiza la app"}`}</button>`;
     }).join("")}</div>`;
@@ -481,6 +484,7 @@
       myName = nearbyName;
       const seat = savedSeat();
       myPlayerId = seat && seat.roomCode === info.room ? seat.playerId : randomPlayerId();
+      if (CT.has(info.mode) && !CT.published(info.mode)) throw new Error("DECK_HIDDEN");
       modeKey = CT.has(info.mode) ? info.mode : modeKey;
       guestSession = CT.LocalSession.createGuestSession({
         nearbyHostId: id, pin, playerId: myPlayerId, name: myName, avatarId: CT.Avatares.ownId(), deckFingerprint: CT.deckFingerprint(modeKey),

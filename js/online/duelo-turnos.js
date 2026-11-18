@@ -51,6 +51,10 @@ const COMP = 'comp:', MAX_CARDS = 30, MAX_THEMES = 5;
 // `cards` son las de cada persona en cada tema: el tema reparte el doble y siempre queda par.
 const compTotal = (mode, cards) => { const themes = mode.slice(COMP.length).split(',').length; return themes * 2 * Math.max(1, Math.min(Number(cards) || 1, Math.floor(MAX_CARDS / (2 * themes)))); };
 const compModes = game => typeof game?.mode === 'string' && game.mode.startsWith(COMP) ? game.mode.slice(COMP.length).split(',').filter(key => CT.has(key)) : null;
+// Un duelo de una colección sin publicar (`PUBLISHED_BLOCKS` en modes.js) no se acepta ni se revancha: pudo crearlo un
+// móvil de antes del lanzamiento. Los que ya estaban empezados se pueden terminar.
+const HIDDEN_DECK = 'Ese mazo aún no está disponible.';
+const publishedGame = game => { const themes = compModes(game); return themes ? themes.length > 0 && themes.every(key => CT.published(key)) : CT.published(game?.mode); };
 const perTheme = game => { const themes = compModes(game); return themes?.length ? Math.max(1, Math.floor(game.total / themes.length)) : game.total; };
 const themeAt = (game, turn = game.turnIndex) => { const themes = compModes(game); return themes?.length ? Math.min(themes.length - 1, Math.floor(turn / perTheme(game))) : 0; };
 const modeAt = (game, turn = game.turnIndex) => compModes(game)?.[themeAt(game, turn)] ?? game.mode;
@@ -376,6 +380,7 @@ async function create(mode, kind, back, competition = null) {
   busy = true;
   try {
   onBack = back;
+  if (!competition && !CT.published(mode)) throw Error(HIDDEN_DECK);
   if (competition) {
     const themes = CT.Tournament.create(competition.rounds, competition.cards).queue.slice(0, MAX_THEMES);
     mode = COMP + themes.join(','); kind = 'orden';
@@ -406,6 +411,7 @@ async function join(gameId, back, accept = false) {
     const game = (await tx.get(ref)).data();
     if (!game) throw Error('no encontrado');
     if (game.playersOrder.includes(uid()) || ended(game) || inactive(game)) return;
+    if (!publishedGame(game)) throw Error(HIDDEN_DECK);
     if (game.invitedUid && !accept) return;
     if (game.status !== 'waiting' || game.playersOrder.length >= 2 || (game.invitedUid && game.invitedUid !== uid())) throw Error('invitación');
     const playersOrder = [...game.playersOrder, uid()];
@@ -646,6 +652,7 @@ async function challenge(sourceId, back = onBack) {
   try {
     const source = (await getDoc(doc(db, 'turnDuels', sourceId))).data();
     if (!source || source.playersOrder.length !== 2 || !source.playersOrder.includes(uid())) throw Error('rival');
+    if (!publishedGame(source)) throw Error(HIDDEN_DECK);
     const invitedUid = source.playersOrder.find(p => p !== uid());
     const games = await list();
     if (blockedPlayers.has(invitedUid)) throw Error('Has bloqueado los retos de este rival.');
@@ -688,7 +695,7 @@ async function next(back = onBack) {
   if (!target) return notify('No tienes más duelos pendientes de jugar.');
   open({ gameId: target.id, back });
 }
-function open({ mode = 'history', kind = 'orden', gameId = '', back, competition = null } = {}) { stop?.(); current = null; preparingTurn = null; enteredAt = 0; turnStarted = true; delivery = ''; pendingIndex = null; selectedId = null; onBack = back; shareLink = ''; retryPending(); if (gameId) openExisting(gameId, back).catch(() => notify('No se pudo abrir este duelo.')); else create(mode, kind, back, competition).catch(() => notify('No se pudo crear el duelo.')); }
+function open({ mode = 'history', kind = 'orden', gameId = '', back, competition = null } = {}) { stop?.(); current = null; preparingTurn = null; enteredAt = 0; turnStarted = true; delivery = ''; pendingIndex = null; selectedId = null; onBack = back; shareLink = ''; retryPending(); if (gameId) openExisting(gameId, back).catch(error => notify(error?.message === HIDDEN_DECK ? HIDDEN_DECK : 'No se pudo abrir este duelo.')); else create(mode, kind, back, competition).catch(error => notify(error?.message === HIDDEN_DECK ? HIDDEN_DECK : 'No se pudo crear el duelo.')); }
 function leave() { stop?.(); stop = null; turnClock?.stop(); turnClock = null; current = null; }
 function close() { leave(); onBack?.(); }
 document.addEventListener('click', e => { const target = e.target.closest('[data-turn-action]'), action = target?.dataset.turnAction; if (action === 'select-card') { CT.Effects?.tap(); selectedId = target.dataset.id; pendingIndex = null; render(); } if (action === 'select-slot') { CT.Effects?.tap(); pendingIndex = Number(target.dataset.index); render(); } if (action === 'confirm-place') { CT.Effects?.stamp(); place(pendingIndex); } if (action === 'cancel-place') { pendingIndex = null; render(); } if (action === 'submit-cifra') submitCifra(); if (action === 'share') share(); if (action === 'back') close(); });
@@ -708,5 +715,5 @@ document.addEventListener('click', event => {
   const action = actions[button?.dataset.turnAction];
   if (!action || button.disabled) return;
   button.disabled = true;
-  Promise.resolve().then(action).catch(() => notify('No se pudo completar la acción. Comprueba tu conexión.')).finally(() => { button.disabled = false; });
+  Promise.resolve().then(action).catch(error => notify(error?.message === HIDDEN_DECK ? HIDDEN_DECK : 'No se pudo completar la acción. Comprueba tu conexión.')).finally(() => { button.disabled = false; });
 });

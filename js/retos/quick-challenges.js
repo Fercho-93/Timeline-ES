@@ -459,6 +459,9 @@
     room=CT.QuickRoom.validate(withOutbox(next,id,code));myId=id;busy=false;page='network-lobby';
     if(readOutbox()&&!flushing&&navigator.onLine!==false)void flushOutbox();
     if(code)CT.Storage.setItem(NET,JSON.stringify({code,name:room.names[room.members.indexOf(id)],duel:duelRoom,len:roomLength,...(duelDeck?{deck:duelDeck}:{})}));
+    // Un duelo de una colección sin publicar (`PUBLISHED_BLOCKS` en modes.js) solo puede venir de un móvil de antes del
+    // lanzamiento: no se empieza. Uno que ya iba por la mitad se puede terminar.
+    if(room.config&&E.isColDuel(room.config)&&!room.commands.length&&!CT.published(deckOf(room.config))){stopNetwork();errorNotice(Error('Ese duelo es de un mazo que aún no está disponible.'));return;}
     if(room.config){
       const starting=wasLobby && !room.commands.length;
       record=CT.QuickRoom.record(room);state=E.restore(record);if(freshOwnPlace)CT.Effects?.feedback(state.result.correct);
@@ -587,7 +590,7 @@
   // si se sabe contra quién es, el reto le llega a su lista de duelos, como en las colecciones.
   async function createDuelRoom({renderPage,name,length,keep,iStart,invite,back,deck=null,players=2,hand=4}) {
     // Sin pintar el formulario de Retos rápidos por debajo: la pantalla desde la que se pide se queda hasta que sale la mesa.
-    paint=renderPage;entry='duel-setup';resetDuel();backTo=back||null;duelFirst=iStart?0:1;duelDeck=CT.has(deck)?deck:null;
+    paint=renderPage;entry='duel-setup';resetDuel();backTo=back||null;duelFirst=iStart?0:1;duelDeck=CT.published(deck)?deck:null;
     // El número de jugadores va por aquí y no por el desplegable (que solo llega a 4): en colecciones pueden ser hasta 10.
     duelPlayers=Math.min(Math.max(Number(players)||2,2),seatsMax());
     duelHand=Math.min(Math.max(Number(hand)||4,1),E.MAX_HAND);
@@ -866,7 +869,7 @@
     }
     if(action==='accept-answer'){await invite.accept(app().querySelector('#quick-answer').value.trim());lobby();return true;}
     if(action==='duels-list'){stopNetwork();state=null;record=null;backTo=null;window.dispatchEvent(new CustomEvent('continuum:duels-list'));return true;}
-    if(action==='reconnect') {const saved=readJSON(NET);if(!saved)throw Error('No hay ninguna sala guardada.');networkSetup('internet');app().querySelector('#quick-net-name').value=saved.name;app().querySelector('#quick-net-name-join').value=saved.name;app().querySelector('#quick-net-code').value=saved.code;duelRoom=!!saved.duel;if(Number.isInteger(saved.len))roomLength=saved.len;duelDeck=CT.has(saved.deck)?saved.deck:null;await connectRoom(false);return true;}
+    if(action==='reconnect') {const saved=readJSON(NET);if(!saved)throw Error('No hay ninguna sala guardada.');networkSetup('internet');app().querySelector('#quick-net-name').value=saved.name;app().querySelector('#quick-net-name-join').value=saved.name;app().querySelector('#quick-net-code').value=saved.code;duelRoom=!!saved.duel;if(Number.isInteger(saved.len))roomLength=saved.len;duelDeck=CT.published(saved.deck)?saved.deck:null;await connectRoom(false);return true;}
     return false;
   }
 
@@ -1514,7 +1517,7 @@
     openLocal(renderPage){paint=renderPage;backTo=null;entry='setup';format='local';setup();},
     openDuel(renderPage){paint=renderPage;entry='duel-setup';format='duel';backTo=null;duelSetup();},
     // Duelo por turnos de Grandes colecciones: el mazo elegido, con estas reglas (lo crea «Cada uno en su móvil · Por turnos»).
-    openCollectionDuel(renderPage,{deck,name,length,keep,back,players=2,hand=4}){if(!CT.has(deck))return Promise.reject(Error('Ese mazo no existe.'));return createDuelRoom({renderPage,name,length,keep,iStart:true,invite:null,back,deck,players,hand});},
+    openCollectionDuel(renderPage,{deck,name,length,keep,back,players=2,hand=4}){if(!CT.published(deck))return Promise.reject(Error(CT.has(deck)?'Ese mazo aún no está disponible.':'Ese mazo no existe.'));return createDuelRoom({renderPage,name,length,keep,iStart:true,invite:null,back,deck,players,hand});},
     duels, openRoom, challenge, resignDuel, cancelInvitation, declineInvite, previewInvite, reshare,
     Duel:{pack:packCommands,unpack:unpackCommands,payload:duelPayload,read:readDuel,fingerprint:duelFingerprint,rounds},
     openNetwork(renderPage,kind,capacity,only){paint=renderPage;backTo=null;entry='network';networkSetup(kind,capacity,only);},

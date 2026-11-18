@@ -497,7 +497,7 @@ async function ensureAuth() {
 export async function openOnlineMode(options = {}) {
   const request = ++entryRequest;
   returnToMenu = typeof options.onBack === "function" ? options.onBack : null;
-  selectedModeKey = CT.has(options.modeKey) ? options.modeKey : CT.DEFAULT_MODE;
+  selectedModeKey = CT.published(options.modeKey) ? options.modeKey : CT.DEFAULT_MODE;
   competitionOptions = options.competition || null;
   joinOnly = !!options.joinOnly;
   // Desde «Crear partida» ya se sabe que se crea: unirse está en su propia entrada.
@@ -607,6 +607,8 @@ async function joinRoom(code, name) {
       // carta señalaría cosas distintas en cada pantalla. Mejor avisar aquí que dejar
       // que la partida se reparta mal o se rompa a mitad de jugarla.
       if (data.deckFingerprint && data.deckFingerprint !== CT.deckFingerprint(data.mode)) throw new Error("DECK_MISMATCH");
+      // Una sala de una colección sin publicar solo puede venir de un móvil de antes del lanzamiento.
+      if (!CT.published(data.mode) && !data.playerOrder.includes(user.uid)) throw new Error("DECK_HIDDEN");
       if (data.playerOrder.includes(user.uid)) return;
       if (data.status !== "lobby") throw new Error("ALREADY_STARTED");
       if (data.playerOrder.length >= (data.capacity ?? 9)) throw new Error("ROOM_FULL");
@@ -621,7 +623,7 @@ async function joinRoom(code, name) {
     updateRoomAddress(code);
     connectToRoom(code);
   } catch (error) {
-    const messages = { ROOM_NOT_FOUND: "No existe ninguna sala con ese código", ALREADY_STARTED: "La partida ya ha comenzado", ROOM_FULL: "La sala ya tiene el máximo de jugadores", DECK_MISMATCH: "Tu móvil lleva una versión distinta del juego. Actualiza la aplicación para poder entrar." };
+    const messages = { ROOM_NOT_FOUND: "No existe ninguna sala con ese código", ALREADY_STARTED: "La partida ya ha comenzado", ROOM_FULL: "La sala ya tiene el máximo de jugadores", DECK_MISMATCH: "Tu móvil lleva una versión distinta del juego. Actualiza la aplicación para poder entrar.", DECK_HIDDEN: "Esa sala juega un mazo que aún no está disponible. Pide que actualicen la aplicación y creen otra sala." };
     console.error(error);
     showToast(messages[error.message] || roomErrorMessage(error, "No se pudo entrar en la sala. Vuelve a intentarlo; si persiste, comunica el error."));
   } finally { busy = false; }
@@ -1067,7 +1069,7 @@ async function rematchRoom(mode = null) {
         turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null, version: data.version + 1, updatedAt: serverTimestamp() };
       if ("pulseTurn" in data) next.pulseTurn = null;
       // Otro mazo para la revancha: la sala vuelve a la espera con ese mazo (y su huella, como al pasar de tema en una competición).
-      if (mode && mode !== data.mode && CT.has(mode)) { next.mode = mode; next.deckFingerprint = CT.deckFingerprint(mode); }
+      if (mode && mode !== data.mode && CT.published(mode)) { next.mode = mode; next.deckFingerprint = CT.deckFingerprint(mode); }
       next.finalRoundOffset = data.final?.round || data.finalRoundOffset || 0;
       for (const key of ["ghost", "pulsePower", "final", "tieQueue", "turnStartedAt"]) delete next[key];
       tx.set(roomRef, next);

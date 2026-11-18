@@ -72,7 +72,7 @@
   function chooseRematchDeck({ current } = {}) {
     return new Promise(resolve => {
       const app = document.getElementById('app'), esc = CT.escapeHtml;
-      const known = CT.has?.(current) ? current : CT.DEFAULT_MODE;
+      const known = CT.published?.(current) ? current : CT.DEFAULT_MODE;
       if (!app || app.querySelector('[data-rematch-deck]')) { resolve(null); return; }
       const layer = document.createElement('div'); layer.className = 'overlay'; layer.dataset.rematchDeck = '';
       let answered = false;
